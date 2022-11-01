@@ -4,14 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GridType.h"
 #include "GridCellData.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class TINYMETRO_API UGridCellData : public UObject
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FGridCellData
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Index;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector WorldLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	GridType GridType;
 };
