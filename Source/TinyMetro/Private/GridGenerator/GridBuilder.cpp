@@ -23,13 +23,13 @@ AGridBuilder::AGridBuilder() : GridCountX(0), GridCountY(0), GeneratorIndex(0)
 
 	// Load tile's mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> objGround(
-		TEXT("StaticMesh'/Game/GridGenerator/Meshes/SM_GirdCell_Ground.SM_GirdCell_Ground'"));
+		TEXT("StaticMesh'/Game/GridBuilder/Meshes/SM_GirdCell_Ground.SM_GirdCell_Ground'"));
 	meshGround = objGround.Object;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> objWater(
-		TEXT("StaticMesh'/Game/GridGenerator/Meshes/SM_GridCell_Water.SM_GridCell_Water'"));
+		TEXT("StaticMesh'/Game/GridBuilder/Meshes/SM_GridCell_Water.SM_GridCell_Water'"));
 	meshWater = objWater.Object;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> objHill(
-		TEXT("StaticMeshVersionPlusOne'/Game/GridGenerator/Meshes/SM_GirdCell_Hill.SM_GirdCell_Hill'"));
+		TEXT("StaticMeshVersionPlusOne'/Game/GridBuilder/Meshes/SM_GirdCell_Hill.SM_GirdCell_Hill'"));
 	meshHill = objHill.Object;
 
 	// Init GridManager
