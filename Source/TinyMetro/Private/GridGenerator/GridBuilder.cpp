@@ -59,6 +59,7 @@ AGridBuilder::AGridBuilder() : GridCountX(0), GridCountY(0), GeneratorIndex(0)
 			mesh->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 		}
 		GridManager->SetGridCellData(GridPoints);
+		GridManager->SetGridSize(GridSize);
 	}
 
 }
@@ -130,8 +131,8 @@ void AGridBuilder::LoadMapData() {
 			TEXT(","),
 			true);
 
-		GridCountX = FCString::Atoi(*mapSize[0]);
-		GridCountY = FCString::Atoi(*mapSize[1]);
+		GridSize.X = FCString::Atoi(*mapSize[0]);
+		GridSize.Y = FCString::Atoi(*mapSize[1]);
 
 		cellTypeVector = cellTypeVector.Replace(
 			LINE_TERMINATOR,
@@ -157,10 +158,10 @@ TArray<FGridCellData> AGridBuilder::CalculateGridData(float GridCellSize) {
 
 	// i = Y, j = X
 	// GridIndex = (X * i) + j
-	for (int i = 0; i < GridCountY; i++) {
-		for (int j = 0; j < GridCountX; j++) {
+	for (int i = 0; i < GridSize.Y; i++) {
+		for (int j = 0; j < GridSize.X; j++) {
 			FGridCellData tmp;
-			int indexOneDim = GridCountX * i + j;
+			int indexOneDim = GridSize.X * i + j;
 			FVector cellLocation = Math::Add_VectorVector(
 				StartLocation,
 				Math::Add_VectorVector(
@@ -182,6 +183,7 @@ TArray<FGridCellData> AGridBuilder::CalculateGridData(float GridCellSize) {
 			);
 			tmp.Index = indexOneDim;
 			tmp.WorldLocation = cellLocation;
+			tmp.GridStructure = GridStructure::Empty;
 			switch (LoadedGridType[indexOneDim]) {
 			case 0:
 				tmp.GridType = GridType::Ground;

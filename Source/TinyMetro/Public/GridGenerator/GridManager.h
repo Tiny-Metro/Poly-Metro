@@ -25,15 +25,23 @@ public:
 	//virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetGridCellSize() const;
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable)
 	void SetGridCellData(TArray<FGridCellData>& data);
+	UFUNCTION(BlueprintCallable)
+	void SetGridSize(FIntVector2& GridSize);
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<FGridCellData> GetGridCellData() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FGridCellData GetGridCellDataAtPoint(int X, int Y) const;
+	UFUNCTION(blueprintCallable, BlueprintPure)
+	bool IsValidStationSpawn(int Coord);
 
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	float GridCellSize = 400;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
+	FIntVector2 GridSize;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<FGridCellData> GridCellData;
 };

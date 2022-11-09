@@ -17,6 +17,8 @@ AStationManager::AStationManager()
 void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Regist station spawn loop
 	FTimerHandle WaitHandle;
 	float WaitTime = 0.2f;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -27,6 +29,7 @@ void AStationManager::BeginPlay()
 		true, 
 		1.0f);
 	
+	// Spawn default 3 stationsstat
 }
 
 void AStationManager::TestFunction() {
