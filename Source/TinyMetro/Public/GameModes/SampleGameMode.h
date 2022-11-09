@@ -14,6 +14,11 @@ class TINYMETRO_API ASampleGameMode : public ATinyMetroGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	virtual FString GetFileName() const override;
+
+	
 };
