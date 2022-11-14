@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Station.h"
+#include "../GridGenerator/GridManager.h"
+#include "../GameModes/TinyMetroGameModeBase.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -22,7 +25,9 @@ protected:
 	void TestFunction();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation();
+	void SpawnStation(FGridCellData& GridCellData);
+	UFUNCTION(BlueprintCallable)
+	void IncreaseSpawnParameter();
 
 public:	
 	// Called every frame
@@ -30,9 +35,17 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	float StationSpawnRequire = 10000.0f;
+	int32 StationSpawnRequire = 15000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	float StationSpawnPerSec = 1000.0f;
+	int32 StationSpawnPerSec = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	float StationSpawnCurrent = 0.0f;
+	int32 StationSpawnCurrent = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Station")
+	TArray<AStation*> Station;
+	UPROPERTY(BlueprintReadOnly, Category = "Station")
+	FTimerHandle TimerSpawnStation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	AGridManager* GridManager;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	ATinyMetroGameModeBase* GameMode;
 };

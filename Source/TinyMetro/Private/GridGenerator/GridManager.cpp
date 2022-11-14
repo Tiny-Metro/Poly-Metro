@@ -26,9 +26,8 @@ void AGridManager::SetGridCellData(TArray<FGridCellData>& data) {
 	GridCellData = data;
 }
 
-void AGridManager::SetGridSize(FIntVector2& GridSize) {
-	this->GridSize.X = GridSize.X;
-	this->GridSize.Y = GridSize.Y;
+void AGridManager::SetGridSize(FIntPoint& Size) {
+	GridSize = Size;
 }
 
 TArray<FGridCellData> AGridManager::GetGridCellData() const {
@@ -36,7 +35,7 @@ TArray<FGridCellData> AGridManager::GetGridCellData() const {
 	return GridCellData;
 }
 
-FGridCellData AGridManager::GetGridCellDataAtPoint(int X, int Y) const {
+FGridCellData AGridManager::GetGridCellDataByPoint(int X, int Y) const {
 	if (X > GridSize.X || Y > GridSize.Y) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("AGridManager::GetGridCellDataAtPoin : Invalid Grid Index")));
 
@@ -44,8 +43,24 @@ FGridCellData AGridManager::GetGridCellDataAtPoint(int X, int Y) const {
 	}
 	// GridIndex = (GridCountX * Y) + X
 
+	return GetGridCellDataByIndex((GridSize.X * Y) + X);
+}
 
-	return GridCellData[(GridSize.X * Y) + X];
+FGridCellData AGridManager::GetGridCellDataByIndex(int Index) const {
+	if (Index > GridCellData.Num()) {
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.0f,
+				FColor::Red,
+				FString::Printf(TEXT("GetGridCellDataByIndex : Out of range")));
+		return FGridCellData();
+	}
+	return GridCellData[Index];
+}
+
+FGridCellData AGridManager::GetGridCellDataRandom() const {
+	return FGridCellData();
 }
 
 bool AGridManager::IsValidStationSpawn(int Coord) {

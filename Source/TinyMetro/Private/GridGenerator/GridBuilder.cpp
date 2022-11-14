@@ -10,7 +10,7 @@
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
-AGridBuilder::AGridBuilder() : GridCountX(0), GridCountY(0), GeneratorIndex(0)
+AGridBuilder::AGridBuilder() : GeneratorIndex(0)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	defaultRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRoot"));
@@ -85,7 +85,7 @@ FVector AGridBuilder::CalcStartLocation(float gridCellSize) const {
 				Math::Multiply_VectorFloat(
 					GetActorRightVector(),
 					Math::Multiply_FloatFloat(
-						GridCountY - 1,
+						GridSize.Y - 1,
 						gridCellSize / 2
 					)
 				)
@@ -93,7 +93,7 @@ FVector AGridBuilder::CalcStartLocation(float gridCellSize) const {
 			Math::Multiply_VectorFloat(
 				GetActorForwardVector(),
 				Math::Multiply_FloatFloat(
-					GridCountX - 1,
+					GridSize.X - 1,
 					gridCellSize / 2
 				)
 			)

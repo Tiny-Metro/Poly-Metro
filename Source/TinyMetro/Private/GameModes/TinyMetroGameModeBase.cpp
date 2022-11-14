@@ -4,5 +4,5 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 
 FString ATinyMetroGameModeBase::GetFileName() const {
-    return TEXT("non.txt");
+    return TEXT("Base");
 }

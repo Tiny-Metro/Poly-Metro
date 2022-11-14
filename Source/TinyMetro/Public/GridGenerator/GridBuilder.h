@@ -42,7 +42,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	TArray<int32> LoadedGridType;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
-	FIntVector2 GridSize;
+	FIntPoint GridSize;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AGridManager* GridManager;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RuntimeAllocation")

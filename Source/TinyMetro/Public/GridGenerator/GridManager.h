@@ -28,11 +28,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetGridCellData(TArray<FGridCellData>& data);
 	UFUNCTION(BlueprintCallable)
-	void SetGridSize(FIntVector2& GridSize);
+	void SetGridSize(FIntPoint& Size);
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<FGridCellData> GetGridCellData() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FGridCellData GetGridCellDataAtPoint(int X, int Y) const;
+	FGridCellData GetGridCellDataByPoint(int X, int Y) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FGridCellData GetGridCellDataByIndex(int Index) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FGridCellData GetGridCellDataRandom() const;
 	UFUNCTION(blueprintCallable, BlueprintPure)
 	bool IsValidStationSpawn(int Coord);
 
@@ -41,7 +45,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	float GridCellSize = 400;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
-	FIntVector2 GridSize;
+	FIntPoint GridSize;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<FGridCellData> GridCellData;
 };
