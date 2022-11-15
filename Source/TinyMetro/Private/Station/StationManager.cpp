@@ -30,7 +30,7 @@ void AStationManager::BeginPlay()
 	InitData = GameMode->GetInitData();
 
 	for (auto& i : InitData) {
-		
+		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y));
 	}
 
 	if (GEngine)
@@ -52,7 +52,7 @@ void AStationManager::TestFunction() {
 
 
 
-void AStationManager::SpawnStation(FGridCellData& GridCellData) {
+void AStationManager::SpawnStation(FGridCellData GridCellData) {
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 
@@ -75,7 +75,7 @@ void AStationManager::SpawnStation(FGridCellData& GridCellData) {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GetActorLocation(), GetActorRotation(), SpawnParams));
+	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
 	
 	Station.Add(tmp);
 

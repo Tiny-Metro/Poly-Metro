@@ -25,7 +25,7 @@ protected:
 	void TestFunction();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation(FGridCellData& GridCellData);
+	void SpawnStation(FGridCellData GridCellData);
 	UFUNCTION(BlueprintCallable)
 	void IncreaseSpawnParameter();
 
