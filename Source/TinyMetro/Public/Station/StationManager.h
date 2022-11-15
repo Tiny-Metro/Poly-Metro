@@ -48,4 +48,7 @@ protected:
 	AGridManager* GridManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	ATinyMetroGameModeBase* GameMode;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	TMap<FIntPoint, StationType> InitData;
+
 };

@@ -19,6 +19,8 @@ struct TINYMETRO_API FGridCellData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Index;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FIntPoint WorldCoordination;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector WorldLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	GridType GridType;

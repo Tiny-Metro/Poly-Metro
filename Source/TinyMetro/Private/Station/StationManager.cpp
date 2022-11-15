@@ -27,12 +27,18 @@ void AStationManager::BeginPlay()
 	// Get GameMode, Get coord and station type
 	GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
 
+	InitData = GameMode->GetInitData();
+
+	for (auto& i : InitData) {
+		
+	}
+
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.0f,
 			FColor::Yellow,
-			GameMode->GetFileName());
+			FString::Printf(TEXT("Data : %d"), InitData.Num()));
 }
 
 void AStationManager::TestFunction() {
