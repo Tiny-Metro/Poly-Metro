@@ -25,7 +25,7 @@ protected:
 	void TestFunction();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation(FGridCellData GridCellData, StationType Type);
+	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false);
 	UFUNCTION(BlueprintCallable)
 	void IncreaseSpawnParameter();
 	UFUNCTION(BlueprintCallable)

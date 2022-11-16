@@ -22,6 +22,23 @@ void AStationManager::BeginPlay()
 	Super::BeginPlay();
 
 	IncreaseSpawnParameter();
+
+	// Test
+	FTimerHandle TestHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		TestHandle,
+		FTimerDelegate::CreateLambda([&]() {
+			if (GEngine)
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					15.0f,
+					FColor::Yellow,
+					FString::Printf(TEXT("Time : %f"), GetWorld()->GetTimeSeconds()));
+		}),
+		1.0f,
+		true,
+		1.0f
+	);
 	
 	// Spawn default 3 stationsstat
 	// Get GameMode, Get coord and station type
@@ -30,7 +47,7 @@ void AStationManager::BeginPlay()
 	InitData = GameMode->GetInitData();
 
 	for (auto& i : InitData) {
-		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
+		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value, true);
 	}
 
 	if (GEngine)
@@ -52,7 +69,7 @@ void AStationManager::TestFunction() {
 
 
 
-void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type) {
+void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 
@@ -77,9 +94,11 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type)
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
 	tmp->SetStationType(Type);
+	if (ActivateFlag) {
+		tmp->ActivateStation();
+	}
 
 	Station.Add(tmp);
-
 	GridManager->SetGridStructure(GridCellData.Index, GridStructure::Station);
 
 
@@ -124,7 +143,7 @@ void AStationManager::IncreaseSpawnParameter() {
 					-1,
 					15.0f,
 					FColor::Yellow,
-					FString::Printf(TEXT("%f"), StationSpawnCurrent));
+					FString::Printf(TEXT("%d"), StationSpawnCurrent));
 		}),
 		1.0f,
 		true,
