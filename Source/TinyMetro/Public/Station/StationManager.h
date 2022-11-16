@@ -25,9 +25,11 @@ protected:
 	void TestFunction();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation(FGridCellData GridCellData);
+	void SpawnStation(FGridCellData GridCellData, StationType Type);
 	UFUNCTION(BlueprintCallable)
 	void IncreaseSpawnParameter();
+	UFUNCTION(BlueprintCallable)
+	StationType GetRandomStationType();
 
 public:	
 	// Called every frame
@@ -50,5 +52,32 @@ protected:
 	ATinyMetroGameModeBase* GameMode;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	TArray<StationType> StationSpawnTable = {
+		StationType::Circle,
+		StationType::Circle,
+		StationType::Circle,
+		StationType::Circle,
+		StationType::Triangle,
+		StationType::Triangle,
+		StationType::Square,
+		// Below after 2 weeks
+		StationType::Circle,
+		StationType::Circle,
+		StationType::Circle,
+		StationType::Circle,
+		StationType::Triangle,
+		StationType::Triangle,
+		StationType::Square,
+		StationType::Cross,
+		StationType::Lozenge,
+		StationType::Almond,
+		StationType::Diamond,
+		StationType::Pentagon,
+		StationType::Star,
+		StationType::Fan
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	int32 StationSpawnRange = 7;
 
 };

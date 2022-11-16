@@ -37,6 +37,8 @@ public:
 	FGridCellData GetGridCellDataByIndex(int Index) const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FGridCellData GetGridCellDataRandom() const;
+	UFUNCTION(BlueprintCallable)
+	void SetGridStructure(int Index, GridStructure Structure);
 	UFUNCTION(blueprintCallable, BlueprintPure)
 	bool IsValidStationSpawn(int Coord);
 

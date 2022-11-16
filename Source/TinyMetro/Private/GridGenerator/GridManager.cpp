@@ -63,6 +63,10 @@ FGridCellData AGridManager::GetGridCellDataRandom() const {
 	return FGridCellData();
 }
 
+void AGridManager::SetGridStructure(int Index, GridStructure Structure) {
+	GridCellData[Index].GridStructure = Structure;
+}
+
 bool AGridManager::IsValidStationSpawn(int Coord) {
 	return false;
 }

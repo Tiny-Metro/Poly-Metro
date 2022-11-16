@@ -30,7 +30,7 @@ void AStationManager::BeginPlay()
 	InitData = GameMode->GetInitData();
 
 	for (auto& i : InitData) {
-		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y));
+		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
 	}
 
 	if (GEngine)
@@ -52,7 +52,7 @@ void AStationManager::TestFunction() {
 
 
 
-void AStationManager::SpawnStation(FGridCellData GridCellData) {
+void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type) {
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 
@@ -76,8 +76,12 @@ void AStationManager::SpawnStation(FGridCellData GridCellData) {
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
-	
+	tmp->SetStationType(Type);
+
 	Station.Add(tmp);
+
+	GridManager->SetGridStructure(GridCellData.Index, GridStructure::Station);
+
 
 	//Log
 	if (GEngine)
@@ -103,7 +107,7 @@ void AStationManager::IncreaseSpawnParameter() {
 		FTimerDelegate::CreateLambda([&]() {
 			StationSpawnCurrent += StationSpawnPerSec;
 			if (StationSpawnCurrent >= StationSpawnRequire) {
-				//SpawnStation();
+				SpawnStation(GridManager->GetGridCellDataRandom(), GetRandomStationType());
 
 				if (GEngine)
 					GEngine->AddOnScreenDebugMessage(
@@ -128,6 +132,10 @@ void AStationManager::IncreaseSpawnParameter() {
 	);
 
 	
+}
+
+StationType AStationManager::GetRandomStationType() {
+	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }
 
 // Called every frame
