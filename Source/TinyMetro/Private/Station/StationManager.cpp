@@ -23,6 +23,15 @@ void AStationManager::BeginPlay()
 
 	IncreaseSpawnParameter();
 
+	FIntPoint test(3,3);
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		15.0f,
+		FColor::Yellow,
+		FString::Printf(TEXT("TEST : %d"), test.Size()));
+
+	
+
 	// Test
 	FTimerHandle TestHandle;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -99,7 +108,10 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	}
 
 	Station.Add(tmp);
-	GridManager->SetGridStructure(GridCellData.Index, GridStructure::Station);
+	GridManager->SetGridStructure(
+		GridCellData.WorldCoordination.X,
+		GridCellData.WorldCoordination.Y, 
+		GridStructure::Station);
 
 
 	//Log
@@ -138,12 +150,12 @@ void AStationManager::IncreaseSpawnParameter() {
 			}
 
 			//Log
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					15.0f,
-					FColor::Yellow,
-					FString::Printf(TEXT("%d"), StationSpawnCurrent));
+			//if (GEngine)
+			//	GEngine->AddOnScreenDebugMessage(
+			//		-1,
+			//		15.0f,
+			//		FColor::Yellow,
+			//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
 		}),
 		1.0f,
 		true,
