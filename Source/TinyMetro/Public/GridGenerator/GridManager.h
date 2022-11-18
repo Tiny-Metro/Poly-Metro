@@ -36,11 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FGridCellData GetGridCellDataByIndex(int Index) const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FGridCellData GetGridCellDataRandom() const;
+	FGridCellData GetGridCellDataRandom();
 	UFUNCTION(BlueprintCallable)
 	void SetGridStructure(int X, int Y, GridStructure Structure);
-	UFUNCTION(blueprintCallable, BlueprintPure)
-	bool IsValidStationSpawn(int Coord);
 
 private:
 	TPair<FVector2D, double> FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2);
@@ -49,17 +47,23 @@ private:
 	FVector2D FindCenter(FVector2D A, FVector2D B);
 	FVector2D FindCenter(FVector2D A, FVector2D B, FVector2D C);
 	double GetDistance(FVector2D A, FVector2D B);
+	bool IsValidStationSpawn(int Coord);
+	bool IsValidStationSpawn(int X, int Y);
 
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	float GridCellSize = 400;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	int32 StationSpawnExtend = 3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	int32 StationSpawnPrevent = 2;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	FIntPoint GridSize;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<FGridCellData> GridCellData;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+
+protected:
 	TArray<TPair<FIntPoint, GridStructure>> GridStructures;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<FIntPoint> StationLocation;
 };

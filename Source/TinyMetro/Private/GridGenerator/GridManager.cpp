@@ -60,10 +60,30 @@ FGridCellData AGridManager::GetGridCellDataByIndex(int Index) const {
 	return GridCellData[Index];
 }
 
-FGridCellData AGridManager::GetGridCellDataRandom() const {
-	FIntPoint tmp;
+FGridCellData AGridManager::GetGridCellDataRandom() {
+	TPair<FVector2D, double> Temp = FindCircle();
+	FIntPoint Point(Temp.Key.X, Temp.Key.Y);
+	int32 Radius = Temp.Value;
+	FIntPoint RandomPoint;
+	bool Flag = true;
 
-	return FGridCellData();
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		15.0f,
+		FColor::Green,
+		FString::Printf(TEXT("FindCircle : %d %d %d"), Point.X, Point.Y, Radius)
+	);
+
+	do {
+		RandomPoint = FIntPoint(
+			FMath::RandRange(-Radius - StationSpawnExtend, Radius + StationSpawnExtend),
+			FMath::RandRange(-Radius - StationSpawnExtend, Radius + StationSpawnExtend));
+		if (RandomPoint.Size() > Radius + StationSpawnExtend) continue;
+		Flag = !IsValidStationSpawn(RandomPoint.X + Point.X, RandomPoint.Y + Point.Y);
+	} while (Flag);
+
+	//return FGridCellData();
+	return GridCellData[(GridSize.X * (RandomPoint.Y + Point.Y)) + (RandomPoint.X + Point.X)];
 }
 
 void AGridManager::SetGridStructure(int X, int Y, GridStructure Structure) {
@@ -75,11 +95,43 @@ void AGridManager::SetGridStructure(int X, int Y, GridStructure Structure) {
 }
 
 bool AGridManager::IsValidStationSpawn(int Coord) {
-	if (GridCellData[Coord].GridStructure == GridStructure::Empty) {
-		return true;
+	// Out of range
+	if (Coord >= GridCellData.Num() || Coord < 0) return false;
+	// Grid is empty
+	if (GridCellData[Coord].GridStructure != GridStructure::Empty) return false;
+	// Grid is ground
+	if (GridCellData[Coord].GridType != GridType::Ground) return false;
+	// Check other station
+	for (int i = -StationSpawnPrevent; i <= StationSpawnPrevent; i++) { // Y
+		for (int j = -StationSpawnPrevent; j <= StationSpawnPrevent; j++) { // X
+			if (FMath::Sqrt(i * i + j * j) > 2) continue;
+			if ((Coord + (i * GridSize.X) + j) >= GridCellData.Num() || (Coord + (i * GridSize.X) + j) < 0) continue;
+			if (GridCellData[(Coord + (i * GridSize.X) + j)].GridStructure == GridStructure::Station) return false;
+			//if (((GridSize.X * (Y + i)) + (X + j)) >= GridCellData.Num()) continue;
+			//if (GridCellData[(GridSize.X * (Y + i)) + (X + j)].GridStructure == GridStructure::Station) return false;
+		}
 	}
 
-	return false;
+	return true;
+}
+
+bool AGridManager::IsValidStationSpawn(int X, int Y) {
+	// Out of range
+	if (X >= GridSize.X || Y >= GridSize.Y || X < 0 || Y < 0) return false;
+	// Grid is empty
+	if (GridCellData[(GridSize.X * Y) + X].GridStructure != GridStructure::Empty) return false;
+	// Grid is ground
+	if (GridCellData[(GridSize.X * Y) + X].GridType != GridType::Ground) return false;
+	// Check other station
+	for (int i = -StationSpawnPrevent; i <= StationSpawnPrevent; i++) { // Y
+		for (int j = -StationSpawnPrevent; j <= StationSpawnPrevent; j++) { // X
+			if (FMath::Sqrt(i * i + j * j) > 2) continue;
+			if (((GridSize.X * (Y + i)) + (X + j)) >= GridCellData.Num() || ((GridSize.X * (Y + i)) + (X + j)) < 0) continue;
+			if (GridCellData[(GridSize.X * (Y + i)) + (X + j)].GridStructure == GridStructure::Station) return false;
+		}
+	}
+
+	return true;
 }
 
 TPair<FVector2D, double> AGridManager::FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2) {
