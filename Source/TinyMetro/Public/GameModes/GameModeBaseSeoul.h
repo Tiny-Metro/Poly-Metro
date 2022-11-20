@@ -4,21 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameModes/TinyMetroGameModeBase.h"
-#include "SampleGameMode.generated.h"
+#include "GameModeBaseSeoul.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TINYMETRO_API ASampleGameMode : public ATinyMetroGameModeBase
+class TINYMETRO_API AGameModeBaseSeoul : public ATinyMetroGameModeBase
 {
 	GENERATED_BODY()
-
-protected:
-	virtual void BeginPlay() override;
-
+	
 public:
 	virtual FString GetFileName() const override;
+	virtual TMap<FIntPoint, StationType> GetInitData() const override;
 
-	
 };

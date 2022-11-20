@@ -10,7 +10,7 @@
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
-AGridBuilder::AGridBuilder() : GridCountX(0), GridCountY(0), GeneratorIndex(0)
+AGridBuilder::AGridBuilder() : GeneratorIndex(0)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	defaultRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRoot"));
@@ -59,6 +59,7 @@ AGridBuilder::AGridBuilder() : GridCountX(0), GridCountY(0), GeneratorIndex(0)
 			mesh->AttachToComponent(this->RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 		}
 		GridManager->SetGridCellData(GridPoints);
+		GridManager->SetGridSize(GridSize);
 	}
 
 }
@@ -84,7 +85,7 @@ FVector AGridBuilder::CalcStartLocation(float gridCellSize) const {
 				Math::Multiply_VectorFloat(
 					GetActorRightVector(),
 					Math::Multiply_FloatFloat(
-						GridCountY - 1,
+						GridSize.Y - 1,
 						gridCellSize / 2
 					)
 				)
@@ -92,7 +93,7 @@ FVector AGridBuilder::CalcStartLocation(float gridCellSize) const {
 			Math::Multiply_VectorFloat(
 				GetActorForwardVector(),
 				Math::Multiply_FloatFloat(
-					GridCountX - 1,
+					GridSize.X - 1,
 					gridCellSize / 2
 				)
 			)
@@ -130,8 +131,8 @@ void AGridBuilder::LoadMapData() {
 			TEXT(","),
 			true);
 
-		GridCountX = FCString::Atoi(*mapSize[0]);
-		GridCountY = FCString::Atoi(*mapSize[1]);
+		GridSize.X = FCString::Atoi(*mapSize[0]);
+		GridSize.Y = FCString::Atoi(*mapSize[1]);
 
 		cellTypeVector = cellTypeVector.Replace(
 			LINE_TERMINATOR,
@@ -157,10 +158,10 @@ TArray<FGridCellData> AGridBuilder::CalculateGridData(float GridCellSize) {
 
 	// i = Y, j = X
 	// GridIndex = (X * i) + j
-	for (int i = 0; i < GridCountY; i++) {
-		for (int j = 0; j < GridCountX; j++) {
+	for (int i = 0; i < GridSize.Y; i++) {
+		for (int j = 0; j < GridSize.X; j++) {
 			FGridCellData tmp;
-			int indexOneDim = GridCountX * i + j;
+			int indexOneDim = GridSize.X * i + j;
 			FVector cellLocation = Math::Add_VectorVector(
 				StartLocation,
 				Math::Add_VectorVector(
@@ -181,7 +182,9 @@ TArray<FGridCellData> AGridBuilder::CalculateGridData(float GridCellSize) {
 				)
 			);
 			tmp.Index = indexOneDim;
+			tmp.WorldCoordination = FIntPoint(j, i);
 			tmp.WorldLocation = cellLocation;
+			tmp.GridStructure = GridStructure::Empty;
 			switch (LoadedGridType[indexOneDim]) {
 			case 0:
 				tmp.GridType = GridType::Ground;
