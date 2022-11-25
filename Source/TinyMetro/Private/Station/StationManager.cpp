@@ -21,7 +21,7 @@ void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	IncreaseSpawnParameter();
+	StationSpawnRoutine();
 
 	FIntPoint test(3,3);
 	GEngine->AddOnScreenDebugMessage(
@@ -103,6 +103,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
 	tmp->SetStationType(Type);
+	tmp->SetStationId(StationId++);
 	if (ActivateFlag) {
 		tmp->ActivateStation();
 	}
@@ -123,7 +124,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 			FString::Printf(TEXT("Stations : %d"), Station.Num()));
 }
 
-void AStationManager::IncreaseSpawnParameter() {
+void AStationManager::StationSpawnRoutine() {
 	/*GetWorld()->GetTimerManager().SetTimer(
 		TimerSpawnStation,
 		this, 
