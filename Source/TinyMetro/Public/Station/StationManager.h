@@ -19,17 +19,19 @@ public:
 	AStationManager();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	void TestFunction();
-
 	UFUNCTION(BlueprintCallable)
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
-	void IncreaseSpawnParameter();
-	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	void StationSpawnRoutine();
+
+	void TestFunction();
+
+
 
 public:	
 	// Called every frame
@@ -79,5 +81,7 @@ protected:
 	};
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationSpawnRange = 7;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	int32 StationId = 0;
 
 };
