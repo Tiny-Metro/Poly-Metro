@@ -2,7 +2,9 @@
 
 
 #include "Station/Station.h"
+#include "Station/StationManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AStation::AStation()
@@ -17,6 +19,9 @@ AStation::AStation()
 void AStation::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// Get StationManager
+	StationManager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 
 	// Get GameMode, set daytime
 	ATinyMetroGameModeBase* GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
@@ -135,6 +140,7 @@ void AStation::PassengerSpawnRoutine() {
 
 void AStation::SpawnPassenger() {
 	UPassenger* tmp = NewObject<UPassenger>();
+	tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
 	Passenger.Add(tmp);
 
 	//Log

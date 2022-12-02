@@ -80,7 +80,7 @@ StationType AStationManager::CalculatePassengerDest(StationType Except) const {
 	StationType tmp;
 
 	do {
-		tmp = Station[FMath::RandRange(0, Station.Num())]->GetStationType();
+		tmp = Station[FMath::RandRange(0, Station.Num()-1)]->GetStationType();
 	} while (tmp != Except);
 
 	return tmp;

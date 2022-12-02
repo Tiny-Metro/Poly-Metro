@@ -8,6 +8,8 @@
 #include "Passenger.h"
 #include "Station.generated.h"
 
+class AStationManager;
+
 UCLASS()
 class TINYMETRO_API AStation : public AActor
 {
@@ -43,6 +45,8 @@ protected:
 	void ComplainRoutine();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	AStationManager* StationManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 ComplainMax = 10000;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Variable")

@@ -3,3 +3,6 @@
 
 #include "Station/Passenger.h"
 
+void UPassenger::SetDestination(StationType Dest) {
+	Destination = Dest;
+}
