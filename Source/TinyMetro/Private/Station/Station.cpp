@@ -134,6 +134,8 @@ void AStation::PassengerSpawnRoutine() {
 }
 
 void AStation::SpawnPassenger() {
+	UPassenger* tmp = NewObject<UPassenger>();
+	Passenger.Add(tmp);
 
 	//Log
 	if (GEngine)

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "StationType.h"
+#include "Passenger.h"
 #include "Station.generated.h"
 
 UCLASS()
@@ -72,4 +73,6 @@ protected:
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerComplain;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	TArray<UPassenger*> Passenger;
 };
