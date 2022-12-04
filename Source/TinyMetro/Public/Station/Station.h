@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "StationType.h"
+#include "../TMSaveManager.h"
 #include "Station.generated.h"
 
 UCLASS()
@@ -15,6 +16,9 @@ class TINYMETRO_API AStation : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStation();
+
+	friend class TMSaveManager;
+
 
 protected:
 	// Called when the game starts or when spawned

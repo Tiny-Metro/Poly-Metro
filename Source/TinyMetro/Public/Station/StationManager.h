@@ -7,6 +7,7 @@
 #include "Station.h"
 #include "../GridGenerator/GridManager.h"
 #include "../GameModes/TinyMetroGameModeBase.h"
+#include "../TMSaveManager.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -17,6 +18,8 @@ class TINYMETRO_API AStationManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStationManager();
+
+	friend class TMSaveManager;
 
 protected:
 	UFUNCTION(BlueprintCallable)

@@ -35,6 +35,7 @@ public :
 		TArray<StationValuesStruct> stations;
 	UPROPERTY()
 		int32 StationSpawnCurrent;
-
+	UPROPERTY()
+		int32 ManagerStationId ; 
 
 };
