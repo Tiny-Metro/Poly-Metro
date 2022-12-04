@@ -4,12 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "Station/StationType.h"
 #include "StationSaveGame.generated.h"
 
 struct StationValuesStruct
 {
 public:
-	int stationvalues;
+	UPROPERTY()
+		int32 ComplainCurrent;
+	UPROPERTY()
+		int32 StationId;
+	UPROPERTY()
+		bool IsActive;
+	UPROPERTY()
+		StationType StationTypeValue;
 
 };
 
@@ -25,4 +33,8 @@ public :
 
 	UPROPERTY()
 		TArray<StationValuesStruct> stations;
+	UPROPERTY()
+		int32 StationSpawnCurrent;
+
+
 };
