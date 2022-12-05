@@ -54,6 +54,8 @@ void AStation::SetStationId(int32 Id) {
 void AStation::SetStationType(StationType Type) {
 	StationTypeValue = Type;
 
+	// Set station's mesh
+
 	//LOG
 	FString EnumToStr = TEXT("NULL");
 	const UEnum* MyType = FindObject<UEnum>(ANY_PACKAGE, TEXT("StationType"), true);
@@ -77,6 +79,14 @@ void AStation::ActivateStation() {
 
 StationType AStation::GetStationType() {
 	return StationTypeValue;
+}
+
+void AStation::DecreaseComplain(double ReduceRate) {
+	ComplainCurrent /= ReduceRate;
+}
+
+void AStation::DecreaseComplain(int32 ReduceValue) {
+	ComplainCurrent -= ReduceValue;
 }
 
 void AStation::ComplainRoutine() {
@@ -115,6 +125,7 @@ void AStation::ComplainRoutine() {
 }
 
 void AStation::UpdatePassengerMesh() {
+	// Read passenger array, clear and reorganize meshes
 }
 
 void AStation::PassengerSpawnRoutine() {
