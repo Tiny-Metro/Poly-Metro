@@ -37,9 +37,8 @@ public:
 	void ActivateStation();
 	UFUNCTION(BlueprintCallable)
 	StationType GetStationType();
-	UFUNCTION(BlueprintCallable)
+
 	void DecreaseComplain(double ReduceRate);
-	UFUNCTION(BlueprintCallable)
 	void DecreaseComplain(int32 ReduceValue);
 
 protected:
