@@ -3,3 +3,5 @@
 
 #include "PlayerState/TinyMetroPlayerState.h"
 
+void ATinyMetroPlayerState::GetPlayInfo() {
+}

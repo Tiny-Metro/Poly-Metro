@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "../Station/StationType.h"
+#include "Station/StationType.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include "TinyMetroGameModeBase.generated.h"
 
 /**
@@ -16,6 +17,8 @@ class TINYMETRO_API ATinyMetroGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	ATinyMetroGameModeBase();
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
+
 };

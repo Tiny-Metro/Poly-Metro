@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "TinyMetroPlayerState.h"
 #include "PlayerStateSeoul.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TINYMETRO_API APlayerStateSeoul : public APlayerState
+class TINYMETRO_API APlayerStateSeoul : public ATinyMetroPlayerState
 {
 	GENERATED_BODY()
 	

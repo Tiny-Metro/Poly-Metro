@@ -2,6 +2,11 @@
 
 
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "PlayerState/TinyMetroPlayerState.h"
+
+ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
+    PlayerStateClass = ATinyMetroPlayerState::StaticClass();
+}
 
 FString ATinyMetroGameModeBase::GetFileName() const {
     return TEXT("Base");
