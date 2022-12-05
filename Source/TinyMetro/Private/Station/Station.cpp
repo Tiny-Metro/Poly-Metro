@@ -85,10 +85,13 @@ void AStation::ComplainRoutine() {
 		FTimerDelegate::CreateLambda([&]() {
 			SpawnDay++;
 			// Passenger complain
+			if (Passenger.Num() > ComplainPassengerNum) {
+				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum));
+			}
 
 			// Not activate
-			if (!IsActive && SpawnDay > 10) {
-				ComplainCurrent += 1000;
+			if (!IsActive && SpawnDay > ComplainSpawnDay) {
+				ComplainCurrent += ComplainFromInactive;
 			}
 
 
@@ -111,6 +114,9 @@ void AStation::ComplainRoutine() {
 		);
 }
 
+void AStation::UpdatePassengerMesh() {
+}
+
 void AStation::PassengerSpawnRoutine() {
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerSpawnPassenger,
@@ -119,6 +125,7 @@ void AStation::PassengerSpawnRoutine() {
 			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
 					SpawnPassenger();
+					UpdatePassengerMesh();
 				}
 
 				PassengerSpawnCurrent = 0.0f;
