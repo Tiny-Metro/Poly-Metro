@@ -17,3 +17,7 @@ TMap<FIntPoint, StationType> ATinyMetroGameModeBase::GetInitData() const {
     Tmp.Add(FIntPoint(0, 0), StationType::Circle);
     return Tmp;
 }
+
+int32 ATinyMetroGameModeBase::GetDaytime() const {
+    return 12;
+}

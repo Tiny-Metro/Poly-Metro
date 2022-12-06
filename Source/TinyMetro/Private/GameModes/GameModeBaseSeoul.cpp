@@ -20,3 +20,7 @@ TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
     return Tmp;
 }
 
+int32 AGameModeBaseSeoul::GetDaytime() const {
+    return 12;
+}
+

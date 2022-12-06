@@ -20,5 +20,5 @@ public:
 	ATinyMetroGameModeBase();
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
-
+	virtual int32 GetDaytime() const;
 };
