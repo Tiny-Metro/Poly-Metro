@@ -18,6 +18,8 @@ class TINYMETRO_API AStationManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStationManager();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	friend class TMSaveManager;
 
@@ -26,7 +28,7 @@ protected:
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType();
-
+  
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,10 +37,14 @@ protected:
 	void TestFunction();
 
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	void StationSpawnRoutine();
+	void TestFunction();
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	StationType CalculatePassengerDest(StationType Except) const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")

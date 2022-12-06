@@ -2,6 +2,9 @@
 
 
 #include "Station/Station.h"
+#include "Station/StationManager.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AStation::AStation()
@@ -16,6 +19,19 @@ AStation::AStation()
 void AStation::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// Get StationManager
+	StationManager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+
+	// Get GameMode, set daytime
+	ATinyMetroGameModeBase* GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
+	Daytime = GameMode->GetDaytime();
+
+	PassengerSpawnRoutine();
+	ComplainRoutine();
+
+
+	// Log
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
 			FString::Printf(TEXT("I am %s"), *this->GetActorLabel()));
@@ -38,6 +54,8 @@ void AStation::SetStationId(int32 Id) {
 void AStation::SetStationType(StationType Type) {
 	StationTypeValue = Type;
 
+	// Set station's mesh
+
 	//LOG
 	FString EnumToStr = TEXT("NULL");
 	const UEnum* MyType = FindObject<UEnum>(ANY_PACKAGE, TEXT("StationType"), true);
@@ -58,4 +76,106 @@ void AStation::ActivateStation() {
 
 	// TODO :  Visible logic
 }
+
+StationType AStation::GetStationType() {
+	return StationTypeValue;
+}
+
+void AStation::DecreaseComplain(double ReduceRate) {
+	ComplainCurrent /= ReduceRate;
+}
+
+void AStation::DecreaseComplain(int32 ReduceValue) {
+	ComplainCurrent -= ReduceValue;
+}
+
+void AStation::ComplainRoutine() {
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerComplain,
+		FTimerDelegate::CreateLambda([&]() {
+			SpawnDay++;
+			// Passenger complain
+			if (Passenger.Num() > ComplainPassengerNum) {
+				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum));
+			}
+
+			// Not activate
+			if (!IsActive && SpawnDay > ComplainSpawnDay) {
+				ComplainCurrent += ComplainFromInactive;
+			}
+
+
+			// Complain excess : Game over
+			if (ComplainMax <= ComplainCurrent) {
+				// Game over code
+				
+				//Log
+				if (GEngine)
+					GEngine->AddOnScreenDebugMessage(
+						-1,
+						15.0f,
+						FColor::Red,
+						FString::Printf(TEXT("Game Over")));
+			}
+		}),
+		Daytime,
+		true,
+		Daytime
+		);
+}
+
+void AStation::UpdatePassengerMesh() {
+	// Read passenger array, clear and reorganize meshes
+}
+
+void AStation::PassengerSpawnRoutine() {
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerSpawnPassenger,
+		FTimerDelegate::CreateLambda([&]() {
+			PassengerSpawnCurrent += PassengerSpawnPerSec;
+			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
+				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
+					SpawnPassenger();
+					UpdatePassengerMesh();
+				}
+
+				PassengerSpawnCurrent = 0.0f;
+			}
+
+			//Log
+			//if (GEngine)
+			//	GEngine->AddOnScreenDebugMessage(
+			//		-1,
+			//		15.0f,
+			//		FColor::Yellow,
+			//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
+		}),
+		1.0f,
+		true,
+		1.0f
+		);
+}
+
+void AStation::SpawnPassenger() {
+	UPassenger* tmp = NewObject<UPassenger>();
+	tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+	Passenger.Add(tmp);
+
+	//Log
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			15.0f,
+			FColor::Yellow,
+			FString::Printf(TEXT("Passenger Spawn!")));
+}
+
+double AStation::GetPassengerSpawnProbability() {
+	double temp = PassengerSpawnProbability;
+	for (auto& i : PassengerSpawnProbabilityVariable) {
+		temp *= i;
+	}
+	return temp;
+}
+
 

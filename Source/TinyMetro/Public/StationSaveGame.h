@@ -7,8 +7,11 @@
 #include "Station/StationType.h"
 #include "StationSaveGame.generated.h"
 
-struct StationValuesStruct
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FStationValuesStruct
 {
+	GENERATED_BODY()
+
 public:
 	UPROPERTY()
 		int32 ComplainCurrent;
@@ -21,19 +24,15 @@ public:
 
 };
 
-
-
 UCLASS()
 class TINYMETRO_API UStationSaveGame : public USaveGame
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
 
-public : 
-	UStationSaveGame();
-
+public :
 	UPROPERTY()
-		TArray<StationValuesStruct> stations;
-	UPROPERTY()
+		TArray <FStationValuesStruct> stations;
+	
 		int32 StationSpawnCurrent;
 	UPROPERTY()
 		int32 ManagerStationId ; 
