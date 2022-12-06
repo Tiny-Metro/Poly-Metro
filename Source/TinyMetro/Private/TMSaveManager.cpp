@@ -13,12 +13,10 @@ TMSaveManager::~TMSaveManager()
 
 
 
-void TMSaveManager::SaveStationManager()
-{
+void TMSaveManager::SaveStationManager() {
 
 }
 
-void TMSaveManager::LoadStationManager()
-{
+void TMSaveManager::LoadStationManager() {
 
 }
