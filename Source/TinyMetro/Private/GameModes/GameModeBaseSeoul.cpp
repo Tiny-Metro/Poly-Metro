@@ -2,6 +2,11 @@
 
 
 #include "GameModes/GameModeBaseSeoul.h"
+#include "PlayerState/PlayerStateSeoul.h"
+
+AGameModeBaseSeoul::AGameModeBaseSeoul() {
+    PlayerStateClass = APlayerStateSeoul::StaticClass();
+}
 
 FString AGameModeBaseSeoul::GetFileName() const {
     return TEXT("Seoul");

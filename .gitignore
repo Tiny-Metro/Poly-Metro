@@ -74,5 +74,5 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 # Directory for test
-Content/Test/*.*
+Content/Test/*
 Content/StarterContent/Maps/Minimal_Default.umap
