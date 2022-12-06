@@ -21,7 +21,7 @@ void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	IncreaseSpawnParameter();
+	StationSpawnRoutine();
 
 	FIntPoint test(3,3);
 	GEngine->AddOnScreenDebugMessage(
@@ -33,7 +33,7 @@ void AStationManager::BeginPlay()
 	
 
 	// Test
-	FTimerHandle TestHandle;
+	/*FTimerHandle TestHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		TestHandle,
 		FTimerDelegate::CreateLambda([&]() {
@@ -47,7 +47,7 @@ void AStationManager::BeginPlay()
 		1.0f,
 		true,
 		1.0f
-	);
+	);*/
 	
 	// Spawn default 3 stationsstat
 	// Get GameMode, Get coord and station type
@@ -76,7 +76,15 @@ void AStationManager::TestFunction() {
 			FString::Printf(TEXT(":)")));
 }
 
+StationType AStationManager::CalculatePassengerDest(StationType Except) const {
+	StationType tmp;
 
+	do {
+		tmp = Station[FMath::RandRange(0, Station.Num()-1)]->GetStationType();
+	} while (tmp != Except);
+
+	return tmp;
+}
 
 void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
 	// Load BP Class
@@ -103,6 +111,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
 	tmp->SetStationType(Type);
+	tmp->SetStationId(StationId++);
 	if (ActivateFlag) {
 		tmp->ActivateStation();
 	}
@@ -123,7 +132,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 			FString::Printf(TEXT("Stations : %d"), Station.Num()));
 }
 
-void AStationManager::IncreaseSpawnParameter() {
+void AStationManager::StationSpawnRoutine() {
 	/*GetWorld()->GetTimerManager().SetTimer(
 		TimerSpawnStation,
 		this, 
