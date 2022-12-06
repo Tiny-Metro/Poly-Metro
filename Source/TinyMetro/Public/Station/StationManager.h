@@ -25,6 +25,14 @@ protected:
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType();
+  
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	void StationSpawnRoutine();
+
+	void TestFunction();
+
 
 protected:
 	// Called when the game starts or when spawned
