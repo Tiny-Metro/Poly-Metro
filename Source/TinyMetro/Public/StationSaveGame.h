@@ -33,4 +33,8 @@ public :
 	UPROPERTY()
 		TArray <FStationValuesStruct> stations;
 	
+		int32 StationSpawnCurrent;
+	UPROPERTY()
+		int32 ManagerStationId ; 
+
 };
