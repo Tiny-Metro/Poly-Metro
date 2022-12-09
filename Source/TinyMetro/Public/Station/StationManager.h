@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Station.h"
 #include "../GridGenerator/GridManager.h"
 #include "../GameModes/TinyMetroGameModeBase.h"
 #include "../TMSaveManager.h"
+#include "Station.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -28,14 +28,6 @@ protected:
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType();
-  
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	void StationSpawnRoutine();
-
-	void TestFunction();
-
 
 protected:
 	// Called when the game starts or when spawned
@@ -53,8 +45,8 @@ protected:
 	int32 StationSpawnPerSec = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnCurrent = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Station")
-	TArray<AStation*> Station;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Station")
+	TArray<class AStation*> Station;
 	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	FTimerHandle TimerSpawnStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")

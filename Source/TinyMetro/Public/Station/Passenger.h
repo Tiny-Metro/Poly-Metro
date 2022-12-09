@@ -17,6 +17,7 @@ class TINYMETRO_API UPassenger : public UObject
 
 public:
 	void SetDestination(StationType Dest);
+	static UPassenger* ConstructPassenger(StationType Dest);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
