@@ -93,4 +93,31 @@ protected:
 	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
+
+protected:
+	// Station meshses
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Root")
+	USceneComponent* DefaultRoot = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UStaticMeshComponent* MeshInner = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UStaticMeshComponent* MeshOuter = nullptr;
+
+	// Material
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material Current")
+	UMaterialInstanceDynamic* DynamicMaterialInner;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material Current")
+	UMaterialInstanceDynamic* DynamicMaterialOuter;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterial* MaterialActiveInner;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterial* MaterialActiveOuter;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterial* MaterialInactiveInner;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterial* MaterialInactiveOuter;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterial* MaterialDestroyedInner;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
+	UMaterial* MaterialDestroyedOuter;
 };
