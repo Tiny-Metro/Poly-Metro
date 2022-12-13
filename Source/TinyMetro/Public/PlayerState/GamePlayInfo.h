@@ -17,13 +17,13 @@ struct TINYMETRO_API FGamePlayInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 PlayTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Money;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Sales;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MoneyInWeek;
+	int32 Profit;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SalesInWeek;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ProfitInWeek;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 ComplainAverage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "PlayerState/GamePlayInfo.h"
 #include "TinyMetroPlayerState.generated.h"
 
 /**
@@ -15,8 +16,8 @@ class TINYMETRO_API ATinyMetroPlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	virtual void GetPlayInfo();
-	
+	virtual FGamePlayInfo GetPlayInfo();
+	ATinyMetroPlayerState();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
@@ -59,4 +60,7 @@ protected:
 	int32 UsingTunnel = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
 	int32 UsingBridge = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = "Config")
+	class AStationManager* StationManager;
 };

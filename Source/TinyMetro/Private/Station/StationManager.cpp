@@ -86,6 +86,14 @@ StationType AStationManager::CalculatePassengerDest(StationType Except) const {
 	return tmp;
 }
 
+float AStationManager::GetComplainAverage() {
+	int32 ComplainSum = 0;
+	for (auto& i : Station) {
+		ComplainSum += i->GetComplain();
+	}
+	return ((float)ComplainSum)/Station.Num();
+}
+
 void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
 	
 	// Load BP Class

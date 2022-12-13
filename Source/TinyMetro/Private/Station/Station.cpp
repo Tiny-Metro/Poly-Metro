@@ -181,6 +181,10 @@ void AStation::DecreaseComplain(int32 ReduceValue) {
 	ComplainCurrent -= ReduceValue;
 }
 
+int32 AStation::GetComplain() const {
+	return ComplainCurrent;
+}
+
 void AStation::ComplainRoutine() {
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerComplain,

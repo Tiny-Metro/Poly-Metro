@@ -45,6 +45,8 @@ public:
 	void DecreaseComplain(double ReduceRate);
 	void DecreaseComplain(int32 ReduceValue);
 
+	int32 GetComplain() const;
+
 protected:
 	void PassengerSpawnRoutine();
 	void SpawnPassenger();
