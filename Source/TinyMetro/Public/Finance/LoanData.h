@@ -13,7 +13,12 @@ USTRUCT(BlueprintType)
 struct TINYMETRO_API FLoanData
 {
 	GENERATED_BODY()
-
+	FLoanData() = default;
+	FLoanData(int32 Amount, int32 DueDate, int32 Interest, float Rate) : 
+		Amount(Amount), 
+		DueDate(DueDate), 
+		Interest(Interest), 
+		Rate(Rate) {}
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Amount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

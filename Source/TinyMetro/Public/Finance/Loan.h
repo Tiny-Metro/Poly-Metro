@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../Finance/LoanData.h"
+#include "UObject/NoExportTypes.h"
+#include "LoanData.h"
+#include "Loan.generated.h"
 
 /**
  * 
  */
-class TINYMETRO_API SampleTimer
+UCLASS()
+class TINYMETRO_API ULoan : public UObject
 {
-public:
-	SampleTimer(UWorld* World, FLoanData& Data);
-	~SampleTimer();
+	GENERATED_BODY()
 
 public:
-	//static SampleTimer* ConstructSample(int32 Amount, int32 DueDate, float Rate);
 	void Test();
 
 protected:

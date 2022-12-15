@@ -16,7 +16,10 @@ void ABank::BeginPlay()
 {
 	Super::BeginPlay();
 	//SampleTimer t;
-	SampleTimer t(GetWorld(), 10, 10, 1.0f);
+	TArray<FLoanData> LoanArr;
+	//LoanArr.Add(FLoanData(500,))
+	FLoanData tmp(10, 10, 10, 0.0f);
+	SampleTimer t(GetWorld(), tmp);
 	
 }
 
