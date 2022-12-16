@@ -24,6 +24,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	ULoan* CreateLoan(FLoanData Data, TFunction<bool(void)> Func);
+	void InitLoan();
 
 public:	
 	// Called every frame

@@ -24,6 +24,22 @@ void ABank::BeginPlay()
 	PlayerState = GetWorld()->GetControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
 
 	// Set loan data
+	InitLoan();
+}
+
+ULoan* ABank::CreateLoan(FLoanData Data, TFunction<bool(void)> Func) {
+	ULoan* Temp = NewObject<ULoan>();
+	Temp->SetLoanData(Data);
+	//ATinyMetroGameModeBase* GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
+	//Daytime = GameMode->GetDaytime();
+	Temp->SetPlayerState(PlayerState);
+	Temp->SetDaytime(Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetDaytime());
+	Temp->SetWorld(GetWorld());
+	Temp->SetAvailabilityFunction(Func);
+	return Temp;
+}
+
+void ABank::InitLoan() {
 	// FLoanData(Amount, AutoRepay, Rate, Message)
 	// Amount : Amount of loan
 	// AutoRepay : Repay money per month
@@ -46,27 +62,10 @@ void ABank::BeginPlay()
 		}
 		return false;
 		}));
-	//LoanArr.Add(FLoanData(500, 20, 1.03, TEXT("")));
-	//LoanArr.Add(FLoanData(2000, 80, 1.06, TEXT("Sales over 3,000")));
-	//LoanArr.Add(FLoanData(5000, 200, 1.10, TEXT("Profit over 10,000")));
 
 	for (auto& i : LoanArr) {
 		Loan.Add(this->CreateLoan(i.Key, i.Value));
 	}
-	//PlayerState->Test()
-	
-}
-
-ULoan* ABank::CreateLoan(FLoanData Data, TFunction<bool(void)> Func) {
-	ULoan* Temp = NewObject<ULoan>();
-	Temp->SetLoanData(Data);
-	//ATinyMetroGameModeBase* GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
-	//Daytime = GameMode->GetDaytime();
-	Temp->SetPlayerState(PlayerState);
-	Temp->SetDaytime(Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetDaytime());
-	Temp->SetWorld(GetWorld());
-	Temp->SetAvailabilityFunction(Func);
-	return Temp;
 }
 
 // Called every frame
