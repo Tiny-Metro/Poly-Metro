@@ -13,7 +13,14 @@ USTRUCT(BlueprintType)
 struct TINYMETRO_API FInvestmentData
 {
 	GENERATED_BODY()
-
+	FInvestmentData() = default;
+	FInvestmentData(int32 TimeRequire, int32 Award, int32 Reward, FString Message) :
+		TimeRequire(TimeRequire),
+		Award(Award),
+		Reward(Reward),
+		Message(Message) { }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TimeRequire;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Award;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

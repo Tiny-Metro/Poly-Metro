@@ -30,10 +30,13 @@ bool ULoan::GetAvailable() {
 void ULoan::ActivateLoan() {
 	IsActivate = true;
 	PlayerState->AddMoney(LoanData.Amount);
-	PlayerState->AddSales(LoanData.Amount);
 	World->GetTimerManager().SetTimer(
 		LoanHandle,
 		FTimerDelegate::CreateLambda([LoanData = LoanData]() {
+			// Interest logic
+
+			// Auto repay logic
+
 			//Log
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(
@@ -47,22 +50,6 @@ void ULoan::ActivateLoan() {
 		0.0f
 		);
 
-	if (GetAvailable()) {
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				15.0f,
-				FColor::Yellow,
-				FString::Printf(TEXT("SmapleTimer : %d, True"), LoanData.Amount));
-	} else {
-
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				15.0f,
-				FColor::Yellow,
-				FString::Printf(TEXT("SmapleTimer : %d, False"), LoanData.Amount));
-	}
 
 }
 
