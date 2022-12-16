@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../Sample/SampleTimer.h"
+#include "Loan.h"
 #include "Bank.generated.h"
 
 UCLASS()
@@ -16,14 +17,19 @@ public:
 	// Sets default values for this actor's properties
 	ABank();
 
+public:
+	UFUNCTION(BlueprintCallable)
+	TArray<ULoan*> GetAllLoan() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	ULoan* CreateLoan(FLoanData Data);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	TArray<SampleTimer*> Loan;
+	TArray<ULoan*> Loan;
 };

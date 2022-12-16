@@ -17,9 +17,23 @@ class TINYMETRO_API ULoan : public UObject
 
 public:
 	void Test();
+	void Repay();
+	void CalculateInterest();
+	void SetLoanData(FLoanData Data);
+	void SetDaytime();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	FLoanData GetLoanData() const;
 
 protected:
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FLoanData LoanData;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	int32 Daytime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	bool IsActivate;
 	FTimerHandle TestHandle;
-	UWorld* World;
 };
