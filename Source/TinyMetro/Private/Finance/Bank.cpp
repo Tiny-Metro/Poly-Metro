@@ -20,29 +20,52 @@ void ABank::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Set PlayerState
+	PlayerState = GetWorld()->GetControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+
 	// Set loan data
 	// FLoanData(Amount, AutoRepay, Rate, Message)
 	// Amount : Amount of loan
 	// AutoRepay : Repay money per month
 	// Rate : Rate of interest (5% = 1.05)
 	// Message : Message for UI
-	TArray<FLoanData> LoanArr;
-	LoanArr.Add(FLoanData(500, 20, 1.03, TEXT("")));
-	LoanArr.Add(FLoanData(2000, 80, 1.06, TEXT("Sales over 3,000")));
-	LoanArr.Add(FLoanData(5000, 200, 1.10, TEXT("Profit over 10,000")));
+	//TArray<FLoanData> LoanArr;
+	TArray<TPair<FLoanData, TFunction<bool(void)>>> LoanArr;
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(500, 20, 1.03, TEXT("")), [PlayerState = PlayerState]()->bool {
+		return true;
+		}));
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(2000, 80, 1.06, TEXT("Sales over 3,000")), [PlayerState = PlayerState]()->bool {
+		if (PlayerState->GetSales() >= 3000) {
+			return true;
+		}
+		return false;
+		}));
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(5000, 200, 1.10, TEXT("Profit over 10,000")), [PlayerState = PlayerState]()->bool {
+		if (PlayerState->GetProfit() >= 10000) {
+			return true;
+		}
+		return false;
+		}));
+	//LoanArr.Add(FLoanData(500, 20, 1.03, TEXT("")));
+	//LoanArr.Add(FLoanData(2000, 80, 1.06, TEXT("Sales over 3,000")));
+	//LoanArr.Add(FLoanData(5000, 200, 1.10, TEXT("Profit over 10,000")));
 
 	for (auto& i : LoanArr) {
-		Loan.Add(this->CreateLoan(i));
+		Loan.Add(this->CreateLoan(i.Key, i.Value));
 	}
-
-	
+	//PlayerState->Test()
 	
 }
 
-ULoan* ABank::CreateLoan(FLoanData Data) {
+ULoan* ABank::CreateLoan(FLoanData Data, TFunction<bool(void)> Func) {
 	ULoan* Temp = NewObject<ULoan>();
 	Temp->SetLoanData(Data);
-	//Temp->SetDaytime();
+	//ATinyMetroGameModeBase* GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
+	//Daytime = GameMode->GetDaytime();
+	Temp->SetPlayerState(PlayerState);
+	Temp->SetDaytime(Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetDaytime());
+	Temp->SetWorld(GetWorld());
+	Temp->SetAvailabilityFunction(Func);
 	return Temp;
 }
 

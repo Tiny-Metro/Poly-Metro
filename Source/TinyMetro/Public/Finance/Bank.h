@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../Sample/SampleTimer.h"
 #include "Loan.h"
 #include "Bank.generated.h"
 
@@ -24,12 +23,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	ULoan* CreateLoan(FLoanData Data);
+	ULoan* CreateLoan(FLoanData Data, TFunction<bool(void)> Func);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	UPROPERTY(BlueprintReadOnly)
 	TArray<ULoan*> Loan;
+	//UPROPERTY(BlueprintReadOnly)
+	//ATinyMetroGameModeBase* GameMode;
+	UPROPERTY(BlueprintReadOnly)
+	ATinyMetroPlayerState* PlayerState;
+
 };
