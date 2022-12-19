@@ -5,12 +5,12 @@
 #include <Kismet/GameplayStatics.h>
 
 void ULoan::Repay() {
-	if (Remainder == 1) {
+	if (RemainTime == 1) {
 		RepayAll();
 	} else {
 		PlayerState->AddMoney(-(RepayPerWeek));
 		Balance -= RepayPerWeek;
-		Remainder--;
+		RemainTime--;
 	}
 }
 
@@ -102,5 +102,5 @@ void ULoan::SetAvailabilityFunction(TFunction<bool(void)> Func) {
 void ULoan::InitLoan(FLoanData Data) {
 	Balance = Data.Amount * FMath::Pow(1 + (Data.Rate / 52), Data.DueDateWeek);
 	RepayPerWeek = Balance / Data.DueDateWeek;
-	Remainder = Data.DueDateWeek;
+	RemainTime = Data.DueDateWeek;
 }

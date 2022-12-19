@@ -50,7 +50,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 RepayPerWeek; // Repay amount per week
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	int32 Remainder; // Remainder week
+	int32 RemainTime; // Remainder week
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	bool IsActivate = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
