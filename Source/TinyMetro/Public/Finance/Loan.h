@@ -17,14 +17,12 @@ class TINYMETRO_API ULoan : public UObject
 	GENERATED_BODY()
 
 public:
-	void Test();
-	void Repay();
-	void CalculateInterest();
 	void SetLoanData(FLoanData Data);
 	void SetDaytime(int32 T);
 	void SetPlayerState(ATinyMetroPlayerState* P);
 	void SetWorld(UWorld* W);
 	void SetAvailabilityFunction(TFunction<bool(void)> Func);
+	void InitLoan(FLoanData Data);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -35,6 +33,10 @@ public:
 	bool GetAvailable();
 	UFUNCTION(BlueprintCallable)
 	void ActivateLoan();
+	void DisableLoan();
+	UFUNCTION(BlueprintCallable)
+	void Repay();
+	void RepayAll();
 
 protected:
 
@@ -43,6 +45,12 @@ protected:
 	FLoanData LoanData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 Daytime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	int32 Balance; // Balance of loan
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	int32 RepayPerWeek; // Repay amount per week
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	int32 Remainder; // Remainder week
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	bool IsActivate = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")

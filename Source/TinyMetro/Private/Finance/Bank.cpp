@@ -47,16 +47,16 @@ void ABank::InitLoan() {
 	// Message : Message for UI
 	//TArray<FLoanData> LoanArr;
 	TArray<TPair<FLoanData, TFunction<bool(void)>>> LoanArr;
-	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(500, 20, 1.03, TEXT("")), [PlayerState = PlayerState]()->bool {
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(500, 0.03, 20, TEXT("")), [PlayerState = PlayerState]()->bool {
 		return true;
 		}));
-	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(2000, 80, 1.06, TEXT("Sales over 3,000")), [PlayerState = PlayerState]()->bool {
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(2000, 0.06, 20, TEXT("Sales over 3,000")), [PlayerState = PlayerState]()->bool {
 		if (PlayerState->GetSales() >= 3000) {
 			return true;
 		}
 		return false;
 		}));
-	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(5000, 200, 1.10, TEXT("Profit over 10,000")), [PlayerState = PlayerState]()->bool {
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(5000, 0.10, 20, TEXT("Profit over 10,000")), [PlayerState = PlayerState]()->bool {
 		if (PlayerState->GetProfit() >= 10000) {
 			return true;
 		}

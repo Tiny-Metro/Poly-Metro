@@ -4,14 +4,19 @@
 #include "Finance/Loan.h"
 #include <Kismet/GameplayStatics.h>
 
-void ULoan::Test() {
-
-}
-
 void ULoan::Repay() {
+	if (Remainder == 1) {
+		RepayAll();
+	} else {
+		PlayerState->AddMoney(-(RepayPerWeek));
+		Balance -= RepayPerWeek;
+		Remainder--;
+	}
 }
 
-void ULoan::CalculateInterest() {
+void ULoan::RepayAll() {
+	PlayerState->AddMoney(-(Balance));
+	DisableLoan();
 }
 
 FLoanData ULoan::GetLoanData() const {
@@ -32,29 +37,50 @@ void ULoan::ActivateLoan() {
 	PlayerState->AddMoney(LoanData.Amount);
 	World->GetTimerManager().SetTimer(
 		LoanHandle,
-		FTimerDelegate::CreateLambda([LoanData = LoanData]() {
-			// Interest logic
-
+		FTimerDelegate::CreateLambda([LoanData = LoanData, this]() {
 			// Auto repay logic
+			this->Repay();
 
-			//Log
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					15.0f,
-					FColor::Yellow,
-					FString::Printf(TEXT("SmapleTimer : %d"), LoanData.Amount));
+			////Log
+			//if (GEngine)
+			//	GEngine->AddOnScreenDebugMessage(
+			//		-1,
+			//		15.0f,
+			//		FColor::Yellow,
+			//		FString::Printf(TEXT("SampleTimer : %d"), LoanData.Amount));
 			}),
-		10.0f,
+		Daytime * 7,
 		true,
-		0.0f
+		(Daytime * 7) - (FMath::Fmod(World->GetTimeSeconds(), Daytime * 7))
 		);
 
+	////Log
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(
+	//		-1,
+	//		15.0f,
+	//		FColor::Yellow,
+	//		FString::Printf(TEXT("Total : %f"), FMath::Fmod(3.3, 2.2)));
 
+}
+
+void ULoan::DisableLoan() {
+	World->GetTimerManager().ClearTimer(LoanHandle);
+	IsActivate = false;
+	InitLoan(LoanData);
+
+	////Log
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(
+	//		-1,
+	//		15.0f,
+	//		FColor::Yellow,
+	//		FString::Printf(TEXT("Disable Loan : %d"), 0));
 }
 
 void ULoan::SetLoanData(FLoanData Data) {
 	this->LoanData = Data;
+	InitLoan(Data);
 }
 
 void ULoan::SetDaytime(int32 T) {
@@ -71,4 +97,10 @@ void ULoan::SetWorld(UWorld* W) {
 
 void ULoan::SetAvailabilityFunction(TFunction<bool(void)> Func) {
 	CheckAvailable = Func;
+}
+
+void ULoan::InitLoan(FLoanData Data) {
+	Balance = Data.Amount * FMath::Pow(1 + (Data.Rate / 52), Data.DueDateWeek);
+	RepayPerWeek = Balance / Data.DueDateWeek;
+	Remainder = Data.DueDateWeek;
 }

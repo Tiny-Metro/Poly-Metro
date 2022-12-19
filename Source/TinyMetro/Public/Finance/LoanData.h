@@ -14,20 +14,17 @@ struct TINYMETRO_API FLoanData
 {
 	GENERATED_BODY()
 	FLoanData() = default;
-	FLoanData(int32 Amount, int32 AutoRepay, float Rate, FString Message) : 
-		Amount(Amount), 
-		AutoRepay(AutoRepay),
-		Interest(0), 
+	FLoanData(int32 Amount, float Rate, int32 DueDateWeek, FString Message) :
+		Amount(Amount),
 		Rate(Rate),
+		DueDateWeek(DueDateWeek),
 		Message(Message) { }
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Amount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 AutoRepay;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Interest;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Rate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DueDateWeek;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Message;
 };
