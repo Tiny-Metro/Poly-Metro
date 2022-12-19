@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Loan.h"
+#include "Investment.h"
 #include "Bank.generated.h"
 
 UCLASS()
@@ -17,25 +18,52 @@ public:
 	ABank();
 
 public:
-	UFUNCTION(BlueprintCallable)
-	TArray<ULoan*> GetAllLoan() const;
-
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	ULoan* CreateLoan(FLoanData Data, TFunction<bool(void)> Func);
-	void InitLoan();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+	// UFunction loan
+	UFUNCTION(BlueprintCallable)
+	TArray<ULoan*> GetAllLoan() const;
+public:
+	// UFunction investment
+	UFUNCTION(BlueprintCallable)
+	int32 GetInvestmentStock() const;
 
 protected:
+	// Function loan
+	ULoan* CreateLoan(FLoanData Data, TFunction<bool(void)> Func);
+	void InitLoan();
+protected:
+	// Function investment
+	void InitInvestment();
+	UInvestment* CreateInvestment(FInvestmentData Data, TFunction<bool(void)> Func);
+	void UpdateInvestment();
+
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	int32 Daytime;
+	UPROPERTY(BlueprintReadOnly)
+	ATinyMetroPlayerState* PlayerState;
+
+protected:
+	// For loan
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ULoan*> Loan;
 	//UPROPERTY(BlueprintReadOnly)
 	//ATinyMetroGameModeBase* GameMode;
-	UPROPERTY(BlueprintReadOnly)
-	ATinyMetroPlayerState* PlayerState;
+
+protected:
+	// For investment
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	int32 InvestmentStock = 1;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	TArray<UInvestment*> Investment;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	TArray<UInvestment*> AvailInvestment;
 
 };

@@ -19,10 +19,12 @@ class TINYMETRO_API UInvestment : public UObject
 public:
 	void SetInvestmentData(FInvestmentData Data);
 	void SetDaytime(int32 T);
-	void SetPlyaerState(ATinyMetroPlayerState* P);
+	void SetPlayerState(ATinyMetroPlayerState* P);
 	void SetWorld(UWorld* W);
+	void SetSuccessFunction(TFunction<bool(void)> Func);
 	void InvestmentSuccess();
 	void InvestmentFail();
+	void InitInvestment();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -31,6 +33,8 @@ public:
 	bool GetIsActivate() const;
 	UFUNCTION(BlueprintCallable)
 	void ActivateInvestment();
+	//UFUNCTION(BlueprintCallable)
+	//void DisableInvestment();
 
 
 protected:
@@ -39,9 +43,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 Daytime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	int32 RemainTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	bool IsActivate = false;
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroPlayerState* PlayerState;
 	UPROPERTY(BlueprintReadOnly)
 	UWorld* World;
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle InvestmentSuccessHandle;
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle InvestmentTimeHandle;
+
+	TFunction<bool(void)> CheckSuccess;
 };
