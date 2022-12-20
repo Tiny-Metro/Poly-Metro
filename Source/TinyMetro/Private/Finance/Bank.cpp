@@ -25,8 +25,8 @@ TArray<UInvestment*> ABank::GetAllInvestment() const {
 
 TArray<UInvestment*> ABank::GetAvailableInvestment() const {
 	TArray<UInvestment*> temp;
-	for (auto& i : AvailInvestment) {
-		temp.Add(Investment[i]);
+	for (auto i : AvailInvestment) {
+		temp.Emplace(Investment[i]);
 	}
 	return temp;
 }
@@ -53,7 +53,7 @@ void ABank::BeginPlay()
 	// Set investment data
 	InitInvestment();
 	UpdateInvestment();
-	AvailInvestment.Add(FMath::RandRange(0, Investment.Num() - 1));
+	AvailInvestment.Emplace(FMath::RandRange(0, Investment.Num() - 1));
 
 }
 
@@ -158,25 +158,28 @@ void ABank::ChangeInvestment(int Index = -1) {
 }
 
 void ABank::ChangeAllInvestment() {
-	TArray<int32> temp;
+	TArray<int32> Temp;
 	int AvailIndex;
-	int flag = 0;
+	int Flag = 0;
 	do {
 		AvailIndex = FMath::RandRange(0, Investment.Num() - 1);
-		if (Investment[AvailInvestment[flag]]->GetIsActivate()) {
-			temp.Add(AvailInvestment[flag]);
-			flag++;
+		int Idx = AvailInvestment[Flag];
+		if (Investment[Idx]->GetIsActivate()) {
+			Temp.Emplace(Idx);
+			Flag++;
 		} else {
-			if (AvailInvestment.Find(AvailIndex) == INDEX_NONE) {
-				temp.Add(AvailIndex);
-				flag++;
+			if (AvailInvestment.Find(AvailIndex) == INDEX_NONE &&
+				Temp.Find(AvailIndex) == INDEX_NONE) {
+				Temp.Emplace(AvailIndex);
+				Flag++;
 			}
 		}
-	} while (flag >= InvestmentStock);
-
+	} while (Flag < InvestmentStock);
+	
+	//AvailInvestment = temp;
 	AvailInvestment.Empty();
-	for (auto& i : temp) {
-		AvailInvestment.Add(i);
+	for (auto i : Temp) {
+		AvailInvestment.Emplace(i);
 	}
 
 }
