@@ -35,8 +35,8 @@ public:
 	void ActivateLoan();
 	void DisableLoan();
 	UFUNCTION(BlueprintCallable)
-	void Repay();
 	void RepayAll();
+	void Repay();
 
 protected:
 
