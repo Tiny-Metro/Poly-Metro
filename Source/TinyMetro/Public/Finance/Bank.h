@@ -32,6 +32,12 @@ public:
 	// UFunction investment
 	UFUNCTION(BlueprintCallable)
 	int32 GetInvestmentStock() const;
+	UFUNCTION(BlueprintCallable)
+	TArray<UInvestment*> GetAllInvestment() const;
+	UFUNCTION(BlueprintCallable)
+	TArray<UInvestment*> GetAvailableInvestment() const;
+	UFUNCTION(BlueprintCallable)
+	TArray<UInvestment*> RefreshInvestment();
 
 protected:
 	// Function loan
@@ -42,6 +48,8 @@ protected:
 	void InitInvestment();
 	UInvestment* CreateInvestment(FInvestmentData Data, TFunction<bool(void)> Func);
 	void UpdateInvestment();
+	void ChangeInvestment(int Index);
+	void ChangeAllInvestment();
 
 
 protected:
@@ -64,6 +72,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
 	TArray<UInvestment*> Investment;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	TArray<UInvestment*> AvailInvestment;
+	TArray<int32> AvailInvestment;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	int32 MaxInvestmetStock = 3;
+	FTimerHandle InvestmentUpdateHandle;
 
 };

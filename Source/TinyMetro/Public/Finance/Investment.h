@@ -25,12 +25,15 @@ public:
 	void InvestmentSuccess();
 	void InvestmentFail();
 	void InitInvestment();
+	void SetAvailable(bool B);
 
 public:
 	UFUNCTION(BlueprintCallable)
 	FInvestmentData GetInvestmentData() const;
 	UFUNCTION(BlueprintCallable)
 	bool GetIsActivate() const;
+	UFUNCTION(BlueprintCallable)
+	bool GetAvailable();
 	UFUNCTION(BlueprintCallable)
 	void ActivateInvestment();
 	//UFUNCTION(BlueprintCallable)
@@ -46,6 +49,8 @@ protected:
 	int32 RemainTime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	bool IsActivate = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	bool IsAvailable = false;
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroPlayerState* PlayerState;
 	UPROPERTY(BlueprintReadOnly)

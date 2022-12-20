@@ -23,6 +23,10 @@ void UInvestment::SetSuccessFunction(TFunction<bool(void)> Func) {
 	CheckSuccess = Func;
 }
 
+void UInvestment::SetAvailable(bool B) {
+	IsAvailable = B;
+}
+
 void UInvestment::InvestmentSuccess() {
 	
 	InitInvestment();
@@ -77,4 +81,8 @@ FInvestmentData UInvestment::GetInvestmentData() const {
 
 bool UInvestment::GetIsActivate() const {
 	return IsActivate;
+}
+
+bool UInvestment::GetAvailable() {
+	return IsAvailable;
 }

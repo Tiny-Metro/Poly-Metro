@@ -19,6 +19,23 @@ int32 ABank::GetInvestmentStock() const {
 	return int32();
 }
 
+TArray<UInvestment*> ABank::GetAllInvestment() const {
+	return Investment;
+}
+
+TArray<UInvestment*> ABank::GetAvailableInvestment() const {
+	TArray<UInvestment*> temp;
+	for (auto& i : AvailInvestment) {
+		temp.Add(Investment[i]);
+	}
+	return temp;
+}
+
+TArray<UInvestment*> ABank::RefreshInvestment() {
+	ChangeAllInvestment();
+	return GetAvailableInvestment();
+}
+
 // Called when the game starts or when spawned
 void ABank::BeginPlay()
 {
@@ -36,6 +53,7 @@ void ABank::BeginPlay()
 	// Set investment data
 	InitInvestment();
 	UpdateInvestment();
+	AvailInvestment.Add(FMath::RandRange(0, Investment.Num() - 1));
 
 }
 
@@ -119,7 +137,65 @@ UInvestment* ABank::CreateInvestment(FInvestmentData Data, TFunction<bool(void)>
 	return temp;
 }
 
+void ABank::ChangeInvestment(int Index = -1) {
+	int AvailIndex;
+	bool flag = true;
+	do {
+		AvailIndex = FMath::RandRange(0, Investment.Num() - 1);
+		if (AvailInvestment.Find(AvailIndex) == INDEX_NONE) {
+			if (Index == -1) {
+				AvailInvestment.Add(AvailIndex);
+				AvailInvestment.RemoveAt(0);
+			} else {
+				AvailInvestment.Insert(AvailIndex, Index);
+				if (InvestmentStock >= MaxInvestmetStock) {
+					AvailInvestment.RemoveAt(Index + 1);
+				}
+			}
+			flag = false;
+		}
+	} while (flag);
+}
+
+void ABank::ChangeAllInvestment() {
+	TArray<int32> temp;
+	int AvailIndex;
+	int flag = 0;
+	do {
+		AvailIndex = FMath::RandRange(0, Investment.Num() - 1);
+		if (Investment[AvailInvestment[flag]]->GetIsActivate()) {
+			temp.Add(AvailInvestment[flag]);
+			flag++;
+		} else {
+			if (AvailInvestment.Find(AvailIndex) == INDEX_NONE) {
+				temp.Add(AvailIndex);
+				flag++;
+			}
+		}
+	} while (flag >= InvestmentStock);
+
+	AvailInvestment.Empty();
+	for (auto& i : temp) {
+		AvailInvestment.Add(i);
+	}
+
+}
+
 void ABank::UpdateInvestment() {
+	GetWorld()->GetTimerManager().SetTimer(
+		InvestmentUpdateHandle,
+		FTimerDelegate::CreateLambda([&InvestmentStock = InvestmentStock, this]() {
+			if (InvestmentStock < MaxInvestmetStock) {
+				this->ChangeInvestment(InvestmentStock);
+				InvestmentStock++;
+			} else {
+				this->ChangeInvestment();
+			}
+		}),
+		Daytime * 7,
+		true,
+		(Daytime * 7) - (FMath::Fmod(GetWorld()->GetTimeSeconds(), Daytime * 7))
+	);
 }
 
 // Called every frame
