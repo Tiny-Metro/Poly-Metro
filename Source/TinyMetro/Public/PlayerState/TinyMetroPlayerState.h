@@ -16,7 +16,8 @@ class TINYMETRO_API ATinyMetroPlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	virtual FGamePlayInfo GetPlayInfo();
+	UFUNCTION(BlueprintCallable)
+	FGamePlayInfo GetPlayInfo();
 	ATinyMetroPlayerState();
 	
 protected:
