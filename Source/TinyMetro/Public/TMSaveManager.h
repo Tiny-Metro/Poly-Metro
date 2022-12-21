@@ -5,6 +5,12 @@
 #include "Station/Station.h"
 #include "Station/StationManager.h"
 #include "StationSaveGame.h"
+
+#include "WorldSaveGame.h"
+
+#include "GridGenerator/GridCellData.h"
+#include "GridGenerator/GridManager.h"
+
 #include "CoreMinimal.h"
 
 /**
@@ -22,6 +28,13 @@ public:
 
 public :
 
-	void SaveStationManager();
-	void LoadStationManager();
+	void SaveStationManager(class AStationManager* stationmanager);
+	void LoadStationManager(class AStationManager* stationmanager);
+
+	void SpawnStations(AStationManager* stationmanager, FGridCellData GridCellData, StationType Type, int32 StationId, int32 ComplainCurrent, bool ActivateFlag);
+
+
+	void SaveGetWorld(UWorld* tmworld);
+	void LoadGetWorld(UWorld* tmworld);
+
 };

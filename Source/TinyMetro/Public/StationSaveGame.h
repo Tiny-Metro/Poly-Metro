@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "Station/StationType.h"
+#include "GridGenerator/GridCellData.h"
 #include "StationSaveGame.generated.h"
 
 USTRUCT(BlueprintType)
@@ -21,6 +22,8 @@ public:
 		bool IsActive;
 	UPROPERTY()
 		StationType StationTypeValue;
+	UPROPERTY()
+		FGridCellData GridCellData;
 
 };
 

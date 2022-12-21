@@ -7,6 +7,7 @@
 #include "StationType.h"
 #include "Passenger.h"
 #include "../TMSaveManager.h"
+#include "../GridGenerator/GridCellData.h"
 #include "Station.generated.h"
 
 class AStationManager;
@@ -35,6 +36,10 @@ public:
 	void SetStationId(int32 Id);
 	UFUNCTION(BlueprintCallable)
 	void SetStationType(StationType Type);
+	UFUNCTION(BlueprintCallable)
+	void SetGridCellData(FGridCellData gridCellData);
+	UFUNCTION(BlueprintCallable)
+	void SetComplainCurrent(int32 complaincurrent);
 	UFUNCTION(BlueprintCallable)
 	void CalculateComplain();
 	UFUNCTION(BlueprintCallable)
@@ -87,6 +92,8 @@ protected:
 	bool IsActive = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	StationType StationTypeValue = StationType::Circle;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	FGridCellData GridCellData;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")

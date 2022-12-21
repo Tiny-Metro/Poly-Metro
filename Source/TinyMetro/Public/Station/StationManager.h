@@ -37,12 +37,6 @@ protected:
 	void TestFunction();
 
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	void StationSpawnRoutine();
-	void TestFunction();
-
 public:	
 	StationType CalculatePassengerDest(StationType Except) const;
 
@@ -54,7 +48,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Station")
-	TArray<AStation*> Station;
+	TArray<class AStation*> Station;
 	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	FTimerHandle TimerSpawnStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
