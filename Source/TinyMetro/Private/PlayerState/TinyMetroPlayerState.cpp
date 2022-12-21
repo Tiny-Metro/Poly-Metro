@@ -28,3 +28,36 @@ ATinyMetroPlayerState::ATinyMetroPlayerState() {
 	StationManager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 
 }
+
+bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
+	if (Money >= Cost) {
+		switch (Type) {
+		case ItemType::Train:
+			ValidTrain += Amount;
+			break;
+		case ItemType::Subtrain:
+			ValidSubTrain += Amount;
+			break;
+		case ItemType::Lane:
+			ValidLane += Amount;
+			break;
+		case ItemType::Tunnel:
+			ValidTunnel += Amount;
+			break;
+		case ItemType::Bridge:
+			ValidBridge += Amount;
+			break;
+		default:
+			// TODO : Upgrade items
+			break;
+		}
+
+		Money -= Cost * Amount;
+		Profit -= Cost * Amount;
+
+		return true;
+	} else {
+		return false;
+	}
+
+}

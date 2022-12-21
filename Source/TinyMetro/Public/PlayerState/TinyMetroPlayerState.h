@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "PlayerState/GamePlayInfo.h"
+#include "../Shop/ItemType.h"
 #include "TinyMetroPlayerState.generated.h"
 
 /**
@@ -19,6 +20,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FGamePlayInfo GetPlayInfo();
 	ATinyMetroPlayerState();
+	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
