@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "StationType.h"
 #include "Passenger.h"
-#include "../TMSaveManager.h"
+#include "../SaveSystem/TMSaveManager.h"
 #include "../GridGenerator/GridCellData.h"
 #include "Station.generated.h"
 
@@ -21,7 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	AStation();
 
-	friend class TMSaveManager;
+	friend class ATMSaveManager;
 
 
 protected:

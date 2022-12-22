@@ -7,7 +7,7 @@
 #include "Station.h"
 #include "../GridGenerator/GridManager.h"
 #include "../GameModes/TinyMetroGameModeBase.h"
-#include "../TMSaveManager.h"
+#include "../SaveSystem/TMSaveManager.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -21,7 +21,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	friend class TMSaveManager;
+	friend class ATMSaveManager;
 
 protected:
 	UFUNCTION(BlueprintCallable)
