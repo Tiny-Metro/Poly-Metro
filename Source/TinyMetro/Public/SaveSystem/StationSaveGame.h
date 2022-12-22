@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "../Station/StationType.h"
+#include "Station/StationType.h"
 #include "GridGenerator/GridCellData.h"
 #include "StationSaveGame.generated.h"
 

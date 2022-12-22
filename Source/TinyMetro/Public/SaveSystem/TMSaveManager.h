@@ -2,9 +2,7 @@
 
 #pragma once
 
-
 #include "StationSaveGame.h"
-
 #include "WorldSaveGame.h"
 
 #include "GridGenerator/GridCellData.h"
@@ -14,8 +12,9 @@
 #include "GameFramework/Actor.h"
 #include "TMSaveManager.generated.h"
 
-class AStation;
 class AStationManager;
+class AStation;
+
 
 UCLASS()
 class TINYMETRO_API ATMSaveManager : public AActor
@@ -26,6 +25,8 @@ public:
 	// Sets default values for this actor's properties
 	ATMSaveManager();
 
+	friend class Station;
+	friend class StationManager;
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,19 +36,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public:
+public :
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 
 public:
 	AStationManager* stationmanager;
 	UWorld* world;
 
-public:
 	void SaveStationManager();
 	void LoadStationManager();
 
-	void SpawnStations( FGridCellData GridCellData, StationType Type, int32 StationId, int32 ComplainCurrent, bool ActivateFlag);
+	void SpawnStations(FGridCellData GridCellData, StationType Type, int32 StationId, int32 ComplainCurrent, bool ActivateFlag);
+
 
 	void SaveGetWorld();
 	void LoadGetWorld();
