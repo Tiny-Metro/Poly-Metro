@@ -21,7 +21,7 @@ void ATMSaveManager::BeginPlay()
 	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 	world = GetWorld();
 
-	LoadGetWorld();
+	//LoadGetWorld();
 	LoadStationManager();
 
 	AutoSave();
@@ -39,7 +39,7 @@ void ATMSaveManager::Tick(float DeltaTime)
 void ATMSaveManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	SaveGetWorld();
+	//SaveGetWorld();
 	SaveStationManager();
 }
 
@@ -51,7 +51,7 @@ void ATMSaveManager::AutoSave() {
 			AutoSaveCurrent += AutoSaveCount;
 			if (AutoSaveCurrent >= AutoSaveRequire) {
 		
-				SaveGetWorld();
+				//SaveGetWorld();
 				SaveStationManager();
 		
 				AutoSaveCurrent = 0.0f;
@@ -84,7 +84,7 @@ void ATMSaveManager::SaveStationManager() {
 
 	int32 size = stationmanager->Station.Num();
 
-	UE_LOG(LogTemp, Error, TEXT("SaveStationManager Station.num : %d"), stationmanager->Station.Num());
+	//UE_LOG(LogTemp, Error, TEXT("SaveStationManager Station.num : %d"), stationmanager->Station.Num());
 
 	StationSaveData->stations.Empty();
 
@@ -104,11 +104,11 @@ void ATMSaveManager::SaveStationManager() {
 
 		StationSaveData->stations.Add(stationValue);
 
-
+		/*
 		UE_LOG(LogTemp, Error, TEXT("i : %d"), i);
 		UE_LOG(LogTemp, Error, TEXT("GridCellData : %d"), temp->GridCellData.Index);
 
-		UE_LOG(LogTemp, Error, TEXT("stations.num : %d"), StationSaveData->stations.Num());
+		UE_LOG(LogTemp, Error, TEXT("stations.num : %d"), StationSaveData->stations.Num());*/
 	}
 
 	if (!UGameplayStatics::SaveGameToSlot(StationSaveData, "StationSave", 0))
@@ -119,7 +119,7 @@ void ATMSaveManager::SaveStationManager() {
 		UE_LOG(LogTemp, Warning, TEXT("StationSaveGame Success!"));
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("SaveStationManager stations.num : %d"), StationSaveData->stations.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("SaveStationManager stations.num : %d"), StationSaveData->stations.Num());
 }
 
 void ATMSaveManager::LoadStationManager() {
@@ -141,7 +141,7 @@ void ATMSaveManager::LoadStationManager() {
 
 		int32 size = StationLoadData->stations.Num();
 
-		UE_LOG(LogTemp, Warning, TEXT("StationLoadData->station.num : %d"), StationLoadData->stations.Num());
+		//UE_LOG(LogTemp, Warning, TEXT("StationLoadData->station.num : %d"), StationLoadData->stations.Num());
 
 		for (int i = 0; i < size; i++)
 		{
@@ -150,7 +150,7 @@ void ATMSaveManager::LoadStationManager() {
 			SpawnStations(stationValue.GridCellData, stationValue.StationTypeValue, stationValue.StationId, stationValue.ComplainCurrent, stationValue.IsActive);
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("StationManagerLoading Success! Station.num : %d"), stationmanager->Station.Num());
+		//UE_LOG(LogTemp, Warning, TEXT("StationManagerLoading Success! Station.num : %d"), stationmanager->Station.Num());
 	}
 
 }
@@ -193,10 +193,10 @@ void ATMSaveManager::SpawnStations(FGridCellData GridCellData, StationType Type,
 		GridCellData.WorldCoordination.Y,
 		GridStructure::Station);
 
-	UE_LOG(LogTemp, Error, TEXT("Station.Num : %d"), stationmanager->Station.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("Station.Num : %d"), stationmanager->Station.Num());
 }
 
-
+/*
 void ATMSaveManager::SaveGetWorld() {
 
 	UWorldSaveGame* WorldSaveData;
@@ -222,6 +222,10 @@ void ATMSaveManager::SaveGetWorld() {
 		UE_LOG(LogTemp, Warning, TEXT("StationSaveGame Success!"));
 	}
 
+	float deltaseconds = WorldSaveData->TMWorld->GetDeltaSeconds();
+
+	UE_LOG(LogTemp, Warning, TEXT("save deltaseconds : %f"), deltaseconds);
+
 }
 
 void ATMSaveManager::LoadGetWorld() {
@@ -233,5 +237,10 @@ void ATMSaveManager::LoadGetWorld() {
 		world = WorldLoadData->TMWorld;
 
 		UE_LOG(LogTemp, Warning, TEXT("WorldLoading Success!"));
+
+		float deltaseconds = world->GetDeltaSeconds();
+
+		UE_LOG(LogTemp, Warning, TEXT("load deltaseconds : %f"), deltaseconds);
 	}
 }
+*/

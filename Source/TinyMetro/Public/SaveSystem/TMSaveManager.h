@@ -57,7 +57,7 @@ public:
 
 	void AutoSave();
 
-	void SaveGetWorld();
-	void LoadGetWorld();
+	//void SaveGetWorld();
+	//void LoadGetWorld();
 
 };
