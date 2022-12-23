@@ -111,7 +111,9 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
 	tmp->SetStationType(Type);
+	tmp->SetGridCellData(GridCellData);
 	tmp->SetStationId(StationId++);
+
 	if (ActivateFlag) {
 		tmp->ActivateStation();
 	}

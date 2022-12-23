@@ -43,11 +43,19 @@ public:
 	AStationManager* stationmanager;
 	UWorld* world;
 
+	FTimerHandle TimerAutoSave;
+
+	int32 AutoSaveCount = 1000;
+	int32 AutoSaveCurrent = 0;
+	int32 AutoSavePeriod = 7;
+	int32 AutoSaveRequire = 84000; // 12 * 7 * 1000
+
 	void SaveStationManager();
 	void LoadStationManager();
 
 	void SpawnStations(FGridCellData GridCellData, StationType Type, int32 StationId, int32 ComplainCurrent, bool ActivateFlag);
 
+	void AutoSave();
 
 	void SaveGetWorld();
 	void LoadGetWorld();
