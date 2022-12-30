@@ -28,3 +28,29 @@ ATinyMetroPlayerState::ATinyMetroPlayerState() {
 	StationManager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 
 }
+
+int32 ATinyMetroPlayerState::GetSales() const {
+	return Sales;
+}
+
+int32 ATinyMetroPlayerState::GetProfit() const {
+	return Profit;
+}
+
+void ATinyMetroPlayerState::AddMoney(int32 Amount) {
+	Money += Amount;
+}
+
+void ATinyMetroPlayerState::AddSales(int32 Sale) {
+	Sales += Sale;
+}
+
+void ATinyMetroPlayerState::Test() {
+	if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			15.0f,
+			FColor::Yellow,
+			FString::Printf(TEXT("PlayerState")));
+	}
+}
