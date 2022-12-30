@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Station.h"
 #include "../GridGenerator/GridManager.h"
 #include "../GameModes/TinyMetroGameModeBase.h"
 #include "../SaveSystem/TMSaveManager.h"
@@ -28,14 +27,6 @@ protected:
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType();
-  
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	void StationSpawnRoutine();
-
-	void TestFunction();
-
 
 public:	
 	StationType CalculatePassengerDest(StationType Except) const;

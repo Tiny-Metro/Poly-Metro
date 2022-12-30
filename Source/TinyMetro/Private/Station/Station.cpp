@@ -166,8 +166,11 @@ void AStation::PassengerSpawnRoutine() {
 }
 
 void AStation::SpawnPassenger() {
-	UPassenger* tmp = NewObject<UPassenger>();
-	tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+	UPassenger* tmp = UPassenger::ConstructPassenger(
+		StationManager->CalculatePassengerDest(StationTypeValue)
+	);
+	//UPassenger* tmp = NewObject<UPassenger>();
+	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
 	Passenger.Add(tmp);
 
 	//Log
