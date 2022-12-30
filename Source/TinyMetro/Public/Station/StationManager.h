@@ -30,6 +30,7 @@ protected:
 
 public:	
 	StationType CalculatePassengerDest(StationType Except) const;
+	float GetComplainAverage();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")

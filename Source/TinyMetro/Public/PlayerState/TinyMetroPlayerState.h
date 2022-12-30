@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "PlayerState/GamePlayInfo.h"
+#include "../Shop/ItemType.h"
 #include "TinyMetroPlayerState.generated.h"
 
 /**
@@ -15,9 +17,21 @@ class TINYMETRO_API ATinyMetroPlayerState : public APlayerState
 	GENERATED_BODY()
 
 public:
-	virtual void GetPlayInfo();
+	UFUNCTION(BlueprintCallable)
+	FGamePlayInfo GetPlayInfo();
+	ATinyMetroPlayerState();
+	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
 	
-	
+	UFUNCTION(BlueprintCallable)
+	int32 GetSales() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetProfit() const;
+
+public:
+	void AddMoney(int32 Amount);
+	void AddSales(int32 Sale);
+	void Test();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 Arrive = 0;
@@ -59,4 +73,7 @@ protected:
 	int32 UsingTunnel = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
 	int32 UsingBridge = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = "Config")
+	class AStationManager* StationManager;
 };

@@ -86,7 +86,16 @@ StationType AStationManager::CalculatePassengerDest(StationType Except) const {
 	return tmp;
 }
 
+float AStationManager::GetComplainAverage() {
+	int32 ComplainSum = 0;
+	for (auto& i : Station) {
+		ComplainSum += i->GetComplain();
+	}
+	return ((float)ComplainSum)/Station.Num();
+}
+
 void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
+	
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 
@@ -115,10 +124,12 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId++);
 
 	if (ActivateFlag) {
-		tmp->ActivateStation();
+		temp->ActivateStation();
 	}
+	temp->FinishSpawning(SpawnTransform);
 
-	Station.Add(tmp);
+
+	Station.Add(temp);
 	GridManager->SetGridStructure(
 		GridCellData.WorldCoordination.X,
 		GridCellData.WorldCoordination.Y, 

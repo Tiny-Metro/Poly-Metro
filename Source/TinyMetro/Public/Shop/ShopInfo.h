@@ -4,36 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "GamePlayInfo.generated.h"
+#include "ShopInfo.generated.h"
 
 /**
  * 
  */
 USTRUCT(BlueprintType)
-struct TINYMETRO_API FGamePlayInfo
+struct TINYMETRO_API FShopInfo
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 PlayTime;
+	int32 CostTrain = 150;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Sales;
+	int32 CostSubtrain = 300;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Profit;
+	int32 CostLane = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SalesInWeek;
+	int32 CostTunnel = 200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ProfitInWeek;
+	int32 CostBridge = 200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ComplainAverage;
+	int32 CostUpgradeTrain = 300;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Passenger;
+	int32 CostUpgradeSubtrain = 500;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 UsingTrain;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 UsingLane;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 UsingTunnel;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ConnectedStation;
+	int32 CostUpgradeStation = 500;
 };
