@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Station.h"
 #include "../GridGenerator/GridManager.h"
 #include "../GameModes/TinyMetroGameModeBase.h"
+#include "../TMSaveManager.h"
+#include "Station.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -17,6 +18,10 @@ class TINYMETRO_API AStationManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStationManager();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	friend class TMSaveManager;
 
 protected:
 	UFUNCTION(BlueprintCallable)
@@ -28,14 +33,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void StationSpawnRoutine();
-
 	void TestFunction();
 
-
-
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	StationType CalculatePassengerDest(StationType Except) const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
@@ -44,8 +45,8 @@ protected:
 	int32 StationSpawnPerSec = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnCurrent = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Station")
-	TArray<AStation*> Station;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Station")
+	TArray<class AStation*> Station;
 	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	FTimerHandle TimerSpawnStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
