@@ -68,6 +68,15 @@ void AStation::SetStationType(StationType Type) {
 	}
 }
 
+void AStation::SetGridCellData(FGridCellData gridCellData) {
+
+	GridCellData = gridCellData;
+}
+
+void AStation::SetComplainCurrent(int32 complaincurrent) {
+	ComplainCurrent = complaincurrent;
+}
+
 void AStation::CalculateComplain() {
 }
 
