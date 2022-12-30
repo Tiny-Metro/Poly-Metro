@@ -22,6 +22,16 @@ public:
 	ATinyMetroPlayerState();
 	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
 	
+	UFUNCTION(BlueprintCallable)
+	int32 GetSales() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetProfit() const;
+
+public:
+	void AddMoney(int32 Amount);
+	void AddSales(int32 Sale);
+	void Test();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 Arrive = 0;

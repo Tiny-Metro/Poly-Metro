@@ -246,9 +246,9 @@ void AStation::PassengerSpawnRoutine() {
 			//		FColor::Yellow,
 			//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
 		}),
-		1.0f,
-		true,
-		1.0f
+		1.0f, // Repeat delay
+		true, // Repeat
+		1.0f // First delay
 		);
 }
 
