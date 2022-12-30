@@ -107,29 +107,22 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		return;
 	}
 
-	//// Check null
-	//UClass* SpawnClass = SpawnActor->StaticClass();
-	//if (SpawnClass == nullptr) {
-	//	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-	//	return;
-	//}
+	// Check null
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return;
+	}
 
-	//// Spawn actor
-	//FActorSpawnParameters SpawnParams;
-	//SpawnParams.Owner = this;
-	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
-	//tmp->SetStationType(Type);
-	//tmp->SetStationId(StationId++);
-	//if (ActivateFlag) {
-	//	tmp->ActivateStation();
-	//}
+	// Spawn actor
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
+	tmp->SetStationType(Type);
+	tmp->SetGridCellData(GridCellData);
+	tmp->SetStationId(StationId++);
 
-	FTransform SpawnTransform;
-	SpawnTransform.SetLocation(GridCellData.WorldLocation);
-	AStation* temp = GetWorld()->SpawnActorDeferred<AStation>(GeneratedBP->GeneratedClass, SpawnTransform);
-	temp->SetStationType(Type);
-	temp->SetStationId(StationId++);
 	if (ActivateFlag) {
 		temp->ActivateStation();
 	}

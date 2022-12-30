@@ -3,6 +3,7 @@
 
 #include "GameModes/GameModeBaseSeoul.h"
 #include "PlayerState/PlayerStateSeoul.h"
+#include "Kismet/GameplayStatics.h"
 
 AGameModeBaseSeoul::AGameModeBaseSeoul() {
     PlayerStateClass = APlayerStateSeoul::StaticClass();
@@ -14,9 +15,13 @@ FString AGameModeBaseSeoul::GetFileName() const {
 
 TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
     TMap<FIntPoint, StationType> Tmp;
-    Tmp.Add(FIntPoint(27, 16), StationType::Triangle);
-    Tmp.Add(FIntPoint(32, 21), StationType::Square);
-    Tmp.Add(FIntPoint(39, 12), StationType::Circle);
+    if (!UGameplayStatics::DoesSaveGameExist("StationSave", 0))
+    {
+        Tmp.Add(FIntPoint(27, 16), StationType::Triangle);
+        Tmp.Add(FIntPoint(32, 21), StationType::Square);
+        Tmp.Add(FIntPoint(39, 12), StationType::Circle);
+    }
+    
     return Tmp;
 }
 
