@@ -116,6 +116,8 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(GridCellData.WorldLocation);
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
@@ -124,12 +126,12 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId++);
 
 	if (ActivateFlag) {
-		temp->ActivateStation();
+		tmp->ActivateStation();
 	}
-	temp->FinishSpawning(SpawnTransform);
+	tmp->FinishSpawning(SpawnTransform);
 
 
-	Station.Add(temp);
+	Station.Add(tmp);
 	GridManager->SetGridStructure(
 		GridCellData.WorldCoordination.X,
 		GridCellData.WorldCoordination.Y, 
