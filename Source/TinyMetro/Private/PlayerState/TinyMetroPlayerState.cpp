@@ -59,6 +59,7 @@ bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
 	} else {
 		return false;
 	}
+}
 
 int32 ATinyMetroPlayerState::GetSales() const {
 	return Sales;

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SampleEmptyClass.h"
 #include "SampleEcho.generated.h"
 
 UCLASS()
@@ -15,8 +14,6 @@ class TINYMETRO_API ASampleEcho : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ASampleEcho();
-
-	SampleEmptyClass c;
 
 protected:
 	// Called when the game starts or when spawned
