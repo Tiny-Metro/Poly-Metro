@@ -14,7 +14,6 @@
 
 class AStationManager;
 class AStation;
-class ATimer;
 class AGameModeBaseSeoul;
 
 
@@ -45,7 +44,6 @@ public :
 public:
 	AStationManager* stationmanager;
 	AGameModeBaseSeoul* gameModeBaseSeoul;
-	ATimer* timer;
 
 	FTimerHandle TimerAutoSave;
 
