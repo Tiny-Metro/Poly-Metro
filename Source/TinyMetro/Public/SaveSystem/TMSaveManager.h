@@ -14,6 +14,8 @@
 
 class AStationManager;
 class AStation;
+class ATimer;
+class AGameModeBaseSeoul;
 
 
 UCLASS()
@@ -27,6 +29,7 @@ public:
 
 	friend class Station;
 	friend class StationManager;
+	friend class GameModeBaseSeoul;
 
 protected:
 	// Called when the game starts or when spawned
@@ -41,7 +44,8 @@ public :
 
 public:
 	AStationManager* stationmanager;
-	UWorld* world;
+	AGameModeBaseSeoul* gameModeBaseSeoul;
+	ATimer* timer;
 
 	FTimerHandle TimerAutoSave;
 
@@ -57,7 +61,7 @@ public:
 
 	void AutoSave();
 
-	//void SaveGetWorld();
-	//void LoadGetWorld();
+	void SaveWorldInfo();
+	void LoadWorldInfo();
 
 };

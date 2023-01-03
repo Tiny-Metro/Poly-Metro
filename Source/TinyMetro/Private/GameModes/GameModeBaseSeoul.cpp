@@ -18,10 +18,8 @@ void AGameModeBaseSeoul::BeginPlay()
     FRotator rotator = FRotator::ZeroRotator;
     FVector spawnLocation = FVector::ZeroVector;
 
-    Timer =
-        GetWorld()->
-        SpawnActor<ATimer>();
-
+    Timer = GetWorld()->SpawnActor<ATimer>();
+    TMSaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
 }
 
 FString AGameModeBaseSeoul::GetFileName() const {
@@ -48,4 +46,17 @@ int32 AGameModeBaseSeoul::GetDaytime() const {
 float AGameModeBaseSeoul::GetTime() {
 
     return Timer->ElapseTime;
+}
+
+void AGameModeBaseSeoul::SetTime(float elapseTime) {
+
+    if (Timer == nullptr || Timer == NULL) {
+        UE_LOG(LogTemp, Error, TEXT("Timer is nullptr!"));
+        return;
+    }
+    else {
+        Timer->ElapseTime = elapseTime;
+    }
+
+    
 }

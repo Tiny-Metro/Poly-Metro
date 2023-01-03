@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "../Timer/Timer.h"
+#include "../SaveSystem/TMSaveManager.h"
 #include "GameModeBaseSeoul.generated.h"
 
 
@@ -27,7 +28,9 @@ public:
 	UFUNCTION()
 		float GetTime();
 
-	TSubclassOf<ATimer> ActorToSpawn;
+	UFUNCTION()
+		void SetTime(float elapseTime);
 
 	ATimer* Timer;
+	ATMSaveManager* TMSaveManager;
 };
