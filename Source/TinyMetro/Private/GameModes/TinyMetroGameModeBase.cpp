@@ -3,9 +3,20 @@
 
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "PlayerState/TinyMetroPlayerState.h"
+#include <UObject/ConstructorHelpers.h>
 
 ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
     PlayerStateClass = ATinyMetroPlayerState::StaticClass();
+    static ConstructorHelpers::FClassFinder<APawn> RTS_Camera(
+        TEXT("Blueprint'/Game/Camera/BP_RtsCamera.BP_RtsCamera_C'"));
+    if (RTS_Camera.Succeeded()) {
+        DefaultPawnClass = RTS_Camera.Class;
+    }
+    static ConstructorHelpers::FClassFinder<AController> RTS_Controller(
+        TEXT("Blueprint'/Game/Camera/BP_RtsController.BP_RtsController_C'"));
+    if (RTS_Controller.Succeeded()) {
+        PlayerControllerClass = RTS_Controller.Class;
+    }
 }
 
 FString ATinyMetroGameModeBase::GetFileName() const {
