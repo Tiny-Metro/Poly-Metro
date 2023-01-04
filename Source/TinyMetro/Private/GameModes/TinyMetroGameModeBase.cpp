@@ -4,6 +4,7 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <UObject/ConstructorHelpers.h>
+#include <GameFramework/HUD.h>
 
 ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
     PlayerStateClass = ATinyMetroPlayerState::StaticClass();
@@ -16,6 +17,11 @@ ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
         TEXT("Blueprint'/Game/Camera/BP_RtsController.BP_RtsController_C'"));
     if (RTS_Controller.Succeeded()) {
         PlayerControllerClass = RTS_Controller.Class;
+    }
+    static ConstructorHelpers::FClassFinder<AHUD> MyHUD(
+        TEXT("Blueprint'/Game/Stage/UI/HUD/BP_PlayerHUD.BP_PlayerHUD_C'"));
+    if (MyHUD.Succeeded()) {
+        HUDClass = MyHUD.Class;
     }
 }
 
