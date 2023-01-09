@@ -60,7 +60,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnExtend = 3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	int32 StationSpawnPrevent = 2;
+	int32 StationSpawnPrevent = 3;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FIntPoint GridSize;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
