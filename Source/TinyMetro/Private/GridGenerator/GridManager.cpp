@@ -36,6 +36,23 @@ TArray<FGridCellData> AGridManager::GetGridCellData() const {
 	return GridCellData;
 }
 
+FGridCellData AGridManager::GetGridCellDataByCoord(FVector Coord, bool& Succeess) const {
+	Succeess = false;
+	FIntPoint ApproxCoord(
+		CoordApproximation(Coord.X, GridSize.X % 2 == 0),
+		CoordApproximation(Coord.Y, GridSize.Y % 2 == 0)
+	);
+
+	for (auto i : GridCellData) {
+		if (i.WorldCoordination == ApproxCoord) {
+			Succeess = true;
+			return i;
+		}
+	}
+
+	return GetGridCellDataByPoint(GridSize.X / 2, GridSize.Y / 2);
+}
+
 FGridCellData AGridManager::GetGridCellDataByPoint(int X, int Y) const {
 	if (X > GridSize.X || Y > GridSize.Y) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("AGridManager::GetGridCellDataAtPoin : Invalid Grid Index")));
@@ -175,6 +192,15 @@ TPair<FVector2D, double> AGridManager::FindCircle() {
 	}
 
 	return CurrentCircle;
+}
+
+int32 AGridManager::CoordApproximation(double Coord, bool Flag) const {
+	if (!Flag) Coord += (200 * (Coord >= 0 ? 1 : -1));
+	int tmp = Coord / 400;
+	int result = tmp * 400;
+	if (Flag) result += (200 * (Coord >= 0 ? 1 : -1));
+
+	return result;
 }
 
 FVector2D AGridManager::FindCenter(FVector2D A, FVector2D B) {

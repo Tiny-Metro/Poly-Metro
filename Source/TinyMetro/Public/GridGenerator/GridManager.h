@@ -31,11 +31,13 @@ public:
 	void SetGridSize(FIntPoint& Size);
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<FGridCellData> GetGridCellData() const;
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable)
+	FGridCellData GetGridCellDataByCoord(FVector Coord, bool& Success) const;
+	UFUNCTION(BlueprintCallable)
 	FGridCellData GetGridCellDataByPoint(int X, int Y) const;
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable)
 	FGridCellData GetGridCellDataByIndex(int Index) const;
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable)
 	FGridCellData GetGridCellDataRandom();
 	UFUNCTION(BlueprintCallable)
 	void SetGridStructure(int X, int Y, GridStructure Structure);
@@ -44,6 +46,7 @@ private:
 	TPair<FVector2D, double> FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2);
 	TPair<FVector2D, double> FindCircleWithPoints(FVector2D P1, int Index);
 	TPair<FVector2D, double> FindCircle();
+	int32 CoordApproximation(double Coord, bool Flag) const;
 	FVector2D FindCenter(FVector2D A, FVector2D B);
 	FVector2D FindCenter(FVector2D A, FVector2D B, FVector2D C);
 	double GetDistance(FVector2D A, FVector2D B);
