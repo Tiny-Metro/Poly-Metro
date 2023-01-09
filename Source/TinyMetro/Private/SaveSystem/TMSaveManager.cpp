@@ -170,6 +170,18 @@ void ATMSaveManager::LoadStationManager() {
 
 }
 
+void ATMSaveManager::DeleteSaveFiles() {
+	if (UGameplayStatics::DoesSaveGameExist("StationSave", 0)) {
+		UGameplayStatics::DeleteGameInSlot("StationSave", 0);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist("WorldInfoSave", 0)) {
+		UGameplayStatics::DeleteGameInSlot("WorldInfoSave", 0);
+	}
+
+	UKismetSystemLibrary::QuitGame(this, 0, EQuitPreference::Quit, false);
+}
+
 void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 

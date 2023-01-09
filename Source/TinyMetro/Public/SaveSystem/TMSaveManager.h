@@ -58,6 +58,8 @@ public:
 	void SpawnStations(FStationValuesStruct StationValues);
 
 
+	void DeleteSaveFiles();
+
 	void AutoSave();
 
 	void SaveWorldInfo();
