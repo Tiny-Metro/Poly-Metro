@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameModes/TinyMetroGameModeBase.h"
-#include "../Timer/Timer.h"
-#include "../SaveSystem/TMSaveManager.h"
 #include "GameModeBaseSeoul.generated.h"
 
 
@@ -25,12 +23,4 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-		float GetTime();
-
-	UFUNCTION()
-		void SetTime(float elapseTime);
-
-	ATimer* Timer;
-	ATMSaveManager* TMSaveManager;
 };

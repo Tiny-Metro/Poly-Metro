@@ -13,13 +13,6 @@ void AGameModeBaseSeoul::BeginPlay()
 {
     Super::BeginPlay();
 
-    FActorSpawnParameters spawnParams;
-    spawnParams.Owner = this;
-    FRotator rotator = FRotator::ZeroRotator;
-    FVector spawnLocation = FVector::ZeroVector;
-
-    Timer = GetWorld()->SpawnActor<ATimer>();
-    TMSaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
 }
 
 FString AGameModeBaseSeoul::GetFileName() const {
@@ -40,23 +33,4 @@ TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
 
 int32 AGameModeBaseSeoul::GetDaytime() const {
     return 12;
-}
-
-
-float AGameModeBaseSeoul::GetTime() {
-
-    return Timer->ElapseTime;
-}
-
-void AGameModeBaseSeoul::SetTime(float elapseTime) {
-
-    if (Timer == nullptr || Timer == NULL) {
-        UE_LOG(LogTemp, Error, TEXT("Timer is nullptr!"));
-        return;
-    }
-    else {
-        Timer->ElapseTime = elapseTime;
-    }
-
-    
 }

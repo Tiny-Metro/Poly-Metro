@@ -16,6 +16,6 @@ class TINYMETRO_API UWorldSaveGame : public USaveGame
 
 public:
 	UPROPERTY()
-		float ElapseTime;
+		float ElapseTimeSec;
 	
 };

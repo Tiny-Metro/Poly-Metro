@@ -6,7 +6,10 @@
 #include "GameFramework/PlayerState.h"
 #include "PlayerState/GamePlayInfo.h"
 #include "../Shop/ItemType.h"
+#include "../Timer/Timer.h"
 #include "TinyMetroPlayerState.generated.h"
+
+class ATinyMetroGameModeBase;
 
 /**
  * 
@@ -20,12 +23,29 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FGamePlayInfo GetPlayInfo();
 	ATinyMetroPlayerState();
+
+	virtual void BeginPlay() override;
+
 	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetSales() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetProfit() const;
+
+public:
+	//게임 플레이 시간
+	UFUNCTION()
+		float GetPlayTimeSec();
+
+	UFUNCTION()
+		void SetPlayTimeSec(float elapseTimeSec);
+
+	UFUNCTION()
+		int32 GetDay();
+
+	UFUNCTION()
+		float GetDayTime();
 
 public:
 	void AddMoney(int32 Amount);
@@ -72,8 +92,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
 	int32 UsingTunnel = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingBridge = 0;
+	int32 UsingBridge = 0;	
+
+	UPROPERTY()
+		int32 DayTime;
 
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class AStationManager* StationManager;
+
+	UPROPERTY()
+	class ATimer* Timer;
+
+	UPROPERTY()
+	class ATMSaveManager* TMSaveManager;
+
+	UPROPERTY()
+		class ATinyMetroGameModeBase* TinyMetroGameModeBase;
 };

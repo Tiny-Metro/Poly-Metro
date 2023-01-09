@@ -23,6 +23,6 @@ void ATimer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ElapseTime += DeltaTime;
+	ElapseTimeSec += DeltaTime;
 }
 

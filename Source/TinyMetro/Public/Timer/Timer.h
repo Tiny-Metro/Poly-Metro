@@ -25,5 +25,5 @@ public:
 
 public:
 	UPROPERTY()
-		float ElapseTime;
+		float ElapseTimeSec;
 };

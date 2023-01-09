@@ -3,7 +3,7 @@
 #include "SaveSystem/TMSaveManager.h"
 #include "../../Public/Station/StationManager.h"
 #include "../../Public/Station/Station.h"
-#include "GameModes/GameModeBaseSeoul.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -21,7 +21,7 @@ void ATMSaveManager::BeginPlay()
 	Super::BeginPlay();
 
 	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-	gameModeBaseSeoul = Cast<AGameModeBaseSeoul>(UGameplayStatics::GetGameMode(GetWorld()));
+	TinyMetroPlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
 
 	LoadWorldInfo();
 	LoadStationManager();
@@ -214,7 +214,7 @@ void ATMSaveManager::SaveWorldInfo() {
 		return;
 	}
 
-	WorldInfoSaveData->ElapseTime = gameModeBaseSeoul->GetTime();
+	WorldInfoSaveData->ElapseTimeSec = TinyMetroPlayerState->GetPlayTimeSec();
 
 	if (!UGameplayStatics::SaveGameToSlot(WorldInfoSaveData, "WorldInfoSave", 0))
 	{
@@ -224,9 +224,10 @@ void ATMSaveManager::SaveWorldInfo() {
 		UE_LOG(LogTemp, Warning, TEXT("StationSaveGame Success!"));
 	}
 
-	float deltaseconds = WorldInfoSaveData->ElapseTime;
+	float deltaseconds = WorldInfoSaveData->ElapseTimeSec;
 
-	UE_LOG(LogTemp, Warning, TEXT("save ElapseTime : %f"), deltaseconds);
+	//UE_LOG(LogTemp, Warning, TEXT("save ElapseTimeSec : %f"), deltaseconds);
+
 
 }
 
@@ -236,12 +237,13 @@ void ATMSaveManager::LoadWorldInfo() {
 	{
 		UWorldSaveGame* WorldInfoLoadData = Cast<UWorldSaveGame>(UGameplayStatics::LoadGameFromSlot("WorldInfoSave", 0));
 
-		gameModeBaseSeoul->SetTime(WorldInfoLoadData->ElapseTime);
+		TinyMetroPlayerState->SetPlayTimeSec(WorldInfoLoadData->ElapseTimeSec);
 
 		UE_LOG(LogTemp, Warning, TEXT("WorldLoading Success!"));
 
-		float deltaseconds = gameModeBaseSeoul->GetTime();
+		float deltaseconds = TinyMetroPlayerState->GetPlayTimeSec();
 
-		UE_LOG(LogTemp, Warning, TEXT("load deltaseconds : %f"), deltaseconds);
+		//UE_LOG(LogTemp, Warning, TEXT("load ElapseTimeSec : %f"), deltaseconds);
+
 	}
 }
