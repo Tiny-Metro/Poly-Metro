@@ -13,5 +13,9 @@ UCLASS()
 class TINYMETRO_API UUserHUD : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UpdateMoney();
+	virtual void UpdateMoney_Implementation();
 };

@@ -3,3 +3,6 @@
 
 #include "HUD/UserHUD.h"
 
+void UUserHUD::UpdateMoney_Implementation() {
+
+}
