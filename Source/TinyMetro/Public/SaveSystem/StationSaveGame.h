@@ -8,6 +8,18 @@
 #include "GridGenerator/GridCellData.h"
 #include "StationSaveGame.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FPassengerValues
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+		StationType Destination;
+};
+
+
 USTRUCT(BlueprintType)
 struct TINYMETRO_API FStationValuesStruct
 {
@@ -24,8 +36,11 @@ public:
 		StationType StationTypeValue;
 	UPROPERTY()
 		FGridCellData GridCellData;
-
+	UPROPERTY()
+		TArray <FPassengerValues> passengers;
 };
+
+
 
 UCLASS()
 class TINYMETRO_API UStationSaveGame : public USaveGame
