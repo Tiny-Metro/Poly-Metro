@@ -18,4 +18,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void UpdateMoney();
 	virtual void UpdateMoney_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UpdateCurrentEvent();
+	virtual void UpdateCurrentEvent_Implementation();
+
 };

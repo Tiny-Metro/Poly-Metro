@@ -4,5 +4,6 @@
 #include "HUD/UserHUD.h"
 
 void UUserHUD::UpdateMoney_Implementation() {
-
 }
+
+void UUserHUD::UpdateCurrentEvent_Implementation() {}
