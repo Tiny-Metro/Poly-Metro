@@ -228,7 +228,6 @@ void ATMSaveManager::SaveWorldInfo() {
 
 	//UE_LOG(LogTemp, Warning, TEXT("save ElapseTimeSec : %f"), deltaseconds);
 
-
 }
 
 void ATMSaveManager::LoadWorldInfo() {
@@ -244,6 +243,10 @@ void ATMSaveManager::LoadWorldInfo() {
 		float deltaseconds = TinyMetroPlayerState->GetPlayTimeSec();
 
 		//UE_LOG(LogTemp, Warning, TEXT("load ElapseTimeSec : %f"), deltaseconds);
+
+		//UE_LOG(LogTemp, Warning, TEXT("load GetDay : %d"), TinyMetroPlayerState->GetDay());
+
+		//UE_LOG(LogTemp, Warning, TEXT("load GetDayTime : %f"), TinyMetroPlayerState->GetDayTime());
 
 	}
 }

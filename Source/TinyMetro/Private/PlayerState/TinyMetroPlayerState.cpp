@@ -31,19 +31,23 @@ ATinyMetroPlayerState::ATinyMetroPlayerState() {
 
 void ATinyMetroPlayerState::BeginPlay() {
 	TinyMetroGameModeBase = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	
-	DayTime = TinyMetroGameModeBase->GetDaytime();
 
-	if (IsValid(TinyMetroGameModeBase)) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
-			FString::Printf(TEXT("Hi %d"), DayTime));
-	}
+	DayTime = TinyMetroGameModeBase->GetDaytime();
 
 	Timer = GetWorld()->SpawnActor<ATimer>();
 	TMSaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
+	/*TMSaveManager = GetWorld()->SpawnActorDeferred<ATMSaveManager>(ATMSaveManager::StaticClass(),
+		FTransform());
+	TMSaveManager->FinishSpawning(FTransform());*/
+	/*
+	if (IsValid(TinyMetroGameModeBase)) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
+			FString::Printf(TEXT("Hi %d"), DayTime));
+	}*/
+
 	
-	GetDay();
-	GetDayTime();
+	//GetDay();
+	//GetDayTime();
 	
 }
 
@@ -112,9 +116,9 @@ int32 ATinyMetroPlayerState::GetDay() {
 	float CurrentSec= GetPlayTimeSec();
 
 	int32 CurrentDay = CurrentSec / DayTime;
-
+	/*
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
-		FString::Printf(TEXT("CurrentDay %d"), CurrentDay));
+		FString::Printf(TEXT("CurrentDay %d"), CurrentDay));*/
 
 	return CurrentDay;
 
@@ -125,8 +129,9 @@ float ATinyMetroPlayerState::GetDayTime() {
 
 	float CurrentHour = GetPlayTimeSec() - (GetDay() * DayTime);
 
+	/*
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
-		FString::Printf(TEXT("CurrentHour %f"), CurrentHour));
+		FString::Printf(TEXT("CurrentHour %f"),CurrentHour));*/
 
 	return CurrentHour;
 }

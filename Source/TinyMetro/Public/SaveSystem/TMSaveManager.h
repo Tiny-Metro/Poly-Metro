@@ -43,7 +43,7 @@ public :
 
 public:
 	AStationManager* stationmanager;
-	ATinyMetroPlayerState* TinyMetroPlayerState; //TODO player state 로 변경 
+	ATinyMetroPlayerState* TinyMetroPlayerState; 
 
 	FTimerHandle TimerAutoSave;
 
