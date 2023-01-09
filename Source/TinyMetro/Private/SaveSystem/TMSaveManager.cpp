@@ -41,8 +41,10 @@ void ATMSaveManager::Tick(float DeltaTime)
 void ATMSaveManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	SaveWorldInfo();
-	SaveStationManager();
+	if (!testing) {
+		SaveWorldInfo();
+		SaveStationManager();
+	}
 }
 
 void ATMSaveManager::AutoSave() {
@@ -51,7 +53,7 @@ void ATMSaveManager::AutoSave() {
 		TimerAutoSave,
 		FTimerDelegate::CreateLambda([&]() {
 			AutoSaveCurrent += AutoSaveCount;
-			if (AutoSaveCurrent >= AutoSaveRequire) {
+			if (AutoSaveCurrent >=AutoSaveRequire) {
 		
 				SaveWorldInfo();
 				SaveStationManager();
@@ -172,14 +174,16 @@ void ATMSaveManager::LoadStationManager() {
 
 void ATMSaveManager::DeleteSaveFiles() {
 	if (UGameplayStatics::DoesSaveGameExist("StationSave", 0)) {
-		UGameplayStatics::DeleteGameInSlot("StationSave", 0);
+		bool check =  UGameplayStatics::DeleteGameInSlot("StationSave", 0);
 	}
 
 	if (UGameplayStatics::DoesSaveGameExist("WorldInfoSave", 0)) {
-		UGameplayStatics::DeleteGameInSlot("WorldInfoSave", 0);
+		bool check = UGameplayStatics::DeleteGameInSlot("WorldInfoSave", 0);
 	}
 
-	UKismetSystemLibrary::QuitGame(this, 0, EQuitPreference::Quit, false);
+	testing = true;
+
+	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, false);
 }
 
 void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
@@ -250,7 +254,7 @@ void ATMSaveManager::SaveWorldInfo() {
 
 	float deltaseconds = WorldInfoSaveData->ElapseTimeSec;
 
-	//UE_LOG(LogTemp, Warning, TEXT("save ElapseTimeSec : %f"), deltaseconds);
+	UE_LOG(LogTemp, Warning, TEXT("save ElapseTimeSec : %f"), deltaseconds);
 
 }
 
@@ -266,7 +270,7 @@ void ATMSaveManager::LoadWorldInfo() {
 
 		float deltaseconds = TinyMetroPlayerState->GetPlayTimeSec();
 
-		//UE_LOG(LogTemp, Warning, TEXT("load ElapseTimeSec : %f"), deltaseconds);
+		UE_LOG(LogTemp, Warning, TEXT("load ElapseTimeSec : %f"), deltaseconds);
 
 		//UE_LOG(LogTemp, Warning, TEXT("load GetDay : %d"), TinyMetroPlayerState->GetDay());
 

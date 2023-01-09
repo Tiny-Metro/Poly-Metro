@@ -52,12 +52,14 @@ public:
 	int32 AutoSavePeriod = 7;
 	int32 AutoSaveRequire = 84000; // 12 * 7 * 1000
 
+
+	bool testing = false;
 	void SaveStationManager();
 	void LoadStationManager();
 
 	void SpawnStations(FStationValuesStruct StationValues);
 
-
+	UFUNCTION(BlueprintCallable)
 	void DeleteSaveFiles();
 
 	void AutoSave();
