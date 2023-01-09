@@ -32,6 +32,10 @@ public:
 	int32 GetSales() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetProfit() const;
+	UFUNCTION(BlueprintCallable)
+	int32& GetMoney();
+
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	//게임 플레이 시간

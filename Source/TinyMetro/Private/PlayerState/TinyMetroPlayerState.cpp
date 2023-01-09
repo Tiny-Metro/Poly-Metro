@@ -49,6 +49,8 @@ void ATinyMetroPlayerState::BeginPlay() {
 	//GetDay();
 	//GetDayTime();
 	
+	PrimaryActorTick.bCanEverTick = true;
+	SetActorTickInterval(1.0);
 }
 
 bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
@@ -134,6 +136,17 @@ float ATinyMetroPlayerState::GetDayTime() {
 		FString::Printf(TEXT("CurrentHour %f"),CurrentHour));*/
 
 	return CurrentHour;
+int32& ATinyMetroPlayerState::GetMoney() {
+	return Money;
+}
+
+void ATinyMetroPlayerState::Tick(float DeltaTime) {
+	// Test code : Need to Remove
+	Money++;
+	/*if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Money : %d"), Money));
+	}*/
 }
 
 void ATinyMetroPlayerState::AddMoney(int32 Amount) {
