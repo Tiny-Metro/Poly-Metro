@@ -136,6 +136,8 @@ float ATinyMetroPlayerState::GetDayTime() {
 		FString::Printf(TEXT("CurrentHour %f"),CurrentHour));*/
 
 	return CurrentHour;
+
+}
 int32& ATinyMetroPlayerState::GetMoney() {
 	return Money;
 }
