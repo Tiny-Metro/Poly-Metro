@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "StationType.h"
+#include "../SaveSystem/TMSaveManager.h"
 #include "Passenger.generated.h"
 
 /**
@@ -18,6 +19,8 @@ class TINYMETRO_API UPassenger : public UObject
 public:
 	void SetDestination(StationType Dest);
 	static UPassenger* ConstructPassenger(StationType Dest);
+
+	friend class ATMSaveManager;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")

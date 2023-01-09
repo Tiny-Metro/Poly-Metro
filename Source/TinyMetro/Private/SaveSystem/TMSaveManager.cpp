@@ -95,6 +95,9 @@ void ATMSaveManager::SaveStationManager() {
 	
 		AStation* temp = stationmanager->Station[i];
 
+		
+		int32 passengersSize = temp->Passenger.Num();
+
 		FStationValuesStruct stationValue;
 
 		stationValue.ComplainCurrent = temp->ComplainCurrent;
@@ -103,6 +106,16 @@ void ATMSaveManager::SaveStationManager() {
 		stationValue.StationTypeValue = temp->StationTypeValue;
 		stationValue.GridCellData = temp->GridCellData;
 		//complain, stationid, isActive, stationtypevalue
+
+		for (int j = 0; j < passengersSize; j++) {
+			UPassenger* passenger = temp->Passenger[j];
+
+			FPassengerValues passengerValue;
+
+			passengerValue.Destination = passenger->Destination;
+
+			stationValue.passengers.Add(passengerValue);
+		}
 
 		StationSaveData->stations.Add(stationValue);
 
@@ -149,7 +162,7 @@ void ATMSaveManager::LoadStationManager() {
 		{
 			FStationValuesStruct stationValue = StationLoadData->stations[i];
 
-			SpawnStations(stationValue);
+			SpawnStations(stationValue );
 		}
 
 		//UE_LOG(LogTemp, Warning, TEXT("StationManagerLoading Success! Station.num : %d"), stationmanager->Station.Num());
@@ -161,6 +174,9 @@ void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 
 	FGridCellData _GridCellData = StationValues.GridCellData;
+
+	
+
 
 	// Cast to BP
 	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
