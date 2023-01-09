@@ -55,7 +55,7 @@ public:
 	void SaveStationManager();
 	void LoadStationManager();
 
-	void SpawnStations(FGridCellData GridCellData, StationType Type, int32 StationId, int32 ComplainCurrent, bool ActivateFlag);
+	void SpawnStations(FStationValuesStruct StationValues);
 
 	void AutoSave();
 

@@ -149,7 +149,7 @@ void ATMSaveManager::LoadStationManager() {
 		{
 			FStationValuesStruct stationValue = StationLoadData->stations[i];
 
-			SpawnStations(stationValue.GridCellData, stationValue.StationTypeValue, stationValue.StationId, stationValue.ComplainCurrent, stationValue.IsActive);
+			SpawnStations(stationValue);
 		}
 
 		//UE_LOG(LogTemp, Warning, TEXT("StationManagerLoading Success! Station.num : %d"), stationmanager->Station.Num());
@@ -157,8 +157,10 @@ void ATMSaveManager::LoadStationManager() {
 
 }
 
-void ATMSaveManager::SpawnStations(FGridCellData GridCellData, StationType Type, int32 StationId, int32 ComplainCurrent, bool ActivateFlag) {
+void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
+
+	FGridCellData _GridCellData = StationValues.GridCellData;
 
 	// Cast to BP
 	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
@@ -180,19 +182,13 @@ void ATMSaveManager::SpawnStations(FGridCellData GridCellData, StationType Type,
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = stationmanager;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, stationmanager->GetActorRotation(), SpawnParams));
-	tmp->SetStationType(Type);
-	tmp->SetStationId(StationId);
-	tmp->SetGridCellData(GridCellData);
-	tmp->SetComplainCurrent(ComplainCurrent);
-	if (ActivateFlag) {
-		tmp->ActivateStation();
-	}
+	AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, _GridCellData.WorldLocation, stationmanager->GetActorRotation(), SpawnParams));
+	tmp->LoadStationValue(StationValues);
 
 	stationmanager->Station.Add(tmp);
 	stationmanager->GridManager->SetGridStructure(
-		GridCellData.WorldCoordination.X,
-		GridCellData.WorldCoordination.Y,
+		_GridCellData.WorldCoordination.X,
+		_GridCellData.WorldCoordination.Y,
 		GridStructure::Station);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Station.Num : %d"), stationmanager->Station.Num());

@@ -37,15 +37,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetStationType(StationType Type);
 	UFUNCTION(BlueprintCallable)
-	void SetGridCellData(FGridCellData gridCellData);
-	UFUNCTION(BlueprintCallable)
-	void SetComplainCurrent(int32 complaincurrent);
+	void SetGridCellData(FGridCellData GridCellData);
 	UFUNCTION(BlueprintCallable)
 	void CalculateComplain();
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
 	UFUNCTION(BlueprintCallable)
 	StationType GetStationType();
+
+	UFUNCTION(BlueprintCallable)
+		void LoadStationValue(FStationValuesStruct StationValues);
 
 	void DecreaseComplain(double ReduceRate);
 	void DecreaseComplain(int32 ReduceValue);

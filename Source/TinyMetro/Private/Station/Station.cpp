@@ -156,14 +156,23 @@ void AStation::SetStationType(StationType Type) {
 	}
 }
 
-void AStation::SetGridCellData(FGridCellData gridCellData) {
-
-	GridCellData = gridCellData;
+void AStation::SetGridCellData(FGridCellData _GridCellData) {
+	GridCellData = _GridCellData;
 }
 
-void AStation::SetComplainCurrent(int32 complaincurrent) {
-	ComplainCurrent = complaincurrent;
+
+
+void AStation::LoadStationValue(FStationValuesStruct StationValues) {
+	ComplainCurrent = StationValues.ComplainCurrent;
+	StationId = StationValues.StationId;
+	if (StationValues.IsActive) {
+		ActivateStation();
+	};
+	SetStationType(StationValues.StationTypeValue);
+	SetGridCellData(StationValues.GridCellData);
 }
+
+
 
 void AStation::CalculateComplain() {
 }
