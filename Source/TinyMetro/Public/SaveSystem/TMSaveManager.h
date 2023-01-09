@@ -14,6 +14,7 @@
 
 class AStationManager;
 class AStation;
+class ATinyMetroPlayerState;
 
 
 UCLASS()
@@ -27,6 +28,7 @@ public:
 
 	friend class Station;
 	friend class StationManager;
+	friend class TinyMetroPlayerState;
 
 protected:
 	// Called when the game starts or when spawned
@@ -41,7 +43,7 @@ public :
 
 public:
 	AStationManager* stationmanager;
-	UWorld* world;
+	ATinyMetroPlayerState* TinyMetroPlayerState; 
 
 	FTimerHandle TimerAutoSave;
 
@@ -57,7 +59,7 @@ public:
 
 	void AutoSave();
 
-	//void SaveGetWorld();
-	//void LoadGetWorld();
+	void SaveWorldInfo();
+	void LoadWorldInfo();
 
 };

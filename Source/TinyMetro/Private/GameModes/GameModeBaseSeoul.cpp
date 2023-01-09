@@ -9,6 +9,12 @@ AGameModeBaseSeoul::AGameModeBaseSeoul() {
     PlayerStateClass = APlayerStateSeoul::StaticClass();
 }
 
+void AGameModeBaseSeoul::BeginPlay()
+{
+    Super::BeginPlay();
+
+}
+
 FString AGameModeBaseSeoul::GetFileName() const {
     return TEXT("Seoul");
 }
@@ -21,11 +27,10 @@ TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
         Tmp.Add(FIntPoint(32, 17), StationType::Square);
         Tmp.Add(FIntPoint(39, 26), StationType::Circle);
     }
-    
+
     return Tmp;
 }
 
 int32 AGameModeBaseSeoul::GetDaytime() const {
     return 12;
 }
-

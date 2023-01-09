@@ -3,6 +3,7 @@
 #include "SaveSystem/TMSaveManager.h"
 #include "../../Public/Station/StationManager.h"
 #include "../../Public/Station/Station.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -18,10 +19,11 @@ ATMSaveManager::ATMSaveManager()
 void ATMSaveManager::BeginPlay()
 {
 	Super::BeginPlay();
-	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-	world = GetWorld();
 
-	//LoadGetWorld();
+	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	TinyMetroPlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+
+	LoadWorldInfo();
 	LoadStationManager();
 
 	AutoSave();
@@ -39,7 +41,7 @@ void ATMSaveManager::Tick(float DeltaTime)
 void ATMSaveManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	//SaveGetWorld();
+	SaveWorldInfo();
 	SaveStationManager();
 }
 
@@ -51,7 +53,7 @@ void ATMSaveManager::AutoSave() {
 			AutoSaveCurrent += AutoSaveCount;
 			if (AutoSaveCurrent >= AutoSaveRequire) {
 		
-				//SaveGetWorld();
+				SaveWorldInfo();
 				SaveStationManager();
 		
 				AutoSaveCurrent = 0.0f;
@@ -196,25 +198,25 @@ void ATMSaveManager::SpawnStations(FGridCellData GridCellData, StationType Type,
 	//UE_LOG(LogTemp, Warning, TEXT("Station.Num : %d"), stationmanager->Station.Num());
 }
 
-/*
-void ATMSaveManager::SaveGetWorld() {
 
-	UWorldSaveGame* WorldSaveData;
+void ATMSaveManager::SaveWorldInfo() {
 
-	if (UGameplayStatics::DoesSaveGameExist("WorldSave", 0)) {
-		WorldSaveData = Cast<UWorldSaveGame>(UGameplayStatics::LoadGameFromSlot("WorldSave", 0));
+	UWorldSaveGame* WorldInfoSaveData;
+
+	if (UGameplayStatics::DoesSaveGameExist("WorldInfoSave", 0)) {
+		WorldInfoSaveData = Cast<UWorldSaveGame>(UGameplayStatics::LoadGameFromSlot("WorldInfoSave", 0));
 	}
 	else {
-		WorldSaveData = Cast<UWorldSaveGame>(UGameplayStatics::CreateSaveGameObject(UWorldSaveGame::StaticClass()));
+		WorldInfoSaveData = Cast<UWorldSaveGame>(UGameplayStatics::CreateSaveGameObject(UWorldSaveGame::StaticClass()));
 	}
 
-	if (WorldSaveData == NULL) {
+	if (WorldInfoSaveData == NULL) {
 		return;
 	}
 
-	WorldSaveData->TMWorld = world;
+	WorldInfoSaveData->ElapseTimeSec = TinyMetroPlayerState->GetPlayTimeSec();
 
-	if (!UGameplayStatics::SaveGameToSlot(WorldSaveData, "WorldSave", 0))
+	if (!UGameplayStatics::SaveGameToSlot(WorldInfoSaveData, "WorldInfoSave", 0))
 	{
 		UE_LOG(LogTemp, Error, TEXT("StationSaveGame Error!"));
 	}
@@ -222,25 +224,29 @@ void ATMSaveManager::SaveGetWorld() {
 		UE_LOG(LogTemp, Warning, TEXT("StationSaveGame Success!"));
 	}
 
-	float deltaseconds = WorldSaveData->TMWorld->GetDeltaSeconds();
+	float deltaseconds = WorldInfoSaveData->ElapseTimeSec;
 
-	UE_LOG(LogTemp, Warning, TEXT("save deltaseconds : %f"), deltaseconds);
+	//UE_LOG(LogTemp, Warning, TEXT("save ElapseTimeSec : %f"), deltaseconds);
 
 }
 
-void ATMSaveManager::LoadGetWorld() {
+void ATMSaveManager::LoadWorldInfo() {
 
-	if (UGameplayStatics::DoesSaveGameExist("WorldSave", 0))
+	if (UGameplayStatics::DoesSaveGameExist("WorldInfoSave", 0))
 	{
-		UWorldSaveGame* WorldLoadData = Cast<UWorldSaveGame>(UGameplayStatics::LoadGameFromSlot("WorldSave", 0));
+		UWorldSaveGame* WorldInfoLoadData = Cast<UWorldSaveGame>(UGameplayStatics::LoadGameFromSlot("WorldInfoSave", 0));
 
-		world = WorldLoadData->TMWorld;
+		TinyMetroPlayerState->SetPlayTimeSec(WorldInfoLoadData->ElapseTimeSec);
 
 		UE_LOG(LogTemp, Warning, TEXT("WorldLoading Success!"));
 
-		float deltaseconds = world->GetDeltaSeconds();
+		float deltaseconds = TinyMetroPlayerState->GetPlayTimeSec();
 
-		UE_LOG(LogTemp, Warning, TEXT("load deltaseconds : %f"), deltaseconds);
+		//UE_LOG(LogTemp, Warning, TEXT("load ElapseTimeSec : %f"), deltaseconds);
+
+		//UE_LOG(LogTemp, Warning, TEXT("load GetDay : %d"), TinyMetroPlayerState->GetDay());
+
+		//UE_LOG(LogTemp, Warning, TEXT("load GetDayTime : %f"), TinyMetroPlayerState->GetDayTime());
+
 	}
 }
-*/
