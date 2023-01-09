@@ -42,9 +42,9 @@ FGridCellData AGridManager::GetGridCellDataByCoord(FVector Coord, bool& Succeess
 		CoordApproximation(Coord.X, GridSize.X % 2 == 0),
 		CoordApproximation(Coord.Y, GridSize.Y % 2 == 0)
 	);
-
 	for (auto i : GridCellData) {
-		if (i.WorldCoordination == ApproxCoord) {
+		FIntPoint tmp(i.WorldLocation.X, i.WorldLocation.Y);
+		if (tmp == ApproxCoord) {
 			Succeess = true;
 			return i;
 		}
