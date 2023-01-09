@@ -104,7 +104,7 @@ bool AGridManager::IsValidStationSpawn(int Coord) {
 	// Check other station
 	for (int i = -StationSpawnPrevent; i <= StationSpawnPrevent; i++) { // Y
 		for (int j = -StationSpawnPrevent; j <= StationSpawnPrevent; j++) { // X
-			if (FMath::Sqrt(i * i + j * j) > 2) continue;
+			if (FMath::Sqrt(i * i + j * j) > StationSpawnPrevent) continue;
 			if ((Coord + (i * GridSize.X) + j) >= GridCellData.Num() || (Coord + (i * GridSize.X) + j) < 0) continue;
 			if (GridCellData[(Coord + (i * GridSize.X) + j)].GridStructure == GridStructure::Station) return false;
 			//if (((GridSize.X * (Y + i)) + (X + j)) >= GridCellData.Num()) continue;
