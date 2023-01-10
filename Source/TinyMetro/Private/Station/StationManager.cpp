@@ -94,6 +94,19 @@ float AStationManager::GetComplainAverage() {
 	return ((float)ComplainSum)/Station.Num();
 }
 
+FVector AStationManager::GetNearestStationLocation(FVector CurrentLocation) {
+	double Distance = FVector::Dist(CurrentLocation, Station[0]->GetCurrentGridCellData().WorldLocation);
+	FVector Result = Station[0]->GetCurrentGridCellData().WorldLocation;
+	for (auto& i : Station) {
+		double tmp = FVector::Dist(CurrentLocation, i->GetCurrentGridCellData().WorldLocation);
+		if (Distance > tmp) {
+			Distance = tmp;
+			Result = i->GetCurrentGridCellData().WorldLocation;
+		}
+	}
+	return Result;
+}
+
 void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
 	
 	// Load BP Class

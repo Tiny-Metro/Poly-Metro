@@ -162,6 +162,10 @@ void AStation::SetGridCellData(FGridCellData _GridCellData) {
 
 
 
+FGridCellData AStation::GetCurrentGridCellData() const {
+	return CurrentGridCellData;
+}
+
 void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	ComplainCurrent = StationValues.ComplainCurrent;
 	StationId = StationValues.StationId;
@@ -195,7 +199,7 @@ void AStation::ActivateStation() {
 	MeshOuter->SetMaterial(0, DynamicMaterialOuter);
 }
 
-StationType AStation::GetStationType() {
+StationType AStation::GetStationType() const {
 	return StationTypeValue;
 }
 

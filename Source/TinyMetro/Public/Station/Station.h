@@ -43,7 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
 	UFUNCTION(BlueprintCallable)
-	StationType GetStationType();
+	StationType GetStationType() const;
+	UFUNCTION(BlueprintCallable)
+	FGridCellData GetCurrentGridCellData() const;
 
 	UFUNCTION(BlueprintCallable)
 		void LoadStationValue(FStationValuesStruct StationValues);
