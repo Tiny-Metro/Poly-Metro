@@ -157,7 +157,7 @@ void AStation::SetStationType(StationType Type) {
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
-	GridCellData = _GridCellData;
+	CurrentGridCellData = _GridCellData;
 }
 
 

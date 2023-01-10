@@ -96,7 +96,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	StationType StationTypeValue = StationType::Circle;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	FGridCellData GridCellData;
+	FGridCellData CurrentGridCellData;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")

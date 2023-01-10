@@ -106,7 +106,7 @@ void ATMSaveManager::SaveStationManager() {
 		stationValue.StationId = temp->StationId;
 		stationValue.IsActive = temp->IsActive;
 		stationValue.StationTypeValue = temp->StationTypeValue;
-		stationValue.GridCellData = temp->GridCellData;
+		stationValue.GridCellData = temp->CurrentGridCellData;
 		//complain, stationid, isActive, stationtypevalue
 
 		for (int j = 0; j < passengersSize; j++) {
