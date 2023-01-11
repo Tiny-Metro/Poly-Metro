@@ -21,4 +21,7 @@ public:
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
+
+	virtual void StartPlay() override;
+	virtual void BeginPlay() override;
 };

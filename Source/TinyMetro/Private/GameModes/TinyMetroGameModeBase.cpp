@@ -4,6 +4,7 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <UObject/ConstructorHelpers.h>
+#include "Finance/Bank.h"
 #include <GameFramework/HUD.h>
 
 ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
@@ -37,4 +38,13 @@ TMap<FIntPoint, StationType> ATinyMetroGameModeBase::GetInitData() const {
 
 int32 ATinyMetroGameModeBase::GetDaytime() const {
     return 12;
+}
+
+void ATinyMetroGameModeBase::StartPlay() {
+    Super::StartPlay();
+    GetWorld()->SpawnActor<ABank>();
+}
+
+void ATinyMetroGameModeBase::BeginPlay() {
+    Super::BeginPlay();
 }
