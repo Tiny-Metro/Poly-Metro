@@ -6,6 +6,7 @@
 #include <UObject/ConstructorHelpers.h>
 #include "Finance/Bank.h"
 #include "Train/TrainManager.h"
+#include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
 ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
@@ -28,6 +29,7 @@ ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
 }
 
 FString ATinyMetroGameModeBase::GetFileName() const {
+    
     return TEXT("Base");
 }
 
@@ -49,4 +51,8 @@ void ATinyMetroGameModeBase::StartPlay() {
 
 void ATinyMetroGameModeBase::BeginPlay() {
     Super::BeginPlay();
+}
+
+void ATinyMetroGameModeBase::SetGameSpeed(float TimeDilation) {
+    UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeDilation);
 }

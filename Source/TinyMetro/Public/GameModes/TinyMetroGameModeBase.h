@@ -24,4 +24,7 @@ public:
 
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetGameSpeed(float TimeDilation);
 };
