@@ -21,6 +21,5 @@ public:
 	virtual TMap<FIntPoint, StationType> GetInitData() const override;
 	virtual int32 GetDaytime() const override;
 
-	virtual void BeginPlay() override;
 
 };

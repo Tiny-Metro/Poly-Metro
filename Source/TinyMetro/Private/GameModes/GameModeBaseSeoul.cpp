@@ -9,11 +9,6 @@ AGameModeBaseSeoul::AGameModeBaseSeoul() {
     PlayerStateClass = APlayerStateSeoul::StaticClass();
 }
 
-void AGameModeBaseSeoul::BeginPlay()
-{
-    Super::BeginPlay();
-
-}
 
 FString AGameModeBaseSeoul::GetFileName() const {
     return TEXT("Seoul");
