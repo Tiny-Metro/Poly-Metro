@@ -16,6 +16,8 @@ void APolicy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//PolicyData = NewObject<FPolicyData>();
+
 	InitPolicy();
 	
 }
@@ -27,17 +29,139 @@ void APolicy::Tick(float DeltaTime)
 
 }
 
-void APolicy::SetPolicyData(FPolicyData _policyData) {
-	this->PolicyData = _policyData;
+void APolicy::SetServiceCostLevel(int costLevel) {
+	PolicyData->ServiceCostLevel = costLevel;
 
-	// 서비스 비용 레벨
+	//TODO ServiceCostlevel 함수 추가
+}
+
+void APolicy::SetHandicappedSeat( ) {
+	bool pre = PolicyData->HandicappedSeat;
+
+	if (!pre) { // 전의 상태가 활성화면
+		// TODO 핸디캡 함수 추가
+	}
+	else { // 전의 상태가 비활성화
+		// TODO 핸디캡 함수 추가
+	}
+
+	PolicyData->HandicappedSeat = !pre;
 
 }
 
-FPolicyData APolicy::GetPolicyData() {
+void APolicy::SetHasCCTV() {
+	bool pre = PolicyData->HasCCTV;
 
-	return PolicyData;
+	if (!pre) { // 전의 상태가 활성화면
+		// TODO cctv 함수 추가
+	}
+	else { // 전의 상태가 비활성화
+		// TODO cctv 함수 추가
+	}
+
+	PolicyData->HasCCTV = !pre;
 }
+
+void APolicy::SetHasElevator( ) {
+	bool pre = PolicyData->HasElevator;
+
+	if (!pre) { // 전의 상태가 활성화면
+		// TODO elevator 함수 추가
+	}
+	else { // 전의 상태가 비활성화
+		// TODO elevator 함수 추가
+	}
+
+	PolicyData->HasElevator = !pre;
+}
+
+void APolicy::SetHasBicycle( ) {
+	bool pre = PolicyData->HasBicycle;
+
+	if (!pre) { // 전의 상태가 활성화면
+		// TODO bicycle 함수 추가
+	}
+	else { // 전의 상태가 비활성화
+		// TODO bicycle 함수 추가
+	}
+
+	PolicyData->HasBicycle = !pre;
+}
+
+void APolicy::SetHasTransfer( ) {
+	bool pre = PolicyData->HasTransfer;
+
+	if (!pre) { // 전의 상태가 활성화면
+		// TODO transfer 함수 추가
+	}
+	else { // 전의 상태가 비활성화
+		// TODO transfer 함수 추가
+	}
+
+	PolicyData->HasTransfer = !pre;
+
+}
+
+
+int APolicy::GetServiceCostLevel() {
+	return PolicyData->ServiceCostLevel;
+}
+
+bool APolicy::GetHandicappedSeat() {
+	return PolicyData->HandicappedSeat;
+}
+
+bool APolicy::GetHasCCTV() {
+	return PolicyData->HasCCTV;
+}
+
+bool APolicy::GetHasElevator() {
+	return PolicyData->HasElevator;
+}
+
+bool APolicy::GetHasBicycle() {
+	return PolicyData->HasBicycle;
+}
+
+bool APolicy::GetHasTransfer() {
+	return PolicyData->HasTransfer;
+}
+
+int APolicy::GetComplainForServiceLevel() {
+
+	int ComplainAmount = ComplainArrayForServiceLevel[GetServiceCostLevel()];
+
+	return ComplainAmount;
+}
+
+
+int32 APolicy::CalculateComplainPercentage() {
+
+	int32 currentPercentage = 0; //음수면 감소량
+
+	if (GetHandicappedSeat()) {
+		currentPercentage -= 5;
+	}
+
+	if (GetHasCCTV()) {
+		currentPercentage -= 10;
+	}
+
+	if (GetHasElevator()) {
+		currentPercentage -= 15;
+	}
+
+	if (GetHasBicycle()) {
+		currentPercentage += 10;
+	}
+
+	if (GetHasTransfer()) {
+		currentPercentage -= 20;
+	}
+
+	return currentPercentage;
+}
+
 
 void APolicy::InitPolicy() {
 }

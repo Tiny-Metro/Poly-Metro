@@ -14,6 +14,7 @@ AStationManager::AStationManager()
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
+	Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 }
 
 // Called when the game starts or when spawned
@@ -124,6 +125,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationType(Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetStationId(StationId++);
+	tmp->SetPolicy(Policy);
 
 	if (ActivateFlag) {
 		tmp->ActivateStation();

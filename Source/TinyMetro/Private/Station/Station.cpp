@@ -160,6 +160,10 @@ void AStation::SetGridCellData(FGridCellData _GridCellData) {
 	GridCellData = _GridCellData;
 }
 
+void AStation::SetPolicy(APolicy* _Policy) {
+	Policy = _Policy;
+}
+
 
 
 void AStation::LoadStationValue(FStationValuesStruct StationValues) {
@@ -216,15 +220,21 @@ void AStation::ComplainRoutine() {
 		TimerComplain,
 		FTimerDelegate::CreateLambda([&]() {
 			SpawnDay++;
+
+			int AddPolicyComplainForLevel = Policy->GetComplainForServiceLevel();
+
+			float AddPolicyComplain = AddPolicyComplainForLevel + abs(AddPolicyComplainForLevel) * Policy->CalculateComplainPercentage();
+			
 			// Passenger complain
 			if (Passenger.Num() > ComplainPassengerNum) {
-				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum));
+				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) + AddPolicyComplain;
 			}
 
 			// Not activate
 			if (!IsActive && SpawnDay > ComplainSpawnDay) {
-				ComplainCurrent += ComplainFromInactive;
+				ComplainCurrent += ComplainFromInactive + AddPolicyComplain;
 			}
+
 
 
 			// Complain excess : Game over

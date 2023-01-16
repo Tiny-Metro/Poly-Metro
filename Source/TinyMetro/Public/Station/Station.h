@@ -8,6 +8,7 @@
 #include "Passenger.h"
 #include "../SaveSystem/TMSaveManager.h"
 #include "../GridGenerator/GridCellData.h"
+#include "../Policy/Policy.h"
 #include "Station.generated.h"
 
 class AStationManager;
@@ -39,6 +40,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetGridCellData(FGridCellData GridCellData);
 	UFUNCTION(BlueprintCallable)
+	void SetPolicy(APolicy* Policy);
+	UFUNCTION(BlueprintCallable)
 	void CalculateComplain();
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
@@ -64,13 +67,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AStationManager* StationManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
-	int32 ComplainMax = 10000;
+	float ComplainMax = 100;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
-	int32 ComplainFromInactive = 1000;
+	float ComplainFromInactive = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
-	int32 ComplainFromPassenger = 500;
+	float ComplainFromPassenger = 5;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
-	int32 ComplainCurrent = 0;
+	float ComplainCurrent = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	int32 ComplainPassengerNum = 5;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
@@ -97,12 +100,15 @@ protected:
 	StationType StationTypeValue = StationType::Circle;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FGridCellData GridCellData;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	APolicy* Policy;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
+	
 
 protected:
 	// Station meshses

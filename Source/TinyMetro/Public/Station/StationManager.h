@@ -8,6 +8,7 @@
 #include "../GameModes/TinyMetroGameModeBase.h"
 #include "../SaveSystem/TMSaveManager.h"
 #include "Station.h"
+#include "../Policy/Policy.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -54,6 +55,8 @@ protected:
 	AGridManager* GridManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	ATinyMetroGameModeBase* GameMode;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	APolicy* Policy;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")

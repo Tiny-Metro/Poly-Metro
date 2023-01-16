@@ -17,7 +17,7 @@ public:
 	FPolicyData();
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-		int ServiceCostLevel = 1;      // 서비스 비용 단계
+		int ServiceCostLevel = 3;      // 서비스 비용 단계
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool HandicappedSeat = false;  // 교통약자 좌석 배치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
