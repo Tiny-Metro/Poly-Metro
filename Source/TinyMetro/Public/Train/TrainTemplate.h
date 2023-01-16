@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TrainDirection.h"
 #include "TrainTemplate.generated.h"
 
 UCLASS()
@@ -26,4 +27,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	UFUNCTION(BlueprintCallable)
+	void SetTrainId(int32 Id);
+	UFUNCTION(BlueprintCallable)
+	void SetTrainDirection(TrainDirection Dir);
+	UFUNCTION(BlueprintCallable)
+	TrainDirection GetTrainDirection() const;
+	UFUNCTION(BlueprintCallable)
+	void Upgrade();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	int32 TrainId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	TrainDirection Direction;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	bool IsUpgrade;
 };

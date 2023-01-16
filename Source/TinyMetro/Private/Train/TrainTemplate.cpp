@@ -32,3 +32,21 @@ void ATrainTemplate::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ATrainTemplate::SetTrainId(int32 Id) {
+	TrainId = Id;
+}
+
+void ATrainTemplate::SetTrainDirection(TrainDirection Dir) {
+	Direction = Dir;
+}
+
+TrainDirection ATrainTemplate::GetTrainDirection() const {
+	return Direction;
+}
+
+void ATrainTemplate::Upgrade() {
+	IsUpgrade = true;
+
+	//TODO : Mesh change
+}
+

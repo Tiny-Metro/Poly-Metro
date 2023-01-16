@@ -26,8 +26,13 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	void AddTrain(ATrainTemplate* Train);
+	UFUNCTION(BlueprintCallable)
+	void SetTrainId(ATrainTemplate* Train);
 
-public:	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	int32 NextTrainId;
 
 };

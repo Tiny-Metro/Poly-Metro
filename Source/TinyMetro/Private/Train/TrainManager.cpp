@@ -22,6 +22,10 @@ void ATrainManager::AddTrain(ATrainTemplate* Train) {
 	Trains.Add(Train);
 }
 
+void ATrainManager::SetTrainId(ATrainTemplate* Train) {
+	Train->SetTrainId(NextTrainId++);
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {
