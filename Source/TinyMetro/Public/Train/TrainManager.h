@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TrainTemplate.h"
 #include "TrainManager.generated.h"
 
 UCLASS()
@@ -15,12 +16,18 @@ public:
 	// Sets default values for this actor's properties
 	ATrainManager();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void AddTrain(ATrainTemplate* Train);
+
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	TArray<ATrainTemplate*> Trains;
 
 };

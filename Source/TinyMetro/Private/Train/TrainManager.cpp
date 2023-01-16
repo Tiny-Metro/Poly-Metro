@@ -18,6 +18,10 @@ void ATrainManager::BeginPlay()
 	
 }
 
+void ATrainManager::AddTrain(ATrainTemplate* Train) {
+	Trains.Add(Train);
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {
