@@ -3,7 +3,3 @@
 
 #include "Policy/PolicyData.h"
 
-FPolicyData::FPolicyData()
-{
-
-}

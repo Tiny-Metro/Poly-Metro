@@ -74,6 +74,7 @@ void AStation::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 }
 
 void AStation::SetStationId(int32 Id) {
@@ -154,6 +155,10 @@ void AStation::SetStationType(StationType Type) {
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
 			EnumToStr);
 	}
+
+	
+
+
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -234,6 +239,16 @@ void AStation::ComplainRoutine() {
 			if (!IsActive && SpawnDay > ComplainSpawnDay) {
 				ComplainCurrent += ComplainFromInactive + AddPolicyComplain;
 			}
+
+			/*
+			if (GEngine) {
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					15.0f,
+					FColor::Yellow,
+					FString::Printf(TEXT("AddPolicyComplain : %f"), AddPolicyComplain));
+
+			}*/
 
 
 

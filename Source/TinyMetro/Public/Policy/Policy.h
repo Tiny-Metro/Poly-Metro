@@ -25,26 +25,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public :
-	FPolicyData* PolicyData;
-
-public : 
-	int ServiceCostLevel = 1;      // 서비스 비용 단계
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HandicappedSeat = false;  // 교통약자 좌석 배치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasCCTV = false;          // CCTV 설치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasElevator = false;      // 엘레베이터 설치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasBicycle = false;       // 자전거 탑승 허가
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasTransfer = false;      // 환승 시스템
+	UPROPERTY()
+	FPolicyData PolicyData;
 
 
 protected :
 
 	TArray<int> ComplainArrayForServiceLevel = { 0,2,1,0,-1,-2 };
-
+	TArray<int> CostArrayForServiceLevel = { 0,0,1,2,3,4 };
 	
 
 public :
@@ -78,6 +66,12 @@ public :
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
 		int GetComplainForServiceLevel();
+	UFUNCTION(BlueprintCallable, Category = "Policy")
+		int GetCostForServiceLevel();
+	UFUNCTION(BlueprintCallable, Category = "Policy")
+		int GetCostForCCTV();
+	UFUNCTION(BlueprintCallable, Category = "Policy")
+		int GetCostForElevator();
 
 	// TODO: HUD 에서 버튼 누르면 바로 반영되게 Set으로 각각 설정
 

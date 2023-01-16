@@ -16,7 +16,13 @@ void APolicy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//PolicyData = NewObject<FPolicyData>();
+	PolicyData.ServiceCostLevel = 3;
+	PolicyData.HandicappedSeat = false;
+	PolicyData.HasCCTV = false;
+	PolicyData.HasElevator = false;
+	PolicyData.HasBicycle = false;
+	PolicyData.HasTransfer = false;
+
 
 	InitPolicy();
 	
@@ -30,13 +36,13 @@ void APolicy::Tick(float DeltaTime)
 }
 
 void APolicy::SetServiceCostLevel(int costLevel) {
-	PolicyData->ServiceCostLevel = costLevel;
+	PolicyData.ServiceCostLevel = costLevel;
 
 	//TODO ServiceCostlevel 함수 추가
 }
 
 void APolicy::SetHandicappedSeat( ) {
-	bool pre = PolicyData->HandicappedSeat;
+	bool pre = PolicyData.HandicappedSeat;
 
 	if (!pre) { // 전의 상태가 활성화면
 		// TODO 핸디캡 함수 추가
@@ -45,12 +51,12 @@ void APolicy::SetHandicappedSeat( ) {
 		// TODO 핸디캡 함수 추가
 	}
 
-	PolicyData->HandicappedSeat = !pre;
+	PolicyData.HandicappedSeat = !pre;
 
 }
 
 void APolicy::SetHasCCTV() {
-	bool pre = PolicyData->HasCCTV;
+	bool pre = PolicyData.HasCCTV;
 
 	if (!pre) { // 전의 상태가 활성화면
 		// TODO cctv 함수 추가
@@ -59,11 +65,11 @@ void APolicy::SetHasCCTV() {
 		// TODO cctv 함수 추가
 	}
 
-	PolicyData->HasCCTV = !pre;
+	PolicyData.HasCCTV = !pre;
 }
 
 void APolicy::SetHasElevator( ) {
-	bool pre = PolicyData->HasElevator;
+	bool pre = PolicyData.HasElevator;
 
 	if (!pre) { // 전의 상태가 활성화면
 		// TODO elevator 함수 추가
@@ -72,11 +78,11 @@ void APolicy::SetHasElevator( ) {
 		// TODO elevator 함수 추가
 	}
 
-	PolicyData->HasElevator = !pre;
+	PolicyData.HasElevator = !pre;
 }
 
 void APolicy::SetHasBicycle( ) {
-	bool pre = PolicyData->HasBicycle;
+	bool pre = PolicyData.HasBicycle;
 
 	if (!pre) { // 전의 상태가 활성화면
 		// TODO bicycle 함수 추가
@@ -85,11 +91,11 @@ void APolicy::SetHasBicycle( ) {
 		// TODO bicycle 함수 추가
 	}
 
-	PolicyData->HasBicycle = !pre;
+	PolicyData.HasBicycle = !pre;
 }
 
 void APolicy::SetHasTransfer( ) {
-	bool pre = PolicyData->HasTransfer;
+	bool pre = PolicyData.HasTransfer;
 
 	if (!pre) { // 전의 상태가 활성화면
 		// TODO transfer 함수 추가
@@ -98,33 +104,33 @@ void APolicy::SetHasTransfer( ) {
 		// TODO transfer 함수 추가
 	}
 
-	PolicyData->HasTransfer = !pre;
+	PolicyData.HasTransfer = !pre;
 
 }
 
 
 int APolicy::GetServiceCostLevel() {
-	return PolicyData->ServiceCostLevel;
+	return PolicyData.ServiceCostLevel;
 }
 
 bool APolicy::GetHandicappedSeat() {
-	return PolicyData->HandicappedSeat;
+	return PolicyData.HandicappedSeat;
 }
 
 bool APolicy::GetHasCCTV() {
-	return PolicyData->HasCCTV;
+	return PolicyData.HasCCTV;
 }
 
 bool APolicy::GetHasElevator() {
-	return PolicyData->HasElevator;
+	return PolicyData.HasElevator;
 }
 
 bool APolicy::GetHasBicycle() {
-	return PolicyData->HasBicycle;
+	return PolicyData.HasBicycle;
 }
 
 bool APolicy::GetHasTransfer() {
-	return PolicyData->HasTransfer;
+	return PolicyData.HasTransfer;
 }
 
 int APolicy::GetComplainForServiceLevel() {
@@ -132,6 +138,30 @@ int APolicy::GetComplainForServiceLevel() {
 	int ComplainAmount = ComplainArrayForServiceLevel[GetServiceCostLevel()];
 
 	return ComplainAmount;
+}
+
+int APolicy::GetCostForServiceLevel() {
+	int Cost = CostArrayForServiceLevel[GetServiceCostLevel()];
+
+	return Cost;
+}
+
+int APolicy::GetCostForCCTV() {
+	if (GetHasCCTV()) {
+		return 5;
+	}
+	else {
+		return 0;
+	}
+}
+
+int APolicy::GetCostForElevator() {
+	if (GetHasElevator()) {
+		return 10;
+	}
+	else {
+		return 0;
+	}
 }
 
 
