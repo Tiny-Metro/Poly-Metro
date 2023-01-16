@@ -20,10 +20,20 @@ public:
 	void SetDestination(StationType Dest);
 	static UPassenger* ConstructPassenger(StationType Dest);
 
+
 	friend class ATMSaveManager;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	StationType Destination;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsFree;
+	UPROPERTY(BlueprintReadOnly)
+	TArray<bool> RandomFree = {true, false, false, false, false};
+		
+
+public:
+	UFUNCTION()
+	void SetFree();
 	
 };

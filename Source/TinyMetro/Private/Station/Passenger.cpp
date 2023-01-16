@@ -10,5 +10,12 @@ void UPassenger::SetDestination(StationType Dest) {
 UPassenger* UPassenger::ConstructPassenger(StationType Dest) {
 	auto Obj = NewObject<UPassenger>();
 	Obj->SetDestination(Dest);
+	Obj->SetFree();
 	return Obj;
+}
+
+void UPassenger::SetFree() {
+	int result = FMath::RandRange(0,4);
+
+	IsFree = RandomFree[result];
 }
