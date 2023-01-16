@@ -42,9 +42,9 @@ FGridCellData AGridManager::GetGridCellDataByCoord(FVector Coord, bool& Succeess
 		CoordApproximation(Coord.X, GridSize.X % 2 == 0),
 		CoordApproximation(Coord.Y, GridSize.Y % 2 == 0)
 	);
-
 	for (auto i : GridCellData) {
-		if (i.WorldCoordination == ApproxCoord) {
+		FIntPoint tmp(i.WorldLocation.X, i.WorldLocation.Y);
+		if (tmp == ApproxCoord) {
 			Succeess = true;
 			return i;
 		}
@@ -142,7 +142,7 @@ bool AGridManager::IsValidStationSpawn(int X, int Y) {
 	// Check other station
 	for (int i = -StationSpawnPrevent; i <= StationSpawnPrevent; i++) { // Y
 		for (int j = -StationSpawnPrevent; j <= StationSpawnPrevent; j++) { // X
-			if (FMath::Sqrt(i * i + j * j) > 2) continue;
+			if (FMath::Sqrt(i * i + j * j) > StationSpawnPrevent) continue;
 			if (((GridSize.X * (Y + i)) + (X + j)) >= GridCellData.Num() || ((GridSize.X * (Y + i)) + (X + j)) < 0) continue;
 			if (GridCellData[(GridSize.X * (Y + i)) + (X + j)].GridStructure == GridStructure::Station) return false;
 		}
