@@ -35,6 +35,8 @@ public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
 		FPolicyData GetPolicyData();
 
+	// TODO: HUD 에서 버튼 누르면 바로 반영되게 Set으로 각각 설정
+
 public :
 
 public:
