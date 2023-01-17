@@ -85,7 +85,6 @@ void APolicy::SetHasBicycle( ) {
 	bool pre = PolicyData.HasBicycle;
 
 	if (!pre) { // 전의 상태가 활성화면
-		// TODO bicycle 함수 추가
 	}
 	else { // 전의 상태가 비활성화
 		// TODO bicycle 함수 추가

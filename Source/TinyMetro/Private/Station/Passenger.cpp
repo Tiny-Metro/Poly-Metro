@@ -10,7 +10,7 @@ void UPassenger::SetDestination(StationType Dest) {
 UPassenger* UPassenger::ConstructPassenger(StationType Dest) {
 	auto Obj = NewObject<UPassenger>();
 	Obj->SetDestination(Dest);
-	Obj->SetFree();
+	//Obj->SetFree();  TODO : if Policy->GetHasBicycle == true
 	return Obj;
 }
 

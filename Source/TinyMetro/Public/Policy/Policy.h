@@ -7,6 +7,7 @@
 #include "PolicyData.h"
 #include "Policy.generated.h"
 
+
 UCLASS()
 class TINYMETRO_API APolicy : public AActor
 {
@@ -29,9 +30,10 @@ public :
 	FPolicyData PolicyData;
 
 
-protected :
-
+public :
+	UPROPERTY()
 	TArray<int> ComplainArrayForServiceLevel = { 0,2,1,0,-1,-2 };
+	UPROPERTY()
 	TArray<int> CostArrayForServiceLevel = { 0,0,1,2,3,4 };
 	
 

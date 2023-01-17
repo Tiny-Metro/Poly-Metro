@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void LoadStationValue(FStationValuesStruct StationValues);
 
+	UFUNCTION(BlueprintCallable)
+	void AddPassengerSpawnProbability(float rate, int32 dueDate);
+
 	void DecreaseComplain(double ReduceRate);
 	void DecreaseComplain(int32 ReduceValue);
 
@@ -87,7 +90,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double PassengerSpawnProbability = 0.6;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	TArray<double> PassengerSpawnProbabilityVariable;
+	double AdditionalPassengerSpawnProbability = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
