@@ -44,9 +44,9 @@ int32 ATinyMetroGameModeBase::GetDaytime() const {
 }
 
 void ATinyMetroGameModeBase::StartPlay() {
-    Super::StartPlay();
     GetWorld()->SpawnActor<ABank>();
     GetWorld()->SpawnActor<ATrainManager>();
+    Super::StartPlay();
 }
 
 void ATinyMetroGameModeBase::BeginPlay() {
