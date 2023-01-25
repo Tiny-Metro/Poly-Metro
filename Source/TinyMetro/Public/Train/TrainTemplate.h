@@ -31,17 +31,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(int32 Id);
 	UFUNCTION(BlueprintCallable)
+	int32 GetTrainId() const;
+	UFUNCTION(BlueprintCallable)
 	void SetTrainDirection(TrainDirection Dir);
 	UFUNCTION(BlueprintCallable)
 	TrainDirection GetTrainDirection() const;
 	UFUNCTION(BlueprintCallable)
 	void Upgrade();
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsUpgrade;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	bool IsActorDragged;
 };

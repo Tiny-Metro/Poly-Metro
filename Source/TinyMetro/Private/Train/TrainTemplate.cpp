@@ -36,6 +36,10 @@ void ATrainTemplate::SetTrainId(int32 Id) {
 	TrainId = Id;
 }
 
+int32 ATrainTemplate::GetTrainId() const {
+	return TrainId;
+}
+
 void ATrainTemplate::SetTrainDirection(TrainDirection Dir) {
 	Direction = Dir;
 }

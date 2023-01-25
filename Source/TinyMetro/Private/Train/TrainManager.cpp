@@ -26,6 +26,15 @@ void ATrainManager::SetTrainId(ATrainTemplate* Train) {
 	Train->SetTrainId(NextTrainId++);
 }
 
+ATrainTemplate* ATrainManager::GetTrainById(int32 TrainId) {
+	for (auto i : Trains) {
+		if (TrainId == i->GetTrainId()) {
+			return i;
+		}
+	}
+	return nullptr;
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {
