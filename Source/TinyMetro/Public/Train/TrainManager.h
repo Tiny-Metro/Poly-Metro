@@ -28,6 +28,8 @@ public:
 	void AddTrain(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(ATrainTemplate* Train);
+	UFUNCTION(BlueprintCallable)
+	ATrainTemplate* GetTrainById(int32 TrainId);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
