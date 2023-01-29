@@ -96,7 +96,6 @@ void APolicy::SetHasBicycle( ) {
 		{
 			stationmanager->Station[0]->AddPassengerSpawnProbability(0.1, -1);
 		}
-		
 	}
 	else { // 전의 상태가 활성화
 		
