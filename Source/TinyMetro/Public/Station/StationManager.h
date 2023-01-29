@@ -24,6 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	friend class ATMSaveManager;
+	friend class APolicy;
 
 protected:
 	UFUNCTION(BlueprintCallable)

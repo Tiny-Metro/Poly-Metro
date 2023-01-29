@@ -2,6 +2,8 @@
 
 
 #include "Policy/Policy.h"
+#include "Station/StationManager.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APolicy::APolicy()
@@ -15,6 +17,8 @@ APolicy::APolicy()
 void APolicy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 
 	PolicyData.ServiceCostLevel = 3;
 	PolicyData.HandicappedSeat = false;
@@ -44,10 +48,10 @@ void APolicy::SetServiceCostLevel(int costLevel) {
 void APolicy::SetHandicappedSeat( ) {
 	bool pre = PolicyData.HandicappedSeat;
 
-	if (!pre) { // 전의 상태가 활성화면
+	if (!pre) { // 전의 상태가 비활성화면
 		// TODO 핸디캡 함수 추가
 	}
-	else { // 전의 상태가 비활성화
+	else { // 전의 상태가 활성화
 		// TODO 핸디캡 함수 추가
 	}
 
@@ -58,10 +62,10 @@ void APolicy::SetHandicappedSeat( ) {
 void APolicy::SetHasCCTV() {
 	bool pre = PolicyData.HasCCTV;
 
-	if (!pre) { // 전의 상태가 활성화면
+	if (!pre) { // 전의 상태가 비활성화면
 		// TODO cctv 함수 추가
 	}
-	else { // 전의 상태가 비활성화
+	else { // 전의 상태가 활성화
 		// TODO cctv 함수 추가
 	}
 
@@ -71,10 +75,10 @@ void APolicy::SetHasCCTV() {
 void APolicy::SetHasElevator( ) {
 	bool pre = PolicyData.HasElevator;
 
-	if (!pre) { // 전의 상태가 활성화면
+	if (!pre) { // 전의 상태가 비활성화면
 		// TODO elevator 함수 추가
 	}
-	else { // 전의 상태가 비활성화
+	else { // 전의 상태가 활성화
 		// TODO elevator 함수 추가
 	}
 
@@ -84,11 +88,22 @@ void APolicy::SetHasElevator( ) {
 void APolicy::SetHasBicycle( ) {
 	bool pre = PolicyData.HasBicycle;
 
-	if (!pre) { // 전의 상태가 활성화면
-		// TODO bicycle 함수 추가
+	if (!pre) { // 전의 상태가 비활성화면 -> 활성화되면
+
+		//승객 수 10% 증가
+
+		for (int i = 0; i < stationmanager->Station.Num(); i++)
+		{
+			stationmanager->Station[0]->AddPassengerSpawnProbability(0.1, -1);
+		}
+		
 	}
-	else { // 전의 상태가 비활성화
-		// TODO bicycle 함수 추가
+	else { // 전의 상태가 활성화
+		
+		for (int i = 0; i < stationmanager->Station.Num(); i++)
+		{
+			stationmanager->Station[0]->AddPassengerSpawnProbability(-0.1, -1);
+		}
 	}
 
 	PolicyData.HasBicycle = !pre;
@@ -97,10 +112,10 @@ void APolicy::SetHasBicycle( ) {
 void APolicy::SetHasTransfer( ) {
 	bool pre = PolicyData.HasTransfer;
 
-	if (!pre) { // 전의 상태가 활성화면
+	if (!pre) { // 전의 상태가 비활성화면
 		// TODO transfer 함수 추가
 	}
-	else { // 전의 상태가 비활성화
+	else { // 전의 상태가 활성화
 		// TODO transfer 함수 추가
 	}
 

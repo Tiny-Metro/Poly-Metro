@@ -143,6 +143,10 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	}
 	tmp->FinishSpawning(SpawnTransform);
 
+	if (Policy->GetHasBicycle())
+	{
+		tmp->AddPassengerSpawnProbability(0.1, -1);
+	}
 
 	Station.Add(tmp);
 	GridManager->SetGridStructure(

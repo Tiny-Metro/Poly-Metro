@@ -189,6 +189,21 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	}
 }
 
+void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate){
+	AdditionalPassengerSpawnProbability += rate;
+	if (dueDate != -1) {
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerComplain,
+			FTimerDelegate::CreateLambda([&]() {
+				AdditionalPassengerSpawnProbability -= rate;
+			}),
+		dueDate,
+		false,
+		0.0f
+		);
+	}
+}
+
 
 
 void AStation::CalculateComplain() {
@@ -280,6 +295,7 @@ void AStation::PassengerSpawnRoutine() {
 		TimerSpawnPassenger,
 		FTimerDelegate::CreateLambda([&]() {
 			PassengerSpawnCurrent += PassengerSpawnPerSec;
+
 			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
 					SpawnPassenger();
@@ -309,6 +325,11 @@ void AStation::SpawnPassenger() {
 	);
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+
+	if (Policy->GetHandicappedSeat()) {
+		tmp->SetFree();
+	}
+
 	Passenger.Add(tmp);
 
 	//Log
@@ -321,11 +342,8 @@ void AStation::SpawnPassenger() {
 }
 
 double AStation::GetPassengerSpawnProbability() {
-	double temp = PassengerSpawnProbability;
-	for (auto& i : PassengerSpawnProbabilityVariable) {
-		temp *= i;
-	}
-	return temp;
+	
+	return PassengerSpawnProbability * AdditionalPassengerSpawnProbability;
 }
 
 
