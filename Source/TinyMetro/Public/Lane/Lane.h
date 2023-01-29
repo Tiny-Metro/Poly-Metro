@@ -3,13 +3,56 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "LanePoint.h"
+#include "Lane.generated.h"
 
-/**
- * 
- */
-class TINYMETRO_API Lane
+UCLASS()
+class TINYMETRO_API ALane : public AActor
 {
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	ALane();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+
 public:
-	Lane();
-	~Lane();
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FLanePoint> LaneArray;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 LaneNum;
+
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+		TArray<FIntPoint> StationPoint;
+
+	TArray<FLanePoint> tmpLaneArray0;  // set station point to laneArray
+
+	TArray<FLanePoint> tmpLaneArray1; // TODO
+
+
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void CheckStationPoint();
+
+	UFUNCTION(BlueprintCallable)
+	void SetBendingPoint();
+
+	bool FindBendingPoint(FIntPoint& TargetPoint,FIntPoint PointStart, FIntPoint PointEnd);
+
+	UFUNCTION(BlueprintCallable)
+	void FillLanePoint();
+
 };
