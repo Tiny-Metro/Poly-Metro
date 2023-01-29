@@ -3,25 +3,10 @@
 
 #include "Lane/Lane.h"
 
-// Sets default values
-ALane::ALane()
+Lane::Lane()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 }
 
-// Called when the game starts or when spawned
-void ALane::BeginPlay()
+Lane::~Lane()
 {
-	Super::BeginPlay();
-	
 }
-
-// Called every frame
-void ALane::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
