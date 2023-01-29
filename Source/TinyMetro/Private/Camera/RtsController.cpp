@@ -3,4 +3,6 @@
 
 #include "Camera/RtsController.h"
 
-void ARtsController::ForceCamera_Implementation(FVector Location) {}
+void ARtsController::AutoCameraZoomIn_Implementation(FVector Location) {}
+void ARtsController::AutoCameraZoomOut_Implementation(FVector Location) {}
+void ARtsController::GameOverZoomIn_Implementation(FVector Location) {}
