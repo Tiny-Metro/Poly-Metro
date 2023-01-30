@@ -30,6 +30,8 @@ public:
 	void SetTrainId(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
 	ATrainTemplate* GetTrainById(int32 TrainId);
+	UFUNCTION(BlueprintCallable)
+	FVector GetNearestTrainLocation(FVector CurrentLocation);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")

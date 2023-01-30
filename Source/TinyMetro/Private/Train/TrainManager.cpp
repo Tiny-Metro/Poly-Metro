@@ -35,6 +35,12 @@ ATrainTemplate* ATrainManager::GetTrainById(int32 TrainId) {
 	return nullptr;
 }
 
+FVector ATrainManager::GetNearestTrainLocation(FVector CurrentLocation) {
+	double Distance = FVector::Dist(CurrentLocation, Trains[0]->GetActorLocation());
+
+	return FVector();
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {
