@@ -3,3 +3,6 @@
 
 #include "Train/TrainAiController.h"
 
+void ATrainAiController::Test() {
+	//MoveToLocation()
+}
