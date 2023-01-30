@@ -14,4 +14,11 @@ class TINYMETRO_API ASubtrain : public ATrainTemplate
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void Test() override;
+
+	// TrainTemplate override function
+	virtual FVector GetTrainNextLocation() override;
+
+protected:
 };

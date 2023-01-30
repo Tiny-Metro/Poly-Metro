@@ -3,3 +3,12 @@
 
 #include "Train/Subtrain.h"
 
+void ASubtrain::Test() {
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		TEXT("Test() : Subtrain"));
+}
+
+FVector ASubtrain::GetTrainNextLocation() {
+	return FVector();
+}
