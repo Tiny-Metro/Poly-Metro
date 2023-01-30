@@ -8,9 +8,15 @@ void ATrain::Test() {
 		TEXT("Test() : Train"));
 }
 
-void ATrain::BeginPlay() {
-	TotalTravel = 0.0f;
-}
+//void ATrain::BeginPlay() {
+//	TotalTravel = 0.0f;
+//	ParentAiControllerRef = Cast<ATrainAiController>(GetController());
+//
+//	if (IsValid(ParentAiControllerRef)) {
+//		UE_LOG(LogTemp, Log, TEXT("Success"));
+//	}
+//
+//}
 
 void ATrain::Tick(float DeltaTime) {
 }

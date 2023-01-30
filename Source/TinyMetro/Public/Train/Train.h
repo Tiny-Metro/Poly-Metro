@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Train/TrainTemplate.h"
 #include "Subtrain.h"
+#include "TrainAiController.h"
 #include "Train.generated.h"
 
 /**
@@ -27,7 +28,7 @@ public:
 protected:
 
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	//virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -36,4 +37,6 @@ protected:
 	float TotalTravel;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FVector LocationAtPreTick;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	ATrainAiController* ParentAiControllerRef;
 };
