@@ -54,3 +54,12 @@ void ATrainTemplate::Upgrade() {
 	//TODO : Mesh change
 }
 
+void ATrainTemplate::Test() {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		TEXT("Test() : TrainTemplate"));
+}
+
+FVector ATrainTemplate::GetTrainNextLocation() {
+	return FVector();
+}
+

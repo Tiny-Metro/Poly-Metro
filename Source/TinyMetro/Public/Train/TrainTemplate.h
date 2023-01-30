@@ -38,6 +38,10 @@ public:
 	TrainDirection GetTrainDirection() const;
 	UFUNCTION(BlueprintCallable)
 	void Upgrade();
+	UFUNCTION(BlueprintCallable)
+	virtual void Test();
+	UFUNCTION(BlueprintCallable)
+	virtual FVector GetTrainNextLocation();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
