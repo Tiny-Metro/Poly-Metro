@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TrainTemplate.h"
+#include "TrainType.h"
 #include "TrainManager.generated.h"
 
 UCLASS()
@@ -29,7 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
-	ATrainTemplate* GetTrainById(int32 TrainId);
+	ATrainTemplate* GetTrainById(int32 TrainId, TrainType& Type);
 	UFUNCTION(BlueprintCallable)
 	FVector GetNearestTrainLocation(FVector CurrentLocation);
 
