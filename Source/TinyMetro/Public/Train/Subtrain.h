@@ -18,7 +18,10 @@ public:
 	virtual void Test() override;
 
 	// TrainTemplate override function
-	virtual FVector GetTrainNextLocation() override;
+	virtual FVector GetNextTrainPosition() override;
 
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
+	int32 OwnerTrainId;
 };

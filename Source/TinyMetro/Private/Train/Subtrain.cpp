@@ -9,6 +9,6 @@ void ASubtrain::Test() {
 		TEXT("Test() : Subtrain"));
 }
 
-FVector ASubtrain::GetTrainNextLocation() {
+FVector ASubtrain::GetNextTrainPosition() {
 	return FVector();
 }

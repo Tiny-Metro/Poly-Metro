@@ -15,6 +15,8 @@ ATrainTemplate::ATrainTemplate()
 void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("Train Spawn"));
 	
 }
 
@@ -59,7 +61,7 @@ void ATrainTemplate::Test() {
 		TEXT("Test() : TrainTemplate"));
 }
 
-FVector ATrainTemplate::GetTrainNextLocation() {
+FVector ATrainTemplate::GetNextTrainPosition() {
 	return FVector();
 }
 

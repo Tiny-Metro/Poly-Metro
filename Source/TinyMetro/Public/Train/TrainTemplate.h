@@ -41,11 +41,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Test();
 	UFUNCTION(BlueprintCallable)
-	virtual FVector GetTrainNextLocation();
+	virtual FVector GetNextTrainPosition();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 ServiceLaneId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

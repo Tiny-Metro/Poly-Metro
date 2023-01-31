@@ -23,12 +23,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// TrainTemplate override function
-	virtual FVector GetTrainNextLocation() override;
+	virtual FVector GetNextTrainPosition() override;
 
 protected:
 
 	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
