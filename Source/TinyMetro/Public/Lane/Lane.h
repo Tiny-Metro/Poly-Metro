@@ -5,9 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "LanePoint.h"
+#include "../GridGenerator/GridManager.h"
 #include "Lane.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class TINYMETRO_API ALane : public AActor
 {
 	GENERATED_BODY()
@@ -32,9 +33,11 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	int32 LaneNum;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AGridManager* GridManagerRef;
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category="Lane")
 		TArray<FIntPoint> StationPoint;
 
 	TArray<FLanePoint> tmpLaneArray0;  // set station point to laneArray
