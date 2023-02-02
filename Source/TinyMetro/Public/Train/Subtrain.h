@@ -14,4 +14,14 @@ class TINYMETRO_API ASubtrain : public ATrainTemplate
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void Test() override;
+
+	// TrainTemplate override function
+	virtual FVector GetNextTrainPosition() override;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
+	int32 OwnerTrainId;
 };

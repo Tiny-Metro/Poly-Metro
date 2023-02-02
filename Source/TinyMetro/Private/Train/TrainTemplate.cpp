@@ -15,6 +15,8 @@ ATrainTemplate::ATrainTemplate()
 void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("Train Spawn"));
 	
 }
 
@@ -52,5 +54,14 @@ void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
 
 	//TODO : Mesh change
+}
+
+void ATrainTemplate::Test() {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		TEXT("Test() : TrainTemplate"));
+}
+
+FVector ATrainTemplate::GetNextTrainPosition() {
+	return FVector();
 }
 
