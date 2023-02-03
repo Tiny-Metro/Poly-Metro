@@ -232,3 +232,5 @@ void ALane::FillLanePoint() {
 	UE_LOG(LogTemp, Error, TEXT("FillLanePoint End!"));
 	*/
 }
+
+void ALane::LaneCreating_Implementation() {}

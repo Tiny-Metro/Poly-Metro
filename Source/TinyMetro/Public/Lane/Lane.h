@@ -58,4 +58,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FillLanePoint();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void LaneCreating();
+	virtual void LaneCreating_Implementation();
+
 };
