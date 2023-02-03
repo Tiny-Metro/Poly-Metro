@@ -33,6 +33,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetTrainId() const;
 	UFUNCTION(BlueprintCallable)
+	void SetServiceLaneId(int32 Id);
+	UFUNCTION(BlueprintCallable)
+	int32 GetServiceLaneId() const;
+	UFUNCTION(BlueprintCallable)
 	void SetTrainDirection(TrainDirection Dir);
 	UFUNCTION(BlueprintCallable)
 	TrainDirection GetTrainDirection() const;
