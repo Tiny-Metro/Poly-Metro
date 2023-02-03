@@ -105,10 +105,21 @@ FGridCellData AGridManager::GetGridCellDataRandom() {
 
 void AGridManager::SetGridStructure(int X, int Y, GridStructure Structure) {
 	GridCellData[(GridSize.X * Y) + X].GridStructure = Structure;
-	GridStructures.Add(TPair<FIntPoint, GridStructure>(FIntPoint(X, Y), Structure));
+	//GridStructures.Add(TPair<FIntPoint, GridStructure>(FIntPoint(X, Y), Structure));
 	if (Structure == GridStructure::Station) {
 		StationLocation.Add(FIntPoint(X, Y));
 	}
+}
+
+void AGridManager::SetGridStation(int X, int Y, GridStationStructure Structure) {
+	GridCellData[(GridSize.X * Y) + X].StationInfo = Structure;
+	if (Structure == GridStationStructure::Station) {
+		StationLocation.Add(FIntPoint(X, Y));
+	}
+}
+
+void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
+	GridCellData[(GridSize.X * Y) + X].LaneInfo = Structure;
 }
 
 bool AGridManager::IsValidStationSpawn(int Coord) {
