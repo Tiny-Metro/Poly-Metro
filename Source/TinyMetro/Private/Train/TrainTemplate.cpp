@@ -42,6 +42,14 @@ int32 ATrainTemplate::GetTrainId() const {
 	return TrainId;
 }
 
+void ATrainTemplate::SetServiceLaneId(int32 Id) {
+	ServiceLaneId = Id;
+}
+
+int32 ATrainTemplate::GetServiceLaneId() const {
+	return ServiceLaneId;
+}
+
 void ATrainTemplate::SetTrainDirection(TrainDirection Dir) {
 	Direction = Dir;
 }
