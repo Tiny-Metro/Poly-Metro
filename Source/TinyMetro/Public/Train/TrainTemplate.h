@@ -7,7 +7,7 @@
 #include "TrainDirection.h"
 #include "TrainTemplate.generated.h"
 
-UCLASS()
+UCLASS(Config=Game)
 class TINYMETRO_API ATrainTemplate : public ACharacter
 {
 	GENERATED_BODY()
@@ -54,4 +54,8 @@ protected:
 	bool IsUpgrade;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorDragged;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float OnPressedTime;
+	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float LongClickInterval;
 };
