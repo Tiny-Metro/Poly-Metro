@@ -149,15 +149,19 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridCellData.WorldCoordination.X,
 		GridCellData.WorldCoordination.Y, 
 		GridStructure::Station);
+	GridManager->SetGridStation(
+		GridCellData.WorldCoordination.X,
+		GridCellData.WorldCoordination.Y,
+		GridStationStructure::Station);
 
 
 	//Log
-	if (GEngine)
+	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.0f,
 			FColor::Magenta,
-			FString::Printf(TEXT("Stations : %d"), Station.Num()));
+			FString::Printf(TEXT("Stations : %d"), Station.Num()));*/
 }
 
 void AStationManager::StationSpawnRoutine() {
@@ -177,12 +181,12 @@ void AStationManager::StationSpawnRoutine() {
 			if (StationSpawnCurrent >= StationSpawnRequire) {
 				SpawnStation(GridManager->GetGridCellDataRandom(), GetRandomStationType());
 
-				if (GEngine)
+				/*if (GEngine)
 					GEngine->AddOnScreenDebugMessage(
 						-1,
 						15.0f,
 						FColor::Yellow,
-						FString::Printf(TEXT("Spawn!")));
+						FString::Printf(TEXT("Spawn!")));*/
 				StationSpawnCurrent = 0.0f;
 			}
 
