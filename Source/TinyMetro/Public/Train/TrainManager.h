@@ -32,7 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ATrainTemplate* GetTrainById(int32 TrainId, TrainType& Type);
 	UFUNCTION(BlueprintCallable)
-	FVector GetNearestTrainLocation(FVector CurrentLocation);
+	ATrain* GetNearestTrain(FVector CurrentLocation, class ALane* LaneRef);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
