@@ -105,6 +105,8 @@ protected:
 	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
+	UPROPERTY(BlueprintReadWrite)
+	TArray<int32> Lanes;
 
 protected:
 	// Station meshses
