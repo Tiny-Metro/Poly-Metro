@@ -2,6 +2,7 @@
 
 
 #include "Lane/Lane.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ALane::ALane()
@@ -9,6 +10,7 @@ ALane::ALane()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 }
 
 // Called when the game starts or when spawned
@@ -27,19 +29,9 @@ void ALane::Tick(float DeltaTime)
 
 void ALane::CheckStationPoint() {
 
-	FIntPoint Stationtmp;
-
-	Stationtmp.X = 0;
-	Stationtmp.Y = 0;
-	StationPoint.Add(Stationtmp);
-
-	Stationtmp.X = 0;
-	Stationtmp.Y = 30;
-	StationPoint.Add(Stationtmp);
-
-	Stationtmp.X = 30;
-	Stationtmp.Y = 0;
-	StationPoint.Add(Stationtmp);
+	tmpLaneArray0.Empty();
+	tmpLaneArray1.Empty();
+	LaneArray.Empty();
 
 	for (int i = 0; i < StationPoint.Num(); i++) {
 
@@ -50,6 +42,15 @@ void ALane::CheckStationPoint() {
 
 		tmpLaneArray0.Add(tmp);
 	}
+	/*
+	for (int i = 0; i < tmpLaneArray0.Num(); i++) {
+
+		UE_LOG(LogTemp, Warning, TEXT("tmpLaneArray0[%d] : X = %d , Y = %d"), i, tmpLaneArray0[i].Coordination.X, tmpLaneArray0[i].Coordination.Y);
+
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("CheckStationPoint End!"));
+	*/
 }
 
 void ALane::SetBendingPoint() {
@@ -74,6 +75,14 @@ void ALane::SetBendingPoint() {
 			}
 		}
 	}
+	/*
+	for (int i = 0; i < tmpLaneArray1.Num(); i++) {
+		UE_LOG(LogTemp, Warning, TEXT("tmpLaneArray1[%d] : X = %d , Y = %d"), i, tmpLaneArray1[i].Coordination.X, tmpLaneArray1[i].Coordination.Y);
+
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("SetBendingPoint End!"));
+	*/
 }
 
 bool ALane::FindBendingPoint( FIntPoint& TargetPoint,FIntPoint PointStart, FIntPoint PointEnd) {
@@ -95,28 +104,31 @@ bool ALane::FindBendingPoint( FIntPoint& TargetPoint,FIntPoint PointStart, FIntP
 			TargetPoint.Y = 0;
 			return false;
 		}
-		else {
-			if (AbsDistanceX > AbsDistanceY) {
+		else if (AbsDistanceX > AbsDistanceY) {
 
-				int32 tmp = PointDistance.X / AbsDistanceX;
+			int32 tmp = PointDistance.X / AbsDistanceX;
 
-				tmp = tmp * AbsDistanceY;
+			tmp = tmp * AbsDistanceY;
 
-				TargetPoint = PointStart + tmp + PointDistance.Y;
+			TargetPoint.X = PointStart.X + tmp;
 				
-				return true;
-			}
-			else {
+			TargetPoint.Y = PointStart.Y + PointDistance.Y;
+
+			return true;
+		}else {
 
 				int32 tmp = PointDistance.Y / AbsDistanceY;
 
 				tmp = tmp * AbsDistanceX;
 
-				TargetPoint = PointStart + tmp + PointDistance.X;
+				TargetPoint.X = PointStart.X + PointDistance.X;
+				TargetPoint.Y = PointStart.Y + tmp;
 				return true;
-			}
+			
  		}
 	}
+
+	//UE_LOG(LogTemp, Error, TEXT("FindBendingPoint End!"));
 }
 
 void ALane::FillLanePoint() {
@@ -126,7 +138,7 @@ void ALane::FillLanePoint() {
 
 		FLanePoint TmpLanePoint0 = tmpLaneArray1[i];
 
-		if ( i < tmpLaneArray1.Num() - 1) {
+		if ( i < (tmpLaneArray1.Num() - 1)) {
 			FLanePoint TmpLanePoint1 = tmpLaneArray1[i + 1];
 
 			FIntPoint DistancePoint =  TmpLanePoint1.Coordination - tmpLaneArray1[i].Coordination;
@@ -145,7 +157,7 @@ void ALane::FillLanePoint() {
 						if (DistancePoint.X == 0) {
 							TmpX = TmpLanePoint0.Coordination.X;
 						}
-						else if (DistancePoint.X < 0) {
+						else if (DistancePoint.X > 0) {
 							TmpX = TmpLanePoint0.Coordination.X + j;
 						}
 						else {
@@ -178,7 +190,7 @@ void ALane::FillLanePoint() {
 						if (DistancePoint.X == 0) {
 							TmpX = TmpLanePoint0.Coordination.X;
 						}
-						else if (DistancePoint.X < 0) {
+						else if (DistancePoint.X > 0) {
 							TmpX = TmpLanePoint0.Coordination.X + j;
 						}
 						else {
@@ -210,4 +222,13 @@ void ALane::FillLanePoint() {
 		}
 
 	}
+
+	/*
+	for (int i = 0; i < LaneArray.Num(); i++) {
+		UE_LOG(LogTemp, Error, TEXT("LaneArray[%d] : X = %d , Y = %d"), i, LaneArray[i].Coordination.X , LaneArray[i].Coordination.Y);
+
+	}
+	
+	UE_LOG(LogTemp, Error, TEXT("FillLanePoint End!"));
+	*/
 }
