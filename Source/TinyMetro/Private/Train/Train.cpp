@@ -2,6 +2,7 @@
 
 
 #include "Train/Train.h"
+#include "Train/SubtrainAiController.h"
 
 void ATrain::Test() {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
@@ -19,10 +20,14 @@ void ATrain::BeginPlay() {
 
 }
 
-void ATrain::Tick(float DeltaTime) {
-}
+//void ATrain::Tick(float DeltaTime) { }
 
 FVector ATrain::GetNextTrainPosition() {
 	return FVector();
+}
+
+void ATrain::SetSubtrain(ASubtrain* T) {
+	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
+	Subtrains.Add(T);
 }
 

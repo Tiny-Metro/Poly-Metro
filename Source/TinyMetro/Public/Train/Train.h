@@ -20,10 +20,13 @@ public:
 	virtual void Test() override;
 
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// virtual void Tick(float DeltaTime) override;
 
 	// TrainTemplate override function
 	virtual FVector GetNextTrainPosition() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
 
 protected:
 
