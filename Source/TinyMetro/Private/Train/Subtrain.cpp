@@ -12,3 +12,11 @@ void ASubtrain::Test() {
 FVector ASubtrain::GetNextTrainPosition() {
 	return FVector();
 }
+
+void ASubtrain::SetOwnerTrainId(int32 TID) {
+	OwnerTrainId = TID;
+}
+
+int32 ASubtrain::GetOwnerTrainId() const {
+	return OwnerTrainId;
+}

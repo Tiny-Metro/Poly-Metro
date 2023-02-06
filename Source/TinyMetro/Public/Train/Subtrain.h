@@ -20,6 +20,11 @@ public:
 	// TrainTemplate override function
 	virtual FVector GetNextTrainPosition() override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetOwnerTrainId(int32 TID);
+	UFUNCTION(BlueprintCallable)
+	int32 GetOwnerTrainId() const;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
