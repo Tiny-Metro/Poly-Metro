@@ -3,10 +3,20 @@
 
 #include "Train/Train.h"
 #include "Train/SubtrainAiController.h"
+#include "Station/Station.h"
+#include "Components/BoxComponent.h"
 
 void ATrain::Test() {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 		TEXT("Test() : Train"));
+}
+
+ATrain::ATrain() {
+	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	OverlapVolume->InitBoxExtent(FVector(10,20,30));
+	OverlapVolume->OnComponentBeginOverlap.__Internal_AddDynamic(this, &ATrain::OnOverlapBegin, FName("OnOverlapBegin"));;
+	OverlapVolume->SetupAttachment(RootComponent);
+	//SetRootComponent(OverlapVolume);
 }
 
 void ATrain::BeginPlay() {
@@ -18,6 +28,14 @@ void ATrain::BeginPlay() {
 		UE_LOG(LogTemp, Log, TEXT("Success"));
 	}
 
+}
+
+void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+	if (OtherActor->IsA(AStation::StaticClass())) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
+
+	}
+	
 }
 
 //void ATrain::Tick(float DeltaTime) { }
