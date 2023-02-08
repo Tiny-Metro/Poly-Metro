@@ -54,6 +54,8 @@ public:
 	void DecreaseComplain(int32 ReduceValue);
 
 	int32 GetComplain() const;
+	TArray<int32> GetLanes();
+	void SetLanes(int32 AdditionalLaneId);
 
 protected:
 	void PassengerSpawnRoutine();

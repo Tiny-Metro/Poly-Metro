@@ -30,20 +30,21 @@ public:
 	int32 NextLaneId = 1;
 
 	UPROPERTY(BlueprintReadWrite)
-		TArray<ALane*> Lanes;
+	TArray<ALane*> Lanes;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void CreatingNewLane(AStation* SelectedStation);
+	void CreatingNewLane(TArray <AStation*> SelectedStations);
 
 	UFUNCTION(BlueprintCallable)
 	void AddStationInLane(ALane* CurrentLane, AStation* SelectedStation);
 	
 	UFUNCTION(BlueprintCallable)
-		void AddLane(ALane* Obj);
+	void AddLane(ALane* Obj);
 	
 	UFUNCTION(BlueprintCallable)
-		ALane* GetLane(int32 LaneId);
+	ALane* GetLane(int32 LaneId);
+
 
 	
 };

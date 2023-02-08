@@ -6,6 +6,7 @@
 #include <UObject/ConstructorHelpers.h>
 #include "Finance/Bank.h"
 #include "Train/TrainManager.h"
+#include "Lane/LaneManager.h"
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
@@ -46,6 +47,7 @@ int32 ATinyMetroGameModeBase::GetDaytime() const {
 void ATinyMetroGameModeBase::StartPlay() {
     GetWorld()->SpawnActor<ABank>();
     GetWorld()->SpawnActor<ATrainManager>();
+    GetWorld()->SpawnActor<ALaneManager>();
     Super::StartPlay();
 }
 

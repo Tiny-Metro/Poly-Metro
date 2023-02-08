@@ -234,3 +234,7 @@ void ALane::FillLanePoint() {
 }
 
 void ALane::LaneCreating_Implementation() {}
+
+void ALane::InitializeNewLane_Implementation()
+{
+}

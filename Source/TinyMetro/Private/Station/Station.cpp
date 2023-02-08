@@ -221,6 +221,16 @@ int32 AStation::GetComplain() const {
 	return ComplainCurrent;
 }
 
+TArray<int32> AStation::GetLanes()
+{
+	return Lanes;
+}
+
+void AStation::SetLanes(int32 AdditionalLaneId)
+{
+	Lanes.Add(AdditionalLaneId);
+}
+
 void AStation::ComplainRoutine() {
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerComplain,

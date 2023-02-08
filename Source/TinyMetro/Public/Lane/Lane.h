@@ -38,11 +38,13 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category="Lane")
-		TArray<FIntPoint> StationPoint;
+	TArray<FIntPoint> StationPoint;
 
 	TArray<FLanePoint> tmpLaneArray0;  // set station point to laneArray
 
 	TArray<FLanePoint> tmpLaneArray1; // TODO
+
+
 
 
 
@@ -61,5 +63,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void LaneCreating();
 	virtual void LaneCreating_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void InitializeNewLane();
+	virtual void InitializeNewLane_Implementation();
+	
 
 };
