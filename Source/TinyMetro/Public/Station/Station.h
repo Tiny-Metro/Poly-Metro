@@ -35,6 +35,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetStationId(int32 Id);
 	UFUNCTION(BlueprintCallable)
+	int32 GetStationId() const;
+	UFUNCTION(BlueprintCallable)
 	void SetStationType(StationType Type);
 	UFUNCTION(BlueprintCallable)
 	void SetGridCellData(FGridCellData GridCellData);

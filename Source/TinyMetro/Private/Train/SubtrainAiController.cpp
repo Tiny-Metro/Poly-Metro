@@ -3,3 +3,6 @@
 
 #include "Train/SubtrainAiController.h"
 
+void ASubtrainAiController::SetTargetTrain(ATrainTemplate* T) {
+	TargetTrain = T;
+}

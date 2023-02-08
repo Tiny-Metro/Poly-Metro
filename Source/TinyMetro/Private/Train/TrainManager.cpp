@@ -22,6 +22,7 @@ void ATrainManager::BeginPlay()
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
+	Train->SetTrainId(NextTrainId++);
 	Trains.Add(Train);
 }
 

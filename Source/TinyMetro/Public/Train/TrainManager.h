@@ -38,6 +38,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
-	int32 NextTrainId;
+	int32 NextTrainId = 0;
 
 };

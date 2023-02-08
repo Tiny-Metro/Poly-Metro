@@ -2,13 +2,18 @@
 
 
 #include "Train/TrainTemplate.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 // Sets default values
 ATrainTemplate::ATrainTemplate()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	auto TrainMovement = GetCharacterMovement();
+	TrainMovement->MaxAcceleration = 50000.0f; // Default 2048
+	TrainMovement->Mass = 1.0f; // Deafult 100
+	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
+	TrainMovement->bUseControllerDesiredRotation = true; // Default false
 }
 
 // Called when the game starts or when spawned

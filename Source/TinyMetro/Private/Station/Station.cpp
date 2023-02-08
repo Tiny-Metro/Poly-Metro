@@ -86,6 +86,10 @@ void AStation::SetStationId(int32 Id) {
 	StationId = Id;
 }
 
+int32 AStation::GetStationId() const {
+	return StationId;
+}
+
 void AStation::SetStationType(StationType Type) {
 	StationTypeValue = Type;
 
