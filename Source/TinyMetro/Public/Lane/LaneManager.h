@@ -32,19 +32,23 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<ALane*> Lanes;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool IsPlacementValid;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 SelecetedLaneNum;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreatingNewLane(TArray <AStation*> SelectedStations);
 
 	UFUNCTION(BlueprintCallable)
-	void AddStationInLane(ALane* CurrentLane, AStation* SelectedStation);
+	void AddStationInLane(int CurrentLane);
 	
 	UFUNCTION(BlueprintCallable)
 	void AddLane(ALane* Obj);
 	
 	UFUNCTION(BlueprintCallable)
 	ALane* GetLane(int32 LaneId);
-
-
 	
 };

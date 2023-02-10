@@ -67,6 +67,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void InitializeNewLane();
 	virtual void InitializeNewLane_Implementation();
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void ExtendLane();
+	virtual void ExtendLane_Implementation();
 	
 
 };
