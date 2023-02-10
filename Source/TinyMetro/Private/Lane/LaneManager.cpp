@@ -58,6 +58,9 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
 	tmpLane->LaneNum = NextLaneId;
 
+	//UE_LOG(LogTemp, Warning, TEXT("GetFName : &d"), tmpLane->GetFName());
+	UE_LOG(LogTemp, Warning, TEXT("GetActorNameOrLabel : %s"), *(tmpLane->GetActorNameOrLabel()));
+
 	
 
 	UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d]"), SelectedStations.Num());
