@@ -53,9 +53,12 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
 
+	
 
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
 	tmpLane->LaneNum = NextLaneId;
+
+	
 
 	UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d]"), SelectedStations.Num());
 	for (int i = 0; i < SelectedStations.Num(); i++) {
@@ -73,14 +76,19 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	tmpLane->InitializeNewLane();
 
 
+	Lanes.Add(tmpLane);
+
 	UE_LOG(LogTemp, Warning, TEXT("StationPoint Num : %d"), tmpLane->StationPoint.Num());
 
 	NextLaneId++;
 }
 
 
-void ALaneManager::AddStationInLane(ALane* CurrentLane , AStation* SelectedStation) {
+void ALaneManager::AddStationInLane(int CurrentLane) {
 
+	ALane* tmp = GetLane(CurrentLane);
+
+	tmp->ExtendLane();
 }
 
 void ALaneManager::AddLane(ALane* Obj) {
