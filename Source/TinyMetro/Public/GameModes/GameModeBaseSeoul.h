@@ -10,7 +10,7 @@
 /**
  *
  */
-UCLASS()
+UCLASS(Config = Game)
 class TINYMETRO_API AGameModeBaseSeoul : public ATinyMetroGameModeBase
 {
 	GENERATED_BODY()
@@ -21,5 +21,6 @@ public:
 	virtual TMap<FIntPoint, StationType> GetInitData() const override;
 	virtual int32 GetDaytime() const override;
 
+	virtual void BeginPlay() override;
 
 };

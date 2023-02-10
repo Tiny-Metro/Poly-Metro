@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Config = Game)
 class TINYMETRO_API ATinyMetroGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
@@ -27,4 +27,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGameSpeed(float TimeDilation);
+
+protected:
+	UPROPERTY(Config)
+	int32 TestValue;
+	UPROPERTY(Config)
+	int32 Daytime;
 };
