@@ -3,6 +3,9 @@
 
 #include "Train/TrainTemplate.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
+#include <Kismet/GameplayStatics.h>
+#include <Kismet/KismetSystemLibrary.h>
 
 // Sets default values
 ATrainTemplate::ATrainTemplate()
@@ -23,6 +26,27 @@ void ATrainTemplate::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 		TEXT("Train Spawn"));
 	
+}
+
+//FVector ATrainTemplate::ConvertMousePositionToWorldLocation_Implementation() {
+//	return FVector();
+//}
+
+FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
+	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+	FVector WorldPosition, WorldDirection;
+	FHitResult HitResult;
+	TArray<AActor*> tmp;
+	tmp.Add(this);
+	UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(GetWorld(), 0),
+		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
+		WorldPosition, WorldDirection);
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000.0f) + WorldPosition,
+		ETraceTypeQuery::TraceTypeQuery1, false, tmp, EDrawDebugTrace::Type::None,
+		HitResult, true);
+
+	return HitResult.Location;
 }
 
 // Called every frame
