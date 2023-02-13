@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Config = Game)
 class TINYMETRO_API ATrain : public ATrainTemplate
 {
 	GENERATED_BODY()
@@ -27,6 +27,8 @@ public:
 
 	// TrainTemplate override function
 	virtual FVector GetNextTrainPosition() override;
+	virtual bool SetTrainMaterial(int32 LaneNumber) override;
+	virtual void Upgrade() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
@@ -38,6 +40,10 @@ protected:
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void TrainMaterialDeferred(); 
+	UFUNCTION()
+	void TrainMeshDeferred();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -52,4 +58,14 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* OverlapVolume;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* TrainMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FStringAssetReference> TrainMaterialPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> TrainMaterial;
+	UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	FStringAssetReference TrainUpgradeMeshPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMesh* TrainUpgradeMesh;
 };

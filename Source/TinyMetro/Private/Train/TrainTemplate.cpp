@@ -49,6 +49,10 @@ FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
 	return HitResult.Location;
 }
 
+bool ATrainTemplate::SetTrainMaterial(int32 LaneNumber) {
+	return false;
+}
+
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)
 {
