@@ -2,6 +2,8 @@
 
 
 #include "Train/TrainTemplate.h"
+#include "GameModes/GameModeBaseSeoul.h"
+#include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
 #include <Kismet/GameplayStatics.h>
@@ -23,6 +25,12 @@ ATrainTemplate::ATrainTemplate()
 void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitTrainMaterial();
+	InitTrainMesh();
+
+
+
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 		TEXT("Train Spawn"));
 	
@@ -65,6 +73,34 @@ void ATrainTemplate::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ATrainTemplate::InitTrainMaterial() {
+	TrainMaterialPath = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		TrainMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMaterialDeferred)
+	);
+}
+
+void ATrainTemplate::InitTrainMesh() {
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		TrainUpgradeMeshPath,
+		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
+	);
+}
+
+void ATrainTemplate::TrainMaterialDeferred() {
+	for (auto& i : TrainMaterialPath) {
+		//TAssetPtr<UMaterial> tmp(i);
+		TrainMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
+	}
+}
+
+void ATrainTemplate::TrainMeshDeferred() {
+	TrainUpgradeMesh = Cast<UStaticMesh>(TrainUpgradeMeshPath.ResolveObject());
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {

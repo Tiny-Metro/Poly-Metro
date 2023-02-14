@@ -17,10 +17,10 @@ ATrain::ATrain() {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TrainMesh(
 		TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'")
 	);
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(
-		TEXT("Material'/Game/Resource/Material/M_Light.M_Light'")
+	/*static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(
+		TEXT("Material'/Game/Resource/Material/Lane/M_Lane_8.M_Lane_8'")
 	);
-	TrainMaterial.AddUnique(DefaultMaterial.Object->GetMaterial());
+	TrainMaterial.AddUnique(DefaultMaterial.Object->GetMaterial());*/
 
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	OverlapVolume->InitBoxExtent(FVector(10,20,30));
@@ -30,7 +30,8 @@ ATrain::ATrain() {
 	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 	TrainMeshComponent->SetWorldScale3D(FVector(2.5f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(TrainMesh.Object);
-	TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
+	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
+	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
 }
 
@@ -39,22 +40,25 @@ void ATrain::BeginPlay() {
 	TotalTravel = 0.0f;
 	ParentAiControllerRef = Cast<ATrainAiController>(GetController());
 
-	TrainMaterialPath = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
-	auto& AssetLoader = UAssetManager::GetStreamableManager();
-	AssetLoader.RequestAsyncLoad(
-		TrainMaterialPath,
-		FStreamableDelegate::CreateUObject(this, &ATrain::TrainMaterialDeferred)
-	); 
-	UE_LOG(LogTemp, Log, TEXT("TUM : %s"), *TrainUpgradeMesh.ToString());
-	AssetLoader.RequestAsyncLoad(
-		TrainUpgradeMesh,
-		FStreamableDelegate::CreateUObject(this, &ATrain::TrainMeshDeferred)
-	);
+	//UE_LOG(LogTemp, Log, TEXT("TUM : %s"), *TrainUpgradeMesh.ToString());
 	
+	
+	
+	// Material change test code
+	/*GetWorld()->GetTimerManager().SetTimer(TestTimer, FTimerDelegate::CreateLambda([&]() {
+				int tmp = FMath::RandRange(0, TrainMaterial.Num() - 1);
+				TrainMeshComponent->SetMaterial(0, TrainMaterial[tmp]);
+				UE_LOG(LogTemp, Log, TEXT("Material Change : %d"), tmp);
+			}
+		),
+		1.0f,
+		true,
+		1.0f
+	);*/
 
-	if (IsValid(ParentAiControllerRef)) {
+	/*if (IsValid(ParentAiControllerRef)) { // True
 		UE_LOG(LogTemp, Log, TEXT("Success"));
-	}
+	}*/
 
 }
 
@@ -64,17 +68,6 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 	}
 	
-}
-
-void ATrain::TrainMaterialDeferred() {
-	for (auto i : TrainMaterialPath) {
-		TAssetPtr<UMaterial> tmp(i);
-		TrainMaterial.AddUnique(tmp.Get());
-	}
-}
-
-void ATrain::TrainMeshDeferred() {
-	TrainUpgradeMesh = Cast<UStaticMesh>(TrainUpgradeMeshPath.ResolveObject());
 }
 
 

@@ -7,7 +7,7 @@
 #include "TrainDirection.h"
 #include "TrainTemplate.generated.h"
 
-UCLASS(Config=Game)
+UCLASS(Config = Game)
 class TINYMETRO_API ATrainTemplate : public ACharacter
 {
 	GENERATED_BODY()
@@ -27,7 +27,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
+	UFUNCTION()
+	void InitTrainMaterial();
+	UFUNCTION()
+	void InitTrainMesh();
+	UFUNCTION()
+	void TrainMaterialDeferred();
+	UFUNCTION()
+	void TrainMeshDeferred();
+	
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(int32 Id);
 	UFUNCTION(BlueprintCallable)
@@ -66,4 +74,16 @@ protected:
 	float OnPressedTime;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float LongClickInterval;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* TrainMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FSoftObjectPath> TrainMaterialPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> TrainMaterial;
+	UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	FSoftObjectPath TrainUpgradeMeshPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMesh* TrainUpgradeMesh;
 };

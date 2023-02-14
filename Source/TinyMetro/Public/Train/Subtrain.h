@@ -9,12 +9,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Config = Game)
 class TINYMETRO_API ASubtrain : public ATrainTemplate
 {
 	GENERATED_BODY()
 	
 public:
+	ASubtrain();
+
 	virtual void Test() override;
 
 	// TrainTemplate override function
@@ -26,7 +28,11 @@ public:
 	int32 GetOwnerTrainId() const;
 
 protected:
+	virtual void BeginPlay() override;
 
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 OwnerTrainId;
+
 };
