@@ -2,6 +2,7 @@
 
 
 #include "Station/StationManager.h"
+#include "Lane/Lane.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -94,17 +95,28 @@ float AStationManager::GetComplainAverage() {
 	return ((float)ComplainSum)/Station.Num();
 }
 
-FVector AStationManager::GetNearestStationLocation(FVector CurrentLocation) {
+AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALane* LaneRef) {
 	double Distance = FVector::Dist(CurrentLocation, Station[0]->GetCurrentGridCellData().WorldLocation);
-	FVector Result = Station[0]->GetCurrentGridCellData().WorldLocation;
+	int StationIndex = 0;
+	bool LaneValid = IsValid(LaneRef);
+	//UE_LOG(LogTemp, Log, TEXT("Lane valid : %d"), LaneValid);
+	for (int i = 1; i < Station.Num(); i++) {
+		//if (LaneValid && !Station[i]->GetLanes().FindByKey<int32>(LaneRef->GetLaneId())) continue;
+		double tmp = FVector::Dist(CurrentLocation, Station[i]->GetCurrentGridCellData().WorldLocation);
+		if (Distance > tmp) {
+			Distance = tmp;
+			StationIndex = i;
+		}
+	}
+	/*FVector Result = Station[0]->GetCurrentGridCellData().WorldLocation;
 	for (auto& i : Station) {
 		double tmp = FVector::Dist(CurrentLocation, i->GetCurrentGridCellData().WorldLocation);
 		if (Distance > tmp) {
 			Distance = tmp;
 			Result = i->GetCurrentGridCellData().WorldLocation;
 		}
-	}
-	return Result;
+	}*/
+	return Station[StationIndex];
 }
 
 void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
