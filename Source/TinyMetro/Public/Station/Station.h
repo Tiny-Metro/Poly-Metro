@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void LoadStationValue(FStationValuesStruct StationValues);
 
+	UFUNCTION(BlueprintCallable)
+		bool IsValidLane(int32 LId) const;
+
 	void DecreaseComplain(double ReduceRate);
 	void DecreaseComplain(int32 ReduceValue);
 

@@ -58,7 +58,6 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
 	tmpLane->LaneNum = NextLaneId;
 
-	//UE_LOG(LogTemp, Warning, TEXT("GetFName : &d"), tmpLane->GetFName());
 	UE_LOG(LogTemp, Warning, TEXT("GetActorNameOrLabel : %s"), *(tmpLane->GetActorNameOrLabel()));
 
 	
@@ -89,7 +88,7 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 void ALaneManager::AddStationInLane(int CurrentLane) {
 
-	ALane* tmp = GetLane(CurrentLane);
+	ALane* tmp = GetLaneById(CurrentLane);
 
 	tmp->ExtendLane();
 }
@@ -98,10 +97,6 @@ void ALaneManager::AddLane(ALane* Obj) {
 
 }
 
-ALane* ALaneManager::GetLane(int32 LaneId) {
+ALane* ALaneManager::GetLaneById(int32 LaneId) {
 	return Lanes[LaneId - 1];
 }
-
-
-
-

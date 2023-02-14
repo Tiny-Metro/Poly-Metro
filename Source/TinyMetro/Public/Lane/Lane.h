@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LanePoint.h"
 #include "../GridGenerator/GridManager.h"
+#include "../Train/TrainDirection.h"
 #include "Lane.generated.h"
 
 UCLASS(Blueprintable)
@@ -74,4 +75,12 @@ public:
 	virtual void ExtendLane_Implementation();
 	
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetNextLocation(FVector CurLocation, TrainDirection Direction) const;
+
+	UFUNCTION(BlueprintCallable)
+	TrainDirection SetDirectionInit(class AStation* Station, FVector CurLocation) const;
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnTrain();
 };

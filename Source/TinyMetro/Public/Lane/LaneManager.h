@@ -49,6 +49,7 @@ public:
 	void AddLane(ALane* Obj);
 	
 	UFUNCTION(BlueprintCallable)
-	ALane* GetLane(int32 LaneId);
+	ALane* GetLaneById(int32 LaneId);
+
 	
 };

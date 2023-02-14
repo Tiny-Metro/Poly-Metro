@@ -238,3 +238,17 @@ void ALane::LaneCreating_Implementation() {}
 void ALane::InitializeNewLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
+
+FVector ALane::GetNextLocation(FVector CurLocation, TrainDirection Direction) const
+{
+	return FVector();
+}
+
+TrainDirection ALane::SetDirectionInit(AStation* Station, FVector CurLocation) const
+{
+	return TrainDirection();
+}
+
+void ALane::SpawnTrain()
+{
+}

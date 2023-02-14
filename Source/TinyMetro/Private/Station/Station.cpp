@@ -194,6 +194,11 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	}
 }
 
+bool AStation::IsValidLane(int32 LId) const
+{
+	return false;
+}
+
 
 
 void AStation::CalculateComplain() {
