@@ -21,6 +21,7 @@ public:
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
+	virtual TArray<FStringAssetReference> GetTrainMaterialPath() const;
 
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
@@ -33,4 +34,6 @@ protected:
 	int32 TestValue;
 	UPROPERTY(Config)
 	int32 Daytime;
+	UPROPERTY(Config)
+	TArray<FStringAssetReference> TrainMaterialPath;
 };

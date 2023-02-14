@@ -41,7 +41,11 @@ TMap<FIntPoint, StationType> ATinyMetroGameModeBase::GetInitData() const {
 }
 
 int32 ATinyMetroGameModeBase::GetDaytime() const {
-    return 12;
+    return Daytime;
+}
+
+TArray<FStringAssetReference> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
+    return TrainMaterialPath;
 }
 
 void ATinyMetroGameModeBase::StartPlay() {

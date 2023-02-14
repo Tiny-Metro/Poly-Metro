@@ -41,11 +41,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TrainDirection GetTrainDirection() const;
 	UFUNCTION(BlueprintCallable)
-	void Upgrade();
+	virtual void Upgrade();
 	UFUNCTION(BlueprintCallable)
 	virtual void Test();
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetNextTrainPosition();
+	UFUNCTION(BlueprintCallable)
+	FVector ConvertMousePositionToWorldLocation();
+	UFUNCTION(BlueprintCallable)
+	virtual bool SetTrainMaterial(int32 LaneNumber);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -55,7 +59,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	bool IsUpgrade;
+	bool IsUpgrade = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorDragged;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
