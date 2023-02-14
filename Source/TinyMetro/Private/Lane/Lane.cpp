@@ -239,13 +239,50 @@ void ALane::InitializeNewLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
-FVector ALane::GetNextLocation(FVector CurLocation, TrainDirection Direction) const
+FIntPoint ALane::GetNextLocation(FIntPoint CurLocation, TrainDirection Direction) const
 {
-	return FVector();
+	int32 Index;
+
+	for (int32 i = 0; i < LaneArray.Num(); i++) {
+
+		if (LaneArray[i].Coordination == CurLocation) {
+
+			Index = i;
+
+			break;
+		}
+	}
+
+	if (Direction == TrainDirection::Up) { // index get smaller
+
+		if (Index != 0) {
+			return LaneArray[Index - 1].Coordination;
+		}
+		else {
+			// Chanege Train Direction
+			return LaneArray[Index + 1].Coordination;
+		}
+
+	}
+	else {
+
+		if (Index != (LaneArray.Num() -1 )) {
+			return LaneArray[Index + 1].Coordination;
+		}
+		else {
+
+			//Change Train Direction
+			return LaneArray[Index - 1].Coordination;
+		}
+	}
+
 }
 
 TrainDirection ALane::SetDirectionInit(AStation* Station, FVector CurLocation) const
 {
+	// 
+
+
 	return TrainDirection();
 }
 

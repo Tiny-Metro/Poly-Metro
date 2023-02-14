@@ -76,7 +76,7 @@ public:
 	
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetNextLocation(FVector CurLocation, TrainDirection Direction) const;
+	FIntPoint GetNextLocation(FIntPoint CurLocation, TrainDirection Direction) const;
 
 	UFUNCTION(BlueprintCallable)
 	TrainDirection SetDirectionInit(class AStation* Station, FVector CurLocation) const;
