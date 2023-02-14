@@ -36,7 +36,7 @@ public:
 	bool IsPlacementValid;
 
 	UPROPERTY(BlueprintReadWrite)
-	int32 SelecetedLaneNum;
+	int32 SelectedLaneNum;
 
 public:
 	UFUNCTION(BlueprintCallable)
