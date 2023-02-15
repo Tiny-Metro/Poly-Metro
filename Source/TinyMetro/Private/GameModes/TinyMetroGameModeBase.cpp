@@ -7,6 +7,7 @@
 #include "Finance/Bank.h"
 #include "Train/TrainManager.h"
 #include "Lane/LaneManager.h"
+#include "Policy/Policy.h"
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
@@ -44,11 +45,12 @@ int32 ATinyMetroGameModeBase::GetDaytime() const {
     return Daytime;
 }
 
-TArray<FStringAssetReference> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
+TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
     return TrainMaterialPath;
 }
 
 void ATinyMetroGameModeBase::StartPlay() {
+    GetWorld()->SpawnActor<APolicy>();
     GetWorld()->SpawnActor<ABank>();
     GetWorld()->SpawnActor<ATrainManager>();
     GetWorld()->SpawnActor<ALaneManager>();

@@ -27,11 +27,20 @@ void AStationManager::BeginPlay()
 
 	Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
 
-	
+	if (IsValid(PlayerState)) {
+		UE_LOG(LogTemp, Log, TEXT("PlayerState Valid"));
+	} else {
+		UE_LOG(LogTemp, Log, TEXT("PlayerState Invalid"));
+	}
+	if (IsValid(Policy)) {
+		UE_LOG(LogTemp, Log, TEXT("Policy Valid"));
+	} else {
+		UE_LOG(LogTemp, Log, TEXT("Policy Invalid"));
+	}
 
 
 	StationSpawnRoutine();
-	PolicyMaintenanceRoutine();
+	//PolicyMaintenanceRoutine();
 
 
 

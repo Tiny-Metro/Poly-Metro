@@ -13,10 +13,10 @@ UENUM(BlueprintType)
 enum class StationType : uint8{
 	Circle = 0 UMETA(DisplayName = "Circle"),
 	Triangle = 1 UMETA(DisplayName = "Triangle"),
-	Square = 2 UMETA(DisplayName = "Square"),
+	Rectangle = 2 UMETA(DisplayName = "Rectangle"),
 	Cross = 3 UMETA(DisplayName = "Cross"),
-	Lozenge = 4 UMETA(DisplayName = "Lozenge"),
-	Almond = 5 UMETA(DisplayName = "Almond"),
+	Rhombus = 4 UMETA(DisplayName = "Rhombus"),
+	Oval = 5 UMETA(DisplayName = "Oval"),
 	Diamond = 6 UMETA(DisplayName = "Diamond"),
 	Pentagon = 7 UMETA(DisplayName = "Pentagon"),
 	Star = 8 UMETA(DisplayName = "Star"),

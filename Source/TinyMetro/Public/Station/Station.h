@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "StationType.h"
+#include "StationState.h"
 #include "Passenger.h"
 #include "../SaveSystem/TMSaveManager.h"
 #include "../GridGenerator/GridCellData.h"
@@ -13,7 +14,7 @@
 
 class AStationManager;
 
-UCLASS()
+UCLASS(Config = Game)
 class TINYMETRO_API AStation : public AActor
 {
 	GENERATED_BODY()
@@ -48,15 +49,34 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
 	UFUNCTION(BlueprintCallable)
+	void UpdateStationMesh();
+	UFUNCTION(BlueprintCallable)
+	StationState GetStationState() const;
+	UFUNCTION(BlueprintCallable)
 	StationType GetStationType() const;
 	UFUNCTION(BlueprintCallable)
 	FGridCellData GetCurrentGridCellData() const;
-
 	UFUNCTION(BlueprintCallable)
-		void LoadStationValue(FStationValuesStruct StationValues);
-
+	void LoadStationValue(FStationValuesStruct StationValues);
 	UFUNCTION(BlueprintCallable)
-		bool IsValidLane(int32 LId) const;
+	bool IsValidLane(int32 LId) const;
+
+	/*UFUNCTION()
+	void InitStationMesh();
+	UFUNCTION()
+	void StationMeshDeferred();
+	UFUNCTION()
+	void InitStationMaterialActive();
+	UFUNCTION()
+	void StationMaterialActiveDeferred();
+	UFUNCTION()
+	void InitStationMaterialInactive();
+	UFUNCTION()
+	void StationMaterialInactiveDeferred();
+	UFUNCTION()
+	void InitStationMaterialDestroyed();
+	UFUNCTION()
+	void StationMaterialDestroyedDeferred();*/
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 
@@ -108,6 +128,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	bool IsActive = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	StationState State = StationState::Inactive;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	StationType StationTypeValue = StationType::Circle;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FGridCellData CurrentGridCellData;
@@ -127,25 +149,52 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Root")
 	USceneComponent* DefaultRoot = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	UStaticMeshComponent* MeshInner = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	UStaticMeshComponent* MeshOuter = nullptr;
+	UStaticMeshComponent* StationMeshComponent = nullptr;
+	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	//TArray<FSoftObjectPath> StationMeshPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UStaticMesh*> StationMesh;
 
 	// Material
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material Current")
-	UMaterialInstanceDynamic* DynamicMaterialInner;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material Current")
-	UMaterialInstanceDynamic* DynamicMaterialOuter;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterial* MaterialActiveInner;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterial* MaterialActiveOuter;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterial* MaterialInactiveInner;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterial* MaterialInactiveOuter;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterial* MaterialDestroyedInner;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Material")
-	UMaterial* MaterialDestroyedOuter;
+	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	//TArray<FSoftObjectPath> StationMaterialInactivePath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> StationMaterialInactive;
+	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	//TArray<FSoftObjectPath> StationMaterialActivePath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> StationMaterialActive;
+	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	//TArray<FSoftObjectPath> StationMaterialDestroyedPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> StationMaterialDestroyed;
+
+	/*UPROPERTY()
+	TArray<FString> StationMeshPath = {
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationTriangle.SM_StationTriangle'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRectangle.SM_StationRectangle'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCross.SM_StationCross'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRhombus.SM_StationRhombus'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationOval.SM_StationOval'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationDiamond.SM_StationDiamond'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationPentagon.SM_StationPentagon'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationStar.SM_StationStar'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationFan.SM_StationFan'")
+	};*/
+	/*UPROPERTY()
+	TArray<FString> StationMaterialInactivePath = {
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
+	};
+	UPROPERTY()
+	TArray<FString> StationMaterialActivePath = {
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationActive_Outer.M_StationActive_Outer'"),
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationActive_Inner.M_StationActive_Inner'")
+	};
+	UPROPERTY()
+	TArray<FString> StationMaterialDestroyedPath = {
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Outer.M_StationDestroyed_Outer'"),
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Inner.M_StationDestroyed_Inner'")
+	};*/
 };

@@ -20,7 +20,7 @@ TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
     if (!UGameplayStatics::DoesSaveGameExist("StationSave", 0))
     {
         Tmp.Add(FIntPoint(27, 22), StationType::Triangle);
-        Tmp.Add(FIntPoint(32, 17), StationType::Square);
+        Tmp.Add(FIntPoint(32, 17), StationType::Rectangle);
         Tmp.Add(FIntPoint(39, 26), StationType::Circle);
     }
 
