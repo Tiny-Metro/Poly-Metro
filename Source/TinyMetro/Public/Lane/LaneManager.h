@@ -30,7 +30,7 @@ public:
 	//int32 NextLaneId = 1;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<ALane*> Lanes;
+	TMap<int32, ALane*> Lanes;
 
 	UPROPERTY(BlueprintReadWrite)
 	bool IsPlacementValid;

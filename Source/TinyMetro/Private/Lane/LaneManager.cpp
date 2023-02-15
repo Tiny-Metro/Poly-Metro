@@ -50,13 +50,13 @@ void ALaneManager::RemoveNextLaneNums()
 
 void ALaneManager::RemoveDestroyedLane(int LaneNum)
 {
-	Lanes.RemoveAt(LaneNum - 1);
+	Lanes.Remove(LaneNum);
 }
 
 void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	// Load BP Class
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/TrackLine/BP_Lane.BP_Lane'")));
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
 
 	// Cast to BP
 	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
@@ -104,7 +104,7 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	tmpLane->InitializeNewLane();
 
-	Lanes.Insert(tmpLane, (NextLaneNums[0]-1));
+	Lanes.Add(NextLaneNums[0], tmpLane);
 	//Lanes.Add(tmpLane);
 
 	UE_LOG(LogTemp, Warning, TEXT("StationPoint Num : %d"), tmpLane->StationPoint.Num());
