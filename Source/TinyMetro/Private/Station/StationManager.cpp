@@ -15,6 +15,7 @@ AStationManager::AStationManager()
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
+	
 }
 
 // Called when the game starts or when spawned
@@ -22,7 +23,17 @@ void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PlayerState = GetWorld()->GetControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+
+	Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
+
+	
+
+
 	StationSpawnRoutine();
+	PolicyMaintenanceRoutine();
+
+
 
 	FIntPoint test(3,3);
 	GEngine->AddOnScreenDebugMessage(
@@ -145,16 +156,22 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnTransform.SetLocation(GridCellData.WorldLocation);
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
+	//AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
+	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
 	tmp->SetStationType(Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetStationId(StationId++);
+	tmp->SetPolicy(Policy);
 
 	if (ActivateFlag) {
 		tmp->ActivateStation();
 	}
 	tmp->FinishSpawning(SpawnTransform);
 
+	if (Policy->GetHasBicycle())
+	{
+		tmp->AddPassengerSpawnProbability(0.1, -1);
+	}
 
 	Station.Add(tmp);
 	GridManager->SetGridStructure(
@@ -218,6 +235,34 @@ void AStationManager::StationSpawnRoutine() {
 	
 }
 
+void AStationManager::PolicyMaintenanceRoutine() {
+	GetWorld()->GetTimerManager().SetTimer(
+		PolicyTimerStation,
+		FTimerDelegate::CreateLambda([&]() {
+			PolicyCostCurrent += PolicyCostPerSec;
+			if (PolicyCostCurrent >= PolicyCostRequire) {
+				
+				int32 MaintenanceCost = Policy->GetCostForCCTV() + Policy->GetCostForElevator() + Policy->GetCostForServiceLevel();
+
+				PlayerState->AddMoney(-(MaintenanceCost));
+
+				if (GEngine) {
+					GEngine->AddOnScreenDebugMessage(
+						-1,
+						15.0f,
+						FColor::Blue,
+						FString::Printf(TEXT("MaintenanceCost : %d"), MaintenanceCost));
+						
+				}
+				PolicyCostCurrent = 0.0f;
+			}
+		}),
+		1.0f,
+		true,
+		1.0f
+	);
+}
+
 StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }
@@ -227,6 +272,7 @@ void AStationManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (Policy == nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(":("));
 	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1, 

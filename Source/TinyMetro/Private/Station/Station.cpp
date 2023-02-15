@@ -80,6 +80,7 @@ void AStation::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 }
 
 void AStation::SetStationId(int32 Id) {
@@ -170,6 +171,10 @@ void AStation::SetGridCellData(FGridCellData _GridCellData) {
 	CurrentGridCellData = _GridCellData;
 }
 
+void AStation::SetPolicy(APolicy* _Policy) {
+	Policy = _Policy;
+}
+
 
 
 FGridCellData AStation::GetCurrentGridCellData() const {
@@ -194,6 +199,20 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	}
 }
 
+void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate){
+	AdditionalPassengerSpawnProbability += rate;
+	if (dueDate != -1) {
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerComplain,
+			FTimerDelegate::CreateLambda([&]() {
+				AdditionalPassengerSpawnProbability -= rate;
+			}),
+		dueDate,
+		false,
+		0.0f
+		);
+	}
+  
 bool AStation::IsValidLane(int32 LId) const
 {
 	return false;
@@ -245,15 +264,31 @@ void AStation::ComplainRoutine() {
 		TimerComplain,
 		FTimerDelegate::CreateLambda([&]() {
 			SpawnDay++;
+
+			int AddPolicyComplainForLevel = Policy->GetComplainForServiceLevel();
+
+			float AddPolicyComplain = AddPolicyComplainForLevel + abs(AddPolicyComplainForLevel) * Policy->CalculateComplainPercentage();
+			
 			// Passenger complain
 			if (Passenger.Num() > ComplainPassengerNum) {
-				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum));
+				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) + AddPolicyComplain;
 			}
 
 			// Not activate
 			if (!IsActive && SpawnDay > ComplainSpawnDay) {
-				ComplainCurrent += ComplainFromInactive;
+				ComplainCurrent += ComplainFromInactive + AddPolicyComplain;
 			}
+
+			/*
+			if (GEngine) {
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					15.0f,
+					FColor::Yellow,
+					FString::Printf(TEXT("AddPolicyComplain : %f"), AddPolicyComplain));
+
+			}*/
+
 
 
 			// Complain excess : Game over
@@ -284,6 +319,7 @@ void AStation::PassengerSpawnRoutine() {
 		TimerSpawnPassenger,
 		FTimerDelegate::CreateLambda([&]() {
 			PassengerSpawnCurrent += PassengerSpawnPerSec;
+
 			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
 					SpawnPassenger();
@@ -313,6 +349,11 @@ void AStation::SpawnPassenger() {
 	);
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+
+	if (Policy->GetHandicappedSeat()) {
+		tmp->SetFree();
+	}
+
 	Passenger.Add(tmp);
 
 	//Log
@@ -325,11 +366,8 @@ void AStation::SpawnPassenger() {
 }
 
 double AStation::GetPassengerSpawnProbability() {
-	double temp = PassengerSpawnProbability;
-	for (auto& i : PassengerSpawnProbabilityVariable) {
-		temp *= i;
-	}
-	return temp;
+	
+	return PassengerSpawnProbability * AdditionalPassengerSpawnProbability;
 }
 
 

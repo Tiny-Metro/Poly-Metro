@@ -8,6 +8,8 @@
 #include "../GameModes/TinyMetroGameModeBase.h"
 #include "../SaveSystem/TMSaveManager.h"
 #include "Station.h"
+#include "../Policy/Policy.h"
+#include "../PlayerState/TinyMetroPlayerState.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -22,6 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	friend class ATMSaveManager;
+	friend class APolicy;
 
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
@@ -31,6 +34,7 @@ protected:
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType();
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -41,6 +45,8 @@ protected:
 public:	
 	StationType CalculatePassengerDest(StationType Except) const;
 	float GetComplainAverage();
+	//Policy maintenance cost routine
+	void PolicyMaintenanceRoutine();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
@@ -57,6 +63,8 @@ protected:
 	AGridManager* GridManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	ATinyMetroGameModeBase* GameMode;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	APolicy* Policy;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -89,4 +97,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
 
+	//Policy Timer
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle PolicyTimerStation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 PolicyCostRequire = 10000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 PolicyCostPerSec = 1000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 PolicyCostCurrent = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		ATinyMetroPlayerState* PlayerState;
 };
