@@ -2,6 +2,7 @@
 
 
 #include "Lane/Lane.h"
+#include "Train/TrainTemplate.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -239,7 +240,7 @@ void ALane::InitializeNewLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
-FIntPoint ALane::GetNextLocation(FIntPoint CurLocation, TrainDirection Direction) const
+FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {
 	int32 Index;
 
@@ -259,7 +260,7 @@ FIntPoint ALane::GetNextLocation(FIntPoint CurLocation, TrainDirection Direction
 			return LaneArray[Index - 1].Coordination;
 		}
 		else {
-			// Chanege Train Direction
+			Train->SetTrainDirection(TrainDirection::Down);
 			return LaneArray[Index + 1].Coordination;
 		}
 
@@ -270,8 +271,7 @@ FIntPoint ALane::GetNextLocation(FIntPoint CurLocation, TrainDirection Direction
 			return LaneArray[Index + 1].Coordination;
 		}
 		else {
-
-			//Change Train Direction
+			Train->SetTrainDirection(TrainDirection::Up);
 			return LaneArray[Index - 1].Coordination;
 		}
 	}
