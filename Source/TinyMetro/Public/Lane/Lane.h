@@ -44,10 +44,7 @@ public:
 
 	TArray<FLanePoint> tmpLaneArray0;  // set station point to laneArray
 
-	TArray<FLanePoint> tmpLaneArray1; // TODO
-
-
-
+	TArray<FLanePoint> tmpLaneArray1; 
 
 
 public:
@@ -80,7 +77,7 @@ public:
 	FIntPoint GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction);
 
 	UFUNCTION(BlueprintCallable)
-	TrainDirection SetDirectionInit(class AStation* Station, FVector CurLocation) const;
+	TrainDirection SetDirectionInit(class AStation* Station, FIntPoint CurLocation) const;
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnTrain();
