@@ -199,19 +199,20 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	}
 }
 
-void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate){
+void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate) {
 	AdditionalPassengerSpawnProbability += rate;
 	if (dueDate != -1) {
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerComplain,
 			FTimerDelegate::CreateLambda([&]() {
 				AdditionalPassengerSpawnProbability -= rate;
-			}),
-		dueDate,
-		false,
-		0.0f
-		);
+				}),
+			dueDate,
+					false,
+					0.0f
+					);
 	}
+}
   
 bool AStation::IsValidLane(int32 LId) const
 {
