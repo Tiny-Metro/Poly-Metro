@@ -26,8 +26,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY(BlueprintReadWrite)
-	int32 NextLaneId = 1;
+	//UPROPERTY(BlueprintReadWrite)
+	//int32 NextLaneId = 1;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<ALane*> Lanes;
@@ -37,6 +37,36 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 SelectedLaneNum;
+
+
+protected:
+
+	UPROPERTY(BlueprintReadOnly)
+	bool CanAssignBridge;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool CanAssignTunnel;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<int32> NextLaneNums = {1,2,3,4,5,6,7,8};
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetCanAssginBridge(bool AssginBridge);
+
+	UFUNCTION(BlueprintCallable)
+	void SetCanAssginTunnel(bool AssginTunnel);
+
+	UFUNCTION(BlueprintCallable)
+	void AddNextLaneNums(int32 LaneNum);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveNextLaneNums();
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveDestroyedLane(int LaneNum);
+
+
 
 public:
 	UFUNCTION(BlueprintCallable)

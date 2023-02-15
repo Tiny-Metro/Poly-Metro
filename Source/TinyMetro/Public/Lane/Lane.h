@@ -36,6 +36,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
+	
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category="Lane")

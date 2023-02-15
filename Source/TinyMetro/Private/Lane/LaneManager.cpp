@@ -26,6 +26,33 @@ void ALaneManager::Tick(float DeltaTime)
 }
 
 
+void ALaneManager::SetCanAssginBridge(bool AssginBridge)
+{
+	CanAssignBridge = AssginBridge;
+}
+
+void ALaneManager::SetCanAssginTunnel(bool AssginTunnel)
+{
+	CanAssignTunnel = AssginTunnel;
+}
+
+void ALaneManager::AddNextLaneNums(int32 LaneNum)
+{
+	NextLaneNums.Add(LaneNum);
+
+	NextLaneNums.Sort();
+}
+
+void ALaneManager::RemoveNextLaneNums()
+{
+	NextLaneNums.RemoveAt(0);
+}
+
+void ALaneManager::RemoveDestroyedLane(int LaneNum)
+{
+	Lanes.RemoveAt(LaneNum - 1);
+}
+
 void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	// Load BP Class
@@ -56,7 +83,7 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	
 
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
-	tmpLane->LaneNum = NextLaneId;
+	tmpLane->LaneNum = NextLaneNums[0];
 
 	UE_LOG(LogTemp, Warning, TEXT("GetActorNameOrLabel : %s"), *(tmpLane->GetActorNameOrLabel()));
 
@@ -66,7 +93,7 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	for (int i = 0; i < SelectedStations.Num(); i++) {
 		
 		if (IsValid(SelectedStations[i])) {
-			SelectedStations[i]->SetLanes(NextLaneId);
+			SelectedStations[i]->SetLanes(NextLaneNums[0]);
 			tmpLane->StationPoint.Add(SelectedStations[i]->GetCurrentGridCellData().WorldCoordination);
 		}
 		else {
@@ -77,12 +104,14 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	tmpLane->InitializeNewLane();
 
-
-	Lanes.Add(tmpLane);
+	Lanes.Insert(tmpLane, (NextLaneNums[0]-1));
+	//Lanes.Add(tmpLane);
 
 	UE_LOG(LogTemp, Warning, TEXT("StationPoint Num : %d"), tmpLane->StationPoint.Num());
 
-	NextLaneId++;
+	UE_LOG(LogTemp, Warning, TEXT("New LaneNum : %d"), NextLaneNums[0]);
+
+	RemoveNextLaneNums();
 }
 
 
