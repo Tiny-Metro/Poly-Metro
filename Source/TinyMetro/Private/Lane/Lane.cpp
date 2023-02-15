@@ -3,6 +3,7 @@
 
 #include "Lane/Lane.h"
 #include "Train/TrainTemplate.h"
+#include "Station/Station.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -278,12 +279,28 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 
 }
 
-TrainDirection ALane::SetDirectionInit(AStation* Station, FVector CurLocation) const
+TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation) const
 {
-	// 
+	int32 StationIndex = -1;
+	int32 CurLocationIndex = -1;
 
+	for (int i = 0; i < LaneArray.Num(); i++) {
+		if (Station->GetCurrentGridCellData().WorldCoordination == LaneArray[i].Coordination) {
+			StationIndex = i;
+		}
 
-	return TrainDirection();
+		if (CurLocation == LaneArray[i].Coordination) {
+			CurLocationIndex = i;
+		}
+	}
+
+	if (StationIndex < CurLocationIndex) {
+		return TrainDirection::Up;
+	}
+	else {
+		return TrainDirection::Down;
+	}
+
 }
 
 void ALane::SpawnTrain()
