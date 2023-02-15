@@ -27,7 +27,7 @@ public:
 	friend class APolicy;
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetNearestStationLocation(FVector CurrentLocation);
+	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
 
 protected:
 	UFUNCTION(BlueprintCallable)

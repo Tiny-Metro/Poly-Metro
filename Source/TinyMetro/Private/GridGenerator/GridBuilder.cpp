@@ -185,6 +185,8 @@ TArray<FGridCellData> AGridBuilder::CalculateGridData(float GridCellSize) {
 			tmp.WorldCoordination = FIntPoint(j, i);
 			tmp.WorldLocation = cellLocation;
 			tmp.GridStructure = GridStructure::Empty;
+			tmp.StationInfo = GridStationStructure::Empty;
+			tmp.LaneInfo = GridLaneStructure::Empty;
 			switch (LoadedGridType[indexOneDim]) {
 			case 0:
 				tmp.GridType = GridType::Ground;

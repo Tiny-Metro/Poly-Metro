@@ -36,6 +36,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetStationId(int32 Id);
 	UFUNCTION(BlueprintCallable)
+	int32 GetStationId() const;
+	UFUNCTION(BlueprintCallable)
 	void SetStationType(StationType Type);
 	UFUNCTION(BlueprintCallable)
 	void SetGridCellData(FGridCellData GridCellData);
@@ -54,12 +56,16 @@ public:
 		void LoadStationValue(FStationValuesStruct StationValues);
 
 	UFUNCTION(BlueprintCallable)
+		bool IsValidLane(int32 LId) const;
+    
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 
 	void DecreaseComplain(double ReduceRate);
 	void DecreaseComplain(int32 ReduceValue);
 
 	int32 GetComplain() const;
+	TArray<int32> GetLanes();
+	void SetLanes(int32 AdditionalLaneId);
 
 protected:
 	void PassengerSpawnRoutine();
@@ -113,7 +119,8 @@ protected:
 	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
-	
+	UPROPERTY(BlueprintReadWrite)
+	TArray<int32> Lanes;
 
 protected:
 	// Station meshses

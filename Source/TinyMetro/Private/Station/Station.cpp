@@ -31,6 +31,10 @@ AStation::AStation()
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialDestroyedInner(TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Inner.M_StationDestroyed_Inner'"));
 	static ConstructorHelpers::FObjectFinder<UMaterial> FoundMaterialDestroyedOuter(TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Outer.M_StationDestroyed_Outer'"));
 
+	// Load Static Mesh
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> FoundStaticMeshTempInner(TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle_Inner.SM_StationCircle_Inner'"));
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> FoundStaticMeshTempOuter(TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle_Outer.SM_StationCircle_Outer'"));
+
 	MaterialActiveInner = FoundMaterialActiveInner.Object;
 	MaterialActiveOuter = FoundMaterialActiveOuter.Object;
 	MaterialInactiveInner = FoundMaterialInactiveInner.Object;
@@ -40,8 +44,10 @@ AStation::AStation()
 
 	DynamicMaterialInner = UMaterialInstanceDynamic::Create(MaterialInactiveInner, MeshInner);
 	DynamicMaterialOuter = UMaterialInstanceDynamic::Create(MaterialInactiveOuter, MeshOuter);
+	/*MeshInner->SetStaticMesh(FoundStaticMeshTempInner.Object);
+	MeshOuter->SetStaticMesh(FoundStaticMeshTempOuter.Object);
 	MeshInner->SetMaterial(0, DynamicMaterialInner);
-	MeshOuter->SetMaterial(0, DynamicMaterialOuter);
+	MeshOuter->SetMaterial(0, DynamicMaterialOuter);*/
 }
 
 // Called when the game starts or when spawned
@@ -60,11 +66,11 @@ void AStation::BeginPlay()
 	ComplainRoutine();
 
 
-	// Log
-	if (GEngine) {
+	// Log ( I am {Actor Name} )
+	/*if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
 			FString::Printf(TEXT("I am %s"), *this->GetActorLabel()));
-	}
+	}*/
 
 
 }
@@ -79,6 +85,10 @@ void AStation::Tick(float DeltaTime)
 
 void AStation::SetStationId(int32 Id) {
 	StationId = Id;
+}
+
+int32 AStation::GetStationId() const {
+	return StationId;
 }
 
 void AStation::SetStationType(StationType Type) {
@@ -146,7 +156,7 @@ void AStation::SetStationType(StationType Type) {
 	MeshOuter->SetWorldLocation(this->GetActorLocation());
 
 	//LOG
-	FString EnumToStr = TEXT("NULL");
+	/*FString EnumToStr = TEXT("NULL");
 	const UEnum* MyType = FindObject<UEnum>(ANY_PACKAGE, TEXT("StationType"), true);
 	if (MyType) {
 		EnumToStr = MyType->GetNameStringByValue((int64)StationTypeValue);
@@ -154,11 +164,7 @@ void AStation::SetStationType(StationType Type) {
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
 			EnumToStr);
-	}
-
-	
-
-
+	}*/
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -206,6 +212,10 @@ void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate){
 		0.0f
 		);
 	}
+  
+bool AStation::IsValidLane(int32 LId) const
+{
+	return false;
 }
 
 
@@ -237,6 +247,16 @@ void AStation::DecreaseComplain(int32 ReduceValue) {
 
 int32 AStation::GetComplain() const {
 	return ComplainCurrent;
+}
+
+TArray<int32> AStation::GetLanes()
+{
+	return Lanes;
+}
+
+void AStation::SetLanes(int32 AdditionalLaneId)
+{
+	Lanes.Add(AdditionalLaneId);
 }
 
 void AStation::ComplainRoutine() {

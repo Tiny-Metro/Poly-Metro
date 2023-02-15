@@ -223,6 +223,10 @@ void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
 		_GridCellData.WorldCoordination.X,
 		_GridCellData.WorldCoordination.Y,
 		GridStructure::Station);
+	stationmanager->GridManager->SetGridStation(
+		_GridCellData.WorldCoordination.X,
+		_GridCellData.WorldCoordination.Y,
+		GridStationStructure::Station);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Station.Num : %d"), stationmanager->Station.Num());
 }

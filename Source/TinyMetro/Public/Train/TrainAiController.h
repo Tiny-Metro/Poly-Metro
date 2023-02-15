@@ -13,5 +13,12 @@ UCLASS()
 class TINYMETRO_API ATrainAiController : public AAIController
 {
 	GENERATED_BODY()
+
+public:
+	void Test();
+	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	TArray<FVector> TestRoutine;
 	
 };

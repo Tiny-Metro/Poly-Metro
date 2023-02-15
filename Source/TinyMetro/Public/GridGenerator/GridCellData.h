@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "GridType.h"
 #include "GridStructure.h"
+#include "GridStationStructure.h"
+#include "GridLaneStructure.h"
 #include "GridCellData.generated.h"
 
 /**
@@ -26,4 +28,9 @@ struct TINYMETRO_API FGridCellData
 	GridType GridType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	GridStructure GridStructure;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	GridStationStructure StationInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	GridLaneStructure LaneInfo;
+
 };

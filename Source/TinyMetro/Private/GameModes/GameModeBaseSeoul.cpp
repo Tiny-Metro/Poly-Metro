@@ -7,6 +7,7 @@
 
 AGameModeBaseSeoul::AGameModeBaseSeoul() {
     PlayerStateClass = APlayerStateSeoul::StaticClass();
+    
 }
 
 
@@ -27,5 +28,9 @@ TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
 }
 
 int32 AGameModeBaseSeoul::GetDaytime() const {
-    return 12;
+    return Daytime;
+}
+
+void AGameModeBaseSeoul::BeginPlay() {
+    Super::BeginPlay();
 }

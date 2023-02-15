@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TrainTemplate.h"
+#include "TrainType.h"
 #include "TrainManager.generated.h"
 
 UCLASS()
@@ -28,11 +29,15 @@ public:
 	void AddTrain(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(ATrainTemplate* Train);
+	UFUNCTION(BlueprintCallable)
+	ATrainTemplate* GetTrainById(int32 TrainId, TrainType& Type);
+	UFUNCTION(BlueprintCallable)
+	ATrain* GetNearestTrain(FVector CurrentLocation, class ALane* LaneRef);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
-	int32 NextTrainId;
+	int32 NextTrainId = 0;
 
 };
