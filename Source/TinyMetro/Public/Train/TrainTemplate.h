@@ -83,7 +83,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> TrainMaterial;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
-	FSoftObjectPath TrainUpgradeMeshPath;
+	TArray<FSoftObjectPath> TrainMeshPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMesh* TrainUpgradeMesh;
+	TArray<UStaticMesh*> TrainMesh;
 };

@@ -87,7 +87,7 @@ void ATrainTemplate::InitTrainMaterial() {
 void ATrainTemplate::InitTrainMesh() {
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
 	AssetLoader.RequestAsyncLoad(
-		TrainUpgradeMeshPath,
+		TrainMeshPath,
 		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
 	);
 }
@@ -100,7 +100,9 @@ void ATrainTemplate::TrainMaterialDeferred() {
 }
 
 void ATrainTemplate::TrainMeshDeferred() {
-	TrainUpgradeMesh = Cast<UStaticMesh>(TrainUpgradeMeshPath.ResolveObject());
+	for (auto& i : TrainMeshPath) {
+		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
+	}
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {

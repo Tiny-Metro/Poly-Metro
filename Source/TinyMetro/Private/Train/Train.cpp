@@ -14,13 +14,15 @@ void ATrain::Test() {
 }
 
 ATrain::ATrain() {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> TrainMesh(
-		TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'")
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
 	);
+	TrainMesh.AddUnique(LoadTrainMesh.Object);
 	/*static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(
 		TEXT("Material'/Game/Resource/Material/Lane/M_Lane_8.M_Lane_8'")
 	);
 	TrainMaterial.AddUnique(DefaultMaterial.Object->GetMaterial());*/
+	
 
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	OverlapVolume->InitBoxExtent(FVector(10,20,30));
@@ -28,8 +30,8 @@ ATrain::ATrain() {
 	OverlapVolume->SetupAttachment(RootComponent);
 
 	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
-	TrainMeshComponent->SetWorldScale3D(FVector(2.5f, 1.0f, 1.0f));
-	TrainMeshComponent->SetStaticMesh(TrainMesh.Object);
+	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
@@ -87,7 +89,7 @@ bool ATrain::SetTrainMaterial(int32 LaneNumber) {
 
 void ATrain::Upgrade() {
 	// Change mesh
-	TrainMeshComponent->SetStaticMesh(TrainUpgradeMesh);
+	TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
 	// Set flag
 	IsUpgrade = true;
 }

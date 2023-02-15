@@ -5,13 +5,14 @@
 
 ASubtrain::ASubtrain() {
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> TrainMesh(
-		TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'")
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort.SM_SubtrainShort'")
 	);
+	TrainMesh.AddUnique(LoadTrainMesh.Object);
 
 	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
-	TrainMeshComponent->SetWorldScale3D(FVector(2.5f, 1.0f, 1.0f));
-	TrainMeshComponent->SetStaticMesh(TrainMesh.Object);
+	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
