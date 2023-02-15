@@ -32,7 +32,7 @@ AComponentTestActor::AComponentTestActor()
 
 	// Load tile's mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> objGround(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCross_Inner.SM_StationCross_Inner'"));
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/CircleStation.CircleStation'"));
 	MyMesh = objGround.Object;
 
 	int num = 0;
