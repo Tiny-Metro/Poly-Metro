@@ -26,6 +26,9 @@ public:
 	friend class ATMSaveManager;
 	friend class APolicy;
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetNearestStationLocation(FVector CurrentLocation);
+
 protected:
 	UFUNCTION(BlueprintCallable)
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);

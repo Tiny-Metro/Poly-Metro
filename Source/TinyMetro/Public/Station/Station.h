@@ -46,7 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
 	UFUNCTION(BlueprintCallable)
-	StationType GetStationType();
+	StationType GetStationType() const;
+	UFUNCTION(BlueprintCallable)
+	FGridCellData GetCurrentGridCellData() const;
 
 	UFUNCTION(BlueprintCallable)
 		void LoadStationValue(FStationValuesStruct StationValues);
@@ -102,7 +104,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	StationType StationTypeValue = StationType::Circle;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	FGridCellData GridCellData;
+	FGridCellData CurrentGridCellData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	APolicy* Policy;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
