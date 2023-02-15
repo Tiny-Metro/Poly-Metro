@@ -6,6 +6,7 @@
 #include <UObject/ConstructorHelpers.h>
 #include "Finance/Bank.h"
 #include "Train/TrainManager.h"
+#include "Lane/LaneManager.h"
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
@@ -40,13 +41,18 @@ TMap<FIntPoint, StationType> ATinyMetroGameModeBase::GetInitData() const {
 }
 
 int32 ATinyMetroGameModeBase::GetDaytime() const {
-    return 12;
+    return Daytime;
+}
+
+TArray<FStringAssetReference> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
+    return TrainMaterialPath;
 }
 
 void ATinyMetroGameModeBase::StartPlay() {
-    Super::StartPlay();
     GetWorld()->SpawnActor<ABank>();
     GetWorld()->SpawnActor<ATrainManager>();
+    GetWorld()->SpawnActor<ALaneManager>();
+    Super::StartPlay();
 }
 
 void ATinyMetroGameModeBase::BeginPlay() {

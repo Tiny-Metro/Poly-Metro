@@ -105,17 +105,28 @@ FGridCellData AGridManager::GetGridCellDataRandom() {
 
 void AGridManager::SetGridStructure(int X, int Y, GridStructure Structure) {
 	GridCellData[(GridSize.X * Y) + X].GridStructure = Structure;
-	GridStructures.Add(TPair<FIntPoint, GridStructure>(FIntPoint(X, Y), Structure));
+	//GridStructures.Add(TPair<FIntPoint, GridStructure>(FIntPoint(X, Y), Structure));
 	if (Structure == GridStructure::Station) {
 		StationLocation.Add(FIntPoint(X, Y));
 	}
+}
+
+void AGridManager::SetGridStation(int X, int Y, GridStationStructure Structure) {
+	GridCellData[(GridSize.X * Y) + X].StationInfo = Structure;
+	if (Structure == GridStationStructure::Station) {
+		StationLocation.Add(FIntPoint(X, Y));
+	}
+}
+
+void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
+	GridCellData[(GridSize.X * Y) + X].LaneInfo = Structure;
 }
 
 bool AGridManager::IsValidStationSpawn(int Coord) {
 	// Out of range
 	if (Coord >= GridCellData.Num() || Coord < 0) return false;
 	// Grid is empty
-	if (GridCellData[Coord].GridStructure != GridStructure::Empty) return false;
+	if (GridCellData[Coord].StationInfo != GridStationStructure::Empty) return false;
 	// Grid is ground
 	if (GridCellData[Coord].GridType != GridType::Ground) return false;
 	// Check other station
@@ -123,7 +134,7 @@ bool AGridManager::IsValidStationSpawn(int Coord) {
 		for (int j = -StationSpawnPrevent; j <= StationSpawnPrevent; j++) { // X
 			if (FMath::Sqrt(i * i + j * j) > StationSpawnPrevent) continue;
 			if ((Coord + (i * GridSize.X) + j) >= GridCellData.Num() || (Coord + (i * GridSize.X) + j) < 0) continue;
-			if (GridCellData[(Coord + (i * GridSize.X) + j)].GridStructure == GridStructure::Station) return false;
+			if (GridCellData[(Coord + (i * GridSize.X) + j)].StationInfo == GridStationStructure::Station) return false;
 			//if (((GridSize.X * (Y + i)) + (X + j)) >= GridCellData.Num()) continue;
 			//if (GridCellData[(GridSize.X * (Y + i)) + (X + j)].GridStructure == GridStructure::Station) return false;
 		}
@@ -136,7 +147,7 @@ bool AGridManager::IsValidStationSpawn(int X, int Y) {
 	// Out of range
 	if (X >= GridSize.X || Y >= GridSize.Y || X < 0 || Y < 0) return false;
 	// Grid is empty
-	if (GridCellData[(GridSize.X * Y) + X].GridStructure != GridStructure::Empty) return false;
+	if (GridCellData[(GridSize.X * Y) + X].StationInfo != GridStationStructure::Empty) return false;
 	// Grid is ground
 	if (GridCellData[(GridSize.X * Y) + X].GridType != GridType::Ground) return false;
 	// Check other station
@@ -144,7 +155,7 @@ bool AGridManager::IsValidStationSpawn(int X, int Y) {
 		for (int j = -StationSpawnPrevent; j <= StationSpawnPrevent; j++) { // X
 			if (FMath::Sqrt(i * i + j * j) > StationSpawnPrevent) continue;
 			if (((GridSize.X * (Y + i)) + (X + j)) >= GridCellData.Num() || ((GridSize.X * (Y + i)) + (X + j)) < 0) continue;
-			if (GridCellData[(GridSize.X * (Y + i)) + (X + j)].GridStructure == GridStructure::Station) return false;
+			if (GridCellData[(GridSize.X * (Y + i)) + (X + j)].StationInfo == GridStationStructure::Station) return false;
 		}
 	}
 

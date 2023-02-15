@@ -41,6 +41,10 @@ public:
 	FGridCellData GetGridCellDataRandom();
 	UFUNCTION(BlueprintCallable)
 	void SetGridStructure(int X, int Y, GridStructure Structure);
+	UFUNCTION(BlueprintCallable)
+	void SetGridStation(int X, int Y, GridStationStructure Structure);
+	UFUNCTION(BlueprintCallable)
+	void SetGridLane(int X, int Y, GridLaneStructure Structure);
 
 private:
 	TPair<FVector2D, double> FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2);
@@ -67,6 +71,6 @@ protected:
 	TArray<FGridCellData> GridCellData;
 
 protected:
-	TArray<TPair<FIntPoint, GridStructure>> GridStructures;
+	//TArray<TPair<FIntPoint, GridStructure>> GridStructures;
 	TArray<FIntPoint> StationLocation;
 };

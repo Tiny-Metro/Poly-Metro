@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Config = Game)
 class TINYMETRO_API ATinyMetroGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
@@ -21,10 +21,19 @@ public:
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
+	virtual TArray<FStringAssetReference> GetTrainMaterialPath() const;
 
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetGameSpeed(float TimeDilation);
+
+protected:
+	UPROPERTY(Config)
+	int32 TestValue;
+	UPROPERTY(Config)
+	int32 Daytime;
+	UPROPERTY(Config)
+	TArray<FStringAssetReference> TrainMaterialPath;
 };
