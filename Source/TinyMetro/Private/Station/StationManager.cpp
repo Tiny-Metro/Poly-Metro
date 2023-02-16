@@ -42,7 +42,7 @@ void AStationManager::BeginPlay()
 
 
 	StationSpawnRoutine();
-	//PolicyMaintenanceRoutine();
+	PolicyMaintenanceRoutine();
 
 
 
