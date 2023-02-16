@@ -3,6 +3,7 @@
 
 #include "Finance/Bank.h"
 #include "Sample/SampleTimer.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ABank::ABank()
@@ -45,7 +46,7 @@ void ABank::BeginPlay()
 	Daytime = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetDaytime();
 
 	// Set PlayerState
-	PlayerState = GetWorld()->GetControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	// Set loan data
 	InitLoan();
