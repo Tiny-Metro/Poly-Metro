@@ -21,7 +21,14 @@ void ATMSaveManager::BeginPlay()
 	Super::BeginPlay();
 
 	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-	TinyMetroPlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+	//TinyMetroPlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	if (IsValid(TinyMetroPlayerState)) {
+		UE_LOG(LogTemp, Log, TEXT("TMSaveManager::BeginPlay : PlayerState Valid"));
+	} else {
+		UE_LOG(LogTemp, Log, TEXT("TMSaveManager::BeginPlay : PlayerState Invalid"));
+	}
+
 
 	LoadWorldInfo();
 	LoadStationManager();
