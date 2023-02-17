@@ -23,32 +23,20 @@ AStation::AStation()
 	
 	// Load meshes
 	for (auto& i : StationMeshPath) {
-		static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMesh(
-			*i
-		);
-		StationMesh.Add(LoadMesh.Object);
+		StationMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
 	}
 
 	// Load material
 	for (auto& i : StationMaterialInactivePath) {
-		static ConstructorHelpers::FObjectFinder<UMaterial> LoadMaterial(
-			*i
-		);
-		StationMaterialInactive.Add(LoadMaterial.Object);
+		StationMaterialInactive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
 	
 	for (auto& i : StationMaterialActivePath) {
-		static ConstructorHelpers::FObjectFinder<UMaterial> LoadMaterial(
-			*i
-		);
-		StationMaterialActive.Add(LoadMaterial.Object);
+		StationMaterialActive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
 	
 	for (auto& i : StationMaterialDestroyedPath) {
-		static ConstructorHelpers::FObjectFinder<UMaterial> LoadMaterial(
-			*i
-		);
-		StationMaterialDestroyed.Add(LoadMaterial.Object);
+		StationMaterialDestroyed.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
 
 }
