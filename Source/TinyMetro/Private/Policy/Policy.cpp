@@ -3,6 +3,7 @@
 
 #include "Policy/Policy.h"
 #include "Station/StationManager.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -18,7 +19,8 @@ void APolicy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	//stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	stationmanager = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 
 	PolicyData.ServiceCostLevel = 3;
 	PolicyData.HandicappedSeat = false;

@@ -4,6 +4,7 @@
 #include "../../Public/Station/StationManager.h"
 #include "../../Public/Station/Station.h"
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -20,7 +21,9 @@ void ATMSaveManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	//stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	stationmanager = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+
 	//TinyMetroPlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	if (IsValid(TinyMetroPlayerState)) {
