@@ -20,141 +20,42 @@ AStation::AStation()
 	// Set station mesh
 	StationMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Station Mesh"));
 	StationMeshComponent->SetupAttachment(RootComponent);
-
+	
 	// Load meshes
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshCircle(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'")
-	);
-	StationMesh.AddUnique(LoadMeshCircle.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshTriangle(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationTriangle.SM_StationTriangle'")
-	);
-	StationMesh.AddUnique(LoadMeshTriangle.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshRectangle(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRectangle.SM_StationRectangle'")
-	);
-	StationMesh.AddUnique(LoadMeshRectangle.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshCross(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCross.SM_StationCross'")
-	);
-	StationMesh.AddUnique(LoadMeshCross.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshRhombus(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRhombus.SM_StationRhombus'")
-	);
-	StationMesh.AddUnique(LoadMeshRhombus.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshOval(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationOval.SM_StationOval'")
-	);
-	StationMesh.AddUnique(LoadMeshOval.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshDiamond(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationDiamond.SM_StationDiamond'")
-	);
-	StationMesh.AddUnique(LoadMeshDiamond.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshPentagon(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationPentagon.SM_StationPentagon'")
-	);
-	StationMesh.AddUnique(LoadMeshPentagon.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshStar(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationStar.SM_StationStar'")
-	);
-	StationMesh.AddUnique(LoadMeshStar.Object);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMeshFan(
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationFan.SM_StationFan'")
-	);
-	StationMesh.AddUnique(LoadMeshFan.Object);
+	for (auto& i : StationMeshPath) {
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadMesh(
+			*i
+		);
+		StationMesh.Add(LoadMesh.Object);
+	}
 
 	// Load material
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadInactiveOuter(
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'")
-	);
-	StationMaterialInactive.AddUnique(LoadInactiveOuter.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadInactiveInner(
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
-	);
-	StationMaterialInactive.AddUnique(LoadInactiveInner.Object);
+	for (auto& i : StationMaterialInactivePath) {
+		static ConstructorHelpers::FObjectFinder<UMaterial> LoadMaterial(
+			*i
+		);
+		StationMaterialInactive.Add(LoadMaterial.Object);
+	}
+	
+	for (auto& i : StationMaterialActivePath) {
+		static ConstructorHelpers::FObjectFinder<UMaterial> LoadMaterial(
+			*i
+		);
+		StationMaterialActive.Add(LoadMaterial.Object);
+	}
+	
+	for (auto& i : StationMaterialDestroyedPath) {
+		static ConstructorHelpers::FObjectFinder<UMaterial> LoadMaterial(
+			*i
+		);
+		StationMaterialDestroyed.Add(LoadMaterial.Object);
+	}
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadActiveOuter(
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationActive_Outer.M_StationActive_Outer'")
-	);
-	StationMaterialActive.AddUnique(LoadActiveOuter.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadActiveInner(
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationActive_Inner.M_StationActive_Inner'")
-	);
-	StationMaterialActive.AddUnique(LoadActiveInner.Object);
-
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadDestroyedOuter(
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Outer.M_StationDestroyed_Outer'")
-	);
-	StationMaterialDestroyed.AddUnique(LoadDestroyedOuter.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadDestroyedInner(
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Inner.M_StationDestroyed_Inner'")
-	);
-	StationMaterialDestroyed.AddUnique(LoadDestroyedInner.Object);
 }
-//
-//void AStation::InitStationMesh() {
-//	auto& AssetLoader = UAssetManager::GetStreamableManager();
-//	AssetLoader.RequestAsyncLoad(
-//		StationMeshPath,
-//		FStreamableDelegate::CreateUObject(this, &AStation::StationMeshDeferred)
-//	);
-//}
-//
-//void AStation::StationMeshDeferred() {
-//	for (auto& i : StationMeshPath) {
-//		StationMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
-//	}
-//}
-//
-//void AStation::InitStationMaterialActive() {
-//	auto& AssetLoader = UAssetManager::GetStreamableManager();
-//	AssetLoader.RequestAsyncLoad(
-//		StationMaterialActivePath,
-//		FStreamableDelegate::CreateUObject(this, &AStation::StationMaterialActiveDeferred)
-//	);
-//}
-//
-//void AStation::StationMaterialActiveDeferred() {
-//	for (auto& i : StationMaterialActivePath) {
-//		StationMaterialActive.AddUnique(Cast<UMaterial>(i.ResolveObject()));
-//	}
-//}
-//
-//void AStation::InitStationMaterialInactive() {
-//	auto& AssetLoader = UAssetManager::GetStreamableManager();
-//	AssetLoader.RequestAsyncLoad(
-//		StationMaterialInactivePath,
-//		FStreamableDelegate::CreateUObject(this, &AStation::StationMaterialInactiveDeferred)
-//	);
-//}
-//
-//void AStation::StationMaterialInactiveDeferred() {
-//	for (auto& i : StationMaterialInactivePath) {
-//		StationMaterialInactive.AddUnique(Cast<UMaterial>(i.ResolveObject()));
-//	}
-//}
-//
-//void AStation::InitStationMaterialDestroyed() {
-//	auto& AssetLoader = UAssetManager::GetStreamableManager();
-//	AssetLoader.RequestAsyncLoad(
-//		StationMaterialDestroyedPath,
-//		FStreamableDelegate::CreateUObject(this, &AStation::StationMaterialDestroyedDeferred)
-//	);
-//}
-//
-//void AStation::StationMaterialDestroyedDeferred() {
-//	for (auto& i : StationMaterialDestroyedPath) {
-//		StationMaterialDestroyed.AddUnique(Cast<UMaterial>(i.ResolveObject()));
-//	}
-//}
 
 // Called when the game starts or when spawned
 void AStation::BeginPlay()
 {
-	/*InitStationMesh();
-	InitStationMaterialActive();
-	InitStationMaterialInactive();
-	InitStationMaterialDestroyed();*/
 
 	Super::BeginPlay();
 	
@@ -166,11 +67,9 @@ void AStation::BeginPlay()
 	PassengerSpawnRoutine();
 	ComplainRoutine();
 
-	//InitStationMesh();
-	//InitStationMaterial();
-
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
 	UpdateStationMesh();
+
 	// Log ( I am {Actor Name} )
 	/*if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
@@ -184,8 +83,6 @@ void AStation::BeginPlay()
 void AStation::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 void AStation::SetStationId(int32 Id) {
@@ -298,6 +195,11 @@ void AStation::UpdateStationMesh() {
 
 StationState AStation::GetStationState() const {
 	return State;
+}
+
+void AStation::SetStationState(StationState S) {
+	State = S;
+	UpdateStationMesh();
 }
 
 StationType AStation::GetStationType() const {

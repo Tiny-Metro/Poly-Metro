@@ -34,49 +34,45 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Station id Getter, Setter
 	UFUNCTION(BlueprintCallable)
 	void SetStationId(int32 Id);
 	UFUNCTION(BlueprintCallable)
 	int32 GetStationId() const;
-	UFUNCTION(BlueprintCallable)
-	void SetStationType(StationType Type);
-	UFUNCTION(BlueprintCallable)
-	void SetGridCellData(FGridCellData GridCellData);
-	UFUNCTION(BlueprintCallable)
-	void SetPolicy(APolicy* Policy);
+
+	// Station complain function
 	UFUNCTION(BlueprintCallable)
 	void CalculateComplain();
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
-	UFUNCTION(BlueprintCallable)
-	void UpdateStationMesh();
+
+
+	// Station state Getter, Setter
 	UFUNCTION(BlueprintCallable)
 	StationState GetStationState() const;
 	UFUNCTION(BlueprintCallable)
+	void SetStationState(UPARAM(DisplayName = "State")StationState S);
+
+	// Station type Getter, Setter
+	UFUNCTION(BlueprintCallable)
 	StationType GetStationType() const;
 	UFUNCTION(BlueprintCallable)
+	void SetStationType(StationType Type);
+
+	// Station grid data Getter, Setter
+	UFUNCTION(BlueprintCallable)
 	FGridCellData GetCurrentGridCellData() const;
+	UFUNCTION(BlueprintCallable)
+	void SetGridCellData(FGridCellData GridCellData);
+
+	UFUNCTION(BlueprintCallable)
+	void SetPolicy(APolicy* Policy);
+	UFUNCTION(BlueprintCallable)
+	void UpdateStationMesh();
 	UFUNCTION(BlueprintCallable)
 	void LoadStationValue(FStationValuesStruct StationValues);
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
-
-	/*UFUNCTION()
-	void InitStationMesh();
-	UFUNCTION()
-	void StationMeshDeferred();
-	UFUNCTION()
-	void InitStationMaterialActive();
-	UFUNCTION()
-	void StationMaterialActiveDeferred();
-	UFUNCTION()
-	void InitStationMaterialInactive();
-	UFUNCTION()
-	void StationMaterialInactiveDeferred();
-	UFUNCTION()
-	void InitStationMaterialDestroyed();
-	UFUNCTION()
-	void StationMaterialDestroyedDeferred();*/
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 
@@ -150,26 +146,19 @@ protected:
 	USceneComponent* DefaultRoot = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* StationMeshComponent = nullptr;
-	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
-	//TArray<FSoftObjectPath> StationMeshPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> StationMesh;
 
 	// Material
-	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
-	//TArray<FSoftObjectPath> StationMaterialInactivePath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> StationMaterialInactive;
-	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
-	//TArray<FSoftObjectPath> StationMaterialActivePath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> StationMaterialActive;
-	//UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
-	//TArray<FSoftObjectPath> StationMaterialDestroyedPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> StationMaterialDestroyed;
 
-	/*UPROPERTY()
+	// Mesh, Material paths
+	UPROPERTY()
 	TArray<FString> StationMeshPath = {
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationTriangle.SM_StationTriangle'"),
@@ -181,8 +170,8 @@ protected:
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationPentagon.SM_StationPentagon'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationStar.SM_StationStar'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationFan.SM_StationFan'")
-	};*/
-	/*UPROPERTY()
+	};
+	UPROPERTY()
 	TArray<FString> StationMaterialInactivePath = {
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
@@ -196,5 +185,5 @@ protected:
 	TArray<FString> StationMaterialDestroyedPath = {
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Outer.M_StationDestroyed_Outer'"),
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Inner.M_StationDestroyed_Inner'")
-	};*/
+	};
 };
