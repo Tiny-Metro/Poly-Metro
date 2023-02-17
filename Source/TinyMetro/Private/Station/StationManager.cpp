@@ -76,7 +76,8 @@ void AStationManager::BeginPlay()
 	
 	// Spawn default 3 stationsstat
 	// Get GameMode, Get coord and station type
-	GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
+	//GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	InitData = GameMode->GetInitData();
 
