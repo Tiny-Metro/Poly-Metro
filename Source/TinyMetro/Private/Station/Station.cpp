@@ -158,11 +158,9 @@ void AStation::BeginPlay()
 
 	Super::BeginPlay();
 	
-	// Get StationManager
-	StationManager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-
 	// Get GameMode, set daytime
-	ATinyMetroGameModeBase* GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
+	ATinyMetroGameModeBase* GameMode = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	StationManager = GameMode->GetStationManager();
 	Daytime = GameMode->GetDaytime();
 
 	PassengerSpawnRoutine();

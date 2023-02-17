@@ -8,6 +8,8 @@
 #include "Train/TrainManager.h"
 #include "Lane/LaneManager.h"
 #include "Policy/Policy.h"
+#include "Shop/Shop.h"
+#include "SaveSystem/TMSaveManager.h"
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
@@ -50,10 +52,15 @@ TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
 }
 
 void ATinyMetroGameModeBase::StartPlay() {
-    GetWorld()->SpawnActor<APolicy>();
-    GetWorld()->SpawnActor<ABank>();
-    GetWorld()->SpawnActor<ATrainManager>();
-    GetWorld()->SpawnActor<ALaneManager>();
+    StationManager = GetWorld()->SpawnActor<AStationManager>();
+    SaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
+    TrainManager = GetWorld()->SpawnActor<ATrainManager>();
+    LaneManager = GetWorld()->SpawnActor<ALaneManager>();
+    Policy = GetWorld()->SpawnActor<APolicy>();
+    Bank = GetWorld()->SpawnActor<ABank>();
+    Timer = GetWorld()->SpawnActor<ATimer>();
+    Shop = GetWorld()->SpawnActor<AShop>();
+    UE_LOG(LogTemp, Log, TEXT("GameMode::StartPlay : Spawn finish"));
     Super::StartPlay();
 }
 
@@ -63,4 +70,36 @@ void ATinyMetroGameModeBase::BeginPlay() {
 
 void ATinyMetroGameModeBase::SetGameSpeed(float TimeDilation) {
     UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeDilation);
+}
+
+AStationManager* ATinyMetroGameModeBase::GetStationManager() const {
+    return StationManager;
+}
+
+ATMSaveManager* ATinyMetroGameModeBase::GetSaveManager() const {
+    return SaveManager;
+}
+
+ATrainManager* ATinyMetroGameModeBase::GetTrainManager() const {
+    return TrainManager;
+}
+
+ALaneManager* ATinyMetroGameModeBase::GetLaneManager() const {
+    return LaneManager;
+}
+
+APolicy* ATinyMetroGameModeBase::GetPolicy() const {
+    return Policy;
+}
+
+ABank* ATinyMetroGameModeBase::GetBank() const {
+    return Bank;
+}
+
+ATimer* ATinyMetroGameModeBase::GetTimer() const {
+    return Timer;
+}
+
+AShop* ATinyMetroGameModeBase::GetShop() const {
+    return Shop;
 }

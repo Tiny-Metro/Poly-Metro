@@ -3,6 +3,7 @@
 
 #include "Station/StationManager.h"
 #include "Lane/Lane.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -27,7 +28,8 @@ void AStationManager::BeginPlay()
 	//PlayerState = Cast<ATinyMetroPlayerState>(GetWorld()->GetPawnIterator()->Get()->GetPlayerState());
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
-	Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
+	//Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
+	Policy = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetPolicy();
 
 	if (IsValid(PlayerState)) {
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Valid"));

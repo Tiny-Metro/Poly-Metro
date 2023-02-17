@@ -2,6 +2,7 @@
 
 
 #include "Shop/Shop.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AShop::AShop()
@@ -16,7 +17,13 @@ void AShop::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+	//PlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
+	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	if (IsValid(PlayerState)) {
+		UE_LOG(LogTemp, Log, TEXT("Shop::BeginPlay : PlayerState Valid"));
+	}else{
+		UE_LOG(LogTemp, Log, TEXT("Shop::BeginPlay : PlayerState Invalid"));
+	}
 
 	UpdateShopInfo();
 	

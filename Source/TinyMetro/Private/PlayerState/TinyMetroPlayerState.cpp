@@ -34,8 +34,8 @@ void ATinyMetroPlayerState::BeginPlay() {
 
 	DayTime = TinyMetroGameModeBase->GetDaytime();
 
-	Timer = GetWorld()->SpawnActor<ATimer>();
-	TMSaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
+	Timer = TinyMetroGameModeBase->GetTimer();
+	TMSaveManager = TinyMetroGameModeBase->GetSaveManager();
 	/*TMSaveManager = GetWorld()->SpawnActorDeferred<ATMSaveManager>(ATMSaveManager::StaticClass(),
 		FTransform());
 	TMSaveManager->FinishSpawning(FTransform());*/
