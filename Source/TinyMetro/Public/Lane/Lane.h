@@ -42,9 +42,19 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category="Lane")
 	TArray<FIntPoint> StationPoint;
 
+
+	UPROPERTY(BlueprintReadWrite, Category="Lane")
 	TArray<FLanePoint> tmpLaneArray0;  // set station point to laneArray
 
+
+	UPROPERTY(BlueprintReadWrite, Category="Lane")
 	TArray<FLanePoint> tmpLaneArray1; 
+
+	UPROPERTY(BlueprintReadWrite, Category = "Lane")
+	FLanePoint TmpLanePoint0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Lane")
+	FLanePoint TmpLanePoint1;
 
 
 public:

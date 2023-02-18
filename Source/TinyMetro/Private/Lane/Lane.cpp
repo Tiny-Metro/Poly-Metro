@@ -138,10 +138,10 @@ void ALane::FillLanePoint() {
 		
 		LaneArray.Add(tmpLaneArray1[i]);
 
-		FLanePoint TmpLanePoint0 = tmpLaneArray1[i];
+		TmpLanePoint0 = tmpLaneArray1[i];
 
 		if ( i < (tmpLaneArray1.Num() - 1)) {
-			FLanePoint TmpLanePoint1 = tmpLaneArray1[i + 1];
+			TmpLanePoint1 = tmpLaneArray1[i + 1];
 
 			FIntPoint DistancePoint =  TmpLanePoint1.Coordination - tmpLaneArray1[i].Coordination;
 
