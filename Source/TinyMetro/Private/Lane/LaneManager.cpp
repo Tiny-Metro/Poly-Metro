@@ -127,5 +127,7 @@ void ALaneManager::AddLane(ALane* Obj) {
 }
 
 ALane* ALaneManager::GetLaneById(int32 LaneId) {
-	return Lanes[LaneId - 1];
+
+	ALane* Lane = Lanes.FindRef(LaneId);
+	return Lane;
 }
