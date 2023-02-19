@@ -13,6 +13,7 @@ ALane::ALane()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	//GridManagerRef->SetGridLane(0,0, GridLanest)
 }
 
 // Called when the game starts or when spawned
@@ -27,6 +28,16 @@ void ALane::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ALane::SetLaneId(int _LaneId)
+{
+	LaneId = _LaneId;
+}
+
+int32 ALane::GetLaneId() const
+{
+	return LaneId;
 }
 
 void ALane::CheckStationPoint() {
