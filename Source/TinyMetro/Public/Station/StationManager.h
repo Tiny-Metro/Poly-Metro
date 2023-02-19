@@ -48,6 +48,12 @@ public:
 	//Policy maintenance cost routine
 	void PolicyMaintenanceRoutine();
 
+	UFUNCTION(BlueprintCallable)
+	void AddNewStationInAdjList(int32 NewStationId);
+
+	UFUNCTION(BlueprintCallable)
+	void AddAdjListItem(AStation* Start, AStation* End, float Length);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnRequire = 15000;
@@ -108,4 +114,7 @@ protected:
 		int32 PolicyCostCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ATinyMetroPlayerState* PlayerState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<TPair<TPair<int32, StationType>, float>> AdjList;
 };

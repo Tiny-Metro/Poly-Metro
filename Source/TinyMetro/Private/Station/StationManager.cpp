@@ -277,6 +277,19 @@ void AStationManager::PolicyMaintenanceRoutine() {
 	);
 }
 
+void AStationManager::AddNewStationInAdjList(int32 NewStationId)
+{
+
+}
+
+void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
+{
+	TPair<TPair<int32, StationType>, float> NewStation;
+	AdjList.Add(NewStation);
+
+	//AdjList[<Start->GetStationId(),>].;
+}
+
 StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }
