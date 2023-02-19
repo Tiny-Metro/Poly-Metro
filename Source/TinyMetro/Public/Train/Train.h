@@ -26,12 +26,15 @@ public:
 	// virtual void Tick(float DeltaTime) override;
 
 	// TrainTemplate override function
-	virtual FVector GetNextTrainPosition() override;
+	virtual FVector GetNextTrainDestination(FVector CurLocation) override;
 	virtual bool SetTrainMaterial(int32 LaneNumber) override;
 	virtual void Upgrade() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
+	UFUNCTION(BlueprintCallable)
+	void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* Destination);
+
 
 protected:
 
@@ -46,11 +49,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<ASubtrain*> Subtrains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	float TotalTravel;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FVector LocationAtPreTick;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	ATrainAiController* ParentAiControllerRef;
+	ATrainAiController* AiControllerRef;
 
 protected:
 	UPROPERTY(VisibleAnywhere)

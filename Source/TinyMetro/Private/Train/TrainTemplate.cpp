@@ -3,6 +3,7 @@
 
 #include "Train/TrainTemplate.h"
 #include "GameModes/GameModeBaseSeoul.h"
+#include "Lane/LaneManager.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -14,7 +15,7 @@ ATrainTemplate::ATrainTemplate()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	auto TrainMovement = GetCharacterMovement();
+	TrainMovement = GetCharacterMovement();
 	TrainMovement->MaxAcceleration = 50000.0f; // Default 2048
 	TrainMovement->Mass = 1.0f; // Deafult 100
 	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
@@ -25,6 +26,9 @@ ATrainTemplate::ATrainTemplate()
 void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
+	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
 	InitTrainMaterial();
 	InitTrainMesh();
@@ -65,7 +69,7 @@ bool ATrainTemplate::SetTrainMaterial(int32 LaneNumber) {
 void ATrainTemplate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	TotalTravel += TrainMovement->MaxWalkSpeed * DeltaTime;
 }
 
 // Called to bind functionality to input
@@ -140,7 +144,7 @@ void ATrainTemplate::Test() {
 		TEXT("Test() : TrainTemplate"));
 }
 
-FVector ATrainTemplate::GetNextTrainPosition() {
+FVector ATrainTemplate::GetNextTrainDestination(FVector CurLocation) {
 	return FVector();
 }
 

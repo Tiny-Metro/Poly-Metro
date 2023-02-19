@@ -6,3 +6,10 @@
 void ATrainAiController::Test() {
 	//MoveToLocation()
 }
+
+void ATrainAiController::Patrol_Implementation() {
+}
+
+void ATrainAiController::SetTrainDestination(FVector Destination) {
+	TrainDestination = Destination;
+}

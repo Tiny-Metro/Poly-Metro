@@ -4,8 +4,11 @@
 #include "Train/Train.h"
 #include "Train/SubtrainAiController.h"
 #include "Station/Station.h"
+#include "Lane/Lane.h"
+#include "Lane/LaneManager.h"
 #include "Components/BoxComponent.h"
 #include "GameModes/GameModeBaseSeoul.h"
+#include <GameFramework/CharacterMovementComponent.h>
 #include <Engine/AssetManager.h>
 
 void ATrain::Test() {
@@ -40,7 +43,7 @@ ATrain::ATrain() {
 void ATrain::BeginPlay() {
 	Super::BeginPlay();
 	TotalTravel = 0.0f;
-	ParentAiControllerRef = Cast<ATrainAiController>(GetController());
+	AiControllerRef = Cast<ATrainAiController>(GetController());
 
 	//UE_LOG(LogTemp, Log, TEXT("TUM : %s"), *TrainUpgradeMesh.ToString());
 	
@@ -75,8 +78,16 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 //void ATrain::Tick(float DeltaTime) { }
 
-FVector ATrain::GetNextTrainPosition() {
-	return FVector();
+FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
+	bool tmp;
+	auto LaneTmp = LaneManagerRef->GetLaneById(ServiceLaneId);
+	auto NextPoint = LaneTmp->GetNextLocation(
+		this,
+		GridManagerRef->GetGridCellDataByCoord(CurLocation, tmp).WorldCoordination,
+		Direction
+	);
+
+	return GridManagerRef->GetGridCellDataByPoint(NextPoint.X, NextPoint.Y).WorldLocation;
 }
 
 bool ATrain::SetTrainMaterial(int32 LaneNumber) {
@@ -92,6 +103,17 @@ void ATrain::Upgrade() {
 	TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
 	// Set flag
 	IsUpgrade = true;
+}
+
+void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* Destination) {
+	bool tmp;
+	SetServiceLaneId(Lane->GetLaneId());
+	SetTrainDirection(Lane->SetDirectionInit(
+		Destination,
+		GridManagerRef->GetGridCellDataByCoord(StartLocation, tmp).WorldCoordination
+	));
+	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
+	AiControllerRef->Patrol();
 }
 
 void ATrain::SetSubtrain(ASubtrain* T) {

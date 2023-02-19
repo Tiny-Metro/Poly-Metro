@@ -53,7 +53,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Test();
 	UFUNCTION(BlueprintCallable)
-	virtual FVector GetNextTrainPosition();
+	virtual FVector GetNextTrainDestination(FVector CurLocation);
 	UFUNCTION(BlueprintCallable)
 	FVector ConvertMousePositionToWorldLocation();
 	UFUNCTION(BlueprintCallable)
@@ -64,6 +64,10 @@ protected:
 	int32 TrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 ServiceLaneId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ALaneManager* LaneManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class AGridManager* GridManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -74,6 +78,8 @@ protected:
 	float OnPressedTime;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float LongClickInterval;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float TotalTravel;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -86,4 +92,6 @@ protected:
 	TArray<FSoftObjectPath> TrainMeshPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> TrainMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UCharacterMovementComponent* TrainMovement;
 };
