@@ -39,7 +39,7 @@ public:
 	
 
 public:
-	UPROPERTY(BlueprintReadWrite, Category="Lane")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
 	TArray<FIntPoint> StationPoint;
 
 
