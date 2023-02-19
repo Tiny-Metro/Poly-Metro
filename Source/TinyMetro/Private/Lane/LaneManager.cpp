@@ -83,7 +83,7 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	
 
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
-	tmpLane->LaneNum = NextLaneNums[0];
+	tmpLane->SetLaneId(NextLaneNums[0]);
 
 	UE_LOG(LogTemp, Warning, TEXT("GetActorNameOrLabel : %s"), *(tmpLane->GetActorNameOrLabel()));
 
