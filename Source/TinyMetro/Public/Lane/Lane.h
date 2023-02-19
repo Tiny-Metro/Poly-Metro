@@ -97,4 +97,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnTrain();
+
+	UFUNCTION(BlueprintCallable)
+	void SetGridLaneStructure();
 };

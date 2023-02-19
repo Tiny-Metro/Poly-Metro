@@ -4,6 +4,7 @@
 #include "Lane/Lane.h"
 #include "Train/TrainTemplate.h"
 #include "Station/Station.h"
+#include "GridGenerator/GridCellData.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -13,7 +14,7 @@ ALane::ALane()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	//GridManagerRef->SetGridLane(0,0, GridLanest)
+	
 }
 
 // Called when the game starts or when spawned
@@ -316,4 +317,28 @@ TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation)
 
 void ALane::SpawnTrain()
 {
+}
+
+void ALane::SetGridLaneStructure()
+{
+	for (int i = 0; i < LaneArray.Num(); i++) {
+
+		FIntPoint Coordination = LaneArray[i].Coordination;
+
+		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Coordination.X, Coordination.Y);
+
+
+		switch (GridCellData.GridType) {
+		case GridType::Ground:
+			GridManagerRef->SetGridLane(Coordination.X, Coordination.Y, GridLaneStructure::Lane);
+			break;
+		case GridType::Water:
+			GridManagerRef->SetGridLane(Coordination.X, Coordination.Y, GridLaneStructure::Bridge);
+			break;
+		case GridType::Hill:
+			GridManagerRef->SetGridLane(Coordination.X, Coordination.Y, GridLaneStructure::Turnel);
+			break;
+		}
+	}
+	
 }
