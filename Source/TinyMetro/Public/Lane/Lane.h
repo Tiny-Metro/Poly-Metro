@@ -31,12 +31,18 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FLanePoint> LaneArray;
 
-	UPROPERTY(BlueprintReadWrite)
-	int32 LaneNum;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 	
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	int32 LaneId;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	int32 GetLaneId() const;
+	UFUNCTION(BlueprintCallable)
+	void SetLaneId(int _LaneId);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")

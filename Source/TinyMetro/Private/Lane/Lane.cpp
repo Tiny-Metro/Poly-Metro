@@ -30,6 +30,16 @@ void ALane::Tick(float DeltaTime)
 
 }
 
+void ALane::SetLaneId(int _LaneId)
+{
+	LaneId = _LaneId;
+}
+
+int32 ALane::GetLaneId() const
+{
+	return LaneId;
+}
+
 void ALane::CheckStationPoint() {
 
 	tmpLaneArray0.Empty();
