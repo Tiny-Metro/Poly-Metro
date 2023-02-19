@@ -222,11 +222,16 @@ void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
 
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(_GridCellData.WorldLocation);
 	SpawnParams.Owner = stationmanager;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, _GridCellData.WorldLocation, stationmanager->GetActorRotation(), SpawnParams));
+	//AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, _GridCellData.WorldLocation, stationmanager->GetActorRotation(), SpawnParams));
+	AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
 	tmp->LoadStationValue(StationValues);
 	tmp->SetPolicy(stationmanager->Policy);
+
+	tmp->FinishSpawning(SpawnTransform);
 
 	stationmanager->Station.Add(tmp);
 	stationmanager->GridManager->SetGridStructure(

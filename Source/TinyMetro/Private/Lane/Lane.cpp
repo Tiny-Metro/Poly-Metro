@@ -13,6 +13,7 @@ ALane::ALane()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	//GridManagerRef->SetGridLane(0,0, GridLanest)
 }
 
 // Called when the game starts or when spawned
