@@ -20,7 +20,7 @@ public:
 	virtual void Test() override;
 
 	// TrainTemplate override function
-	virtual FVector GetNextTrainPosition() override;
+	//virtual FVector GetNextTrainPosition() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetOwnerTrainId(int32 TID);

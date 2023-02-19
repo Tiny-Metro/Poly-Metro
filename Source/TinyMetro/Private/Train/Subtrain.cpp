@@ -28,9 +28,9 @@ void ASubtrain::BeginPlay() {
 	Super::BeginPlay();
 }
 
-FVector ASubtrain::GetNextTrainPosition() {
-	return FVector();
-}
+//FVector ASubtrain::GetNextTrainPosition() {
+//	return FVector();
+//}
 
 void ASubtrain::SetOwnerTrainId(int32 TID) {
 	OwnerTrainId = TID;
