@@ -60,7 +60,7 @@ private:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	float GridCellSize = 400;
+	float GridCellSize = 500;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnExtend = 3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
