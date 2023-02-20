@@ -20,13 +20,31 @@ AStation::AStation()
 	// Set station mesh
 	StationMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Station Mesh"));
 	StationMeshComponent->SetupAttachment(RootComponent);
+
+	// Set passenger mesh
+	for (int i = 0; i < MaxPassengerSpawn; i++) {
+		FName name = *FString::Printf(TEXT("Passenger %d"), i);
+		auto tmp = CreateDefaultSubobject<UStaticMeshComponent>(name);
+		tmp->SetupAttachment(RootComponent);
+		FVector PassengerPosition =
+			PassengerMeshDefaultPosition +
+			FVector(PassengerX_Distance * (i / 2), 0.0f, 0.0f) +
+			FVector(0.0f, PassengerY_Distance * ((i % 2) == 0 ? 1 : -1), 0.0f);
+		tmp->SetRelativeLocation(PassengerPosition);
+		PassengerMeshComponent.Add(MoveTemp(tmp));
+	}
 	
-	// Load meshes
+	// Load meshes (Station)
 	for (auto& i : StationMeshPath) {
 		StationMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
 	}
 
-	// Load material
+	// Load meshes (Passenger)
+	for (auto& i : PassengerMeshPath) {
+		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+
+	// Load material (Station)
 	for (auto& i : StationMaterialInactivePath) {
 		StationMaterialInactive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
@@ -57,6 +75,7 @@ void AStation::BeginPlay()
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
 	UpdateStationMesh();
+	UpdatePassengerMesh();
 
 	// Log ( I am {Actor Name} )
 	/*if (GEngine) {
@@ -269,6 +288,11 @@ void AStation::ComplainRoutine() {
 
 void AStation::UpdatePassengerMesh() {
 	// Read passenger array, clear and reorganize meshes
+	for (int i = 0; i < MaxPassengerSpawn; i++) {
+		if (Passenger.IsValidIndex(i)) {
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+		}
+	}
 }
 
 void AStation::PassengerSpawnRoutine() {
@@ -311,7 +335,7 @@ void AStation::SpawnPassenger() {
 		tmp->SetFree();
 	}
 
-	Passenger.Add(tmp);
+	Passenger.Add(MoveTemp(tmp));
 
 	//Log
 	if (GEngine)
