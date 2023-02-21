@@ -65,6 +65,7 @@ FGridCellData AGridManager::GetGridCellDataByPoint(int X, int Y) const {
 }
 
 FGridCellData AGridManager::GetGridCellDataByIndex(int Index) const {
+	UE_LOG(LogTemp, Log, TEXT("GridManager::GetGridCellDataByIndex"));
 	if (Index > GridCellData.Num()) {
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(
@@ -206,10 +207,10 @@ TPair<FVector2D, double> AGridManager::FindCircle() {
 }
 
 int32 AGridManager::CoordApproximation(double Coord, bool Flag) const {
-	if (!Flag) Coord += (200 * (Coord >= 0 ? 1 : -1));
-	int tmp = Coord / 400;
-	int result = tmp * 400;
-	if (Flag) result += (200 * (Coord >= 0 ? 1 : -1));
+	if (!Flag) Coord += ((GridCellSize / 2) * (Coord >= 0 ? 1 : -1));
+	int tmp = Coord / GridCellSize;
+	int result = tmp * GridCellSize;
+	if (Flag) result += ((GridCellSize / 2) * (Coord >= 0 ? 1 : -1));
 
 	return result;
 }
