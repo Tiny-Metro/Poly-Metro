@@ -143,7 +143,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
 	int32 MaxPassengerSpawn = 15;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
-	FVector PassengerMeshDefaultPosition = FVector(150.0f, 0.0f, 0.0f);
+	FVector PassengerMeshDefaultPosition = FVector(180.0f, 0.0f, 10.0f);
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
 	float PassengerX_Distance = 100;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
