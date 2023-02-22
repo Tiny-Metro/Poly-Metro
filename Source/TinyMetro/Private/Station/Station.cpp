@@ -338,12 +338,12 @@ void AStation::SpawnPassenger() {
 	Passenger.Add(MoveTemp(tmp));
 
 	//Log
-	if (GEngine)
+	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.0f,
 			FColor::Yellow,
-			FString::Printf(TEXT("Passenger Spawn!")));
+			FString::Printf(TEXT("Passenger Spawn!")));*/
 }
 
 double AStation::GetPassengerSpawnProbability() {

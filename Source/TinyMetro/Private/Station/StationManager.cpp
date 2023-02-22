@@ -48,12 +48,12 @@ void AStationManager::BeginPlay()
 
 
 
-	FIntPoint test(3,3);
+	/*FIntPoint test(3,3);
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		15.0f,
 		FColor::Yellow,
-		FString::Printf(TEXT("TEST : %d"), test.Size()));
+		FString::Printf(TEXT("TEST : %d"), test.Size()));*/
 
 	
 
@@ -85,12 +85,12 @@ void AStationManager::BeginPlay()
 		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value, true);
 	}
 
-	if (GEngine)
+	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.0f,
 			FColor::Yellow,
-			FString::Printf(TEXT("Data : %d"), InitData.Num()));
+			FString::Printf(TEXT("Data : %d"), InitData.Num()));*/
 }
 
 void AStationManager::TestFunction() {
