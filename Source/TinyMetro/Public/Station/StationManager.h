@@ -10,6 +10,7 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
+#include "AdjArrayItem.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -49,10 +50,13 @@ public:
 	void PolicyMaintenanceRoutine();
 
 	UFUNCTION(BlueprintCallable)
-	void AddNewStationInAdjList(int32 NewStationId);
+	void AddNewStationInAdjList();
 
 	UFUNCTION(BlueprintCallable)
 	void AddAdjListItem(AStation* Start, AStation* End, float Length);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveAdjListItem(AStation* Start, AStation* End);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
@@ -116,5 +120,5 @@ protected:
 		ATinyMetroPlayerState* PlayerState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<TPair<TPair<int32, StationType>, float>> AdjList;
+	TArray<FAdjArrayItem> AdjList;
 };

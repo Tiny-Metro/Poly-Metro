@@ -4,6 +4,7 @@
 #include "Station/StationManager.h"
 #include "Lane/Lane.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Station/AdjItem.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -198,6 +199,9 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridStationStructure::Station);
 
 
+
+	AddNewStationInAdjList();
+
 	//Log
 	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
@@ -277,17 +281,33 @@ void AStationManager::PolicyMaintenanceRoutine() {
 	);
 }
 
-void AStationManager::AddNewStationInAdjList(int32 NewStationId)
+void AStationManager::AddNewStationInAdjList()
 {
+	FAdjArrayItem NewStation;
+	AdjList.Add(NewStation);
 
 }
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
-	TPair<TPair<int32, StationType>, float> NewStation;
-	AdjList.Add(NewStation);
+	FAdjItem StartTmp ;
+	StartTmp.StationId = Start->GetStationId();
+	StartTmp.StationType = Start->GetStationType();
+	StartTmp.Length = Length;
 
-	//AdjList[<Start->GetStationId(),>].;
+	AdjList[End->GetStationId()].AdjItems.Add(StartTmp);
+
+	FAdjItem EndTmp;
+	StartTmp.StationId = End->GetStationId();
+	StartTmp.StationType = End->GetStationType();
+	StartTmp.Length = Length;
+
+	AdjList[Start->GetStationId()].AdjItems.Add(EndTmp);
+
+}
+
+void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
+{
 }
 
 StationType AStationManager::GetRandomStationType() {
