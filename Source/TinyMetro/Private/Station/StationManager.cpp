@@ -126,7 +126,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 	bool LaneValid = IsValid(LaneRef);
 	//UE_LOG(LogTemp, Log, TEXT("Lane valid : %d"), LaneValid);
 	for (int i = 1; i < Station.Num(); i++) {
-		//if (LaneValid && !Station[i]->GetLanes().FindByKey<int32>(LaneRef->GetLaneId())) continue;
+		if (LaneValid && !Station[i]->GetLanes().FindByKey<int32>(LaneRef->GetLaneId())) continue;
 		double tmp = FVector::Dist(CurrentLocation, Station[i]->GetCurrentGridCellData().WorldLocation);
 		if (Distance > tmp) {
 			Distance = tmp;
