@@ -35,7 +35,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 	
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AStationManager* StationManagerRef;
 	
