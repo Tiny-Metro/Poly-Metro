@@ -308,6 +308,18 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 
 void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
 {
+	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
+		if (AdjList[End->GetStationId()].AdjItems[i].StationId == Start->GetStationId()) {
+			AdjList[End->GetStationId()].AdjItems.RemoveAt(i);
+		}
+	}
+
+	for (int i = 0; i < AdjList[Start->GetStationId()].AdjItems.Num(); i++) {
+		if (AdjList[Start->GetStationId()].AdjItems[i].StationId == End->GetStationId()) {
+			AdjList[Start->GetStationId()].AdjItems.RemoveAt(i);
+		}
+	}
+	
 }
 
 StationType AStationManager::GetRandomStationType() {
