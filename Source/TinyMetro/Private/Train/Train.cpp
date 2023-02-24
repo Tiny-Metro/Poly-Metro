@@ -29,7 +29,10 @@ ATrain::ATrain() {
 
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	OverlapVolume->InitBoxExtent(FVector(10,20,30));
-	OverlapVolume->OnComponentBeginOverlap.__Internal_AddDynamic(this, &ATrain::OnOverlapBegin, FName("OnOverlapBegin"));;
+	//OverlapVolume->OnComponentBeginOverlap.__Internal_AddDynamic(this, &ATrain::OnOverlapBegin, FName("OnOverlapBegin"));
+	OverlapVolume->OnComponentBeginOverlap.AddDynamic(this, &ATrain::OnOverlapBegin);
+	//OverlapVolume->OnComponentEndOverlap.__Internal_AddDynamic(this, &ATrain::OnOverlapEnd, FName("OnOverlapEnd"));
+	OverlapVolume->OnComponentEndOverlap.AddDynamic(this, &ATrain::OnOverlapEnd);
 	OverlapVolume->SetupAttachment(RootComponent);
 
 	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
@@ -76,6 +79,13 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 	}
 	
 }
+
+void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
+	if (OtherActor->IsA(AStation::StaticClass())) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("End Overlap"));
+	}
+}
+
 
 
 //void ATrain::Tick(float DeltaTime) { }
