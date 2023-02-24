@@ -20,6 +20,10 @@ ATrainTemplate::ATrainTemplate()
 	TrainMovement->Mass = 1.0f; // Deafult 100
 	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
 	TrainMovement->bUseControllerDesiredRotation = true; // Default false
+
+	TrainMaterial.AddUnique(
+		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
+	);
 }
 
 // Called when the game starts or when spawned
@@ -61,9 +65,9 @@ FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
 	return HitResult.Location;
 }
 
-bool ATrainTemplate::SetTrainMaterial(int32 LaneNumber) {
-	return false;
+void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
 }
+
 
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)
