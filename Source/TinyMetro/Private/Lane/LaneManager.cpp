@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Misc/OutputDeviceNull.h"
+#include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManager.h"
 
 // Sets default values
@@ -15,6 +16,8 @@ ALaneManager::ALaneManager()
 void ALaneManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 	
 }
 
@@ -98,10 +101,10 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d] is null"), i);
+			return;
 		}
 		
 	}
-
 	tmpLane->InitializeNewLane();
 
 	Lanes.Add(NextLaneNums[0], tmpLane);
@@ -112,6 +115,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	UE_LOG(LogTemp, Warning, TEXT("New LaneNum : %d"), NextLaneNums[0]);
 
 	RemoveNextLaneNums();
+
+	//StationManagerRef->AddAdjListItem(SelectedStations[0], SelectedStations[1], )
 }
 
 

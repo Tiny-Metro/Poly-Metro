@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Lane.h"
 #include "../Station/Station.h"
+#include "../Station/StationManager.h"
 #include "LaneManager.generated.h"
 
 UCLASS()
@@ -49,6 +50,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<int32> NextLaneNums = {1,2,3,4,5,6,7,8};
+
+	UPROPERTY(BlueprintReadOnly)
+	AStationManager* StationManagerRef;
 
 public:
 	UFUNCTION(BlueprintCallable)
