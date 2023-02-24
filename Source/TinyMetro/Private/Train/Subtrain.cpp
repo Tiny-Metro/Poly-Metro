@@ -24,6 +24,9 @@ void ASubtrain::Test() {
 		TEXT("Test() : Subtrain"));
 }
 
+void ASubtrain::SetTrainMaterial(ALane* Lane) {
+}
+
 void ASubtrain::BeginPlay() {
 	Super::BeginPlay();
 }

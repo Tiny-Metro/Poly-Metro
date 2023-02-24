@@ -38,6 +38,8 @@ ATrain::ATrain() {
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
+
+	//TrainMaterial.Add(TrainMeshComponent->GetStaticMesh()->GetMaterial(0)->GetMaterial());
 }
 
 void ATrain::BeginPlay() {
@@ -79,6 +81,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 //void ATrain::Tick(float DeltaTime) { }
 
 FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
+	UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
 	bool tmp;
 	auto LaneTmp = LaneManagerRef->GetLaneById(ServiceLaneId);
 	auto NextPoint = LaneTmp->GetNextLocation(
@@ -90,12 +93,12 @@ FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 	return GridManagerRef->GetGridCellDataByPoint(NextPoint.X, NextPoint.Y).WorldLocation;
 }
 
-bool ATrain::SetTrainMaterial(int32 LaneNumber) {
-	if (!TrainMaterial.IsValidIndex(LaneNumber)) {
-		return false;
+void ATrain::SetTrainMaterial(ALane* Lane) {
+	if (IsValid(Lane)) {
+		TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+	} else {
+		TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[0]);
 	}
-	TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[LaneNumber]);
-	return true;
 }
 
 void ATrain::Upgrade() {

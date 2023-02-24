@@ -18,6 +18,7 @@ public:
 	ASubtrain();
 
 	virtual void Test() override;
+	virtual void SetTrainMaterial(class ALane* Lane) override;
 
 	// TrainTemplate override function
 	//virtual FVector GetNextTrainPosition() override;

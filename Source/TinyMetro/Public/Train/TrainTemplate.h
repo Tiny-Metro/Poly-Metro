@@ -57,7 +57,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FVector ConvertMousePositionToWorldLocation();
 	UFUNCTION(BlueprintCallable)
-	virtual bool SetTrainMaterial(int32 LaneNumber);
+	virtual void SetTrainMaterial(class ALane* Lane);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -88,6 +88,8 @@ protected:
 	TArray<FSoftObjectPath> TrainMaterialPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> TrainMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString TrainDefaultMaterialPath = "Material'/Game/Train/TrainMatrial/M_DefaultTrain.M_DefaultTrain'";
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> TrainMeshPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

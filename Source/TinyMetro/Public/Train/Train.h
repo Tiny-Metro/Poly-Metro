@@ -27,7 +27,7 @@ public:
 
 	// TrainTemplate override function
 	virtual FVector GetNextTrainDestination(FVector CurLocation) override;
-	virtual bool SetTrainMaterial(int32 LaneNumber) override;
+	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void Upgrade() override;
 
 	UFUNCTION(BlueprintCallable)
