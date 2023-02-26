@@ -352,10 +352,10 @@ void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, 
 	float Distance;
 
 	if (N < M) {
-		Distance = float(N * 14)/10 + M - N;
+		Distance = (N * 14)/10.0 + M - N;
 	}
 	else {
-		Distance = float(M * 14) / 10 + N - M;
+		Distance = (M * 14) / 10.0 + N - M;
 	}
 
 	
