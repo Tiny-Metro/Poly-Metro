@@ -319,8 +319,12 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 
 }
 
-void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
+void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
 {
+	AStation* Start = GetStationByGridCellData(First);
+	AStation* End = GetStationByGridCellData(Second);
+
+
 	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
 		if (AdjList[End->GetStationId()].AdjItems[i].StationId == Start->GetStationId()) {
 			AdjList[End->GetStationId()].AdjItems.RemoveAt(i);
