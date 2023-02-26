@@ -297,6 +297,17 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 	StartTmp.StationType = Start->GetStationType();
 	StartTmp.Length = Length;
 
+	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
+
+		FAdjItem Tmp = AdjList[End->GetStationId()].AdjItems[i];
+
+		if (Tmp.StationId == StartTmp.StationId) {
+			if (Tmp.Length <= Length) {
+				return;
+			}
+		}
+	}
+
 	AdjList[End->GetStationId()].AdjItems.Add(StartTmp);
 
 	FAdjItem EndTmp;

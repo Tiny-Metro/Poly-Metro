@@ -346,10 +346,19 @@ void ALane::SetGridLaneStructure()
 
 void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, AStation* Second)
 {
-	float N = Start.X - End.X;
-	float M = Start.Y - End.Y;
+	int N = abs(Start.X - End.X);
+	int M = abs(Start.Y - End.Y);
 
-	float Distance = abs(N) * 1.40 + abs(M - N);
+	float Distance;
+
+	if (N < M) {
+		Distance = float(N * 14)/10 + M - N;
+	}
+	else {
+		Distance = float(M * 14) / 10 + N - M;
+	}
+
+	
 
 	UE_LOG(LogTemp, Warning, TEXT("AddAdjListDistance /IntPoint Start : %d, %d"), Start.X, Start.Y);
 	UE_LOG(LogTemp, Warning, TEXT("AddAdjListDistance /IntPoint End : %d, %d"), End.X, End.Y);
