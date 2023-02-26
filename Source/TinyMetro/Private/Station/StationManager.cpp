@@ -322,6 +322,17 @@ void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
 	
 }
 
+AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
+{
+	for (int i = 0; i < Station.Num(); i++) {
+		if (Station[i]->GetCurrentGridCellData().WorldCoordination == _IntPoint) {
+			return Station[i];
+		}
+	}
+
+	return nullptr;
+}
+
 StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }

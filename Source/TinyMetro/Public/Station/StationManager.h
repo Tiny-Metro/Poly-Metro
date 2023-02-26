@@ -58,6 +58,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveAdjListItem(AStation* Start, AStation* End);
 
+	UFUNCTION(BlueprintCallable)
+	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnRequire = 15000;
