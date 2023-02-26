@@ -55,6 +55,8 @@ void ATMSaveManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		SaveWorldInfo();
 		SaveStationManager();
 	}
+
+	DeleteSaveFiles(); // TODO for Testing
 }
 
 void ATMSaveManager::AutoSave() {

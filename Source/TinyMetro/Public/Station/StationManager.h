@@ -10,6 +10,7 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
+#include "AdjArrayItem.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -47,6 +48,18 @@ public:
 	float GetComplainAverage();
 	//Policy maintenance cost routine
 	void PolicyMaintenanceRoutine();
+
+	UFUNCTION(BlueprintCallable)
+	void AddNewStationInAdjList();
+
+	UFUNCTION(BlueprintCallable)
+	void AddAdjListItem(AStation* Start, AStation* End, float Length);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveAdjListItem(FIntPoint First, FIntPoint Second);
+
+	UFUNCTION(BlueprintCallable)
+	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
@@ -108,4 +121,7 @@ protected:
 		int32 PolicyCostCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ATinyMetroPlayerState* PlayerState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FAdjArrayItem> AdjList;
 };

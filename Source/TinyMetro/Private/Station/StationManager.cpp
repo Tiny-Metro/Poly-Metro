@@ -4,6 +4,7 @@
 #include "Station/StationManager.h"
 #include "Lane/Lane.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Station/AdjItem.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -198,6 +199,11 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridStationStructure::Station);
 
 
+
+	AddNewStationInAdjList();
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
+
 	//Log
 	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
@@ -275,6 +281,80 @@ void AStationManager::PolicyMaintenanceRoutine() {
 		true,
 		1.0f
 	);
+}
+
+void AStationManager::AddNewStationInAdjList()
+{
+	FAdjArrayItem NewStation;
+	AdjList.Add(NewStation);
+
+}
+
+void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
+{
+	FAdjItem StartTmp ;
+	StartTmp.StationId = Start->GetStationId();
+	StartTmp.StationType = Start->GetStationType();
+	StartTmp.Length = Length;
+
+	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
+
+		FAdjItem Tmp = AdjList[End->GetStationId()].AdjItems[i];
+
+		if (Tmp.StationId == StartTmp.StationId) {
+			if (Tmp.Length <= Length) {
+				return;
+			}
+		}
+	}
+
+	AdjList[End->GetStationId()].AdjItems.Add(StartTmp);
+
+	FAdjItem EndTmp;
+	EndTmp.StationId = End->GetStationId();
+	EndTmp.StationType = End->GetStationType();
+	EndTmp.Length = Length;
+
+	AdjList[Start->GetStationId()].AdjItems.Add(EndTmp);
+
+}
+
+void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
+{
+	AStation* Start = GetStationByGridCellData(First);
+	AStation* End = GetStationByGridCellData(Second);
+
+
+	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
+		if (AdjList[End->GetStationId()].AdjItems[i].StationId == Start->GetStationId()) {
+			AdjList[End->GetStationId()].AdjItems.RemoveAt(i);
+		}
+	}
+
+	for (int i = 0; i < AdjList[Start->GetStationId()].AdjItems.Num(); i++) {
+		if (AdjList[Start->GetStationId()].AdjItems[i].StationId == End->GetStationId()) {
+			AdjList[Start->GetStationId()].AdjItems.RemoveAt(i);
+		}
+	}
+	
+}
+
+AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
+{
+	for (int i = 0; i < Station.Num(); i++) {
+
+		FIntPoint Coor = Station[i]->GetCurrentGridCellData().WorldCoordination;
+
+		if ( Coor == _IntPoint) {
+			return Station[i];
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Get Station By GridCellData / Station : %d, %d / IntPoint : %d, %d"), Coor.X, Coor.Y, _IntPoint.X, _IntPoint.Y);
+	}
+
+	
+
+	return nullptr;
 }
 
 StationType AStationManager::GetRandomStationType() {

@@ -7,6 +7,7 @@
 #include "LanePoint.h"
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
+#include "../Station/StationManager.h"
 #include "Lane.generated.h"
 
 UCLASS(Blueprintable)
@@ -33,6 +34,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AStationManager* StationManagerRef;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -100,4 +104,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGridLaneStructure();
+
+	UFUNCTION(BlueprintCallable)
+	void AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First = nullptr, AStation* Second = nullptr);
 };

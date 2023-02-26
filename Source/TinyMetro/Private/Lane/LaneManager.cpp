@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Misc/OutputDeviceNull.h"
 #include "Lane/LaneManager.h"
+#include "Misc/OutputDeviceNull.h"
+#include <Kismet/GameplayStatics.h>
+
 
 // Sets default values
 ALaneManager::ALaneManager()
@@ -15,6 +17,8 @@ ALaneManager::ALaneManager()
 void ALaneManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 	
 }
 
@@ -94,13 +98,23 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		
 		if (IsValid(SelectedStations[i])) {
 			SelectedStations[i]->SetLanes(NextLaneNums[0]);
-			tmpLane->StationPoint.Add(SelectedStations[i]->GetCurrentGridCellData().WorldCoordination);
+			FIntPoint Coor = SelectedStations[i]->GetCurrentGridCellData().WorldCoordination;
+			tmpLane->StationPoint.Add(Coor);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d] is null"), i);
+			return;
 		}
 		
 	}
+
+	FIntPoint Start = SelectedStations[0]->GetCurrentGridCellData().WorldCoordination;
+	FIntPoint End = SelectedStations[1]->GetCurrentGridCellData().WorldCoordination;
+	UE_LOG(LogTemp, Warning, TEXT("CreatingNewLane /IntPoint Start : %d, %d"), Start.X, Start.Y);
+	UE_LOG(LogTemp, Warning, TEXT("CreatingNewLane /IntPoint End : %d, %d"), End.X, End.Y);
+
+
+	tmpLane->AddAdjListDistance(Start, End, SelectedStations[0], SelectedStations[1]);
 
 	tmpLane->InitializeNewLane();
 
@@ -112,6 +126,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	UE_LOG(LogTemp, Warning, TEXT("New LaneNum : %d"), NextLaneNums[0]);
 
 	RemoveNextLaneNums();
+
+	//StationManagerRef->AddAdjListItem(SelectedStations[0], SelectedStations[1], )
 }
 
 
