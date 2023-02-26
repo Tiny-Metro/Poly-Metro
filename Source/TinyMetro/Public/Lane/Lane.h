@@ -104,4 +104,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGridLaneStructure();
+
+	UFUNCTION(BlueprintCallable)
+	void AddAdjListDistance(FIntPoint Start, FIntPoint End);
 };
