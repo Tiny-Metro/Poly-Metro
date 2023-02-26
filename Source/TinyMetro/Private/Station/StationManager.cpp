@@ -202,6 +202,8 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	AddNewStationInAdjList();
 
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
+
 	//Log
 	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
@@ -298,9 +300,9 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 	AdjList[End->GetStationId()].AdjItems.Add(StartTmp);
 
 	FAdjItem EndTmp;
-	StartTmp.StationId = End->GetStationId();
-	StartTmp.StationType = End->GetStationType();
-	StartTmp.Length = Length;
+	EndTmp.StationId = End->GetStationId();
+	EndTmp.StationType = End->GetStationType();
+	EndTmp.Length = Length;
 
 	AdjList[Start->GetStationId()].AdjItems.Add(EndTmp);
 

@@ -344,16 +344,21 @@ void ALane::SetGridLaneStructure()
 	
 }
 
-void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End)
+void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, AStation* Second)
 {
 	float N = Start.X - End.X;
 	float M = Start.Y = End.Y;
 
 	float Distance = abs(N) * 1.4 + abs(M - N);
 
-	AStation* First = StationManagerRef->GetStationByGridCellData(Start);
-	AStation* Second = StationManagerRef->GetStationByGridCellData(End);
 
+	if (First == nullptr) {
+		First = StationManagerRef->GetStationByGridCellData(Start);
+	}
+
+	if (Second == nullptr) {
+		Second = StationManagerRef->GetStationByGridCellData(End);
+	}
 
 	StationManagerRef->AddAdjListItem(First, Second, Distance);
 

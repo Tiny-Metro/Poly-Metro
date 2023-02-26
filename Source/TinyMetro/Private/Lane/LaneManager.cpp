@@ -106,6 +106,12 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		}
 		
 	}
+
+	FIntPoint Start = SelectedStations[0]->GetCurrentGridCellData().WorldCoordination;
+	FIntPoint End = SelectedStations[1]->GetCurrentGridCellData().WorldCoordination;
+
+	tmpLane->AddAdjListDistance(Start, End, SelectedStations[0], SelectedStations[1]);
+
 	tmpLane->InitializeNewLane();
 
 	Lanes.Add(NextLaneNums[0], tmpLane);

@@ -106,5 +106,5 @@ public:
 	void SetGridLaneStructure();
 
 	UFUNCTION(BlueprintCallable)
-	void AddAdjListDistance(FIntPoint Start, FIntPoint End);
+	void AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First = nullptr, AStation* Second = nullptr);
 };
