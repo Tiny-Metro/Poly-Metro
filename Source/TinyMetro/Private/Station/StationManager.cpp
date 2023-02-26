@@ -201,7 +201,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 
 	AddNewStationInAdjList();
-
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
 
 	//Log
@@ -327,10 +327,17 @@ void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
 AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
 {
 	for (int i = 0; i < Station.Num(); i++) {
-		if (Station[i]->GetCurrentGridCellData().WorldCoordination == _IntPoint) {
+
+		FIntPoint Coor = Station[i]->GetCurrentGridCellData().WorldCoordination;
+
+		if ( Coor == _IntPoint) {
 			return Station[i];
 		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Get Station By GridCellData / Station : %d, %d / IntPoint : %d, %d"), Coor.X, Coor.Y, _IntPoint.X, _IntPoint.Y);
 	}
+
+	
 
 	return nullptr;
 }
