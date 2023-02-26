@@ -48,10 +48,6 @@ ATrain::ATrain() {
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
 	}
-
-	RideAction.CallbackTarget = this;
-	RideAction.ExecutionFunction = FName("RidePassengerTest");
-	RideAction.UUID = 1;
 }
 
 void ATrain::BeginPlay() {
@@ -101,7 +97,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 		RideDelegate = FTimerDelegate::CreateUObject(
 			this, 
-			&ATrain::RidePassengerTest, 
+			&ATrain::GetOnPassenger, 
 			Cast<AStation>(OtherActor)
 		);
 
@@ -180,7 +176,7 @@ void ATrain::ActiveMoveTest() {
 	TrainMovement->SetActive(true);
 }
 
-void ATrain::RidePassengerTest(AStation* Station) {
+void ATrain::GetOnPassenger(AStation* Station) {
 	if (IsPassengerSlotFull()) {
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
 
@@ -189,7 +185,7 @@ void ATrain::RidePassengerTest(AStation* Station) {
 				-1,
 				1.0f,
 				FColor::Magenta,
-				FString::Printf(TEXT("RidePassengerTest::Call")));
+				FString::Printf(TEXT("GetOnPassenger::Call")));
 
 		if (RidePassenger.Key != nullptr) {
 			// Log
