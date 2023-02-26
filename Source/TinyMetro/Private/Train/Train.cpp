@@ -9,6 +9,7 @@
 #include "Components/BoxComponent.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Kismet/KismetSystemLibrary.h>
 #include <Engine/AssetManager.h>
 
 void ATrain::Test() {
@@ -17,7 +18,7 @@ void ATrain::Test() {
 }
 
 ATrain::ATrain() {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
+	ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
@@ -43,6 +44,14 @@ ATrain::ATrain() {
 	TrainMeshComponent->SetupAttachment(RootComponent);
 
 	//TrainMaterial.Add(TrainMeshComponent->GetStaticMesh()->GetMaterial(0)->GetMaterial());
+
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
+	}
+
+	RideAction.CallbackTarget = this;
+	RideAction.ExecutionFunction = FName("RidePassengerTest");
+	RideAction.UUID = 1;
 }
 
 void ATrain::BeginPlay() {
@@ -51,7 +60,7 @@ void ATrain::BeginPlay() {
 	AiControllerRef = Cast<ATrainAiController>(GetController());
 
 	//UE_LOG(LogTemp, Log, TEXT("TUM : %s"), *TrainUpgradeMesh.ToString());
-	
+
 	
 	
 	// Material change test code
@@ -75,7 +84,36 @@ void ATrain::BeginPlay() {
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor->IsA(AStation::StaticClass())) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
+		
+		// Movement stop, release
+		TrainMovement->SetActive(false);
+		/*FLatentActionInfo f;
+		f.CallbackTarget = this;
+		f.ExecutionFunction = FName("ActiveMoveTest");
+		f.Linkage = 1;
+		f.UUID = 0;
+		UKismetSystemLibrary::Delay(GetWorld(), 5.0f, f);*/
+		
+		// Ride passenger
+		//RidePassengerTest();
 
+		PassengerIndex = 0;
+
+		RideDelegate = FTimerDelegate::CreateUObject(
+			this, 
+			&ATrain::RidePassengerTest, 
+			Cast<AStation>(OtherActor)
+		);
+
+		GetWorld()->GetTimerManager().SetTimer(
+			RideHandle,
+			RideDelegate,
+			1.0f,
+			true,
+			0.0f
+		);
+
+		//AiControllerRef->StopMovement();
 	}
 	
 }
@@ -118,6 +156,15 @@ void ATrain::Upgrade() {
 	IsUpgrade = true;
 }
 
+bool ATrain::IsPassengerSlotFull() {
+	// TODO : Check subtrains
+	if (Passenger.Num() < CurrentPassengerSlot) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* Destination) {
 	bool tmp;
 	SetServiceLaneId(Lane->GetLaneId());
@@ -127,6 +174,77 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* De
 	));
 	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
 	AiControllerRef->Patrol();
+}
+
+void ATrain::ActiveMoveTest() {
+	TrainMovement->SetActive(true);
+}
+
+void ATrain::RidePassengerTest(AStation* Station) {
+	if (IsPassengerSlotFull()) {
+		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
+
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				1.0f,
+				FColor::Magenta,
+				FString::Printf(TEXT("RidePassengerTest::Call")));
+
+		if (RidePassenger.Key != nullptr) {
+			// Log
+			if (GEngine)
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					1.0f,
+					FColor::Magenta,
+					FString::Printf(TEXT("Ride %d"), PassengerIndex));
+			PassengerIndex--;
+			Passenger.Add(MoveTemp(RidePassenger.Key));
+			TotalPassenger++;
+			UpdatePassengerMesh();
+		}
+
+		// Index invalid
+		if (!RidePassenger.Value) {
+			if (GEngine)
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					1.0f,
+					FColor::Black,
+					FString::Printf(TEXT("Ride Finish")));
+			GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+			TrainMovement->SetActive(true);
+		}
+	} else {
+		GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+		TrainMovement->SetActive(true);
+	}
+
+
+	//RidePassenger = Station->GetOnPassenger(Index++);
+
+
+
+
+	//if (!TrainMovement->IsActive()) {
+	//	// Log
+	//	if (GEngine)
+	//		GEngine->AddOnScreenDebugMessage(
+	//			-1,
+	//			1.0f,
+	//			FColor::Magenta,
+	//			FString::Printf(TEXT("Ride %d"), RideCount++));
+	//	//UKismetSystemLibrary::Delay(GetWorld(), 1.0f, RideAction);
+
+	//	/*auto RidePassenger = Station->GetOnPassenger(Index);
+	//	if (RidePassenger.Value) {
+	//		Passenger.Add(MoveTemp(RidePassenger.Key));
+	//	}*/
+
+	//} else {
+	//	GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+	//}
 }
 
 void ATrain::SetSubtrain(ASubtrain* T) {

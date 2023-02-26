@@ -29,7 +29,10 @@ AStation::AStation()
 		FVector PassengerPosition =
 			PassengerMeshDefaultPosition +
 			FVector(PassengerX_Distance * (i / 2), 0.0f, 0.0f) +
-			FVector(0.0f, PassengerY_Distance * ((i % 2) == 0 ? 1 : -1), 0.0f);
+			FVector(0.0f, PassengerY_Distance * ((i % 2) == 0 ? -1 : 1), 0.0f);
+		if ((i == MaxPassengerSpawn - 1) && (MaxPassengerSpawn % 2 == 1)) {
+			PassengerPosition += FVector(0.0f, PassengerY_Distance * ((i % 2) == 0 ? 1 : -1), 0.0f);
+		}
 		tmp->SetRelativeLocation(PassengerPosition);
 		PassengerMeshComponent.Add(MoveTemp(tmp));
 	}
@@ -145,6 +148,26 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 		UPassenger* tmp = UPassenger::ConstructPassenger(passengerValue.Destination);
 		Passenger.Add(tmp);
 	}
+}
+
+TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index) {
+	if (Passenger.IsValidIndex(Index)) {
+		// TODO : Check passenger's destination
+		TPair<UPassenger*, bool> Tmp(MoveTemp(Passenger[Index]), true);
+		Passenger.RemoveAt(Index);
+		// Log
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				1.0f,
+				FColor::Magenta,
+				FString::Printf(TEXT("Passenger Count %d"), Passenger.Num()));
+		UpdatePassengerMesh();
+		return Tmp;
+	} else {
+		return TPair<UPassenger*, bool>(nullptr, false);
+	}
+	//return TPair<UPassenger*, bool>();
 }
 
 void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate) {
@@ -291,6 +314,8 @@ void AStation::UpdatePassengerMesh() {
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
 		if (Passenger.IsValidIndex(i)) {
 			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+		} else {
+			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
 		}
 	}
 }

@@ -73,6 +73,13 @@ public:
 	void LoadStationValue(FStationValuesStruct StationValues);
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
+
+	//UFUNCTION()
+	/*Return passenger at Index
+	Key is passenger's pointer, set nullptr when passenger don't want ride
+	Value is bool of Index's validation. return true when index is valid
+	*/
+	TPair<UPassenger*, bool> GetOnPassenger(int32 Index);
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 
@@ -145,9 +152,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
 	FVector PassengerMeshDefaultPosition = FVector(180.0f, 0.0f, 10.0f);
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
-	float PassengerX_Distance = 100;
+	float PassengerX_Distance = 90;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
-	float PassengerY_Distance = 50;
+	float PassengerY_Distance = 45;
 
 protected:
 	// Station meshses
@@ -207,20 +214,20 @@ protected:
 	// Mesh, Material paths (Passenger)
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCross.SM_PassengerCross'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRhombus.SM_PassengerRhombus'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerOval.SM_PassengerOval'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerDiamond.SM_PassengerDiamond'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerPentagon.SM_PassengerPentagon'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerStar.SM_PassengerStar'"),
-			TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerFan.SM_PassengerFan'")
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCross.SM_PassengerCross'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRhombus.SM_PassengerRhombus'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerOval.SM_PassengerOval'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerDiamond.SM_PassengerDiamond'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerPentagon.SM_PassengerPentagon'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerStar.SM_PassengerStar'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerFan.SM_PassengerFan'")
 	};
 	UPROPERTY()
-		TArray<FString> PassengerMaterialPath = {
-			TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
-			TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
+	TArray<FString> PassengerMaterialPath = {
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
 	};
 };

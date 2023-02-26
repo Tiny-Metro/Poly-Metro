@@ -29,12 +29,16 @@ public:
 	virtual FVector GetNextTrainDestination(FVector CurLocation) override;
 	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void Upgrade() override;
+	virtual bool IsPassengerSlotFull() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
 	UFUNCTION(BlueprintCallable)
 	void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* Destination);
-
+	UFUNCTION()
+	void ActiveMoveTest(); 
+	UFUNCTION()
+	void GetOnPassenger(class AStation* Station);
 
 protected:
 
@@ -58,8 +62,41 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* OverlapVolume;
 	
+	UPROPERTY()
+	FLatentActionInfo RideAction;
+	UPROPERTY()
+	FTimerHandle RideHandle;
+	UPROPERTY()
+	int32 RideCount = 0;
+	UPROPERTY()
+	int32 PassengerIndex = 0;
+
+	TArray<FVector> PassengerMeshPosition = {
+		FVector(10.0f, 55.0f, 190.0f),
+		FVector(10.0f, -55.0f, 190.0f),
+		FVector(-100.0f, 55.0f, 190.0f),
+		FVector(-100.0f, -55.0f, 190.0f),
+		FVector(-210.0f, 55.0f, 190.0f),
+		FVector(-210.0f, -55.0f, 190.0f),
+		FVector(10.0f, 55.0f, 190.0f),
+		FVector(10.0f, 55.0f, 190.0f)
+	};
+
+	TArray<FVector> PassengerMeshPositionUpgrade = {
+		FVector(70.0f, 55.0f, 190.0f),
+		FVector(70.0f, -55.0f, 190.0f),
+		FVector(-50.0f, 55.0f, 190.0f),
+		FVector(-50.0f, -55.0f, 190.0f),
+		FVector(-160.0f, 55.0f, 190.0f),
+		FVector(-160.0f, -55.0f, 190.0f),
+		FVector(-270.0f, 55.0f, 190.0f),
+		FVector(-270.0f, -55.0f, 190.0f)
+	};
 
 	// Test
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FTimerHandle TestTimer;
+
+private:
+	FTimerDelegate RideDelegate;
 };

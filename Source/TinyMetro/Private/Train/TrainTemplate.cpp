@@ -24,6 +24,26 @@ ATrainTemplate::ATrainTemplate()
 	TrainMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
 	);
+
+	auto PassengerScene = CreateDefaultSubobject<USceneComponent>("Passengers");
+	PassengerScene->SetupAttachment(RootComponent);
+
+	// Set passenger mesh
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		FName name = *FString::Printf(TEXT("Passenger %d"), i);
+		auto tmp = CreateDefaultSubobject<UStaticMeshComponent>(name);
+		tmp->SetupAttachment(PassengerScene);
+		tmp->SetWorldRotation(PassengerMeshRotation);
+		PassengerMeshComponent.Add(MoveTemp(tmp));
+	}
+
+	// Load meshes (Passenger)
+	for (auto& i : PassengerMeshPath) {
+		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+	/*for (int i = 0; i < 8; i++) {
+
+	}*/
 }
 
 // Called when the game starts or when spawned
@@ -42,6 +62,17 @@ void ATrainTemplate::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 		TEXT("Train Spawn"));
 	
+}
+
+void ATrainTemplate::UpdatePassengerMesh() {
+	// Read passenger array, clear and reorganize meshes
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		if (Passenger.IsValidIndex(i)) {
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+		} else {
+			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
+		}
+	}
 }
 
 //FVector ATrainTemplate::ConvertMousePositionToWorldLocation_Implementation() {
@@ -66,6 +97,10 @@ FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
 }
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
+}
+
+bool ATrainTemplate::IsPassengerSlotFull() {
+	return false;
 }
 
 

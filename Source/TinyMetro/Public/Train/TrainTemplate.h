@@ -19,6 +19,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void UpdatePassengerMesh();
 
 public:	
 	// Called every frame
@@ -58,6 +59,8 @@ public:
 	FVector ConvertMousePositionToWorldLocation();
 	UFUNCTION(BlueprintCallable)
 	virtual void SetTrainMaterial(class ALane* Lane);
+	UFUNCTION(BlueprintCallable)
+	virtual bool IsPassengerSlotFull();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -71,6 +74,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	TArray<class UPassenger*> Passenger;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsUpgrade = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorDragged;
@@ -79,7 +84,23 @@ protected:
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float LongClickInterval;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	float TotalTravel;
+	float TotalTravel = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 TotalPassenger = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 MaxPassengerSlotUpgrade = 8;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 MaxPassengerSlot = 6;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 CurrentPassengerSlot = 6;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<UStaticMeshComponent*> PassengerMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<FVector> PassengerMeshPosition; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<FVector> PassengerMeshPositionUpgrade;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	FRotator PassengerMeshRotation = FRotator(0.0f, -90.0f, 20.0f);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -96,4 +117,21 @@ protected:
 	TArray<UStaticMesh*> TrainMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCharacterMovementComponent* TrainMovement;
+
+	// Mesh, Material paths (Passenger)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UStaticMesh*> PassengerMesh;
+	UPROPERTY()
+	TArray<FString> PassengerMeshPath = {
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCross.SM_PassengerCross'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRhombus.SM_PassengerRhombus'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerOval.SM_PassengerOval'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerDiamond.SM_PassengerDiamond'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerPentagon.SM_PassengerPentagon'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerStar.SM_PassengerStar'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerFan.SM_PassengerFan'")
+	};
 };
