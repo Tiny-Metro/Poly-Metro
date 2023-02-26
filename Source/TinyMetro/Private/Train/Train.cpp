@@ -95,15 +95,22 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 		PassengerIndex = 0;
 
-		RideDelegate = FTimerDelegate::CreateUObject(
-			this, 
-			&ATrain::GetOnPassenger, 
+		/* Train::GetOffPassenger
+		*/
+		// AdjList[Index] : FAdjArrayItem
+		// AdjList[Index].AdjItem
+		TMap<int, UPassenger*> tmp;
+		
+
+		GetOnDelegate.BindUObject(
+			this,
+			&ATrain::GetOnPassenger,
 			Cast<AStation>(OtherActor)
 		);
 
 		GetWorld()->GetTimerManager().SetTimer(
-			RideHandle,
-			RideDelegate,
+			GetOnHandle,
+			GetOnDelegate,
 			1.0f,
 			true,
 			0.0f
@@ -209,11 +216,11 @@ void ATrain::GetOnPassenger(AStation* Station) {
 					1.0f,
 					FColor::Black,
 					FString::Printf(TEXT("Ride Finish")));
-			GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
 		}
 	} else {
-		GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+		GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 		TrainMovement->SetActive(true);
 	}
 

@@ -93,5 +93,7 @@ private:
 	UPROPERTY()
 	FTimerHandle GetOnHandle;
 	FTimerDelegate GetOnDelegate;
-
+	UPROPERTY()
+	FTimerHandle GetOffHandle;
+	FTimerDelegate GetOffDelegate;
 };
