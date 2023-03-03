@@ -8,12 +8,19 @@
 /**
  * 
  */
-USTRUCT(BlueprintType)
-struct TINYMETRO_API FAdjArrayItem
+UCLASS()
+class TINYMETRO_API UAdjArrayItem : public UObject
 {
-
 	GENERATED_BODY()
 
+public :
+	float operator[] (FAdjItem item) { return length[item]; }
+private :
+	TMap<FAdjItem, float> length;
+
+	/*
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	TArray<FAdjItem> AdjItems;
+	*/
+
 };

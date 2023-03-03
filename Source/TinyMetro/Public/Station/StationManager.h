@@ -10,7 +10,7 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
-#include "AdjArrayItem.h"
+#include "AdjList.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -123,5 +123,5 @@ protected:
 		ATinyMetroPlayerState* PlayerState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FAdjArrayItem> AdjList;
+	UAdjList* AdjList;
 };

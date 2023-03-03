@@ -285,23 +285,25 @@ void AStationManager::PolicyMaintenanceRoutine() {
 
 void AStationManager::AddNewStationInAdjList()
 {
+	/*
 	FAdjArrayItem NewStation;
 	AdjList.Add(NewStation);
-
+	*/
 }
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
+	/*
 	FAdjItem StartTmp ;
-	StartTmp.StationId = Start->GetStationId();
-	StartTmp.StationType = Start->GetStationType();
+	StartTmp.Id = Start->GetStationId();
+	StartTmp.Type = Start->GetStationType();
 	StartTmp.Length = Length;
 
 	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
 
 		FAdjItem Tmp = AdjList[End->GetStationId()].AdjItems[i];
 
-		if (Tmp.StationId == StartTmp.StationId) {
+		if (Tmp.Id == StartTmp.Id) {
 			if (Tmp.Length <= Length) {
 				return;
 			}
@@ -311,32 +313,33 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 	AdjList[End->GetStationId()].AdjItems.Add(StartTmp);
 
 	FAdjItem EndTmp;
-	EndTmp.StationId = End->GetStationId();
-	EndTmp.StationType = End->GetStationType();
+	EndTmp.Id = End->GetStationId();
+	EndTmp.Type = End->GetStationType();
 	EndTmp.Length = Length;
 
 	AdjList[Start->GetStationId()].AdjItems.Add(EndTmp);
-
+	*/
 }
 
 void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
 {
+	/*
 	AStation* Start = GetStationByGridCellData(First);
 	AStation* End = GetStationByGridCellData(Second);
 
 
 	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
-		if (AdjList[End->GetStationId()].AdjItems[i].StationId == Start->GetStationId()) {
+		if (AdjList[End->GetStationId()].AdjItems[i].Id == Start->GetStationId()) {
 			AdjList[End->GetStationId()].AdjItems.RemoveAt(i);
 		}
 	}
 
 	for (int i = 0; i < AdjList[Start->GetStationId()].AdjItems.Num(); i++) {
-		if (AdjList[Start->GetStationId()].AdjItems[i].StationId == End->GetStationId()) {
+		if (AdjList[Start->GetStationId()].AdjItems[i].Id == End->GetStationId()) {
 			AdjList[Start->GetStationId()].AdjItems.RemoveAt(i);
 		}
 	}
-	
+	*/
 }
 
 AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
