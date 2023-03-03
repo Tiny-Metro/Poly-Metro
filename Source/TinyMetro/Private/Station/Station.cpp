@@ -171,7 +171,12 @@ TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index) {
 }
 
 void AStation::GetOffPassenger(UPassenger* P) {
-	Passenger.Add(P);
+	if (P->GetDestination() == this->StationTypeValue) {
+		// Passenger arrive destination
+		P = nullptr;
+	} else {
+		Passenger.Add(P);
+	}
 	UpdatePassengerMesh();
 }
 
