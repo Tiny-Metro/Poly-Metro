@@ -80,13 +80,6 @@ void AStation::BeginPlay()
 	UpdateStationMesh();
 	UpdatePassengerMesh();
 
-	// Log ( I am {Actor Name} )
-	/*if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
-			FString::Printf(TEXT("I am %s"), *this->GetActorLabel()));
-	}*/
-
-
 }
 
 // Called every frame
@@ -105,17 +98,6 @@ int32 AStation::GetStationId() const {
 
 void AStation::SetStationType(StationType Type) {
 	StationTypeValue = Type;
-
-	//LOG
-	/*FString EnumToStr = TEXT("NULL");
-	const UEnum* MyType = FindObject<UEnum>(ANY_PACKAGE, TEXT("StationType"), true);
-	if (MyType) {
-		EnumToStr = MyType->GetNameStringByValue((int64)StationTypeValue);
-	}
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
-			EnumToStr);
-	}*/
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -155,19 +137,12 @@ TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index) {
 		// TODO : Check passenger's destination
 		TPair<UPassenger*, bool> Tmp(MoveTemp(Passenger[Index]), true);
 		Passenger.RemoveAt(Index);
-		// Log
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				1.0f,
-				FColor::Magenta,
-				FString::Printf(TEXT("Passenger Count %d"), Passenger.Num()));
+
 		UpdatePassengerMesh();
 		return Tmp;
 	} else {
 		return TPair<UPassenger*, bool>(nullptr, false);
 	}
-	//return TPair<UPassenger*, bool>();
 }
 
 void AStation::GetOffPassenger(UPassenger* P) {

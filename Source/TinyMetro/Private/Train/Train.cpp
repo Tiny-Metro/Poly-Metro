@@ -22,30 +22,17 @@ ATrain::ATrain() {
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
-
 	
-	/*static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(
-		TEXT("Material'/Game/Resource/Material/Lane/M_Lane_8.M_Lane_8'")
-	);
-	TrainMaterial.AddUnique(DefaultMaterial.Object->GetMaterial());*/
-	
-
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	OverlapVolume->InitBoxExtent(FVector(10,20,30));
-	//OverlapVolume->OnComponentBeginOverlap.__Internal_AddDynamic(this, &ATrain::OnOverlapBegin, FName("OnOverlapBegin"));
 	OverlapVolume->OnComponentBeginOverlap.AddDynamic(this, &ATrain::OnOverlapBegin);
-	//OverlapVolume->OnComponentEndOverlap.__Internal_AddDynamic(this, &ATrain::OnOverlapEnd, FName("OnOverlapEnd"));
 	OverlapVolume->OnComponentEndOverlap.AddDynamic(this, &ATrain::OnOverlapEnd);
 	OverlapVolume->SetupAttachment(RootComponent);
 
 	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
-	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
-	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
-
-	//TrainMaterial.Add(TrainMeshComponent->GetStaticMesh()->GetMaterial(0)->GetMaterial());
 
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
@@ -56,27 +43,6 @@ void ATrain::BeginPlay() {
 	Super::BeginPlay();
 	TotalTravel = 0.0f;
 	AiControllerRef = Cast<ATrainAiController>(GetController());
-
-	//UE_LOG(LogTemp, Log, TEXT("TUM : %s"), *TrainUpgradeMesh.ToString());
-
-	
-	
-	// Material change test code
-	/*GetWorld()->GetTimerManager().SetTimer(TestTimer, FTimerDelegate::CreateLambda([&]() {
-				int tmp = FMath::RandRange(0, TrainMaterial.Num() - 1);
-				TrainMeshComponent->SetMaterial(0, TrainMaterial[tmp]);
-				UE_LOG(LogTemp, Log, TEXT("Material Change : %d"), tmp);
-			}
-		),
-		1.0f,
-		true,
-		1.0f
-	);*/
-
-	/*if (IsValid(ParentAiControllerRef)) { // True
-		UE_LOG(LogTemp, Log, TEXT("Success"));
-	}*/
-
 }
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -85,23 +51,11 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		
 		// Movement stop, release
 		TrainMovement->SetActive(false);
-		/*FLatentActionInfo f;
-		f.CallbackTarget = this;
-		f.ExecutionFunction = FName("ActiveMoveTest");
-		f.Linkage = 1;
-		f.UUID = 0;
-		UKismetSystemLibrary::Delay(GetWorld(), 5.0f, f);*/
-		
-		// Ride passenger
-		//RidePassengerTest();
 
+		// Initialize check index
 		PassengerIndex = 0;
 
-		/* Train::GetOffPassenger
-		*/
-		// AdjList[Index] : FAdjArrayItem
-		// AdjList[Index].AdjItem
-
+		// Set up delegate (Passenger get on, off)
 		GetOffDelegate.BindUObject(
 			this,
 			&ATrain::GetOffPassenger,
@@ -114,6 +68,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			Cast<AStation>(OtherActor)
 		); 
 		
+		// Start get off passenger
 		GetWorld()->GetTimerManager().SetTimer(
 			GetOffHandle,
 			GetOffDelegate,
@@ -121,9 +76,6 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			true,
 			0.0f
 		);
-
-
-		//AiControllerRef->StopMovement();
 	}
 	
 }
@@ -133,10 +85,6 @@ void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("End Overlap"));
 	}
 }
-
-
-
-//void ATrain::Tick(float DeltaTime) { }
 
 FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 	UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
@@ -153,10 +101,8 @@ FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 
 void ATrain::SetTrainMaterial(ALane* Lane) {
 	if (IsValid(Lane)) {
-		//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
 	} else {
-		//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[0]);
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	}
 }
@@ -166,6 +112,8 @@ void ATrain::Upgrade() {
 	TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
 	// Set flag
 	IsUpgrade = true;
+	// Set passenger slot
+	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
 }
 
 bool ATrain::IsPassengerSlotFull() {
@@ -203,21 +151,7 @@ void ATrain::GetOnPassenger(AStation* Station) {
 	if (!IsPassengerSlotFull()) {
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
 
-		/*if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				1.0f,
-				FColor::Magenta,
-				FString::Printf(TEXT("GetOnPassenger::Call")));*/
-
 		if (RidePassenger.Key != nullptr) {
-			// Log
-			/*if (GEngine)
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					1.0f,
-					FColor::Magenta,
-					FString::Printf(TEXT("Ride %d"), PassengerIndex));*/
 			PassengerIndex--;
 			if (!AddPassenger(RidePassenger.Key)) { // Train is full
 				// Passenger get on subtrain
@@ -227,20 +161,12 @@ void ATrain::GetOnPassenger(AStation* Station) {
 					}
 				}
 			} 
-
-			//Passenger.Add(MoveTemp(RidePassenger.Key));
 			TotalPassenger++;
 			UpdatePassengerMesh();
 		}
 
 		// Index invalid
 		if (!RidePassenger.Value) {
-			/*if (GEngine)
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					1.0f,
-					FColor::Black,
-					FString::Printf(TEXT("Ride Finish")));*/
 			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
 		}
@@ -248,31 +174,6 @@ void ATrain::GetOnPassenger(AStation* Station) {
 		GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 		TrainMovement->SetActive(true);
 	}
-
-
-	//RidePassenger = Station->GetOnPassenger(Index++);
-
-
-
-
-	//if (!TrainMovement->IsActive()) {
-	//	// Log
-	//	if (GEngine)
-	//		GEngine->AddOnScreenDebugMessage(
-	//			-1,
-	//			1.0f,
-	//			FColor::Magenta,
-	//			FString::Printf(TEXT("Ride %d"), RideCount++));
-	//	//UKismetSystemLibrary::Delay(GetWorld(), 1.0f, RideAction);
-
-	//	/*auto RidePassenger = Station->GetOnPassenger(Index);
-	//	if (RidePassenger.Value) {
-	//		Passenger.Add(MoveTemp(RidePassenger.Key));
-	//	}*/
-
-	//} else {
-	//	GetWorld()->GetTimerManager().ClearTimer(RideHandle);
-	//}
 }
 
 void ATrain::GetOffPassenger(AStation* Station) {

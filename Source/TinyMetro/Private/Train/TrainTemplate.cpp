@@ -58,11 +58,6 @@ void ATrainTemplate::BeginPlay()
 	InitTrainMaterial();
 	InitTrainMesh();
 
-
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		TEXT("Train Spawn"));
-	
 }
 
 void ATrainTemplate::UpdatePassengerMesh() {
@@ -75,10 +70,6 @@ void ATrainTemplate::UpdatePassengerMesh() {
 		}
 	}
 }
-
-//FVector ATrainTemplate::ConvertMousePositionToWorldLocation_Implementation() {
-//	return FVector();
-//}
 
 FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
 	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
