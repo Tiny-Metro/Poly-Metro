@@ -41,9 +41,10 @@ ATrainTemplate::ATrainTemplate()
 	for (auto& i : PassengerMeshPath) {
 		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
 	}
-	/*for (int i = 0; i < 8; i++) {
 
-	}*/
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		Passenger.Add(i, nullptr);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -67,7 +68,7 @@ void ATrainTemplate::BeginPlay()
 void ATrainTemplate::UpdatePassengerMesh() {
 	// Read passenger array, clear and reorganize meshes
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
-		if (Passenger.IsValidIndex(i)) {
+		if (Passenger[i]) {
 			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
 		} else {
 			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
@@ -102,6 +103,27 @@ void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
 bool ATrainTemplate::IsPassengerSlotFull() {
 	return false;
 }
+
+int32 ATrainTemplate::GetValidSeatCount() const {
+	int32 ValidSeat = 0;
+	for (int i = 0; i < CurrentPassengerSlot; i++) {
+		if (!Passenger[i]) {
+			ValidSeat++;
+		}
+	}
+	return ValidSeat;
+}
+
+bool ATrainTemplate::AddPassenger(UPassenger* P) {
+	for (int i = 0; i < Passenger.Num(); i++) {
+		if (Passenger[i] == nullptr) {
+			Passenger.Add(i, P);
+			return true;
+		}
+	}
+	return false;
+}
+
 
 
 // Called every frame

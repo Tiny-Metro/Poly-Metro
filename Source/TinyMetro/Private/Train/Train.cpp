@@ -99,7 +99,6 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		*/
 		// AdjList[Index] : FAdjArrayItem
 		// AdjList[Index].AdjItem
-		TMap<int, UPassenger*> tmp;
 		
 
 		GetOnDelegate.BindUObject(
@@ -160,10 +159,17 @@ void ATrain::Upgrade() {
 }
 
 bool ATrain::IsPassengerSlotFull() {
-	// TODO : Check subtrains
-	if (Passenger.Num() < CurrentPassengerSlot) {
+	int32 ValidSeat = GetValidSeatCount();
+	for (auto& i : Subtrains) {
+		if (ValidSeat > 0) {
+			break;
+		}
+		ValidSeat += i->GetValidSeatCount();
+	}
+
+	if (ValidSeat <= 0) { // Seat full
 		return true;
-	} else {
+	} else { // Seat not full
 		return false;
 	}
 }
@@ -184,38 +190,47 @@ void ATrain::ActiveMoveTest() {
 }
 
 void ATrain::GetOnPassenger(AStation* Station) {
-	if (IsPassengerSlotFull()) {
+	if (!IsPassengerSlotFull()) {
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
 
-		if (GEngine)
+		/*if (GEngine)
 			GEngine->AddOnScreenDebugMessage(
 				-1,
 				1.0f,
 				FColor::Magenta,
-				FString::Printf(TEXT("GetOnPassenger::Call")));
+				FString::Printf(TEXT("GetOnPassenger::Call")));*/
 
 		if (RidePassenger.Key != nullptr) {
 			// Log
-			if (GEngine)
+			/*if (GEngine)
 				GEngine->AddOnScreenDebugMessage(
 					-1,
 					1.0f,
 					FColor::Magenta,
-					FString::Printf(TEXT("Ride %d"), PassengerIndex));
+					FString::Printf(TEXT("Ride %d"), PassengerIndex));*/
 			PassengerIndex--;
-			Passenger.Add(MoveTemp(RidePassenger.Key));
+			if (!AddPassenger(RidePassenger.Key)) { // Train is full
+				// Passenger get on subtrain
+				for (auto& i : Subtrains) {
+					if (i->AddPassenger(RidePassenger.Key)) {
+						break;
+					}
+				}
+			} 
+
+			//Passenger.Add(MoveTemp(RidePassenger.Key));
 			TotalPassenger++;
 			UpdatePassengerMesh();
 		}
 
 		// Index invalid
 		if (!RidePassenger.Value) {
-			if (GEngine)
+			/*if (GEngine)
 				GEngine->AddOnScreenDebugMessage(
 					-1,
 					1.0f,
 					FColor::Black,
-					FString::Printf(TEXT("Ride Finish")));
+					FString::Printf(TEXT("Ride Finish")));*/
 			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
 		}

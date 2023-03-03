@@ -61,6 +61,10 @@ public:
 	virtual void SetTrainMaterial(class ALane* Lane);
 	UFUNCTION(BlueprintCallable)
 	virtual bool IsPassengerSlotFull();
+	UFUNCTION()
+	virtual int32 GetValidSeatCount() const;
+	UFUNCTION()
+	virtual bool AddPassenger(class UPassenger* P);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -74,7 +78,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	TArray<class UPassenger*> Passenger;
+	TMap<int32, class UPassenger*> Passenger;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsUpgrade = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
