@@ -22,6 +22,8 @@ ATrain::ATrain() {
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
+
+	
 	/*static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(
 		TEXT("Material'/Game/Resource/Material/Lane/M_Lane_8.M_Lane_8'")
 	);
@@ -151,9 +153,11 @@ FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 
 void ATrain::SetTrainMaterial(ALane* Lane) {
 	if (IsValid(Lane)) {
-		TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
 	} else {
-		TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[0]);
+		//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, TrainMaterial[0]);
+		TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	}
 }
 
