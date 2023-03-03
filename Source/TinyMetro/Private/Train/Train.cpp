@@ -48,10 +48,6 @@ ATrain::ATrain() {
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
 	}
-
-	RideAction.CallbackTarget = this;
-	RideAction.ExecutionFunction = FName("RidePassengerTest");
-	RideAction.UUID = 1;
 }
 
 void ATrain::BeginPlay() {
@@ -99,19 +95,31 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 		PassengerIndex = 0;
 
-		RideDelegate = FTimerDelegate::CreateUObject(
-			this, 
-			&ATrain::RidePassengerTest, 
+		/* Train::GetOffPassenger
+		*/
+		// AdjList[Index] : FAdjArrayItem
+		// AdjList[Index].AdjItem
+
+		GetOffDelegate.BindUObject(
+			this,
+			&ATrain::GetOffPassenger,
 			Cast<AStation>(OtherActor)
 		);
 
+		GetOnDelegate.BindUObject(
+			this,
+			&ATrain::GetOnPassenger,
+			Cast<AStation>(OtherActor)
+		); 
+		
 		GetWorld()->GetTimerManager().SetTimer(
-			RideHandle,
-			RideDelegate,
+			GetOffHandle,
+			GetOffDelegate,
 			1.0f,
 			true,
 			0.0f
 		);
+
 
 		//AiControllerRef->StopMovement();
 	}
@@ -157,10 +165,17 @@ void ATrain::Upgrade() {
 }
 
 bool ATrain::IsPassengerSlotFull() {
-	// TODO : Check subtrains
-	if (Passenger.Num() < CurrentPassengerSlot) {
+	int32 ValidSeat = GetValidSeatCount();
+	for (auto& i : Subtrains) {
+		if (ValidSeat > 0) {
+			break;
+		}
+		ValidSeat += i->GetValidSeatCount();
+	}
+
+	if (ValidSeat <= 0) { // Seat full
 		return true;
-	} else {
+	} else { // Seat not full
 		return false;
 	}
 }
@@ -180,44 +195,53 @@ void ATrain::ActiveMoveTest() {
 	TrainMovement->SetActive(true);
 }
 
-void ATrain::RidePassengerTest(AStation* Station) {
-	if (IsPassengerSlotFull()) {
+void ATrain::GetOnPassenger(AStation* Station) {
+	if (!IsPassengerSlotFull()) {
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
 
-		if (GEngine)
+		/*if (GEngine)
 			GEngine->AddOnScreenDebugMessage(
 				-1,
 				1.0f,
 				FColor::Magenta,
-				FString::Printf(TEXT("RidePassengerTest::Call")));
+				FString::Printf(TEXT("GetOnPassenger::Call")));*/
 
 		if (RidePassenger.Key != nullptr) {
 			// Log
-			if (GEngine)
+			/*if (GEngine)
 				GEngine->AddOnScreenDebugMessage(
 					-1,
 					1.0f,
 					FColor::Magenta,
-					FString::Printf(TEXT("Ride %d"), PassengerIndex));
+					FString::Printf(TEXT("Ride %d"), PassengerIndex));*/
 			PassengerIndex--;
-			Passenger.Add(MoveTemp(RidePassenger.Key));
+			if (!AddPassenger(RidePassenger.Key)) { // Train is full
+				// Passenger get on subtrain
+				for (auto& i : Subtrains) {
+					if (i->AddPassenger(RidePassenger.Key)) {
+						break;
+					}
+				}
+			} 
+
+			//Passenger.Add(MoveTemp(RidePassenger.Key));
 			TotalPassenger++;
 			UpdatePassengerMesh();
 		}
 
 		// Index invalid
 		if (!RidePassenger.Value) {
-			if (GEngine)
+			/*if (GEngine)
 				GEngine->AddOnScreenDebugMessage(
 					-1,
 					1.0f,
 					FColor::Black,
-					FString::Printf(TEXT("Ride Finish")));
-			GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+					FString::Printf(TEXT("Ride Finish")));*/
+			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
 		}
 	} else {
-		GetWorld()->GetTimerManager().ClearTimer(RideHandle);
+		GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 		TrainMovement->SetActive(true);
 	}
 
@@ -245,6 +269,32 @@ void ATrain::RidePassengerTest(AStation* Station) {
 	//} else {
 	//	GetWorld()->GetTimerManager().ClearTimer(RideHandle);
 	//}
+}
+
+void ATrain::GetOffPassenger(AStation* Station) {
+	for (int i = 0; i < CurrentPassengerSlot; i++) {
+		if (Passenger[i]) {
+			// Check passenger route
+			if (true) {
+				Station->GetOffPassenger(Passenger[i]);
+				Passenger.Add(i, nullptr);
+				UpdatePassengerMesh();
+				return;
+			}
+		}
+	}
+	
+	// Call when any passenger get off
+	// Stop get off, Start get on
+	GetWorld()->GetTimerManager().ClearTimer(GetOffHandle);
+	GetWorld()->GetTimerManager().SetTimer(
+		GetOnHandle,
+		GetOnDelegate,
+		1.0f,
+		true,
+		0.0f
+	);
+
 }
 
 void ATrain::SetSubtrain(ASubtrain* T) {

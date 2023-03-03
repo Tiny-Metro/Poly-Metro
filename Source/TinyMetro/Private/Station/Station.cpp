@@ -170,6 +170,11 @@ TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index) {
 	//return TPair<UPassenger*, bool>();
 }
 
+void AStation::GetOffPassenger(UPassenger* P) {
+	Passenger.Add(P);
+	UpdatePassengerMesh();
+}
+
 void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate) {
 	AdditionalPassengerSpawnProbability += rate;
 	if (dueDate != -1) {

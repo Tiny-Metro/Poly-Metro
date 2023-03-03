@@ -39,6 +39,8 @@ public:
 	void ActiveMoveTest(); 
 	UFUNCTION()
 	void GetOnPassenger(class AStation* Station);
+	UFUNCTION()
+	void GetOffPassenger(class AStation* Station);
 
 protected:
 
@@ -62,10 +64,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* OverlapVolume;
 	
-	UPROPERTY()
-	FLatentActionInfo RideAction;
-	UPROPERTY()
-	FTimerHandle RideHandle;
 	UPROPERTY()
 	int32 RideCount = 0;
 	UPROPERTY()
@@ -93,10 +91,11 @@ protected:
 		FVector(-270.0f, -55.0f, 190.0f)
 	};
 
-	// Test
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FTimerHandle TestTimer;
-
 private:
-	FTimerDelegate RideDelegate;
+	UPROPERTY()
+	FTimerHandle GetOnHandle;
+	FTimerDelegate GetOnDelegate;
+	UPROPERTY()
+	FTimerHandle GetOffHandle;
+	FTimerDelegate GetOffDelegate;
 };
