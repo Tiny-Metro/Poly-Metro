@@ -39,6 +39,8 @@ public:
 	void ActiveMoveTest(); 
 	UFUNCTION()
 	void GetOnPassenger(class AStation* Station);
+	UFUNCTION()
+	void GetOffPassenger(class AStation* Station);
 
 protected:
 

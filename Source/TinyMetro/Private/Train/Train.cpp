@@ -99,21 +99,27 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		*/
 		// AdjList[Index] : FAdjArrayItem
 		// AdjList[Index].AdjItem
-		
+
+		GetOffDelegate.BindUObject(
+			this,
+			&ATrain::GetOffPassenger,
+			Cast<AStation>(OtherActor)
+		);
 
 		GetOnDelegate.BindUObject(
 			this,
 			&ATrain::GetOnPassenger,
 			Cast<AStation>(OtherActor)
-		);
-
+		); 
+		
 		GetWorld()->GetTimerManager().SetTimer(
-			GetOnHandle,
-			GetOnDelegate,
+			GetOffHandle,
+			GetOffDelegate,
 			1.0f,
 			true,
 			0.0f
 		);
+
 
 		//AiControllerRef->StopMovement();
 	}
@@ -263,6 +269,32 @@ void ATrain::GetOnPassenger(AStation* Station) {
 	//} else {
 	//	GetWorld()->GetTimerManager().ClearTimer(RideHandle);
 	//}
+}
+
+void ATrain::GetOffPassenger(AStation* Station) {
+	for (int i = 0; i < CurrentPassengerSlot; i++) {
+		if (Passenger[i]) {
+			// Check passenger route
+			if (true) {
+				Station->GetOffPassenger(Passenger[i]);
+				Passenger.Add(i, nullptr);
+				UpdatePassengerMesh();
+				return;
+			}
+		}
+	}
+	
+	// Call when any passenger get off
+	// Stop get off, Start get on
+	GetWorld()->GetTimerManager().ClearTimer(GetOffHandle);
+	GetWorld()->GetTimerManager().SetTimer(
+		GetOnHandle,
+		GetOnDelegate,
+		1.0f,
+		true,
+		0.0f
+	);
+
 }
 
 void ATrain::SetSubtrain(ASubtrain* T) {

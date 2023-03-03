@@ -80,6 +80,7 @@ public:
 	Value is bool of Index's validation. return true when index is valid
 	*/
 	TPair<UPassenger*, bool> GetOnPassenger(int32 Index);
+	void GetOffPassenger(class UPassenger* P);
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 
