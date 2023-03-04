@@ -50,9 +50,6 @@ public:
 	void PolicyMaintenanceRoutine();
 
 	UFUNCTION(BlueprintCallable)
-	void AddNewStationInAdjList(int32 Id, StationType Type);
-
-	UFUNCTION(BlueprintCallable)
 	void AddAdjListItem(AStation* Start, AStation* End, float Length);
 
 	UFUNCTION(BlueprintCallable)

@@ -296,22 +296,6 @@ void AStationManager::PolicyMaintenanceRoutine() {
 	);
 }
 
-
-
-
-void AStationManager::AddNewStationInAdjList(int32 Id, StationType Type)
-{
-	/*
-	FAdjItem Tmp;
-	Tmp.Id = Id;
-	Tmp.Type = Type;
-
-	UAdjArrayItem ArrayItem;
-
-	AdjList->AdjList.Add(Tmp, ArrayItem);
-	*/
-}
-
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
 	(*AdjList)[Start->GetAdjItem()].Add(End->GetAdjItem(), Length);
@@ -320,54 +304,7 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetAdjItem()][Start->GetAdjItem()]);
 	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetAdjItem()][End->GetAdjItem()]);
 
-	/*
-	AdjList[Start->GetItem()][End->GetItem()] = Length
-	*/
-	/*
-	FAdjItem StartTmp;
-	StartTmp.Id = Start->GetStationId();
-	StartTmp.Type = Start->GetStationType();
-
-	FAdjItem EndTmp;
-	EndTmp.Id = End->GetStationId();
-	EndTmp.Type = End->GetStationType();
-
-	UAdjArrayItem StartArrayItem = AdjList->AdjList.FindRef(StartTmp);
 	
-	StartArrayItem.length.Add(EndTmp, Length);
-
-	UAdjArrayItem EndArrayItem = AdjList->AdjList.FindRef(EndTmp);
-
-	EndArrayItem.length.Add(StartTmp, Length);
-
-	*/
-
-	/*
-	FAdjItem StartTmp ;
-	StartTmp.Id = Start->GetStationId();
-	StartTmp.Type = Start->GetStationType();
-	StartTmp.Length = Length;
-
-	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
-
-		FAdjItem Tmp = AdjList[End->GetStationId()].AdjItems[i];
-
-		if (Tmp.Id == StartTmp.Id) {
-			if (Tmp.Length <= Length) {
-				return;
-			}
-		}
-	}
-
-	AdjList[End->GetStationId()].AdjItems.Add(StartTmp);
-
-	FAdjItem EndTmp;
-	EndTmp.Id = End->GetStationId();
-	EndTmp.Type = End->GetStationType();
-	EndTmp.Length = Length;
-
-	AdjList[Start->GetStationId()].AdjItems.Add(EndTmp);
-	*/
 }
 
 void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
@@ -380,46 +317,6 @@ void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
 
 	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetAdjItem()].Num());
 
-
-	/*
-	AStation* Start = GetStationByGridCellData(First);
-	AStation* End = GetStationByGridCellData(Second);
-
-	FAdjItem StartTmp;
-	StartTmp.Id = Start->GetStationId();
-	StartTmp.Type = Start->GetStationType();
-
-	FAdjItem EndTmp;
-	EndTmp.Id = End->GetStationId();
-	EndTmp.Type = End->GetStationType();
-
-	UAdjArrayItem StartArrayItem = AdjList->AdjList.FindRef(StartTmp);
-
-	StartArrayItem.length.Remove(EndTmp);
-
-	UAdjArrayItem EndArrayItem = AdjList->AdjList.FindRef(EndTmp);
-
-	EndArrayItem.length.Remove(StartTmp);
-	*/
-
-
-	/*
-	AStation* Start = GetStationByGridCellData(First);
-	AStation* End = GetStationByGridCellData(Second);
-
-
-	for (int i = 0; i < AdjList[End->GetStationId()].AdjItems.Num(); i++) {
-		if (AdjList[End->GetStationId()].AdjItems[i].Id == Start->GetStationId()) {
-			AdjList[End->GetStationId()].AdjItems.RemoveAt(i);
-		}
-	}
-
-	for (int i = 0; i < AdjList[Start->GetStationId()].AdjItems.Num(); i++) {
-		if (AdjList[Start->GetStationId()].AdjItems[i].Id == End->GetStationId()) {
-			AdjList[Start->GetStationId()].AdjItems.RemoveAt(i);
-		}
-	}
-	*/
 }
 
 AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
@@ -434,8 +331,6 @@ AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
 
 		UE_LOG(LogTemp, Warning, TEXT("Get Station By GridCellData / Station : %d, %d / IntPoint : %d, %d"), Coor.X, Coor.Y, _IntPoint.X, _IntPoint.Y);
 	}
-
-	
 
 	return nullptr;
 }

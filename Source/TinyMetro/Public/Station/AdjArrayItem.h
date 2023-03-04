@@ -27,9 +27,5 @@ protected:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	TMap<FAdjItem, float> length;
 
-	/*
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	TArray<FAdjItem> AdjItems;
-	*/
 
 };
