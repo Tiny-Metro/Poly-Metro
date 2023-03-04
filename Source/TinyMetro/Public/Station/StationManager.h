@@ -50,7 +50,7 @@ public:
 	void PolicyMaintenanceRoutine();
 
 	UFUNCTION(BlueprintCallable)
-	void AddNewStationInAdjList();
+	void AddNewStationInAdjList(int32 Id, StationType Type);
 
 	UFUNCTION(BlueprintCallable)
 	void AddAdjListItem(AStation* Start, AStation* End, float Length);
@@ -62,6 +62,9 @@ public:
 	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
 
 protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	int32 MaxStationCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnRequire = 15000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")

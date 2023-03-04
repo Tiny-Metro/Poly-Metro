@@ -18,7 +18,7 @@ class TINYMETRO_API UAdjList : public UObject
 public:
 	UAdjArrayItem& operator[] (FAdjItem item) { return AdjList[item]; }
 
-private :
+
 	TMap<FAdjItem, UAdjArrayItem> AdjList;
 	
 };

@@ -15,7 +15,12 @@ class TINYMETRO_API UAdjArrayItem : public UObject
 
 public :
 	float operator[] (FAdjItem item) { return length[item]; }
-private :
+
+	
+
+protected:
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	TMap<FAdjItem, float> length;
 
 	/*

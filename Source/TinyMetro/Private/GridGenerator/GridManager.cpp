@@ -31,9 +31,19 @@ void AGridManager::SetGridSize(FIntPoint& Size) {
 	GridSize = Size;
 }
 
+FIntPoint AGridManager::GetGridSize() const
+{
+	return GridSize;
+}
+
 TArray<FGridCellData> AGridManager::GetGridCellData() const {
 	// // O: insert return statement here
 	return GridCellData;
+}
+
+int32 AGridManager::GetStationSpawnPrevent() const
+{
+	return StationSpawnPrevent;
 }
 
 FGridCellData AGridManager::GetGridCellDataByCoord(FVector Coord, bool& Succeess) const {

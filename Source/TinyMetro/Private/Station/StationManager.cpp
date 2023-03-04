@@ -32,6 +32,11 @@ void AStationManager::BeginPlay()
 	//Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
 	Policy = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetPolicy();
 
+	//MaxStationCount = GridManager->GetGridSize()
+	auto GridSize = GridManager->GetGridSize();
+	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
+
+
 	if (IsValid(PlayerState)) {
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Valid"));
 	} else {
@@ -178,6 +183,8 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId++);
 	tmp->SetPolicy(Policy);
 
+	tmp->SetAdjItem(StationId, Type);
+
 	if (ActivateFlag) {
 		tmp->ActivateStation();
 	}
@@ -198,9 +205,13 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridCellData.WorldCoordination.Y,
 		GridStationStructure::Station);
 
+	/*
+	AdjList.Add(tmp->GetItem(), NewObject<UAdjArrayItem>());
+	AdjList[tmp->GetItem()].Add(tmp2->GetItem(), Length);
+	AdjList[tmp->GetItem()][tmp2->GetItem()] == Length;
+	*/
 
-
-	AddNewStationInAdjList();
+	AddNewStationInAdjList(StationId, Type);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
 
@@ -283,16 +294,46 @@ void AStationManager::PolicyMaintenanceRoutine() {
 	);
 }
 
-void AStationManager::AddNewStationInAdjList()
+
+
+
+void AStationManager::AddNewStationInAdjList(int32 Id, StationType Type)
 {
 	/*
-	FAdjArrayItem NewStation;
-	AdjList.Add(NewStation);
+	FAdjItem Tmp;
+	Tmp.Id = Id;
+	Tmp.Type = Type;
+
+	UAdjArrayItem ArrayItem;
+
+	AdjList->AdjList.Add(Tmp, ArrayItem);
 	*/
 }
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
+	/*
+	AdjList[Start->GetItem()][End->GetItem()] = Length
+	*/
+	/*
+	FAdjItem StartTmp;
+	StartTmp.Id = Start->GetStationId();
+	StartTmp.Type = Start->GetStationType();
+
+	FAdjItem EndTmp;
+	EndTmp.Id = End->GetStationId();
+	EndTmp.Type = End->GetStationType();
+
+	UAdjArrayItem StartArrayItem = AdjList->AdjList.FindRef(StartTmp);
+	
+	StartArrayItem.length.Add(EndTmp, Length);
+
+	UAdjArrayItem EndArrayItem = AdjList->AdjList.FindRef(EndTmp);
+
+	EndArrayItem.length.Add(StartTmp, Length);
+
+	*/
+
 	/*
 	FAdjItem StartTmp ;
 	StartTmp.Id = Start->GetStationId();
@@ -323,6 +364,28 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 
 void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
 {
+	/*
+	AStation* Start = GetStationByGridCellData(First);
+	AStation* End = GetStationByGridCellData(Second);
+
+	FAdjItem StartTmp;
+	StartTmp.Id = Start->GetStationId();
+	StartTmp.Type = Start->GetStationType();
+
+	FAdjItem EndTmp;
+	EndTmp.Id = End->GetStationId();
+	EndTmp.Type = End->GetStationType();
+
+	UAdjArrayItem StartArrayItem = AdjList->AdjList.FindRef(StartTmp);
+
+	StartArrayItem.length.Remove(EndTmp);
+
+	UAdjArrayItem EndArrayItem = AdjList->AdjList.FindRef(EndTmp);
+
+	EndArrayItem.length.Remove(StartTmp);
+	*/
+
+
 	/*
 	AStation* Start = GetStationByGridCellData(First);
 	AStation* End = GetStationByGridCellData(Second);
