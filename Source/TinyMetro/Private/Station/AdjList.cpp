@@ -3,7 +3,7 @@
 
 #include "Station/AdjList.h"
 
-void UAdjList::Add(FAdjItem Item, UAdjArrayItem* ArrayItem)
+void UAdjList::Add(FStationInfo Item, UAdjArrayItem* ArrayItem)
 {
 	AdjList.Add(Item, ArrayItem);
 }

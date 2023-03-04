@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AdjArrayItem.h"
-#include "AdjItem.h"
+#include "StationInfo.h"
 #include "AdjList.generated.h"
 
 /**
@@ -16,13 +16,13 @@ class TINYMETRO_API UAdjList : public UObject
 	GENERATED_BODY()
 
 public:
-	UAdjArrayItem& operator[] (FAdjItem item) { return *AdjList[item]; }
+	UAdjArrayItem& operator[] (FStationInfo item) { return *AdjList[item]; }
 
-	void Add(FAdjItem Item, UAdjArrayItem* ArrayItem);
+	void Add(FStationInfo Item, UAdjArrayItem* ArrayItem);
 
 
 protected:
 	UPROPERTY()
-	TMap<FAdjItem, UAdjArrayItem*> AdjList;
+	TMap<FStationInfo, UAdjArrayItem*> AdjList;
 	
 };

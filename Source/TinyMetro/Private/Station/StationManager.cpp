@@ -4,7 +4,7 @@
 #include "Station/StationManager.h"
 #include "Lane/Lane.h"
 #include "GameModes/TinyMetroGameModeBase.h"
-#include "Station/AdjItem.h"
+#include "Station/StationInfo.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -183,7 +183,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId++);
 	tmp->SetPolicy(Policy);
 
-	tmp->SetAdjItem(StationId, Type);
+	tmp->SetStationInfo(StationId, Type);
 
 	if (ActivateFlag) {
 		tmp->ActivateStation();
@@ -206,7 +206,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridStationStructure::Station);
 
 
-	AdjList->Add(tmp->GetAdjItem(), NewObject<UAdjArrayItem>());
+	AdjList->Add(tmp->GetStationInfo(), NewObject<UAdjArrayItem>());
 
 	/*
 	AdjList.Add(tmp->GetItem(), NewObject<UAdjArrayItem>());
@@ -298,11 +298,11 @@ void AStationManager::PolicyMaintenanceRoutine() {
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
-	(*AdjList)[Start->GetAdjItem()].Add(End->GetAdjItem(), Length);
-	(*AdjList)[End->GetAdjItem()].Add(Start->GetAdjItem(), Length);
+	(*AdjList)[Start->GetStationInfo()].Add(End->GetStationInfo(), Length);
+	(*AdjList)[End->GetStationInfo()].Add(Start->GetStationInfo(), Length);
 
-	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetAdjItem()][Start->GetAdjItem()]);
-	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetAdjItem()][End->GetAdjItem()]);
+	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetStationInfo()][Start->GetStationInfo()]);
+	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetStationInfo()][End->GetStationInfo()]);
 
 	
 }
@@ -312,10 +312,10 @@ void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
 	AStation* Start = GetStationByGridCellData(First);
 	AStation* End = GetStationByGridCellData(Second);
 
-	(*AdjList)[Start->GetAdjItem()].RemoveRef(End->GetAdjItem());
-	(*AdjList)[End->GetAdjItem()].RemoveRef(Start->GetAdjItem());
+	(*AdjList)[Start->GetStationInfo()].RemoveRef(End->GetStationInfo());
+	(*AdjList)[End->GetStationInfo()].RemoveRef(Start->GetStationInfo());
 
-	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetAdjItem()].Num());
+	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetStationInfo()].Num());
 
 }
 
