@@ -22,6 +22,7 @@ public:
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
 	virtual TArray<FSoftObjectPath> GetTrainMaterialPath() const;
+	virtual TArray<FSoftObjectPath> GetLaneMaterialPath() const;
 
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
@@ -52,6 +53,8 @@ protected:
 	int32 Daytime;
 	UPROPERTY(Config)
 	TArray<FSoftObjectPath> TrainMaterialPath;
+	UPROPERTY(Config)
+	TArray<FSoftObjectPath> LaneMaterialPath;
 	UPROPERTY()
 	class AStationManager* StationManager;
 	UPROPERTY()

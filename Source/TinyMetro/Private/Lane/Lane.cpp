@@ -16,6 +16,11 @@ ALane::ALane()
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+
+
+	LaneMaterial.AddUnique(
+		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
+	);
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +40,10 @@ void ALane::Tick(float DeltaTime)
 void ALane::SetLaneId(int _LaneId)
 {
 	LaneId = _LaneId;
+}
+
+void ALane::InitLaneMaterial(TArray<UMaterial*> Materials) {
+	LaneMaterial.Append(Materials);
 }
 
 int32 ALane::GetLaneId() const

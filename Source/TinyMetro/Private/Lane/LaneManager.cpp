@@ -2,6 +2,8 @@
 
 #include "Lane/LaneManager.h"
 #include "Misc/OutputDeviceNull.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include <Engine/AssetManager.h>
 #include <Kismet/GameplayStatics.h>
 
 
@@ -19,7 +21,7 @@ void ALaneManager::BeginPlay()
 	Super::BeginPlay();
 
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-	
+	InitLaneMaterial();
 }
 
 // Called every frame
@@ -116,6 +118,7 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	tmpLane->AddAdjListDistance(Start, End, SelectedStations[0], SelectedStations[1]);
 
+	tmpLane->InitLaneMaterial(LaneMaterial);
 	tmpLane->InitializeNewLane();
 
 	Lanes.Add(NextLaneNums[0], tmpLane);
@@ -146,4 +149,25 @@ ALane* ALaneManager::GetLaneById(int32 LaneId) {
 
 	ALane* Lane = Lanes.FindRef(LaneId);
 	return Lane;
+}
+
+void ALaneManager::InitLaneMaterial() {
+	LaneMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetLaneMaterialPath();
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		LaneMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ALaneManager::LaneMaterialDeferred)
+	);
+}
+
+void ALaneManager::LaneMaterialDeferred() {
+
+	for (auto& i : LaneMaterialPath) {
+		//TAssetPtr<UMaterial> tmp(i);
+		LaneMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
+	}
+}
+
+TArray<UMaterial*> ALaneManager::GetLaneMaterial() const {
+	return LaneMaterial;
 }

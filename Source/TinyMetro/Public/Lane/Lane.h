@@ -37,16 +37,26 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AStationManager* StationManagerRef;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ALaneManager* LaneManagerRef;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	int32 LaneId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> LaneMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
+
 
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetLaneId() const;
 	UFUNCTION(BlueprintCallable)
 	void SetLaneId(int _LaneId);
+	UFUNCTION(BlueprintCallable)
+	void InitLaneMaterial(TArray<UMaterial*> Materials);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")

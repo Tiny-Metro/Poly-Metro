@@ -54,6 +54,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	AStationManager* StationManagerRef;
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> LaneMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FSoftObjectPath> LaneMaterialPath;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetCanAssginBridge(bool AssginBridge);
@@ -85,5 +91,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ALane* GetLaneById(int32 LaneId);
 
-	
+
+	UFUNCTION()
+	void InitLaneMaterial();
+	UFUNCTION()
+	void LaneMaterialDeferred();
+	UFUNCTION()
+	TArray<UMaterial*> GetLaneMaterial() const;
 };
