@@ -49,6 +49,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
 
+	UPROPERTY(BlueprintReadOnly)
+	bool IsCircularLine = false;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -57,6 +59,11 @@ public:
 	void SetLaneId(int _LaneId);
 	UFUNCTION(BlueprintCallable)
 	void InitLaneMaterial(TArray<UMaterial*> Materials);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsCircularLine();
+	UFUNCTION(BlueprintCallable)
+	void SetIsCircularLine(bool _Circular);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
