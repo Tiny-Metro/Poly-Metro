@@ -34,7 +34,8 @@ struct TINYMETRO_API FAdjItem
 		return Id == Other.Id && Type == Other.Type;
 	}
 
-	FORCEINLINE uint32 GetTypeHash(const FAdjItem& AdjItem);
+
+	friend uint32 GetTypeHash(const FAdjItem& AdjItem);
 
 	/*
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
