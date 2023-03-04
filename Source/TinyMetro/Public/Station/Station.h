@@ -10,7 +10,6 @@
 #include "../SaveSystem/TMSaveManager.h"
 #include "../GridGenerator/GridCellData.h"
 #include "../Policy/Policy.h"
-#include "AdjItem.h"
 #include "Station.generated.h"
 
 class AStationManager;
@@ -92,9 +91,6 @@ public:
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
 
-	FAdjItem GetAdjItem();
-	void SetAdjItem(int32 Id, StationType Type);
-
 protected:
 	void PassengerSpawnRoutine();
 	void SpawnPassenger();
@@ -151,9 +147,6 @@ protected:
 	TArray<UPassenger*> Passenger;
 	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> Lanes;
-	UPROPERTY(BlueprintReadWrite)
-	FAdjItem AdjItem;
-
 
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
 	int32 MaxPassengerSpawn = 15;

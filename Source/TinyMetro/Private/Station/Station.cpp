@@ -243,17 +243,6 @@ void AStation::SetLanes(int32 AdditionalLaneId)
 	Lanes.Add(AdditionalLaneId);
 }
 
-FAdjItem AStation::GetAdjItem()
-{
-	return AdjItem;
-}
-
-void AStation::SetAdjItem(int32 Id, StationType Type)
-{
-	AdjItem.Id = Id;
-	AdjItem.Type = Type;
-}
-
 void AStation::ComplainRoutine() {
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerComplain,
