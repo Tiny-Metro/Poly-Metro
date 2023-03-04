@@ -3,12 +3,12 @@
 
 #include "Station/AdjArrayItem.h"
 
-void UAdjArrayItem::Add(FAdjItem Item, float Length)
+void UAdjArrayItem::Add(FStationInfo Item, float Length)
 {
 	length.Add(Item, Length);
 }
 
-void UAdjArrayItem::RemoveRef(FAdjItem Item)
+void UAdjArrayItem::RemoveRef(FStationInfo Item)
 {
 	length.Remove(Item);
 }

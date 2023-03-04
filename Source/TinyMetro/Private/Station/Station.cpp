@@ -243,15 +243,15 @@ void AStation::SetLanes(int32 AdditionalLaneId)
 	Lanes.Add(AdditionalLaneId);
 }
 
-FAdjItem AStation::GetAdjItem()
+FStationInfo AStation::GetStationInfo()
 {
-	return AdjItem;
+	return StationInfo;
 }
 
-void AStation::SetAdjItem(int32 Id, StationType Type)
+void AStation::SetStationInfo(int32 Id, StationType Type)
 {
-	AdjItem.Id = Id;
-	AdjItem.Type = Type;
+	StationInfo.Id = Id;
+	StationInfo.Type = Type;
 }
 
 void AStation::ComplainRoutine() {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AdjItem.h"
+#include "StationInfo.h"
 #include "AdjArrayItem.generated.h"
 /**
  * 
@@ -14,18 +14,18 @@ class TINYMETRO_API UAdjArrayItem : public UObject
 	GENERATED_BODY()
 
 public :
-	float operator[] (FAdjItem item) { return length[item]; }
+	float operator[] (FStationInfo item) { return length[item]; }
 
-	void Add(FAdjItem Item, float Length);
+	void Add(FStationInfo Item, float Length);
 
-	void RemoveRef(FAdjItem Item);
+	void RemoveRef(FStationInfo Item);
 
 	int32 Num();
 
 protected:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	TMap<FAdjItem, float> length;
+	TMap<FStationInfo, float> length;
 
 
 };

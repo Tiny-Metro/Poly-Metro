@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "StationType.h"
 #include "UObject/NoExportTypes.h"
-#include "AdjItem.generated.h"
+#include "StationInfo.generated.h"
 
 /**
  * 
  */
 USTRUCT(BlueprintType)
-struct TINYMETRO_API FAdjItem
+struct TINYMETRO_API FStationInfo
 {
+public:
 	GENERATED_BODY()
 
 
@@ -22,23 +23,18 @@ struct TINYMETRO_API FAdjItem
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	StationType Type;
 
-	FAdjItem() { Id = 0; Type = StationType::Circle; }
-	
-	FAdjItem(int32 a, StationType _Type) {
+	FStationInfo() { Id = 0; Type = StationType::Circle; }
+
+	FStationInfo(int32 a, StationType _Type) {
 		Id = a;
 		Type = _Type;
 	}
 
-	bool operator==(const FAdjItem& Other) const
+	bool operator==(const FStationInfo& Other) const
 	{
 		return Id == Other.Id && Type == Other.Type;
 	}
 
 
-	friend uint32 GetTypeHash(const FAdjItem& AdjItem);
-
-	/*
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	float Length;
-	*/
+	friend uint32 GetTypeHash(const FStationInfo& StaitonInfo);
 };
