@@ -47,35 +47,38 @@ void ATrain::BeginPlay() {
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor->IsA(AStation::StaticClass())) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
-		
-		// Movement stop, release
-		TrainMovement->SetActive(false);
+		auto Station = Cast<AStation>(OtherActor);
+		if (Station->GetLanes().Contains(ServiceLaneId)) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
-		// Initialize check index
-		PassengerIndex = 0;
+			// Movement stop, release
+			TrainMovement->SetActive(false);
 
-		// Set up delegate (Passenger get on, off)
-		GetOffDelegate.BindUObject(
-			this,
-			&ATrain::GetOffPassenger,
-			Cast<AStation>(OtherActor)
-		);
+			// Initialize check index
+			PassengerIndex = 0;
 
-		GetOnDelegate.BindUObject(
-			this,
-			&ATrain::GetOnPassenger,
-			Cast<AStation>(OtherActor)
-		); 
-		
-		// Start get off passenger
-		GetWorld()->GetTimerManager().SetTimer(
-			GetOffHandle,
-			GetOffDelegate,
-			1.0f,
-			true,
-			0.0f
-		);
+			// Set up delegate (Passenger get on, off)
+			GetOffDelegate.BindUObject(
+				this,
+				&ATrain::GetOffPassenger,
+				Cast<AStation>(OtherActor)
+			);
+
+			GetOnDelegate.BindUObject(
+				this,
+				&ATrain::GetOnPassenger,
+				Cast<AStation>(OtherActor)
+			);
+
+			// Start get off passenger
+			GetWorld()->GetTimerManager().SetTimer(
+				GetOffHandle,
+				GetOffDelegate,
+				1.0f,
+				true,
+				0.0f
+			);
+		}
 	}
 	
 }
