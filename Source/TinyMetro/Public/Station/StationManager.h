@@ -10,7 +10,7 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
-#include "AdjArrayItem.h"
+#include "AdjList.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -50,9 +50,6 @@ public:
 	void PolicyMaintenanceRoutine();
 
 	UFUNCTION(BlueprintCallable)
-	void AddNewStationInAdjList();
-
-	UFUNCTION(BlueprintCallable)
 	void AddAdjListItem(AStation* Start, AStation* End, float Length);
 
 	UFUNCTION(BlueprintCallable)
@@ -62,6 +59,9 @@ public:
 	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
 
 protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	int32 MaxStationCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnRequire = 15000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
@@ -123,5 +123,5 @@ protected:
 		ATinyMetroPlayerState* PlayerState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FAdjArrayItem> AdjList;
+	UAdjList* AdjList;
 };
