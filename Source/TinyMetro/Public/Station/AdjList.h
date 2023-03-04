@@ -16,9 +16,13 @@ class TINYMETRO_API UAdjList : public UObject
 	GENERATED_BODY()
 
 public:
-	UAdjArrayItem& operator[] (FAdjItem item) { return AdjList[item]; }
+	UAdjArrayItem& operator[] (FAdjItem item) { return *AdjList[item]; }
+
+	void Add(FAdjItem Item, UAdjArrayItem* ArrayItem);
 
 
-	TMap<FAdjItem, UAdjArrayItem> AdjList;
+protected:
+	UPROPERTY()
+	TMap<FAdjItem, UAdjArrayItem*> AdjList;
 	
 };

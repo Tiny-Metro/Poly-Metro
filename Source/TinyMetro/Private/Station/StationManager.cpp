@@ -17,7 +17,7 @@ AStationManager::AStationManager()
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
-	
+	AdjList = NewObject<UAdjList>();
 }
 
 // Called when the game starts or when spawned
@@ -205,13 +205,15 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridCellData.WorldCoordination.Y,
 		GridStationStructure::Station);
 
+
+	AdjList->Add(tmp->GetAdjItem(), NewObject<UAdjArrayItem>());
+
 	/*
 	AdjList.Add(tmp->GetItem(), NewObject<UAdjArrayItem>());
 	AdjList[tmp->GetItem()].Add(tmp2->GetItem(), Length);
 	AdjList[tmp->GetItem()][tmp2->GetItem()] == Length;
 	*/
 
-	AddNewStationInAdjList(StationId, Type);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
 
@@ -312,6 +314,12 @@ void AStationManager::AddNewStationInAdjList(int32 Id, StationType Type)
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
+	(*AdjList)[Start->GetAdjItem()].Add(End->GetAdjItem(), Length);
+	(*AdjList)[End->GetAdjItem()].Add(Start->GetAdjItem(), Length);
+
+	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetAdjItem()][Start->GetAdjItem()]);
+	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetAdjItem()][End->GetAdjItem()]);
+
 	/*
 	AdjList[Start->GetItem()][End->GetItem()] = Length
 	*/
@@ -364,6 +372,15 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 
 void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
 {
+	AStation* Start = GetStationByGridCellData(First);
+	AStation* End = GetStationByGridCellData(Second);
+
+	(*AdjList)[Start->GetAdjItem()].RemoveRef(End->GetAdjItem());
+	(*AdjList)[End->GetAdjItem()].RemoveRef(Start->GetAdjItem());
+
+	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetAdjItem()].Num());
+
+
 	/*
 	AStation* Start = GetStationByGridCellData(First);
 	AStation* End = GetStationByGridCellData(Second);

@@ -16,7 +16,11 @@ class TINYMETRO_API UAdjArrayItem : public UObject
 public :
 	float operator[] (FAdjItem item) { return length[item]; }
 
-	
+	void Add(FAdjItem Item, float Length);
+
+	void RemoveRef(FAdjItem Item);
+
+	int32 Num();
 
 protected:
 
