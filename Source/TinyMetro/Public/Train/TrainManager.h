@@ -41,6 +41,14 @@ public:
 	UFUNCTION()
 	TArray<UMaterial*> GetTrainMaterial() const;
 
+	UFUNCTION()
+	void InitPassengerMaterial();
+	UFUNCTION()
+	void PassengerMaterialDeferred();
+	UFUNCTION()
+	TArray<UMaterial*> GetPassengerMaterial() const;
+	
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
@@ -50,5 +58,10 @@ public:
 	TArray<UMaterial*> TrainMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> TrainMaterialPath;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> PassengerMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FSoftObjectPath> PassengerMaterialPath;
 
 };

@@ -22,6 +22,7 @@ void ATrainManager::BeginPlay()
 	Super::BeginPlay();
 
 	InitTrainMaterial();
+	InitPassengerMaterial();
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
@@ -79,6 +80,26 @@ void ATrainManager::TrainMaterialDeferred() {
 
 TArray<UMaterial*> ATrainManager::GetTrainMaterial() const {
 	return TrainMaterial;
+}
+
+void ATrainManager::InitPassengerMaterial() {
+	PassengerMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetPassengerMaterialPath();
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		PassengerMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ATrainManager::PassengerMaterialDeferred)
+	);
+}
+
+void ATrainManager::PassengerMaterialDeferred() {
+	for (auto& i : PassengerMaterialPath) {
+		//TAssetPtr<UMaterial> tmp(i);
+		PassengerMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
+	}
+}
+
+TArray<UMaterial*> ATrainManager::GetPassengerMaterial() const {
+	return PassengerMaterial;
 }
 
 // Called every frame

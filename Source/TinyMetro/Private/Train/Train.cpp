@@ -105,6 +105,9 @@ FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 void ATrain::SetTrainMaterial(ALane* Lane) {
 	if (IsValid(Lane)) {
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		for (auto& i : PassengerMeshComponent) {
+			i->SetMaterial(0, PassengerMaterial[Lane->GetLaneId()]);
+		}
 	} else {
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	}

@@ -23,6 +23,7 @@ public:
 	virtual int32 GetDaytime() const;
 	virtual TArray<FSoftObjectPath> GetTrainMaterialPath() const;
 	virtual TArray<FSoftObjectPath> GetLaneMaterialPath() const;
+	virtual TArray<FSoftObjectPath> GetPassengerMaterialPath() const;
 
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
@@ -51,10 +52,12 @@ protected:
 	int32 TestValue;
 	UPROPERTY(Config)
 	int32 Daytime;
-	UPROPERTY(Config)
+	UPROPERTY(Config, VisibleAnywhere)
 	TArray<FSoftObjectPath> TrainMaterialPath;
-	UPROPERTY(Config)
+	UPROPERTY(Config, VisibleAnywhere)
 	TArray<FSoftObjectPath> LaneMaterialPath;
+	UPROPERTY(Config, VisibleAnywhere)
+	TArray<FSoftObjectPath> PassengerMaterialPath;
 	UPROPERTY()
 	class AStationManager* StationManager;
 	UPROPERTY()
