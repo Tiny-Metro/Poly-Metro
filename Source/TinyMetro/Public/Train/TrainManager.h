@@ -34,10 +34,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ATrain* GetNearestTrain(FVector CurrentLocation, class ALane* LaneRef);
 
+	UFUNCTION()
+	void InitTrainMaterial();
+	UFUNCTION()
+	void TrainMaterialDeferred();
+	UFUNCTION()
+	TArray<UMaterial*> GetTrainMaterial() const;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	int32 NextTrainId = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> TrainMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FSoftObjectPath> TrainMaterialPath;
 
 };

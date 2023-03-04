@@ -2,6 +2,7 @@
 
 
 #include "Train/TrainTemplate.h"
+#include "Train/TrainManager.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include "Lane/LaneManager.h"
 #include <Engine/AssetManager.h>
@@ -132,12 +133,15 @@ void ATrainTemplate::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 }
 
 void ATrainTemplate::InitTrainMaterial() {
-	TrainMaterialPath = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
+	/*TrainMaterialPath = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
 	AssetLoader.RequestAsyncLoad(
 		TrainMaterialPath,
 		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMaterialDeferred)
-	);
+	);*/
+
+	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetTrainMaterial();
+	TrainMaterial.Append(tmp);
 }
 
 void ATrainTemplate::InitTrainMesh() {
