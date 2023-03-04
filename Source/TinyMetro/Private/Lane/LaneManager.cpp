@@ -61,6 +61,12 @@ void ALaneManager::RemoveDestroyedLane(int LaneNum)
 
 void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
+	if (NextLaneNums.IsEmpty()) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
+		return;
+	}
+
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
 
