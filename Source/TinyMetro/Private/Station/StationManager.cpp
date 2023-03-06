@@ -335,6 +335,15 @@ AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
 	return nullptr;
 }
 
+AStation* AStationManager::GetStationByStationInfo(FStationInfo Info) {
+	for (auto& i : Station) {
+		if (i->GetStationInfo().Id == Info.Id) {
+			return i;
+		}
+	}
+	return nullptr;
+}
+
 StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }
