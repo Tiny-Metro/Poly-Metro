@@ -26,6 +26,11 @@ ATrainTemplate::ATrainTemplate()
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
 	);
 
+	// Add dummy material (Material index start "1")
+	PassengerMaterial.AddUnique(
+		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
+	);
+
 	auto PassengerScene = CreateDefaultSubobject<USceneComponent>("Passengers");
 	PassengerScene->SetupAttachment(RootComponent);
 
@@ -57,6 +62,7 @@ void ATrainTemplate::BeginPlay()
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
 	InitTrainMaterial();
+	InitPassengerMaterial();
 	InitTrainMesh();
 
 }
@@ -163,6 +169,11 @@ void ATrainTemplate::TrainMeshDeferred() {
 	for (auto& i : TrainMeshPath) {
 		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
 	}
+}
+
+void ATrainTemplate::InitPassengerMaterial() {
+	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetPassengerMaterial();
+	PassengerMaterial.Append(tmp);
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {

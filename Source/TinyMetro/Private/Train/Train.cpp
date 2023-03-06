@@ -46,8 +46,9 @@ void ATrain::BeginPlay() {
 }
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	if (OtherActor->IsA(AStation::StaticClass())) {
+	if (OtherActor->IsA(AStation::StaticClass()) && !IsActorDragged) {
 		auto Station = Cast<AStation>(OtherActor);
+		// Check passing station
 		if (Station->GetLanes().Contains(ServiceLaneId)) {
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
@@ -105,6 +106,9 @@ FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 void ATrain::SetTrainMaterial(ALane* Lane) {
 	if (IsValid(Lane)) {
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		for (auto& i : PassengerMeshComponent) {
+			i->SetMaterial(0, PassengerMaterial[Lane->GetLaneId()]);
+		}
 	} else {
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	}

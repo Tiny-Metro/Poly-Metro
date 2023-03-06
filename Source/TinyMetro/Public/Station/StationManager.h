@@ -10,6 +10,7 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
+#include "StationInfo.h"
 #include "AdjList.h"
 #include "StationManager.generated.h"
 
@@ -57,6 +58,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
+	UFUNCTION(BlueprintCallable)
+	AStation* GetStationByStationInfo(FStationInfo Info);
 
 protected:
 

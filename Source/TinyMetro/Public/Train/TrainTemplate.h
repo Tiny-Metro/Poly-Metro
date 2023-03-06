@@ -36,6 +36,8 @@ public:
 	void TrainMaterialDeferred();
 	UFUNCTION()
 	void TrainMeshDeferred();
+	UFUNCTION()
+	void InitPassengerMaterial();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(int32 Id);
@@ -125,6 +127,8 @@ protected:
 	// Mesh, Material paths (Passenger)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> PassengerMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> PassengerMaterial;
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
