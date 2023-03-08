@@ -4,6 +4,7 @@
 #include "Station/Station.h"
 #include "Station/StationManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include <Engine/AssetManager.h>
 
@@ -13,18 +14,21 @@ AStation::AStation()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Ser root
+
+	// Set root
 	DefaultRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRoot"));
 	SetRootComponent(DefaultRoot);
 
 	// Set station mesh
 	StationMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Station Mesh"));
 	StationMeshComponent->SetupAttachment(RootComponent);
+	StationMeshComponent->SetGenerateOverlapEvents(false);
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
 		FName name = *FString::Printf(TEXT("Passenger %d"), i);
 		auto tmp = CreateDefaultSubobject<UStaticMeshComponent>(name);
+		tmp->SetGenerateOverlapEvents(false);
 		tmp->SetupAttachment(RootComponent);
 		FVector PassengerPosition =
 			PassengerMeshDefaultPosition +
@@ -59,6 +63,12 @@ AStation::AStation()
 	for (auto& i : StationMaterialDestroyedPath) {
 		StationMaterialDestroyed.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
+
+
+	// Set overlap volume
+	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	OverlapVolume->InitBoxExtent(FVector(10, 10, 100));
+	OverlapVolume->SetupAttachment(RootComponent);
 
 }
 
