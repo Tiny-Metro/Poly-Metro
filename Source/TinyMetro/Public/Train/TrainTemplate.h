@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TrainDirection.h"
+#include "../Station/StationInfo.h"
 #include "TrainTemplate.generated.h"
 
 UCLASS(Config = Game)
@@ -27,6 +28,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
 
 	UFUNCTION()
 	void InitTrainMaterial();
@@ -68,6 +71,12 @@ public:
 	UFUNCTION()
 	virtual bool AddPassenger(class UPassenger* P);
 
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DespawnTrain();
+	UFUNCTION(BlueprintCallable)
+	void DropPassenger();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
@@ -77,6 +86,8 @@ protected:
 	class ALaneManager* LaneManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class AGridManager* GridManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class AStationManager* StationManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -99,6 +110,11 @@ protected:
 	int32 MaxPassengerSlot = 6;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 CurrentPassengerSlot = 6;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	FStationInfo CurrentStation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	FStationInfo NextStation;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
