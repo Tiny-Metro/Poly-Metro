@@ -290,10 +290,22 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 	if (Direction == TrainDirection::Up) { // index get smaller
 
 		if (Index != 0) {
+
+			for (int32 i = Index; i > 0; i--) {
+				if (LaneArray[i].IsBendingPoint) {
+					return LaneArray[i].Coordination;
+				}
+			}
+			
 			return LaneArray[Index - 1].Coordination;
 		}
 		else {
 			Train->SetTrainDirection(TrainDirection::Down);
+			for (int32 i = Index; i < LaneArray.Num(); i++) {
+				if (LaneArray[i].IsBendingPoint) {
+					return LaneArray[i].Coordination;
+				}
+			}
 			return LaneArray[Index + 1].Coordination;
 		}
 
@@ -301,10 +313,20 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 	else {
 
 		if (Index != (LaneArray.Num() -1 )) {
+			for (int32 i = Index; i < LaneArray.Num(); i++) {
+				if (LaneArray[i].IsBendingPoint) {
+					return LaneArray[i].Coordination;
+				}
+			}
 			return LaneArray[Index + 1].Coordination;
 		}
 		else {
 			Train->SetTrainDirection(TrainDirection::Up);
+			for (int32 i = Index; i > 0; i--) {
+				if (LaneArray[i].IsBendingPoint) {
+					return LaneArray[i].Coordination;
+				}
+			}
 			return LaneArray[Index - 1].Coordination;
 		}
 	}
