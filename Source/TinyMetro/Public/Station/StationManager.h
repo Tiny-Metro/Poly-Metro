@@ -54,10 +54,8 @@ public:
 	void AddAdjListItem(AStation* Start, AStation* End, float Length);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveAdjListItem(FIntPoint First, FIntPoint Second);
+	void RemoveAdjListItem(AStation* Start, AStation* End);
 
-	UFUNCTION(BlueprintCallable)
-	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationByStationInfo(FStationInfo Info);
 

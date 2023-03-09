@@ -307,32 +307,13 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 	
 }
 
-void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
+void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
 {
-	AStation* Start = GetStationByGridCellData(First);
-	AStation* End = GetStationByGridCellData(Second);
-
 	(*AdjList)[Start->GetStationInfo()].RemoveRef(End->GetStationInfo());
 	(*AdjList)[End->GetStationInfo()].RemoveRef(Start->GetStationInfo());
 
 	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetStationInfo()].Num());
 
-}
-
-AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
-{
-	for (int i = 0; i < Station.Num(); i++) {
-
-		FIntPoint Coor = Station[i]->GetCurrentGridCellData().WorldCoordination;
-
-		if ( Coor == _IntPoint) {
-			return Station[i];
-		}
-
-		UE_LOG(LogTemp, Warning, TEXT("Get Station By GridCellData / Station : %d, %d / IntPoint : %d, %d"), Coor.X, Coor.Y, _IntPoint.X, _IntPoint.Y);
-	}
-
-	return nullptr;
 }
 
 AStation* AStationManager::GetStationByStationInfo(FStationInfo Info) {

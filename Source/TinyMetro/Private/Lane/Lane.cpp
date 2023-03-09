@@ -70,7 +70,7 @@ void ALane::CheckStationPoint() {
 	for (int i = 0; i < StationPoint.Num(); i++) {
 
 		FLanePoint tmp;
-		tmp.Coordination = StationPoint[i];
+		tmp.Coordination = StationPoint[i]->GetCurrentGridCellData().WorldCoordination;
 		tmp.IsBendingPoint = true;
 		tmp.IsStation = true;
 
@@ -339,6 +339,35 @@ void ALane::SpawnTrain()
 {
 }
 
+AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)
+{
+	int Index;
+	for (int i = 0; i < StationPoint.Num(); i++) {
+		
+		if (CurrStation == StationPoint[i]) {
+			Index = i;
+			break;
+		}
+	}
+
+	if (Direction == TrainDirection::Down) {
+		if (Index == StationPoint.Num() - 1) {
+			return StationPoint[Index + 1];
+		}
+		else {
+			return StationPoint[Index - 1];
+		}
+		
+	} else {
+		if (Index == 0) {
+			return StationPoint[1];
+		}
+		else {
+			return StationPoint[Index - 1];
+		}
+	}
+}
+
 void ALane::SetGridLaneStructure()
 {
 	for (int i = 0; i < LaneArray.Num(); i++) {
@@ -363,8 +392,12 @@ void ALane::SetGridLaneStructure()
 	
 }
 
-void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, AStation* Second)
+void ALane::AddAdjListDistance(AStation* First, AStation* Second)
 {
+	FIntPoint Start = First->GetCurrentGridCellData().WorldCoordination;
+	FIntPoint End = Second->GetCurrentGridCellData().WorldCoordination;
+
+
 	int N = abs(Start.X - End.X);
 	int M = abs(Start.Y - End.Y);
 
@@ -382,6 +415,7 @@ void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, 
 	UE_LOG(LogTemp, Warning, TEXT("AddAdjListDistance /IntPoint Start : %d, %d"), Start.X, Start.Y);
 	UE_LOG(LogTemp, Warning, TEXT("AddAdjListDistance /IntPoint End : %d, %d"), End.X, End.Y);
 
+	/*
 	if (First == nullptr) {
 		First = StationManagerRef->GetStationByGridCellData(Start);
 
@@ -394,7 +428,14 @@ void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, 
 
 		UE_LOG(LogTemp, Warning, TEXT("Station Id : %d"), Second->GetStationId());
 	}
+	*/
 
 	StationManagerRef->AddAdjListItem(First, Second, Distance);
 
+}
+
+FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
+{
+	FIntPoint Result = StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
+	return StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
 }
