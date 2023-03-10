@@ -151,7 +151,7 @@ protected:
 	TArray<UPassenger*> Passenger;
 	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> Lanes;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FStationInfo StationInfo;
 
 
