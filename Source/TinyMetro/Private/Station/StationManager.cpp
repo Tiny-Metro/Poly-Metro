@@ -97,6 +97,23 @@ void AStationManager::BeginPlay()
 			15.0f,
 			FColor::Yellow,
 			FString::Printf(TEXT("Data : %d"), InitData.Num()));*/
+
+	// Init adj matrix
+	FAdjArray adjTmp;
+	adjTmp.Init(TNumericLimits<float>::Max(), 301);
+	adj.Init(adjTmp, 301);
+
+	FPath pathTmp;
+	pathTmp.Init(-1, 301);
+	AdjPath.Init(pathTmp, 301);
+
+	AdjDist.Init(adjTmp, 301);
+
+	// Test Spawn actors
+	/*for (int i = 0; i < 300; i++) {
+		GetWorld()->SpawnActor<AStation>();
+	}*/
+
 }
 
 void AStationManager::TestFunction() {
@@ -180,10 +197,10 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
 	tmp->SetStationType(Type);
 	tmp->SetGridCellData(GridCellData);
-	tmp->SetStationId(StationId++);
+	tmp->SetStationId(StationId);
 	tmp->SetPolicy(Policy);
 
-	tmp->SetStationInfo(StationId, Type);
+	tmp->SetStationInfo(StationId++, Type);
 
 	if (ActivateFlag) {
 		tmp->ActivateStation();
@@ -298,8 +315,20 @@ void AStationManager::PolicyMaintenanceRoutine() {
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
 {
+	int32 StartId = Start->GetStationInfo().Id;
+	int32 EndId = End->GetStationInfo().Id;
 	(*AdjList)[Start->GetStationInfo()].Add(End->GetStationInfo(), Length);
 	(*AdjList)[End->GetStationInfo()].Add(Start->GetStationInfo(), Length);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, FString::Printf(TEXT("%d to %d : %f"), StartId, EndId, Length));
+
+	adj[StartId][EndId] = Length;
+	adj[EndId][StartId] = Length;
+
+	FloydWarshall();
+
+	//AdjDist[Start->GetStationInfo().Id][End->GetStationInfo().Id] = Length;
+	//AdjDist[Start->GetStationInfo().Id][End->GetStationInfo().Id] = Start->GetStationInfo().Id;
 
 	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetStationInfo()][Start->GetStationInfo()]);
 	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetStationInfo()][End->GetStationInfo()]);
@@ -312,17 +341,125 @@ void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
 	(*AdjList)[Start->GetStationInfo()].RemoveRef(End->GetStationInfo());
 	(*AdjList)[End->GetStationInfo()].RemoveRef(Start->GetStationInfo());
 
+	FloydWarshall();
+
+	adj[Start->GetStationInfo().Id][End->GetStationInfo().Id] = TNumericLimits<float>::Max();
+	adj[End->GetStationInfo().Id][Start->GetStationInfo().Id] = TNumericLimits<float>::Max();
+
+
 	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetStationInfo()].Num());
 
 }
 
 AStation* AStationManager::GetStationByStationInfo(FStationInfo Info) {
 	for (auto& i : Station) {
-		if (i->GetStationInfo().Id == Info.Id) {
+		if (i->GetStationInfo() == Info) {
 			return i;
 		}
 	}
 	return nullptr;
+}
+
+AStation* AStationManager::GetStationById(int32 Id) {
+	for (auto& i : Station) {
+		if (i->GetStationId() == Id) {
+			return i;
+		}
+	}
+	return nullptr;
+}
+
+TQueue<int32>* AStationManager::GetShortestRoute(int32 Start, StationType Type) {
+	if (ShortestRoute.Find(Start) == nullptr) {
+		return nullptr;
+	}
+	if (ShortestRoute[Start].Find(Type) == nullptr) {
+		return nullptr;
+	}
+	return ShortestRoute[Start][Type];
+}
+
+AStation* AStationManager::GetNearestStationByType(int32 Start, StationType Type) {
+	int32 StationNum = Station.Num();
+	int32 NearestStationId = -1;
+	float Distance = TNumericLimits<float>::Max();
+	for (int i = 0; i < StationNum; i++) {
+		if (GetStationById(i)->GetStationType() == Type) {
+			if (AdjDist[Start][i] < Distance) {
+				Distance = AdjDist[Start][i];
+				NearestStationId = i;
+			}
+		}
+	}
+	return GetStationById(NearestStationId);
+}
+
+void AStationManager::FloydWarshall() {
+	int32 StationNum = Station.Num();
+	// Init dist
+	for (int i = 0; i < StationNum; i++) {
+		for (int j = 0; j < StationNum; j++) {
+			if (i == j) {
+				AdjDist[i][j] = 0;
+				AdjPath[i][j] = -1;
+			}else if (adj[i][j] != TNumericLimits<float>::Max()) {
+				AdjDist[i][j] = adj[i][j];
+				AdjPath[i][j] = j;
+			}else { 
+				AdjDist[i][j] = TNumericLimits<float>::Max();
+				AdjPath[i][j] = -1;
+			}
+		}
+	}
+	
+
+	// Floyd-Warshall
+	
+	for (int k = 0; k < StationNum; k++) {
+		for (int i = 0; i < StationNum; i++) {
+			for (int j = 0; j < StationNum; j++) {
+				if (AdjDist[i][j] > AdjDist[i][k] + AdjDist[k][j]) {
+					AdjDist[i][j] = AdjDist[i][k] + AdjDist[k][j];
+					AdjPath[i][j] = AdjPath[i][k];
+				}
+			}
+		}
+	}
+
+	// Calculate route
+	for (int i = 0; i < StationNum; i++) {
+		for (int j = 0; j < 10; j++) {
+			if (ShortestRoute.Find(i) == nullptr) {
+				ShortestRoute.Add(i);
+			}
+			ShortestRoute[i].Emplace(
+				StaticCast<StationType>(j),
+				PathFinding(i, StaticCast<StationType>(j))
+			);
+			//ShortestRoute[i][StaticCast<StationType>(j)] = PathFinding(i, StaticCast<StationType>(j));
+		}
+	}
+	
+}
+
+TQueue<int32>* AStationManager::PathFinding(int32 Start, StationType Type) {
+	auto NearestStation = GetNearestStationByType(Start, Type);
+	if (!IsValid(NearestStation)) return nullptr;
+
+	int32 End = NearestStation->GetStationId();
+	if (AdjPath[Start][End] == -1)
+		return nullptr;
+
+	// Storing the path in a vector
+	TQueue<int32>* Path = new TQueue<int32>();
+	//vector<int> path = { u };
+	while (Start != End) {
+		Start = AdjPath[Start][End];
+		Path->Enqueue(Start);
+	}
+	Path->Enqueue(End);
+
+	return MoveTemp(Path);
 }
 
 StationType AStationManager::GetRandomStationType() {

@@ -146,6 +146,14 @@ void ATrainTemplate::DropPassenger() {
 	}
 }
 
+FStationInfo ATrainTemplate::GetCurrentStation() const {
+	return CurrentStation;
+}
+
+FStationInfo ATrainTemplate::GetNextStation() const {
+	return NextStation;
+}
+
 
 
 // Called every frame

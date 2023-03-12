@@ -55,7 +55,8 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			// Set current Station
 			CurrentStation = Station->GetStationInfo();
 			// TODO : Set next Station
-			
+			NextStation = Station->GetStationInfo();
+
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
 			// Movement stop, release
@@ -173,7 +174,7 @@ void ATrain::ActiveMoveTest() {
 
 void ATrain::GetOnPassenger(AStation* Station) {
 	if (!IsPassengerSlotFull()) {
-		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
+		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
 
 		if (RidePassenger.Key != nullptr) {
 			PassengerIndex--;
@@ -203,8 +204,31 @@ void ATrain::GetOnPassenger(AStation* Station) {
 void ATrain::GetOffPassenger(AStation* Station) {
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger[i]) {
-			// Check passenger route
-			if (true) {
+			// Update passenger route
+			Passenger[i]->SetPassengerRoute(
+				StationManagerRef->GetShortestRoute(
+					CurrentStation.Id,
+					Passenger[i]->GetDestination()
+				)
+			);
+			auto PassengerRoute = Passenger[i]->GetPassengerRoute();
+			// Check route validation
+			// True : Route valid
+			// False(else) : Route invalid (Get off)
+			if (PassengerRoute != nullptr) {
+				if (!PassengerRoute->IsEmpty()) {
+					// Check passenger route
+					// True : Get off (Ride other train)
+					if ((*PassengerRoute->Peek()) != NextStation.Id) {
+						Station->GetOffPassenger(Passenger[i]);
+						Passenger.Add(i, nullptr);
+						UpdatePassengerMesh();
+						return;
+					} else {
+						PassengerRoute->Pop();
+					}
+				}
+			} else {
 				Station->GetOffPassenger(Passenger[i]);
 				Passenger.Add(i, nullptr);
 				UpdatePassengerMesh();

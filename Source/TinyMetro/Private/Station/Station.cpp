@@ -3,6 +3,7 @@
 
 #include "Station/Station.h"
 #include "Station/StationManager.h"
+#include "Train/TrainTemplate.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -142,17 +143,38 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	}
 }
 
-TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index) {
+TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
+	// TPair.key : Passenger pointer
+	// TPair.value : Index validation (true : Need to next passenger check, false : Last index)
+	TPair<UPassenger*, bool> Tmp(nullptr, false);
 	if (Passenger.IsValidIndex(Index)) {
-		// TODO : Check passenger's destination
-		TPair<UPassenger*, bool> Tmp(MoveTemp(Passenger[Index]), true);
-		Passenger.RemoveAt(Index);
+		Tmp.Value = true;
+		// Update passenger route
+		Passenger[Index]->SetPassengerRoute(
+			StationManager->GetShortestRoute(
+				StationInfo.Id, 
+				Passenger[Index]->GetDestination()
+			)
+		);
+		auto PassengerRoute = Passenger[Index]->GetPassengerRoute();
+		// Check passenger route validation
+		// True : Passenger have a route
+		if (PassengerRoute != nullptr) {
+			// Check route is empty
+			if (!PassengerRoute->IsEmpty()) {
+				// Passenger next stopover station == Train next station
+				// True : Passenger get on
+				if ((*PassengerRoute->Peek()) == Train->GetNextStation().Id) {
+					PassengerRoute->Pop();
+					Tmp.Key = MoveTemp(Passenger[Index]);
+					Passenger.RemoveAt(Index);
 
-		UpdatePassengerMesh();
-		return Tmp;
-	} else {
-		return TPair<UPassenger*, bool>(nullptr, false);
+					UpdatePassengerMesh();
+				}
+			}
+		}
 	}
+	return Tmp;
 }
 
 void AStation::GetOffPassenger(UPassenger* P) {
@@ -356,9 +378,11 @@ void AStation::PassengerSpawnRoutine() {
 }
 
 void AStation::SpawnPassenger() {
+	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationTypeValue);
 	UPassenger* tmp = UPassenger::ConstructPassenger(
-		StationManager->CalculatePassengerDest(StationTypeValue)
+		NewPassengerDestination
 	);
+	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
 

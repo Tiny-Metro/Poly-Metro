@@ -14,6 +14,35 @@
 #include "AdjList.h"
 #include "StationManager.generated.h"
 
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FAdjArray {
+	GENERATED_USTRUCT_BODY()
+public:
+	float& operator[] (int32 Index) { 
+		if (Index > Size.Num()) Size.SetNum(Index);
+		return Size[Index]; 
+	}
+	void Init(const float& Element, int32 Number) { Size.Init(Element, Number); }
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<float> Size;
+};
+
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FPath {
+
+	GENERATED_USTRUCT_BODY()
+public:
+	int& operator[] (int32 Index) {
+		if (Index > Size.Num()) Size.SetNum(Index);
+		return Size[Index];
+	}
+	void Init(const int& Element, int32 Number) { Size.Init(Element, Number); }
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<int> Size;
+};
+
 UCLASS()
 class TINYMETRO_API AStationManager : public AActor
 {
@@ -58,6 +87,16 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationByStationInfo(FStationInfo Info);
+	UFUNCTION(BlueprintCallable)
+	AStation* GetStationById(int32 Id);
+
+	TQueue<int32>* GetShortestRoute(int32 Start, StationType Type);
+
+private:
+	AStation* GetNearestStationByType(int32 Start, StationType Type);
+	void FloydWarshall();
+	TQueue<int32>* PathFinding(int32 Start, StationType Type);
+
 
 protected:
 
@@ -125,4 +164,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAdjList* AdjList;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FAdjArray> AdjDist;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FPath> AdjPath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FAdjArray> adj;
+
+	TMap<int32, TMap<StationType, TQueue<int32>*>> ShortestRoute;
 };
