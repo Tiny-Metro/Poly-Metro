@@ -157,7 +157,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* De
 	));
 
 	// Set train destination (Next grid)
-	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
+	AiControllerRef->SetTrainDestination(StartLocation);
 
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;

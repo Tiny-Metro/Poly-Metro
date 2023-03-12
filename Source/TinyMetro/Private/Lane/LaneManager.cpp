@@ -106,8 +106,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		
 		if (IsValid(SelectedStations[i])) {
 			SelectedStations[i]->SetLanes(NextLaneNums[0]);
-			FIntPoint Coor = SelectedStations[i]->GetCurrentGridCellData().WorldCoordination;
-			tmpLane->StationPoint.Add(Coor);
+			//FIntPoint Coor = SelectedStations[i]->GetCurrentGridCellData().WorldCoordination;
+			tmpLane->StationPoint.Add(SelectedStations[i]);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d] is null"), i);
@@ -116,13 +116,14 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		
 	}
 
+	/*
 	FIntPoint Start = SelectedStations[0]->GetCurrentGridCellData().WorldCoordination;
 	FIntPoint End = SelectedStations[1]->GetCurrentGridCellData().WorldCoordination;
 	UE_LOG(LogTemp, Warning, TEXT("CreatingNewLane /IntPoint Start : %d, %d"), Start.X, Start.Y);
 	UE_LOG(LogTemp, Warning, TEXT("CreatingNewLane /IntPoint End : %d, %d"), End.X, End.Y);
+	*/
 
-
-	tmpLane->AddAdjListDistance(Start, End, SelectedStations[0], SelectedStations[1]);
+	tmpLane->AddAdjListDistance(SelectedStations[0], SelectedStations[1]);
 
 	tmpLane->InitLaneMaterial(LaneMaterial);
 	tmpLane->InitializeNewLane();

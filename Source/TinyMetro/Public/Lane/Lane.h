@@ -67,7 +67,7 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
-	TArray<FIntPoint> StationPoint;
+	TArray<class AStation * > StationPoint;
 
 
 	UPROPERTY(BlueprintReadWrite, Category="Lane")
@@ -120,8 +120,15 @@ public:
 	void SpawnTrain();
 
 	UFUNCTION(BlueprintCallable)
+	AStation* GetNextStation(AStation* CurrStation, TrainDirection Direction);
+
+	UFUNCTION(BlueprintCallable)
 	void SetGridLaneStructure();
 
 	UFUNCTION(BlueprintCallable)
-	void AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First = nullptr, AStation* Second = nullptr);
+	void AddAdjListDistance(AStation* First, AStation* Second);
+
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
+
 };
