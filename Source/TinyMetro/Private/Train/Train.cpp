@@ -89,6 +89,10 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 				true,
 				0.0f
 			);
+
+			AiControllerRef->SetTrainDestination(
+				GetNextTrainDestination(AiControllerRef->GetTrainDestination())
+			);
 		}
 	}
 	
@@ -161,7 +165,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* De
 	));
 
 	// Set train destination (Next grid)
-	AiControllerRef->SetTrainDestination(StartLocation);
+	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
 
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;

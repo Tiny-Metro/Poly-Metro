@@ -13,3 +13,7 @@ void ATrainAiController::Patrol_Implementation() {
 void ATrainAiController::SetTrainDestination(FVector Destination) {
 	TrainDestination = Destination;
 }
+
+FVector ATrainAiController::GetTrainDestination() {
+	return TrainDestination;
+}

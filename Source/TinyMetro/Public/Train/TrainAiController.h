@@ -22,6 +22,8 @@ public:
 	virtual void Patrol_Implementation();
 	UFUNCTION(BlueprintCallable)
 	void SetTrainDestination(FVector Destination);
+	UFUNCTION(BlueprintCallable)
+	FVector GetTrainDestination();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
