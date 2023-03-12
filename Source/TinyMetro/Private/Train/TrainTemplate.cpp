@@ -14,6 +14,9 @@
 // Sets default values
 ATrainTemplate::ATrainTemplate()
 {
+	//APlayerController::bEnableClickEvents = true;
+
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	TrainMovement = GetCharacterMovement();
@@ -60,7 +63,8 @@ void ATrainTemplate::BeginPlay()
 
 	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-
+	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	
 	InitTrainMaterial();
 	InitPassengerMaterial();
 	InitTrainMesh();
@@ -120,6 +124,26 @@ bool ATrainTemplate::AddPassenger(UPassenger* P) {
 		}
 	}
 	return false;
+}
+
+void ATrainTemplate::DespawnTrain() {
+	
+}
+
+void ATrainTemplate::DropPassenger() {
+	auto CurrentStationPointer = StationManagerRef->GetStationByStationInfo(CurrentStation);
+	auto NextStationPointer = StationManagerRef->GetStationByStationInfo(NextStation);
+
+	if (IsValid(CurrentStationPointer)) {
+		for (auto& i : Passenger) {
+			if (i.Value != nullptr) {
+				CurrentStationPointer->GetOffPassenger(i.Value);
+				i.Value = nullptr;
+			}
+		}
+	} else {
+
+	}
 }
 
 

@@ -178,6 +178,8 @@ protected:
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> PassengerMesh;
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* OverlapVolume;
 
 	// Material (Station)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

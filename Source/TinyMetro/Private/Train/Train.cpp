@@ -47,10 +47,16 @@ void ATrain::BeginPlay() {
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor->IsA(AStation::StaticClass()) && !IsActorDragged) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
+		
 		auto Station = Cast<AStation>(OtherActor);
 		// Check passing station
 		if (Station->GetLanes().Contains(ServiceLaneId)) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
+			// Set current Station
+			CurrentStation = Station->GetStationInfo();
+			// TODO : Set next Station
+			
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
 			// Movement stop, release
 			TrainMovement->SetActive(false);
@@ -141,12 +147,23 @@ bool ATrain::IsPassengerSlotFull() {
 
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* Destination) {
 	bool tmp;
+
+	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
+	// Set train direction (Down or Up)
 	SetTrainDirection(Lane->SetDirectionInit(
 		Destination,
 		GridManagerRef->GetGridCellDataByCoord(StartLocation, tmp).WorldCoordination
 	));
+
+	// Set train destination (Next grid)
 	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
+
+	// Initialize train's Current, Next station
+	CurrentStation.Id = -1;
+	NextStation = Destination->GetStationInfo();
+
+	// Train move start
 	AiControllerRef->Patrol();
 }
 
