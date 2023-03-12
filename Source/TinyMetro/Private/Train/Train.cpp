@@ -194,6 +194,7 @@ void ATrain::GetOnPassenger(AStation* Station) {
 				}
 			} 
 			TotalPassenger++;
+			PlayerStateRef->AddMoney(Fare);
 			UpdatePassengerMesh();
 		}
 
