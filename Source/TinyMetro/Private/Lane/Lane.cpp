@@ -275,7 +275,7 @@ void ALane::ExtendLane_Implementation() {}
 
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {
-	int32 Index;
+	int32 Index = -1;
 
 	for (int32 i = 0; i < LaneArray.Num(); i++) {
 
@@ -285,6 +285,12 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 
 			break;
 		}
+	}
+
+	if (Index == -1) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find Index in GetNextLocation"))
+		return FIntPoint();
 	}
 
 	if (Direction == TrainDirection::Up) { // index get smaller
@@ -348,6 +354,12 @@ TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation)
 		}
 	}
 
+	if (StationIndex == -1 || CurLocationIndex == -1) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find TrainDirection in SetDirectionInit"));
+		return TrainDirection();
+	}
+
 	if (StationIndex < CurLocationIndex) {
 		return TrainDirection::Up;
 	}
@@ -363,7 +375,7 @@ void ALane::SpawnTrain()
 
 AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)
 {
-	int Index;
+	int Index = -1;
 	for (int i = 0; i < StationPoint.Num(); i++) {
 		
 		if (CurrStation == StationPoint[i]) {
@@ -372,12 +384,57 @@ AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)
 		}
 	}
 
+	if (Index == -1) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find Index in GetNextStation"))
+		return nullptr;
+	}
+
+
+
+	if (!GetIsCircularLine()) {
+		if (Index == StationPoint.Num() - 1) {
+			return StationPoint[Index + 1];
+		}
+		else if (Index == 0) {
+			return StationPoint[1];
+		}
+		else {
+			if (Direction == TrainDirection::Down) {
+				return StationPoint[Index + 1];
+			}
+			else {
+				return StationPoint[Index - 1];
+			}
+		}
+	}
+	else { // circular
+		if (Direction == TrainDirection::Down) {
+			if (Index == StationPoint.Num() - 1) {
+				return StationPoint[1];
+			}
+			else {
+				return StationPoint[Index + 1];
+			}
+
+		}
+		else {
+			if (Index == 0) {
+				return StationPoint[StationPoint.Num() - 2];
+			}
+			else {
+				return StationPoint[Index - 1];
+			}
+		}
+	}
+	
+	/*
 	if (Direction == TrainDirection::Down) {
 		if (Index == StationPoint.Num() - 1) {
 			return StationPoint[Index + 1];
 		}
 		else {
-			return StationPoint[Index - 1];
+			return StationPoint[Index + 1];
 		}
 		
 	} else {
@@ -388,6 +445,7 @@ AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)
 			return StationPoint[Index - 1];
 		}
 	}
+	*/
 }
 
 void ALane::SetGridLaneStructure()
