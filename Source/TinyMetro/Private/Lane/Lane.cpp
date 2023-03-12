@@ -293,6 +293,64 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 		return FIntPoint();
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Train Direction : %d"), Direction);
+	UE_LOG(LogTemp, Warning, TEXT("Index Num : %d"), Index);
+
+	if (Direction == TrainDirection::Up) { // index get smaller
+
+		if (Index != 0) {
+
+			for (int32 i = Index; i >= 0; i--) {
+				if (LaneArray[i].IsStation) {
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Up : %d"), i);
+					return LaneArray[i].Coordination;
+				}
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
+			return LaneArray[Index - 1].Coordination;
+		}
+		else {
+			Train->SetTrainDirection(TrainDirection::Down);
+			for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
+				if (LaneArray[i].IsStation) {
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is 0 : %d"), i);
+					return LaneArray[i].Coordination;
+				}
+			}
+			return LaneArray[1].Coordination;
+		}
+
+	}
+	else {
+
+		if (Index != (LaneArray.Num() - 1)) {
+			for (int32 i = Index; i < LaneArray.Num(); i++) {
+				if (LaneArray[i].IsStation) {
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Down : %d"), i);
+					return LaneArray[i].Coordination;
+					
+				}
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Index+1 : %d"), Index +1);
+			return LaneArray[Index + 1].Coordination;
+		}
+		else {
+			Train->SetTrainDirection(TrainDirection::Up);
+			for (int32 i = Index - 1; i >= 0; i--) {
+				if (LaneArray[i].IsStation) {
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is Last Index : %d"), i);
+					return LaneArray[i].Coordination;
+				}
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
+			return LaneArray[Index - 1].Coordination;
+		}
+	}
+
+
+	/*
+
 	if (Direction == TrainDirection::Up) { // index get smaller
 
 		if (Index != 0) {
@@ -307,12 +365,13 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 		}
 		else {
 			Train->SetTrainDirection(TrainDirection::Down);
-			for (int32 i = Index; i < LaneArray.Num(); i++) {
+			for (int32 i = Index +1; i < LaneArray.Num(); i++) {
 				if (LaneArray[i].IsBendingPoint) {
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : %d"), i);
 					return LaneArray[i].Coordination;
 				}
 			}
-			return LaneArray[Index + 1].Coordination;
+			return LaneArray[1].Coordination;
 		}
 
 	}
@@ -328,15 +387,17 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 		}
 		else {
 			Train->SetTrainDirection(TrainDirection::Up);
-			for (int32 i = Index; i > 0; i--) {
+			for (int32 i = Index - 1; i >= 0; i--) {
 				if (LaneArray[i].IsBendingPoint) {
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : %d"), i);
 					return LaneArray[i].Coordination;
 				}
 			}
+			UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index-1);
 			return LaneArray[Index - 1].Coordination;
 		}
 	}
-
+	*/
 }
 
 TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation) const
