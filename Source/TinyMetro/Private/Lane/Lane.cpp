@@ -46,7 +46,7 @@ void ALane::InitLaneMaterial(TArray<UMaterial*> Materials) {
 	LaneMaterial.Append(Materials);
 }
 
-bool ALane::GetIsCircularLine()
+bool ALane::GetIsCircularLine() const
 {
 	return IsCircularLine;
 }

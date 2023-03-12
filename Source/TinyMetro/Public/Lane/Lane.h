@@ -61,7 +61,7 @@ public:
 	void InitLaneMaterial(TArray<UMaterial*> Materials);
 
 	UFUNCTION(BlueprintCallable)
-	bool GetIsCircularLine();
+	bool GetIsCircularLine() const;
 	UFUNCTION(BlueprintCallable)
 	void SetIsCircularLine(bool _Circular);
 
