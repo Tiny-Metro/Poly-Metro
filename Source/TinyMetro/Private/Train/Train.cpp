@@ -55,7 +55,10 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			// Set current Station
 			CurrentStation = Station->GetStationInfo();
 			// TODO : Set next Station
-			NextStation = Station->GetStationInfo();
+			NextStation = LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
+				Station,
+				GetTrainDirection()
+			)->GetStationInfo();
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
@@ -174,6 +177,10 @@ void ATrain::ActiveMoveTest() {
 
 void ATrain::GetOnPassenger(AStation* Station) {
 	if (!IsPassengerSlotFull()) {
+		// Log
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Staton::GetOnPassenger"));
+
+
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
 
 		if (RidePassenger.Key != nullptr) {
@@ -202,6 +209,9 @@ void ATrain::GetOnPassenger(AStation* Station) {
 }
 
 void ATrain::GetOffPassenger(AStation* Station) {
+	// Log
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
+
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger[i]) {
 			// Update passenger route
@@ -223,7 +233,6 @@ void ATrain::GetOffPassenger(AStation* Station) {
 						Station->GetOffPassenger(Passenger[i]);
 						Passenger.Add(i, nullptr);
 						UpdatePassengerMesh();
-						return;
 					} else {
 						PassengerRoute->Pop();
 					}
@@ -232,8 +241,8 @@ void ATrain::GetOffPassenger(AStation* Station) {
 				Station->GetOffPassenger(Passenger[i]);
 				Passenger.Add(i, nullptr);
 				UpdatePassengerMesh();
-				return;
 			}
+			return;
 		}
 	}
 	
