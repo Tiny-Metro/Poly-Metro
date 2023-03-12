@@ -17,7 +17,10 @@ class TINYMETRO_API UPassenger : public UObject
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
 	void SetDestination(StationType Dest);
+	UFUNCTION()
+	StationType GetDestination() const;
 	static UPassenger* ConstructPassenger(StationType Dest);
 
 

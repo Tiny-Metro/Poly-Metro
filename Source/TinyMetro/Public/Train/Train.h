@@ -26,12 +26,21 @@ public:
 	// virtual void Tick(float DeltaTime) override;
 
 	// TrainTemplate override function
-	virtual FVector GetNextTrainPosition() override;
-	virtual bool SetTrainMaterial(int32 LaneNumber) override;
+	virtual FVector GetNextTrainDestination(FVector CurLocation) override;
+	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void Upgrade() override;
+	virtual bool IsPassengerSlotFull() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
+	UFUNCTION(BlueprintCallable)
+	void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* Destination);
+	UFUNCTION()
+	void ActiveMoveTest(); 
+	UFUNCTION()
+	void GetOnPassenger(class AStation* Station);
+	UFUNCTION()
+	void GetOffPassenger(class AStation* Station);
 
 protected:
 
@@ -40,24 +49,53 @@ protected:
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<ASubtrain*> Subtrains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	float TotalTravel;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FVector LocationAtPreTick;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	ATrainAiController* ParentAiControllerRef;
+	ATrainAiController* AiControllerRef;
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* OverlapVolume;
 	
+	UPROPERTY()
+	int32 RideCount = 0;
+	UPROPERTY()
+	int32 PassengerIndex = 0;
 
-	// Test
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FTimerHandle TestTimer;
+	TArray<FVector> PassengerMeshPosition = {
+		FVector(10.0f, 55.0f, 190.0f),
+		FVector(10.0f, -55.0f, 190.0f),
+		FVector(-100.0f, 55.0f, 190.0f),
+		FVector(-100.0f, -55.0f, 190.0f),
+		FVector(-210.0f, 55.0f, 190.0f),
+		FVector(-210.0f, -55.0f, 190.0f),
+		FVector(10.0f, 55.0f, 190.0f),
+		FVector(10.0f, 55.0f, 190.0f)
+	};
+
+	TArray<FVector> PassengerMeshPositionUpgrade = {
+		FVector(70.0f, 55.0f, 190.0f),
+		FVector(70.0f, -55.0f, 190.0f),
+		FVector(-50.0f, 55.0f, 190.0f),
+		FVector(-50.0f, -55.0f, 190.0f),
+		FVector(-160.0f, 55.0f, 190.0f),
+		FVector(-160.0f, -55.0f, 190.0f),
+		FVector(-270.0f, 55.0f, 190.0f),
+		FVector(-270.0f, -55.0f, 190.0f)
+	};
+
+private:
+	UPROPERTY()
+	FTimerHandle GetOnHandle;
+	FTimerDelegate GetOnDelegate;
+	UPROPERTY()
+	FTimerHandle GetOffHandle;
+	FTimerDelegate GetOffDelegate;
 };

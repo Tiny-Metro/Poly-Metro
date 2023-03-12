@@ -5,6 +5,8 @@
 #include "Train/Train.h"
 #include "Train/Subtrain.h"
 #include "Lane/Lane.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include <Engine/AssetManager.h>
 
 // Sets default values
 ATrainManager::ATrainManager()
@@ -18,7 +20,9 @@ ATrainManager::ATrainManager()
 void ATrainManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InitTrainMaterial();
+	InitPassengerMaterial();
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
@@ -56,6 +60,46 @@ ATrain* ATrainManager::GetNearestTrain(FVector CurrentLocation, class ALane* Lan
 	}
 
 	return Cast<ATrain>(Trains[TrainIndex]);
+}
+
+void ATrainManager::InitTrainMaterial() {
+	TrainMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		TrainMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ATrainManager::TrainMaterialDeferred)
+	);
+}
+
+void ATrainManager::TrainMaterialDeferred() {
+	for (auto& i : TrainMaterialPath) {
+		//TAssetPtr<UMaterial> tmp(i);
+		TrainMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
+	}
+}
+
+TArray<UMaterial*> ATrainManager::GetTrainMaterial() const {
+	return TrainMaterial;
+}
+
+void ATrainManager::InitPassengerMaterial() {
+	PassengerMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetPassengerMaterialPath();
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		PassengerMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ATrainManager::PassengerMaterialDeferred)
+	);
+}
+
+void ATrainManager::PassengerMaterialDeferred() {
+	for (auto& i : PassengerMaterialPath) {
+		//TAssetPtr<UMaterial> tmp(i);
+		PassengerMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
+	}
+}
+
+TArray<UMaterial*> ATrainManager::GetPassengerMaterial() const {
+	return PassengerMaterial;
 }
 
 // Called every frame

@@ -16,9 +16,17 @@ class TINYMETRO_API ATrainAiController : public AAIController
 
 public:
 	void Test();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Patrol();
+	virtual void Patrol_Implementation();
+	UFUNCTION(BlueprintCallable)
+	void SetTrainDestination(FVector Destination);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<FVector> TestRoutine;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	FVector TrainDestination;
 	
 };

@@ -4,6 +4,7 @@
 #include "Station/Station.h"
 #include "Station/StationManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include <Engine/AssetManager.h>
 
@@ -13,20 +14,44 @@ AStation::AStation()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Ser root
+
+	// Set root
 	DefaultRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRoot"));
 	SetRootComponent(DefaultRoot);
 
 	// Set station mesh
 	StationMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Station Mesh"));
 	StationMeshComponent->SetupAttachment(RootComponent);
+	StationMeshComponent->SetGenerateOverlapEvents(false);
+
+	// Set passenger mesh
+	for (int i = 0; i < MaxPassengerSpawn; i++) {
+		FName name = *FString::Printf(TEXT("Passenger %d"), i);
+		auto tmp = CreateDefaultSubobject<UStaticMeshComponent>(name);
+		tmp->SetGenerateOverlapEvents(false);
+		tmp->SetupAttachment(RootComponent);
+		FVector PassengerPosition =
+			PassengerMeshDefaultPosition +
+			FVector(PassengerX_Distance * (i / 2), 0.0f, 0.0f) +
+			FVector(0.0f, PassengerY_Distance * ((i % 2) == 0 ? -1 : 1), 0.0f);
+		if ((i == MaxPassengerSpawn - 1) && (MaxPassengerSpawn % 2 == 1)) {
+			PassengerPosition += FVector(0.0f, PassengerY_Distance * ((i % 2) == 0 ? 1 : -1), 0.0f);
+		}
+		tmp->SetRelativeLocation(PassengerPosition);
+		PassengerMeshComponent.Add(MoveTemp(tmp));
+	}
 	
-	// Load meshes
+	// Load meshes (Station)
 	for (auto& i : StationMeshPath) {
 		StationMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
 	}
 
-	// Load material
+	// Load meshes (Passenger)
+	for (auto& i : PassengerMeshPath) {
+		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+
+	// Load material (Station)
 	for (auto& i : StationMaterialInactivePath) {
 		StationMaterialInactive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
@@ -38,6 +63,12 @@ AStation::AStation()
 	for (auto& i : StationMaterialDestroyedPath) {
 		StationMaterialDestroyed.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
+
+
+	// Set overlap volume
+	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	OverlapVolume->InitBoxExtent(FVector(10, 10, 100));
+	OverlapVolume->SetupAttachment(RootComponent);
 
 }
 
@@ -57,13 +88,7 @@ void AStation::BeginPlay()
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
 	UpdateStationMesh();
-
-	// Log ( I am {Actor Name} )
-	/*if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
-			FString::Printf(TEXT("I am %s"), *this->GetActorLabel()));
-	}*/
-
+	UpdatePassengerMesh();
 
 }
 
@@ -83,17 +108,6 @@ int32 AStation::GetStationId() const {
 
 void AStation::SetStationType(StationType Type) {
 	StationTypeValue = Type;
-
-	//LOG
-	/*FString EnumToStr = TEXT("NULL");
-	const UEnum* MyType = FindObject<UEnum>(ANY_PACKAGE, TEXT("StationType"), true);
-	if (MyType) {
-		EnumToStr = MyType->GetNameStringByValue((int64)StationTypeValue);
-	}
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Cyan,
-			EnumToStr);
-	}*/
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -126,6 +140,29 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 		UPassenger* tmp = UPassenger::ConstructPassenger(passengerValue.Destination);
 		Passenger.Add(tmp);
 	}
+}
+
+TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index) {
+	if (Passenger.IsValidIndex(Index)) {
+		// TODO : Check passenger's destination
+		TPair<UPassenger*, bool> Tmp(MoveTemp(Passenger[Index]), true);
+		Passenger.RemoveAt(Index);
+
+		UpdatePassengerMesh();
+		return Tmp;
+	} else {
+		return TPair<UPassenger*, bool>(nullptr, false);
+	}
+}
+
+void AStation::GetOffPassenger(UPassenger* P) {
+	if (P->GetDestination() == this->StationTypeValue) {
+		// Passenger arrive destination
+		P = nullptr;
+	} else {
+		Passenger.Add(P);
+	}
+	UpdatePassengerMesh();
 }
 
 void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate) {
@@ -216,6 +253,17 @@ void AStation::SetLanes(int32 AdditionalLaneId)
 	Lanes.Add(AdditionalLaneId);
 }
 
+FStationInfo AStation::GetStationInfo()
+{
+	return StationInfo;
+}
+
+void AStation::SetStationInfo(int32 Id, StationType Type)
+{
+	StationInfo.Id = Id;
+	StationInfo.Type = Type;
+}
+
 void AStation::ComplainRoutine() {
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerComplain,
@@ -269,6 +317,13 @@ void AStation::ComplainRoutine() {
 
 void AStation::UpdatePassengerMesh() {
 	// Read passenger array, clear and reorganize meshes
+	for (int i = 0; i < MaxPassengerSpawn; i++) {
+		if (Passenger.IsValidIndex(i)) {
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+		} else {
+			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
+		}
+	}
 }
 
 void AStation::PassengerSpawnRoutine() {
@@ -311,15 +366,15 @@ void AStation::SpawnPassenger() {
 		tmp->SetFree();
 	}
 
-	Passenger.Add(tmp);
+	Passenger.Add(MoveTemp(tmp));
 
 	//Log
-	if (GEngine)
+	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.0f,
 			FColor::Yellow,
-			FString::Printf(TEXT("Passenger Spawn!")));
+			FString::Printf(TEXT("Passenger Spawn!")));*/
 }
 
 double AStation::GetPassengerSpawnProbability() {

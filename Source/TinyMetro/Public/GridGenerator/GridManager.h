@@ -29,8 +29,12 @@ public:
 	void SetGridCellData(TArray<FGridCellData>& data);
 	UFUNCTION(BlueprintCallable)
 	void SetGridSize(FIntPoint& Size);
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetGridSize() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<FGridCellData> GetGridCellData() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetStationSpawnPrevent() const;
 	UFUNCTION(BlueprintCallable)
 	FGridCellData GetGridCellDataByCoord(FVector Coord, bool& Success) const;
 	UFUNCTION(BlueprintCallable)
@@ -60,7 +64,7 @@ private:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	float GridCellSize = 400;
+	float GridCellSize = 500;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnExtend = 3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")

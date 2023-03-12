@@ -7,6 +7,10 @@ void UPassenger::SetDestination(StationType Dest) {
 	Destination = Dest;
 }
 
+StationType UPassenger::GetDestination() const {
+	return Destination;
+}
+
 UPassenger* UPassenger::ConstructPassenger(StationType Dest) {
 	auto Obj = NewObject<UPassenger>();
 	Obj->SetDestination(Dest);

@@ -51,6 +51,14 @@ TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
     return TrainMaterialPath;
 }
 
+TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetLaneMaterialPath() const {
+    return LaneMaterialPath;
+}
+
+TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetPassengerMaterialPath() const {
+    return PassengerMaterialPath;
+}
+
 void ATinyMetroGameModeBase::StartPlay() {
     StationManager = GetWorld()->SpawnActor<AStationManager>();
     SaveManager = GetWorld()->SpawnActor<ATMSaveManager>();

@@ -2,7 +2,9 @@
 
 
 #include "Train/TrainTemplate.h"
+#include "Train/TrainManager.h"
 #include "GameModes/GameModeBaseSeoul.h"
+#include "Lane/LaneManager.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -12,13 +14,46 @@
 // Sets default values
 ATrainTemplate::ATrainTemplate()
 {
+	//APlayerController::bEnableClickEvents = true;
+
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	auto TrainMovement = GetCharacterMovement();
+	TrainMovement = GetCharacterMovement();
 	TrainMovement->MaxAcceleration = 50000.0f; // Default 2048
 	TrainMovement->Mass = 1.0f; // Deafult 100
 	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
 	TrainMovement->bUseControllerDesiredRotation = true; // Default false
+
+	TrainMaterial.AddUnique(
+		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
+	);
+
+	// Add dummy material (Material index start "1")
+	PassengerMaterial.AddUnique(
+		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
+	);
+
+	auto PassengerScene = CreateDefaultSubobject<USceneComponent>("Passengers");
+	PassengerScene->SetupAttachment(RootComponent);
+
+	// Set passenger mesh
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		FName name = *FString::Printf(TEXT("Passenger %d"), i);
+		auto tmp = CreateDefaultSubobject<UStaticMeshComponent>(name);
+		tmp->SetupAttachment(PassengerScene);
+		tmp->SetWorldRotation(PassengerMeshRotation);
+		PassengerMeshComponent.Add(MoveTemp(tmp));
+	}
+
+	// Load meshes (Passenger)
+	for (auto& i : PassengerMeshPath) {
+		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		Passenger.Add(i, nullptr);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -26,19 +61,26 @@ void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
+	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	
 	InitTrainMaterial();
+	InitPassengerMaterial();
 	InitTrainMesh();
 
-
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		TEXT("Train Spawn"));
-	
 }
 
-//FVector ATrainTemplate::ConvertMousePositionToWorldLocation_Implementation() {
-//	return FVector();
-//}
+void ATrainTemplate::UpdatePassengerMesh() {
+	// Read passenger array, clear and reorganize meshes
+	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+		if (Passenger[i]) {
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+		} else {
+			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
+		}
+	}
+}
 
 FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
 	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
@@ -57,15 +99,60 @@ FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
 	return HitResult.Location;
 }
 
-bool ATrainTemplate::SetTrainMaterial(int32 LaneNumber) {
+void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
+}
+
+bool ATrainTemplate::IsPassengerSlotFull() {
 	return false;
 }
+
+int32 ATrainTemplate::GetValidSeatCount() const {
+	int32 ValidSeat = 0;
+	for (int i = 0; i < CurrentPassengerSlot; i++) {
+		if (!Passenger[i]) {
+			ValidSeat++;
+		}
+	}
+	return ValidSeat;
+}
+
+bool ATrainTemplate::AddPassenger(UPassenger* P) {
+	for (int i = 0; i < Passenger.Num(); i++) {
+		if (Passenger[i] == nullptr) {
+			Passenger.Add(i, P);
+			return true;
+		}
+	}
+	return false;
+}
+
+void ATrainTemplate::DespawnTrain() {
+	
+}
+
+void ATrainTemplate::DropPassenger() {
+	auto CurrentStationPointer = StationManagerRef->GetStationByStationInfo(CurrentStation);
+	auto NextStationPointer = StationManagerRef->GetStationByStationInfo(NextStation);
+
+	if (IsValid(CurrentStationPointer)) {
+		for (auto& i : Passenger) {
+			if (i.Value != nullptr) {
+				CurrentStationPointer->GetOffPassenger(i.Value);
+				i.Value = nullptr;
+			}
+		}
+	} else {
+
+	}
+}
+
+
 
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	TotalTravel += TrainMovement->MaxWalkSpeed * DeltaTime;
 }
 
 // Called to bind functionality to input
@@ -76,12 +163,15 @@ void ATrainTemplate::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 }
 
 void ATrainTemplate::InitTrainMaterial() {
-	TrainMaterialPath = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
+	/*TrainMaterialPath = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
 	AssetLoader.RequestAsyncLoad(
 		TrainMaterialPath,
 		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMaterialDeferred)
-	);
+	);*/
+
+	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetTrainMaterial();
+	TrainMaterial.Append(tmp);
 }
 
 void ATrainTemplate::InitTrainMesh() {
@@ -103,6 +193,11 @@ void ATrainTemplate::TrainMeshDeferred() {
 	for (auto& i : TrainMeshPath) {
 		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
 	}
+}
+
+void ATrainTemplate::InitPassengerMaterial() {
+	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetPassengerMaterial();
+	PassengerMaterial.Append(tmp);
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {
@@ -140,7 +235,7 @@ void ATrainTemplate::Test() {
 		TEXT("Test() : TrainTemplate"));
 }
 
-FVector ATrainTemplate::GetNextTrainPosition() {
+FVector ATrainTemplate::GetNextTrainDestination(FVector CurLocation) {
 	return FVector();
 }
 

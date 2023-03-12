@@ -27,11 +27,13 @@ AActor* USpawnTrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldL
 	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
 	FVector WorldPosition, WorldDirection;
 	FHitResult HitResult;
+	//UE_LOG(LogTemp, Log, TEXT("Screen Location : %lf %lf"), ScreenLocation.X, ScreenLocation.Y);
+	//UE_LOG(LogTemp, Log, TEXT("ViewportScale : %f"), UWidgetLayoutLibrary::GetViewportScale(GetWorld()));
 	UGameplayStatics::DeprojectScreenToWorld(
 		UGameplayStatics::GetPlayerController(GetWorld(), 0),
 		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
 		WorldPosition, WorldDirection);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000.0f) + WorldPosition,
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000000.0f) + WorldPosition,
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
 	WorldLocation = HitResult.Location;

@@ -18,9 +18,10 @@ public:
 	ASubtrain();
 
 	virtual void Test() override;
+	virtual void SetTrainMaterial(class ALane* Lane) override;
 
 	// TrainTemplate override function
-	virtual FVector GetNextTrainPosition() override;
+	//virtual FVector GetNextTrainPosition() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetOwnerTrainId(int32 TID);

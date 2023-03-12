@@ -1,7 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Misc/OutputDeviceNull.h"
 #include "Lane/LaneManager.h"
+#include "Misc/OutputDeviceNull.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include <Engine/AssetManager.h>
+#include <Kismet/GameplayStatics.h>
+
 
 // Sets default values
 ALaneManager::ALaneManager()
@@ -15,7 +19,9 @@ ALaneManager::ALaneManager()
 void ALaneManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	InitLaneMaterial();
 }
 
 // Called every frame
@@ -54,6 +60,12 @@ void ALaneManager::RemoveDestroyedLane(int LaneNum)
 }
 
 void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
+
+	if (NextLaneNums.IsEmpty()) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
+		return;
+	}
 
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
@@ -94,14 +106,25 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		
 		if (IsValid(SelectedStations[i])) {
 			SelectedStations[i]->SetLanes(NextLaneNums[0]);
-			tmpLane->StationPoint.Add(SelectedStations[i]->GetCurrentGridCellData().WorldCoordination);
+			FIntPoint Coor = SelectedStations[i]->GetCurrentGridCellData().WorldCoordination;
+			tmpLane->StationPoint.Add(Coor);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d] is null"), i);
+			return;
 		}
 		
 	}
 
+	FIntPoint Start = SelectedStations[0]->GetCurrentGridCellData().WorldCoordination;
+	FIntPoint End = SelectedStations[1]->GetCurrentGridCellData().WorldCoordination;
+	UE_LOG(LogTemp, Warning, TEXT("CreatingNewLane /IntPoint Start : %d, %d"), Start.X, Start.Y);
+	UE_LOG(LogTemp, Warning, TEXT("CreatingNewLane /IntPoint End : %d, %d"), End.X, End.Y);
+
+
+	tmpLane->AddAdjListDistance(Start, End, SelectedStations[0], SelectedStations[1]);
+
+	tmpLane->InitLaneMaterial(LaneMaterial);
 	tmpLane->InitializeNewLane();
 
 	Lanes.Add(NextLaneNums[0], tmpLane);
@@ -112,6 +135,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	UE_LOG(LogTemp, Warning, TEXT("New LaneNum : %d"), NextLaneNums[0]);
 
 	RemoveNextLaneNums();
+
+	//StationManagerRef->AddAdjListItem(SelectedStations[0], SelectedStations[1], )
 }
 
 
@@ -127,5 +152,28 @@ void ALaneManager::AddLane(ALane* Obj) {
 }
 
 ALane* ALaneManager::GetLaneById(int32 LaneId) {
-	return Lanes[LaneId - 1];
+
+	ALane* Lane = Lanes.FindRef(LaneId);
+	return Lane;
+}
+
+void ALaneManager::InitLaneMaterial() {
+	LaneMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetLaneMaterialPath();
+	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	AssetLoader.RequestAsyncLoad(
+		LaneMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ALaneManager::LaneMaterialDeferred)
+	);
+}
+
+void ALaneManager::LaneMaterialDeferred() {
+
+	for (auto& i : LaneMaterialPath) {
+		//TAssetPtr<UMaterial> tmp(i);
+		LaneMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
+	}
+}
+
+TArray<UMaterial*> ALaneManager::GetLaneMaterial() const {
+	return LaneMaterial;
 }

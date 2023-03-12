@@ -10,6 +10,7 @@
 #include "../SaveSystem/TMSaveManager.h"
 #include "../GridGenerator/GridCellData.h"
 #include "../Policy/Policy.h"
+#include "StationInfo.h"
 #include "Station.generated.h"
 
 class AStationManager;
@@ -73,6 +74,14 @@ public:
 	void LoadStationValue(FStationValuesStruct StationValues);
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
+
+	//UFUNCTION()
+	/*Return passenger at Index
+	Key is passenger's pointer, set nullptr when passenger don't want ride
+	Value is bool of Index's validation. return true when index is valid
+	*/
+	TPair<UPassenger*, bool> GetOnPassenger(int32 Index);
+	void GetOffPassenger(class UPassenger* P);
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 
@@ -82,6 +91,9 @@ public:
 	int32 GetComplain() const;
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
+
+	FStationInfo GetStationInfo();
+	void SetStationInfo(int32 Id, StationType Type);
 
 protected:
 	void PassengerSpawnRoutine();
@@ -139,6 +151,18 @@ protected:
 	TArray<UPassenger*> Passenger;
 	UPROPERTY(BlueprintReadWrite)
 	TArray<int32> Lanes;
+	UPROPERTY(BlueprintReadWrite)
+	FStationInfo StationInfo;
+
+
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	int32 MaxPassengerSpawn = 15;
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	FVector PassengerMeshDefaultPosition = FVector(180.0f, 0.0f, 10.0f);
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	float PassengerX_Distance = 90;
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	float PassengerY_Distance = 45;
 
 protected:
 	// Station meshses
@@ -149,15 +173,25 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> StationMesh;
 
-	// Material
+	// Passenger meshes
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<UStaticMeshComponent*> PassengerMeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UStaticMesh*> PassengerMesh;
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* OverlapVolume;
+
+	// Material (Station)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> StationMaterialInactive;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> StationMaterialActive;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> StationMaterialDestroyed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> PassengerMaterial;
 
-	// Mesh, Material paths
+	// Mesh, Material paths (Station)
 	UPROPERTY()
 	TArray<FString> StationMeshPath = {
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'"),
@@ -185,5 +219,25 @@ protected:
 	TArray<FString> StationMaterialDestroyedPath = {
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Outer.M_StationDestroyed_Outer'"),
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationDestroyed_Inner.M_StationDestroyed_Inner'")
+	};
+
+	// Mesh, Material paths (Passenger)
+	UPROPERTY()
+	TArray<FString> PassengerMeshPath = {
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCross.SM_PassengerCross'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRhombus.SM_PassengerRhombus'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerOval.SM_PassengerOval'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerDiamond.SM_PassengerDiamond'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerPentagon.SM_PassengerPentagon'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerStar.SM_PassengerStar'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerFan.SM_PassengerFan'")
+	};
+	UPROPERTY()
+	TArray<FString> PassengerMaterialPath = {
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
+		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
 	};
 };

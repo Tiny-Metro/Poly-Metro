@@ -7,6 +7,7 @@
 #include "LanePoint.h"
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
+#include "../Station/StationManager.h"
 #include "Lane.generated.h"
 
 UCLASS(Blueprintable)
@@ -34,15 +35,35 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AStationManager* StationManagerRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ALaneManager* LaneManagerRef;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	int32 LaneId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> LaneMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsCircularLine = false;
 
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetLaneId() const;
 	UFUNCTION(BlueprintCallable)
 	void SetLaneId(int _LaneId);
+	UFUNCTION(BlueprintCallable)
+	void InitLaneMaterial(TArray<UMaterial*> Materials);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsCircularLine();
+	UFUNCTION(BlueprintCallable)
+	void SetIsCircularLine(bool _Circular);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
@@ -100,4 +121,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGridLaneStructure();
+
+	UFUNCTION(BlueprintCallable)
+	void AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First = nullptr, AStation* Second = nullptr);
 };

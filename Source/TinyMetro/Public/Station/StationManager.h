@@ -10,6 +10,8 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
+#include "StationInfo.h"
+#include "AdjList.h"
 #include "StationManager.generated.h"
 
 UCLASS()
@@ -48,7 +50,21 @@ public:
 	//Policy maintenance cost routine
 	void PolicyMaintenanceRoutine();
 
+	UFUNCTION(BlueprintCallable)
+	void AddAdjListItem(AStation* Start, AStation* End, float Length);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveAdjListItem(FIntPoint First, FIntPoint Second);
+
+	UFUNCTION(BlueprintCallable)
+	AStation* GetStationByGridCellData(FIntPoint _IntPoint);
+	UFUNCTION(BlueprintCallable)
+	AStation* GetStationByStationInfo(FStationInfo Info);
+
 protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	int32 MaxStationCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 StationSpawnRequire = 15000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
@@ -108,4 +124,7 @@ protected:
 		int32 PolicyCostCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ATinyMetroPlayerState* PlayerState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UAdjList* AdjList;
 };

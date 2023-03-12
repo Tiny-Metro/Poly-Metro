@@ -4,6 +4,7 @@
 #include "Station/StationManager.h"
 #include "Lane/Lane.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Station/StationInfo.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -16,7 +17,7 @@ AStationManager::AStationManager()
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
-	
+	AdjList = NewObject<UAdjList>();
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +31,11 @@ void AStationManager::BeginPlay()
 
 	//Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
 	Policy = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetPolicy();
+
+	//MaxStationCount = GridManager->GetGridSize()
+	auto GridSize = GridManager->GetGridSize();
+	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
+
 
 	if (IsValid(PlayerState)) {
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Valid"));
@@ -48,12 +54,12 @@ void AStationManager::BeginPlay()
 
 
 
-	FIntPoint test(3,3);
+	/*FIntPoint test(3,3);
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		15.0f,
 		FColor::Yellow,
-		FString::Printf(TEXT("TEST : %d"), test.Size()));
+		FString::Printf(TEXT("TEST : %d"), test.Size()));*/
 
 	
 
@@ -85,12 +91,12 @@ void AStationManager::BeginPlay()
 		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value, true);
 	}
 
-	if (GEngine)
+	/*if (GEngine)
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			15.0f,
 			FColor::Yellow,
-			FString::Printf(TEXT("Data : %d"), InitData.Num()));
+			FString::Printf(TEXT("Data : %d"), InitData.Num()));*/
 }
 
 void AStationManager::TestFunction() {
@@ -107,7 +113,7 @@ StationType AStationManager::CalculatePassengerDest(StationType Except) const {
 
 	do {
 		tmp = Station[FMath::RandRange(0, Station.Num()-1)]->GetStationType();
-	} while (tmp != Except);
+	} while (tmp == Except);
 
 	return tmp;
 }
@@ -126,7 +132,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 	bool LaneValid = IsValid(LaneRef);
 	//UE_LOG(LogTemp, Log, TEXT("Lane valid : %d"), LaneValid);
 	for (int i = 1; i < Station.Num(); i++) {
-		//if (LaneValid && !Station[i]->GetLanes().FindByKey<int32>(LaneRef->GetLaneId())) continue;
+		if (LaneValid && !Station[i]->GetLanes().FindByKey<int32>(LaneRef->GetLaneId())) continue;
 		double tmp = FVector::Dist(CurrentLocation, Station[i]->GetCurrentGridCellData().WorldLocation);
 		if (Distance > tmp) {
 			Distance = tmp;
@@ -177,6 +183,8 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId++);
 	tmp->SetPolicy(Policy);
 
+	tmp->SetStationInfo(StationId, Type);
+
 	if (ActivateFlag) {
 		tmp->ActivateStation();
 	}
@@ -197,6 +205,17 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridCellData.WorldCoordination.Y,
 		GridStationStructure::Station);
 
+
+	AdjList->Add(tmp->GetStationInfo(), NewObject<UAdjArrayItem>());
+
+	/*
+	AdjList.Add(tmp->GetItem(), NewObject<UAdjArrayItem>());
+	AdjList[tmp->GetItem()].Add(tmp2->GetItem(), Length);
+	AdjList[tmp->GetItem()][tmp2->GetItem()] == Length;
+	*/
+
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
 
 	//Log
 	/*if (GEngine)
@@ -275,6 +294,54 @@ void AStationManager::PolicyMaintenanceRoutine() {
 		true,
 		1.0f
 	);
+}
+
+void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
+{
+	(*AdjList)[Start->GetStationInfo()].Add(End->GetStationInfo(), Length);
+	(*AdjList)[End->GetStationInfo()].Add(Start->GetStationInfo(), Length);
+
+	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetStationInfo()][Start->GetStationInfo()]);
+	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetStationInfo()][End->GetStationInfo()]);
+
+	
+}
+
+void AStationManager::RemoveAdjListItem(FIntPoint First,FIntPoint Second)
+{
+	AStation* Start = GetStationByGridCellData(First);
+	AStation* End = GetStationByGridCellData(Second);
+
+	(*AdjList)[Start->GetStationInfo()].RemoveRef(End->GetStationInfo());
+	(*AdjList)[End->GetStationInfo()].RemoveRef(Start->GetStationInfo());
+
+	UE_LOG(LogTemp, Warning, TEXT(" Remove AddList: StartId : %d / EndId : %d / Length : %d"), Start->GetStationId(), End->GetStationId(), (*AdjList)[Start->GetStationInfo()].Num());
+
+}
+
+AStation* AStationManager::GetStationByGridCellData(FIntPoint _IntPoint)
+{
+	for (int i = 0; i < Station.Num(); i++) {
+
+		FIntPoint Coor = Station[i]->GetCurrentGridCellData().WorldCoordination;
+
+		if ( Coor == _IntPoint) {
+			return Station[i];
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Get Station By GridCellData / Station : %d, %d / IntPoint : %d, %d"), Coor.X, Coor.Y, _IntPoint.X, _IntPoint.Y);
+	}
+
+	return nullptr;
+}
+
+AStation* AStationManager::GetStationByStationInfo(FStationInfo Info) {
+	for (auto& i : Station) {
+		if (i->GetStationInfo().Id == Info.Id) {
+			return i;
+		}
+	}
+	return nullptr;
 }
 
 StationType AStationManager::GetRandomStationType() {

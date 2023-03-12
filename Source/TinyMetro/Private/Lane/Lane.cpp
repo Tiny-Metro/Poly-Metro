@@ -15,6 +15,12 @@ ALane::ALane()
 
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	
+	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+
+
+	LaneMaterial.AddUnique(
+		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
+	);
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +40,20 @@ void ALane::Tick(float DeltaTime)
 void ALane::SetLaneId(int _LaneId)
 {
 	LaneId = _LaneId;
+}
+
+void ALane::InitLaneMaterial(TArray<UMaterial*> Materials) {
+	LaneMaterial.Append(Materials);
+}
+
+bool ALane::GetIsCircularLine()
+{
+	return IsCircularLine;
+}
+
+void ALane::SetIsCircularLine(bool _Circular)
+{
+	IsCircularLine = _Circular;
 }
 
 int32 ALane::GetLaneId() const
@@ -341,4 +361,40 @@ void ALane::SetGridLaneStructure()
 		}
 	}
 	
+}
+
+void ALane::AddAdjListDistance(FIntPoint Start, FIntPoint End, AStation* First, AStation* Second)
+{
+	int N = abs(Start.X - End.X);
+	int M = abs(Start.Y - End.Y);
+
+	float Distance;
+
+	if (N < M) {
+		Distance = (N * 14)/10.0 + M - N;
+	}
+	else {
+		Distance = (M * 14) / 10.0 + N - M;
+	}
+
+	
+
+	UE_LOG(LogTemp, Warning, TEXT("AddAdjListDistance /IntPoint Start : %d, %d"), Start.X, Start.Y);
+	UE_LOG(LogTemp, Warning, TEXT("AddAdjListDistance /IntPoint End : %d, %d"), End.X, End.Y);
+
+	if (First == nullptr) {
+		First = StationManagerRef->GetStationByGridCellData(Start);
+
+		UE_LOG(LogTemp, Warning, TEXT("IntPoint : %d / %d"), Start.X, Start.Y);
+		//UE_LOG(LogTemp, Warning, TEXT("Station Id : %d"), First->GetStationId());
+	}
+
+	if (Second == nullptr) {
+		Second = StationManagerRef->GetStationByGridCellData(End);
+
+		UE_LOG(LogTemp, Warning, TEXT("Station Id : %d"), Second->GetStationId());
+	}
+
+	StationManagerRef->AddAdjListItem(First, Second, Distance);
+
 }
