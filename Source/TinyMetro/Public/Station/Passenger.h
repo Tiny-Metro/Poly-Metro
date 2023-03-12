@@ -33,10 +33,14 @@ protected:
 	bool IsFree;
 	UPROPERTY(BlueprintReadOnly)
 	TArray<bool> RandomFree = {true, false, false, false, false};
-		
+	
+	TQueue<int32>* ShortestRoute;
 
 public:
 	UFUNCTION()
 	void SetFree();
+
+	void SetPassengerRoute(TQueue<int32>* Route);
+	TQueue<int32>* GetPassengerRoute();
 	
 };
