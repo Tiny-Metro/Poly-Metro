@@ -77,6 +77,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DropPassenger();
 
+	UFUNCTION()
+	FStationInfo GetCurrentStation() const;
+	UFUNCTION()
+	FStationInfo GetNextStation() const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
