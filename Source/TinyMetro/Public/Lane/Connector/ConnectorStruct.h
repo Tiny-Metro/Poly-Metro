@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Connector.h"
+
 #include "ConnectorStruct.generated.h"
 
 /**
@@ -20,11 +20,5 @@ struct TINYMETRO_API FConnectorStruct
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AConnector* ConnectorRef;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	enum class EConnector : uint8 {
-		Bridge = 0 UMETA(DisplayName = "Bridge"),
-		Tunnel = 1 UMETA(DisplayName = "Tunnel")
-	};
 
 };
