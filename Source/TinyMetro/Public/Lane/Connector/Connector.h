@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ConnectorStruct.h"
+
 #include "Connector.generated.h"
 
 UCLASS()
@@ -23,4 +25,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FConnectorStruct Connector;
 };
