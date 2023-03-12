@@ -149,7 +149,7 @@ protected:
 	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<int32> Lanes;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FStationInfo StationInfo;
