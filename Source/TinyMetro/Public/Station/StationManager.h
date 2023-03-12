@@ -92,10 +92,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationById(int32 Id);
 
+	TQueue<int32>* GetShortestRoute(int32 Start, StationType Type);
+
 private:
 	AStation* GetNearestStationByType(int32 Start, StationType Type);
 	void FloydWarshall();
-	void PathFinding(int32 Start, StationType Type);
+	TQueue<int32>* PathFinding(int32 Start, StationType Type);
+
 
 protected:
 
@@ -170,4 +173,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FAdjArray> adj;
+
+	TMap<int32, TMap<StationType, TQueue<int32>*>> ShortestRoute;
 };
