@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "StationType.h"
+#include "PathQueue.h"
 #include "../SaveSystem/TMSaveManager.h"
 #include "Passenger.generated.h"
 
@@ -34,13 +35,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<bool> RandomFree = {true, false, false, false, false};
 	
-	TQueue<int32>* ShortestRoute;
+	PathQueue ShortestPath;
 
 public:
 	UFUNCTION()
 	void SetFree();
 
-	void SetPassengerRoute(TQueue<int32>* Route);
-	TQueue<int32>* GetPassengerRoute();
+	void SetPassengerPath(PathQueue Path);
+	PathQueue GetPassengerPath();
 	
 };

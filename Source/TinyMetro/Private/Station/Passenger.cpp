@@ -24,14 +24,10 @@ void UPassenger::SetFree() {
 	IsFree = RandomFree[result];
 }
 
-void UPassenger::SetPassengerRoute(TQueue<int32>* Route) {
-	// Remove start station
-	if (Route != nullptr) {
-		Route->Pop();
-	}
-	ShortestRoute = Route;
+void UPassenger::SetPassengerPath(PathQueue Path) {
+	ShortestPath = Path;
 }
 
-TQueue<int32>* UPassenger::GetPassengerRoute() {
-	return ShortestRoute;
+PathQueue UPassenger::GetPassengerPath() {
+	return ShortestPath;
 }
