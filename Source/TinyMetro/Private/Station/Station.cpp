@@ -3,6 +3,7 @@
 
 #include "Station/Station.h"
 #include "Station/StationManager.h"
+#include "Station/PathQueue.h"
 #include "Train/TrainTemplate.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Components/BoxComponent.h"
@@ -143,38 +144,35 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	}
 }
 
-TPair<UPassenger*, bool> AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
+UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 	// TPair.key : Passenger pointer
 	// TPair.value : Index validation (true : Need to next passenger check, false : Last index)
-	TPair<UPassenger*, bool> Tmp(nullptr, false);
-	if (Passenger.IsValidIndex(Index)) {
-		Tmp.Value = true;
+	//TPair<UPassenger*, bool> RidePassenger(nullptr, false);
+	for (int i = 0; i < Passenger.Num(); i++) {
 		// Update passenger route
-		Passenger[Index]->SetPassengerRoute(
-			StationManager->GetShortestRoute(
-				StationInfo.Id, 
-				Passenger[Index]->GetDestination()
-			)
+		auto PassengerRoute = StationManager->GetShortestPath(
+			StationInfo.Id,
+			Passenger[i]->GetDestination()
 		);
-		auto PassengerRoute = Passenger[Index]->GetPassengerRoute();
-		// Check passenger route validation
-		// True : Passenger have a route
-		if (PassengerRoute != nullptr) {
-			// Check route is empty
-			if (!PassengerRoute->IsEmpty()) {
-				// Passenger next stopover station == Train next station
-				// True : Passenger get on
-				if ((*PassengerRoute->Peek()) == Train->GetNextStation().Id) {
-					PassengerRoute->Pop();
-					Tmp.Key = MoveTemp(Passenger[Index]);
-					Passenger.RemoveAt(Index);
 
-					UpdatePassengerMesh();
-				}
+		// Check route is empty
+		if (!PassengerRoute.IsEmpty()) {
+			// Passenger next stopover station == Train next station
+			// True : Passenger get on
+			if (PassengerRoute.Peek() == Train->GetNextStation().Id) {
+				PassengerRoute.Dequeue();
+				UPassenger* tmp = Passenger[i];
+				Passenger.RemoveAt(i);
+				UpdatePassengerMesh();
+				
+				return MoveTemp(tmp);
 			}
 		}
+
+		Passenger[i]->SetPassengerPath(PassengerRoute);
 	}
-	return Tmp;
+
+	return nullptr;
 }
 
 void AStation::GetOffPassenger(UPassenger* P) {
