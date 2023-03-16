@@ -369,14 +369,14 @@ AStation* AStationManager::GetStationById(int32 Id) {
 	return nullptr;
 }
 
-TQueue<int32>* AStationManager::GetShortestRoute(int32 Start, StationType Type) {
-	if (ShortestRoute.Find(Start) == nullptr) {
-		return nullptr;
+PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
+	if (ShortestPath.Find(Start) == nullptr) {
+		return PathQueue();
 	}
-	if (ShortestRoute[Start].Find(Type) == nullptr) {
-		return nullptr;
+	if (ShortestPath[Start].Find(Type) == nullptr) {
+		return PathQueue();
 	}
-	return ShortestRoute[Start][Type];
+	return ShortestPath[Start][Type];
 }
 
 AStation* AStationManager::GetNearestStationByType(int32 Start, StationType Type) {
@@ -429,37 +429,44 @@ void AStationManager::FloydWarshall() {
 	// Calculate route
 	for (int i = 0; i < StationNum; i++) {
 		for (int j = 0; j < 10; j++) {
-			if (ShortestRoute.Find(i) == nullptr) {
+			if (ShortestPath.Find(i) == nullptr) {
+				ShortestPath.Add(i);
+			}
+			ShortestPath[i].Emplace(
+				StaticCast<StationType>(j),
+				PathFinding(i, StaticCast<StationType>(j))
+			);
+			/*if (ShortestRoute.Find(i) == nullptr) {
 				ShortestRoute.Add(i);
 			}
 			ShortestRoute[i].Emplace(
 				StaticCast<StationType>(j),
 				PathFinding(i, StaticCast<StationType>(j))
-			);
+			);*/
 			//ShortestRoute[i][StaticCast<StationType>(j)] = PathFinding(i, StaticCast<StationType>(j));
 		}
 	}
 	
 }
 
-TQueue<int32>* AStationManager::PathFinding(int32 Start, StationType Type) {
+PathQueue AStationManager::PathFinding(int32 Start, StationType Type) {
 	auto NearestStation = GetNearestStationByType(Start, Type);
-	if (!IsValid(NearestStation)) return nullptr;
+	if (!IsValid(NearestStation)) return PathQueue();
 
 	int32 End = NearestStation->GetStationId();
-	if (AdjPath[Start][End] == -1)
-		return nullptr;
+	if (AdjPath[Start][End] == -1) return PathQueue();
 
 	// Storing the path in a vector
-	TQueue<int32>* Path = new TQueue<int32>();
-	//vector<int> path = { u };
+	PathQueue Path;
 	while (Start != End) {
 		Start = AdjPath[Start][End];
-		Path->Enqueue(Start);
+		Path.Enqueue(Start);
 	}
-	Path->Enqueue(End);
 
-	return MoveTemp(Path);
+	return Path;
+}
+
+void AStationManager::PrintPath(int32 Start, StationType Type, TQueue<int32>* Path) {
 }
 
 StationType AStationManager::GetRandomStationType() {

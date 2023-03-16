@@ -90,12 +90,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationById(int32 Id);
 
-	TQueue<int32>* GetShortestRoute(int32 Start, StationType Type);
+	PathQueue GetShortestPath(int32 Start, StationType Type);
 
 private:
 	AStation* GetNearestStationByType(int32 Start, StationType Type);
 	void FloydWarshall();
-	TQueue<int32>* PathFinding(int32 Start, StationType Type);
+	PathQueue PathFinding(int32 Start, StationType Type);
+
+	void PrintPath(int32 Start, StationType Type, TQueue<int32>* Path);
 
 
 protected:
@@ -173,4 +175,6 @@ protected:
 	TArray<FAdjArray> adj;
 
 	TMap<int32, TMap<StationType, TQueue<int32>*>> ShortestRoute;
+	
+	TMap<int32, TMap<StationType, PathQueue>> ShortestPath;
 };
