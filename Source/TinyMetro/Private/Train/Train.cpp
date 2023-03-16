@@ -4,6 +4,7 @@
 #include "Train/Train.h"
 #include "Train/SubtrainAiController.h"
 #include "Station/Station.h"
+#include "Station/PathQueue.h"
 #include "Lane/Lane.h"
 #include "Lane/LaneManager.h"
 #include "Components/BoxComponent.h"
@@ -54,7 +55,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		if (Station->GetLanes().Contains(ServiceLaneId)) {
 			// Set current Station
 			CurrentStation = Station->GetStationInfo();
-			// TODO : Set next Station
+			// Set next Station
 			NextStation = LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
 				Station,
 				GetTrainDirection()
@@ -99,13 +100,13 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 }
 
 void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	if (OtherActor->IsA(AStation::StaticClass())) {
+	/*if (OtherActor->IsA(AStation::StaticClass())) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("End Overlap"));
-	}
+	}*/
 }
 
 FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
-	UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
+	//UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
 	bool tmp;
 	auto LaneTmp = LaneManagerRef->GetLaneById(ServiceLaneId);
 	auto NextPoint = LaneTmp->GetNextLocation(
@@ -187,23 +188,24 @@ void ATrain::GetOnPassenger(AStation* Station) {
 
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
 
-		if (RidePassenger.Key != nullptr) {
+
+		if (RidePassenger != nullptr) {
 			PassengerIndex--;
-			if (!AddPassenger(RidePassenger.Key)) { // Train is full
+			// Add Passenger
+			if (!AddPassenger(RidePassenger)) { // Train is full
 				// Passenger get on subtrain
 				for (auto& i : Subtrains) {
-					if (i->AddPassenger(RidePassenger.Key)) {
+					if (i->AddPassenger(RidePassenger)) {
 						break;
 					}
 				}
 			} 
 			TotalPassenger++;
+
+			// Get money
 			PlayerStateRef->AddMoney(Fare);
 			UpdatePassengerMesh();
-		}
-
-		// Index invalid
-		if (!RidePassenger.Value) {
+		} else {
 			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
 		}
@@ -220,34 +222,33 @@ void ATrain::GetOffPassenger(AStation* Station) {
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger[i]) {
 			// Update passenger route
-			Passenger[i]->SetPassengerRoute(
-				StationManagerRef->GetShortestRoute(
-					CurrentStation.Id,
-					Passenger[i]->GetDestination()
-				)
+			auto PassengerRoute = StationManagerRef->GetShortestPath(
+				CurrentStation.Id,
+				Passenger[i]->GetDestination()
 			);
-			auto PassengerRoute = Passenger[i]->GetPassengerRoute();
+
+			//auto PassengerRoute = Passenger[i]->GetPassengerPath();
 			// Check route validation
 			// True : Route valid
 			// False(else) : Route invalid (Get off)
-			if (PassengerRoute != nullptr) {
-				if (!PassengerRoute->IsEmpty()) {
-					// Check passenger route
-					// True : Get off (Ride other train)
-					if ((*PassengerRoute->Peek()) != NextStation.Id) {
-						Station->GetOffPassenger(Passenger[i]);
-						Passenger.Add(i, nullptr);
-						UpdatePassengerMesh();
-					} else {
-						PassengerRoute->Pop();
-					}
+			if (!PassengerRoute.IsEmpty()) {
+				// Check passenger route
+				// False : Get off (Ride other train)
+				if (PassengerRoute.Peek() == NextStation.Id) {
+					PassengerRoute.Dequeue();
+					Passenger[i]->SetPassengerPath(PassengerRoute);
+				} else {
+					Station->GetOffPassenger(Passenger[i]);
+					Passenger.Add(i, nullptr);
+					UpdatePassengerMesh();
+					return;
 				}
-			} else {
+			}else {
 				Station->GetOffPassenger(Passenger[i]);
 				Passenger.Add(i, nullptr);
 				UpdatePassengerMesh();
+				return;
 			}
-			return;
 		}
 	}
 	
