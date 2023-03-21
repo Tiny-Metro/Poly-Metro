@@ -61,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetNextTrainDestination(FVector CurLocation);
 	UFUNCTION(BlueprintCallable)
-	FVector ConvertMousePositionToWorldLocation();
+	AActor* ConvertMousePositionToWorldLocation(FVector& WorldLocation);
 	UFUNCTION(BlueprintCallable)
 	virtual void SetTrainMaterial(class ALane* Lane);
 	UFUNCTION(BlueprintCallable)
@@ -99,6 +99,9 @@ protected:
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TMap<int32, class UPassenger*> Passenger;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<AActor*> LineTraceIgnoreActors;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsUpgrade = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

@@ -84,21 +84,20 @@ void ATrainTemplate::UpdatePassengerMesh() {
 	}
 }
 
-FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
+AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocation) {
 	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
 	FVector WorldPosition, WorldDirection;
 	FHitResult HitResult;
-	TArray<AActor*> tmp;
-	tmp.Add(this);
+	LineTraceIgnoreActors.AddUnique(this);
 	UGameplayStatics::DeprojectScreenToWorld(
 		UGameplayStatics::GetPlayerController(GetWorld(), 0),
 		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
 		WorldPosition, WorldDirection);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000.0f) + WorldPosition,
-		ETraceTypeQuery::TraceTypeQuery1, false, tmp, EDrawDebugTrace::Type::None,
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000000.0f) + WorldPosition,
+		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
-
-	return HitResult.Location;
+	WorldLocation = HitResult.Location;
+	return HitResult.GetActor();
 }
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
