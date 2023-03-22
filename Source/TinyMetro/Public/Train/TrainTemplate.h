@@ -77,6 +77,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DropPassenger();
 
+	UFUNCTION()
+	FStationInfo GetCurrentStation() const;
+	UFUNCTION()
+	FStationInfo GetNextStation() const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
@@ -88,6 +93,8 @@ protected:
 	class AGridManager* GridManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class AStationManager* StationManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -114,6 +121,9 @@ protected:
 	FStationInfo CurrentStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FStationInfo NextStation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 Fare = 2;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;

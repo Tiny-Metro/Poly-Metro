@@ -4,6 +4,7 @@
 #include "Train/Train.h"
 #include "Train/SubtrainAiController.h"
 #include "Station/Station.h"
+#include "Station/PathQueue.h"
 #include "Lane/Lane.h"
 #include "Lane/LaneManager.h"
 #include "Components/BoxComponent.h"
@@ -54,8 +55,12 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		if (Station->GetLanes().Contains(ServiceLaneId)) {
 			// Set current Station
 			CurrentStation = Station->GetStationInfo();
-			// TODO : Set next Station
-			
+			// Set next Station
+			NextStation = LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
+				Station,
+				GetTrainDirection()
+			)->GetStationInfo();
+
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
 			// Movement stop, release
@@ -85,19 +90,23 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 				true,
 				0.0f
 			);
+
+			AiControllerRef->SetTrainDestination(
+				GetNextTrainDestination(AiControllerRef->GetTrainDestination())
+			);
 		}
 	}
 	
 }
 
 void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	if (OtherActor->IsA(AStation::StaticClass())) {
+	/*if (OtherActor->IsA(AStation::StaticClass())) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("End Overlap"));
-	}
+	}*/
 }
 
 FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
-	UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
+	//UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
 	bool tmp;
 	auto LaneTmp = LaneManagerRef->GetLaneById(ServiceLaneId);
 	auto NextPoint = LaneTmp->GetNextLocation(
@@ -157,7 +166,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* De
 	));
 
 	// Set train destination (Next grid)
-	AiControllerRef->SetTrainDestination(StartLocation);
+	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
 
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;
@@ -173,24 +182,30 @@ void ATrain::ActiveMoveTest() {
 
 void ATrain::GetOnPassenger(AStation* Station) {
 	if (!IsPassengerSlotFull()) {
-		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++);
+		// Log
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Staton::GetOnPassenger"));
 
-		if (RidePassenger.Key != nullptr) {
+
+		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
+
+
+		if (RidePassenger != nullptr) {
 			PassengerIndex--;
-			if (!AddPassenger(RidePassenger.Key)) { // Train is full
+			// Add Passenger
+			if (!AddPassenger(RidePassenger)) { // Train is full
 				// Passenger get on subtrain
 				for (auto& i : Subtrains) {
-					if (i->AddPassenger(RidePassenger.Key)) {
+					if (i->AddPassenger(RidePassenger)) {
 						break;
 					}
 				}
 			} 
 			TotalPassenger++;
-			UpdatePassengerMesh();
-		}
 
-		// Index invalid
-		if (!RidePassenger.Value) {
+			// Get money
+			PlayerStateRef->AddMoney(Fare);
+			UpdatePassengerMesh();
+		} else {
 			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
 		}
@@ -201,10 +216,34 @@ void ATrain::GetOnPassenger(AStation* Station) {
 }
 
 void ATrain::GetOffPassenger(AStation* Station) {
+	// Log
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
+
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger[i]) {
-			// Check passenger route
-			if (true) {
+			// Update passenger route
+			auto PassengerRoute = StationManagerRef->GetShortestPath(
+				CurrentStation.Id,
+				Passenger[i]->GetDestination()
+			);
+
+			//auto PassengerRoute = Passenger[i]->GetPassengerPath();
+			// Check route validation
+			// True : Route valid
+			// False(else) : Route invalid (Get off)
+			if (!PassengerRoute.IsEmpty()) {
+				// Check passenger route
+				// False : Get off (Ride other train)
+				if (PassengerRoute.Peek() == NextStation.Id) {
+					PassengerRoute.Dequeue();
+					Passenger[i]->SetPassengerPath(PassengerRoute);
+				} else {
+					Station->GetOffPassenger(Passenger[i]);
+					Passenger.Add(i, nullptr);
+					UpdatePassengerMesh();
+					return;
+				}
+			}else {
 				Station->GetOffPassenger(Passenger[i]);
 				Passenger.Add(i, nullptr);
 				UpdatePassengerMesh();

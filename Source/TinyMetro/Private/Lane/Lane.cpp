@@ -293,16 +293,16 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 		return FIntPoint();
 	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("Train Direction : %d"), Direction);
-	//UE_LOG(LogTemp, Warning, TEXT("Index Num : %d"), Index);
+	UE_LOG(LogTemp, Warning, TEXT("Train Direction : %d"), Direction);
+	UE_LOG(LogTemp, Warning, TEXT("Index Num : %d"), Index);
 
 	if (Direction == TrainDirection::Up) { // index get smaller
 
 		if (Index != 0) {
 
-			for (int32 i = Index; i >= 0; i--) {
+			for (int32 i = Index -1; i >= 0; i--) {
 				if (LaneArray[i].IsStation) {
-					//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Up : %d"), i);
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Up : %d"), i);
 					return LaneArray[i].Coordination;
 				}
 			}
@@ -325,9 +325,9 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 	else {
 
 		if (Index != (LaneArray.Num() - 1)) {
-			for (int32 i = Index; i < LaneArray.Num(); i++) {
+			for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
 				if (LaneArray[i].IsStation) {
-					//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Down : %d"), i);
+					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Down : %d"), i);
 					return LaneArray[i].Coordination;
 					
 				}
@@ -404,8 +404,9 @@ AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)
 
 
 	if (!GetIsCircularLine()) {
+
 		if (Index == StationPoint.Num() - 1) {
-			return StationPoint[Index + 1];
+			return StationPoint[Index-1];
 		}
 		else if (Index == 0) {
 			return StationPoint[1];

@@ -15,11 +15,19 @@ UPassenger* UPassenger::ConstructPassenger(StationType Dest) {
 	auto Obj = NewObject<UPassenger>();
 	Obj->SetDestination(Dest);
 	//Obj->SetFree();  TODO : if Policy->GetHasBicycle == true
-	return Obj;
+	return MoveTemp(Obj);
 }
 
 void UPassenger::SetFree() {
 	int result = FMath::RandRange(0,4);
 
 	IsFree = RandomFree[result];
+}
+
+void UPassenger::SetPassengerPath(PathQueue Path) {
+	ShortestPath = Path;
+}
+
+PathQueue UPassenger::GetPassengerPath() {
+	return ShortestPath;
 }

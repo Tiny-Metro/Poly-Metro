@@ -4,6 +4,7 @@
 #include "Train/TrainTemplate.h"
 #include "Train/TrainManager.h"
 #include "GameModes/GameModeBaseSeoul.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include "Lane/LaneManager.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
@@ -64,7 +65,8 @@ void ATrainTemplate::BeginPlay()
 	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
-	
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
 	InitTrainMaterial();
 	InitPassengerMaterial();
 	InitTrainMesh();
@@ -144,6 +146,14 @@ void ATrainTemplate::DropPassenger() {
 	} else {
 
 	}
+}
+
+FStationInfo ATrainTemplate::GetCurrentStation() const {
+	return CurrentStation;
+}
+
+FStationInfo ATrainTemplate::GetNextStation() const {
+	return NextStation;
 }
 
 

@@ -80,7 +80,7 @@ public:
 	Key is passenger's pointer, set nullptr when passenger don't want ride
 	Value is bool of Index's validation. return true when index is valid
 	*/
-	TPair<UPassenger*, bool> GetOnPassenger(int32 Index);
+	UPassenger* GetOnPassenger(int32 Index, class ATrainTemplate* Train);
 	void GetOffPassenger(class UPassenger* P);
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
@@ -149,9 +149,9 @@ protected:
 	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<int32> Lanes;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FStationInfo StationInfo;
 
 
