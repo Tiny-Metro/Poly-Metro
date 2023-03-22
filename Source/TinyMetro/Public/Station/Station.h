@@ -75,6 +75,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
 
+	UFUNCTION(BlueprintCallable)
+	void RemoveLane(int32 LId);
+
 	//UFUNCTION()
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -91,6 +94,7 @@ public:
 	int32 GetComplain() const;
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
+	
 
 	FStationInfo GetStationInfo();
 	void SetStationInfo(int32 Id, StationType Type);

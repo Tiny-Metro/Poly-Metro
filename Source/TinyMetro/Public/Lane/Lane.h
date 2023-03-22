@@ -52,6 +52,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsCircularLine = false;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool AlreadyDeleted = false;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetLaneId() const;
@@ -64,6 +67,12 @@ public:
 	bool GetIsCircularLine() const;
 	UFUNCTION(BlueprintCallable)
 	void SetIsCircularLine(bool _Circular);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetAlreadyDeleted() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetAlreadyDeleted(bool _Delete);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")

@@ -56,6 +56,16 @@ void ALane::SetIsCircularLine(bool _Circular)
 	IsCircularLine = _Circular;
 }
 
+bool ALane::GetAlreadyDeleted() const
+{
+	return AlreadyDeleted;
+}
+
+void ALane::SetAlreadyDeleted(bool _Delete)
+{
+	AlreadyDeleted = _Delete;
+}
+
 int32 ALane::GetLaneId() const
 {
 	return LaneId;
