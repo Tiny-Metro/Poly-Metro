@@ -49,10 +49,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool IsCircularLine = false;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool AlreadyDeleted = false;
 
 public:
