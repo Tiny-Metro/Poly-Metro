@@ -20,6 +20,8 @@ public:
 	ATrain();
 
 public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 	virtual void Test() override;
 
 	// Called every frame

@@ -13,6 +13,27 @@
 #include <Kismet/KismetSystemLibrary.h>
 #include <Engine/AssetManager.h>
 
+void ATrain::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("Train::Tick")
+	);*/
+
+	if (IsActorDragged) {
+		FVector MouseToWorldLocation;
+		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+		this->SetActorLocation(MouseToWorldLocation);
+
+		FVector TrainForwardVector = TrainMeshComponent->GetForwardVector();
+		FRotator TrainRotationVector = TrainMeshComponent->GetComponentRotation();
+		for (int i = 0; i < Subtrains.Num(); i++) {
+			FVector NewSubtrainLocation = TrainForwardVector * TrainSafeDistance * (i + 1);
+			Subtrains[i]->SetActorLocationAndRotation(NewSubtrainLocation, TrainRotationVector);
+			//FRotator TrainWorldRotation = TrainMeshComponent->getrotationo
+		}
+	}
+}
+
 void ATrain::Test() {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 		TEXT("Test() : Train"));
@@ -30,10 +51,10 @@ ATrain::ATrain() {
 	OverlapVolume->OnComponentEndOverlap.AddDynamic(this, &ATrain::OnOverlapEnd);
 	OverlapVolume->SetupAttachment(RootComponent);
 
-	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
+	
 
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);

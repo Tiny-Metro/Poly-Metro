@@ -17,6 +17,8 @@ ATrainTemplate::ATrainTemplate()
 {
 	//APlayerController::bEnableClickEvents = true;
 
+	// Init train static mesh
+	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -55,6 +57,13 @@ ATrainTemplate::ATrainTemplate()
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		Passenger.Add(i, nullptr);
 	}
+
+	// Bind click, release event
+	//OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	//OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
+
+	TrainMeshComponent->OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	TrainMeshComponent->OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 }
 
 // Called when the game starts or when spawned
@@ -155,13 +164,38 @@ FStationInfo ATrainTemplate::GetNextStation() const {
 	return NextStation;
 }
 
+void ATrainTemplate::TrainOnClicked(UPrimitiveComponent* Target, FKey ButtonPressed) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("TrainTemplate::OnClick")
+	);
+}
+
+void ATrainTemplate::TrainOnReleased(UPrimitiveComponent* Target, FKey ButtonPressed) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("TrainTemplate::OnRelease")
+	);
+}
+
 
 
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("TrainTemplate::Tick")
+	);*/
 	TotalTravel += TrainMovement->MaxWalkSpeed * DeltaTime;
+
+	if (TouchInput) {
+		// Check train pressed time
+		TouchTime += DeltaTime;
+		if (TouchTime > LongClickInterval) {
+			IsActorDragged = true;
+		} else {
+			IsActorDragged = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
