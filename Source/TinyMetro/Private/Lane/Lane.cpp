@@ -777,4 +777,8 @@ void ALane::ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh) {
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
 	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World,true);
+
+	for (int32 i = 0; i < RLaneLocation.Num(); i++) {
+		Spline->SetSplinePointType(i, ESplinePointType::CurveClamped, true);
+	}
 }

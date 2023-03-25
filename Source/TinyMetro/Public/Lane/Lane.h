@@ -182,4 +182,6 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaneSpline(USplineComponent* Spline);
+
+//Refactoring HandleScaling
 };
