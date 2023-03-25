@@ -5,6 +5,7 @@
 #include "Train/TrainTemplate.h"
 #include "Station/Station.h"
 #include "GridGenerator/GridCellData.h"
+#include "Components/SplineMeshComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -760,6 +761,15 @@ void ALane::RSetLaneLocation() {
 
 }
 
+// REFACTORING SetLaneVector
 FVector ALane::PointToLocation(const FIntPoint& Point) {
 	return GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).WorldLocation;
+}
+
+// Refactoring clearSplineMesh
+void ALane::ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh) {
+	for (USplineMeshComponent* SplineMeshComponent : SplineMesh) {
+		if (SplineMeshComponent) { SplineMeshComponent->DestroyComponent(); }
+	}
+	SplineMesh.Empty();
 }

@@ -8,6 +8,7 @@
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
+#include "Components/SplineMeshComponent.h"
 #include "Lane.generated.h"
 
 UCLASS(Blueprintable)
@@ -168,4 +169,11 @@ public:
 private:
 	FVector PointToLocation(const FIntPoint& Point);
 
+// Refactoring clearSplineMesh
+public:
+	UFUNCTION(BlueprintCallable)
+	void ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh);
+
+//	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	//TArray<USplineMeshComponent*> SplineMesh;
 };
