@@ -6,6 +6,7 @@
 #include "Station/Station.h"
 #include "GridGenerator/GridCellData.h"
 #include "Components/SplineMeshComponent.h"
+#include "Components/SplineComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -772,4 +773,8 @@ void ALane::ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh) {
 		if (SplineMeshComponent) { SplineMeshComponent->DestroyComponent(); }
 	}
 	SplineMesh.Empty();
+}
+
+void ALane::SetLaneSpline(USplineComponent* Spline) {
+	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World,true);
 }

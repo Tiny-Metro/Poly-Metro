@@ -9,6 +9,7 @@
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
 #include "Components/SplineMeshComponent.h"
+#include "Components/SplineComponent.h"
 #include "Lane.generated.h"
 
 UCLASS(Blueprintable)
@@ -176,4 +177,9 @@ public:
 
 //	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	//TArray<USplineMeshComponent*> SplineMesh;
+
+//Refactoring SetSpline
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetLaneSpline(USplineComponent* Spline);
 };
