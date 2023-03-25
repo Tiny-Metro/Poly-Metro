@@ -190,4 +190,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	double RSectionLength;
+
+//Refactoring HandleFullLength
+public:
+	UFUNCTION(BlueprintCallable)
+	void HandleFullLength(bool IsFullLength, USplineComponent* Spline);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 EndLoop;
 };

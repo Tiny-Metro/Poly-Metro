@@ -786,3 +786,12 @@ void ALane::SetLaneSpline(USplineComponent* Spline) {
 void ALane::HandleScaling(bool IsScaling) {
 	if (IsScaling) { RSectionLength = GetActorScale3D().X * 100; }
 }
+
+void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
+	if (IsFullLength) {
+		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength))-1;
+	}
+	else {
+		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength));
+	}
+}
