@@ -61,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetNextTrainDestination(FVector CurLocation);
 	UFUNCTION(BlueprintCallable)
-	FVector ConvertMousePositionToWorldLocation();
+	AActor* ConvertMousePositionToWorldLocation(FVector& WorldLocation);
 	UFUNCTION(BlueprintCallable)
 	virtual void SetTrainMaterial(class ALane* Lane);
 	UFUNCTION(BlueprintCallable)
@@ -82,11 +82,19 @@ public:
 	UFUNCTION()
 	FStationInfo GetNextStation() const;
 
+	// Click & Release
+	UFUNCTION()
+	virtual void TrainOnClicked(AActor* Target, FKey ButtonPressed);
+	UFUNCTION()
+	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 ServiceLaneId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class ALane* LaneRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALaneManager* LaneManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
@@ -99,10 +107,13 @@ protected:
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TMap<int32, class UPassenger*> Passenger;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<AActor*> LineTraceIgnoreActors;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsUpgrade = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	bool IsActorDragged;
+	bool IsActorDragged = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float OnPressedTime;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -121,6 +132,8 @@ protected:
 	FStationInfo CurrentStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FStationInfo NextStation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class AStation* Destination;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 Fare = 2;
@@ -133,6 +146,13 @@ protected:
 	TArray<FVector> PassengerMeshPositionUpgrade;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	FRotator PassengerMeshRotation = FRotator(0.0f, -90.0f, 20.0f);
+
+	UPROPERTY(BlueprintReadWrite)
+	float TouchTime = 0.0f;
+	UPROPERTY(BlueprintReadWrite)
+	bool TouchInput = false;
+	UPROPERTY(BlueprintReadWrite)
+	float TrainSafeDistance = 250.f;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
