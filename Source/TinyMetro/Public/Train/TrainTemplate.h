@@ -84,15 +84,17 @@ public:
 
 	// Click & Release
 	UFUNCTION()
-	virtual void TrainOnClicked(UPrimitiveComponent* Target, FKey ButtonPressed);
+	virtual void TrainOnClicked(AActor* Target, FKey ButtonPressed);
 	UFUNCTION()
-	virtual void TrainOnReleased(UPrimitiveComponent* Target, FKey ButtonPressed);
+	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 ServiceLaneId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class ALane* LaneRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALaneManager* LaneManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
@@ -130,6 +132,8 @@ protected:
 	FStationInfo CurrentStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FStationInfo NextStation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class AStation* Destination;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 Fare = 2;

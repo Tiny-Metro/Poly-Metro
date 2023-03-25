@@ -20,6 +20,8 @@ ATrainTemplate::ATrainTemplate()
 	// Init train static mesh
 	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 
+	//SetRootComponent(CreateDefaultSubobject<USceneComponent>("DefaultSceneRoot"));
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	TrainMovement = GetCharacterMovement();
@@ -31,14 +33,14 @@ ATrainTemplate::ATrainTemplate()
 	TrainMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
 	);
-
+	
 	// Add dummy material (Material index start "1")
 	PassengerMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
 	);
 
 	auto PassengerScene = CreateDefaultSubobject<USceneComponent>("Passengers");
-	PassengerScene->SetupAttachment(RootComponent);
+	PassengerScene->SetupAttachment(GetRootComponent());
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
@@ -59,11 +61,11 @@ ATrainTemplate::ATrainTemplate()
 	}
 
 	// Bind click, release event
-	//OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
-	//OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
+	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 
-	TrainMeshComponent->OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
-	TrainMeshComponent->OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
+	//TrainMeshComponent->OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	//TrainMeshComponent->OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 }
 
 // Called when the game starts or when spawned
@@ -149,6 +151,7 @@ void ATrainTemplate::DropPassenger() {
 			if (i.Value != nullptr) {
 				CurrentStationPointer->GetOffPassenger(i.Value);
 				i.Value = nullptr;
+				UpdatePassengerMesh();
 			}
 		}
 	} else {
@@ -164,19 +167,17 @@ FStationInfo ATrainTemplate::GetNextStation() const {
 	return NextStation;
 }
 
-void ATrainTemplate::TrainOnClicked(UPrimitiveComponent* Target, FKey ButtonPressed) {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		TEXT("TrainTemplate::OnClick")
-	);
+void ATrainTemplate::TrainOnClicked(AActor* Target, FKey ButtonPressed) {
+	TouchInput = true;
+	TouchTime = 0.0f;
+	OnPressedTime = UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld());
 }
 
-void ATrainTemplate::TrainOnReleased(UPrimitiveComponent* Target, FKey ButtonPressed) {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
-		TEXT("TrainTemplate::OnRelease")
-	);
+void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	IsActorDragged = false;
+	TouchInput = false;
+	TouchTime = 0.0f;
 }
-
-
 
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)

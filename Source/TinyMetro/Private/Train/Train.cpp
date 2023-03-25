@@ -11,6 +11,7 @@
 #include "GameModes/GameModeBaseSeoul.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetSystemLibrary.h>
+#include <Kismet/KismetMathLibrary.h>
 #include <Engine/AssetManager.h>
 
 void ATrain::Tick(float DeltaTime) {
@@ -19,10 +20,29 @@ void ATrain::Tick(float DeltaTime) {
 		TEXT("Train::Tick")
 	);*/
 
+	// Drag & Drop
 	if (IsActorDragged) {
+		DropPassenger();
 		FVector MouseToWorldLocation;
 		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
-		this->SetActorLocation(MouseToWorldLocation);
+		LaneRef = Cast<ALane>(MouseToWorldActor);
+		SetTrainMaterial(LaneRef);
+		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
+			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		}
+		if (IsValid(LaneRef)) {
+			
+		}
+
+		Destination = StationManagerRef->GetNearestStation(MouseToWorldLocation, LaneRef);
+		this->SetActorLocationAndRotation(
+			MouseToWorldLocation,
+			FRotator(
+				0,
+				UKismetMathLibrary::FindLookAtRotation(MouseToWorldLocation, Destination->GetActorLocation()).Yaw,
+				0
+			)
+		);
 
 		FVector TrainForwardVector = TrainMeshComponent->GetForwardVector();
 		FRotator TrainRotationVector = TrainMeshComponent->GetComponentRotation();
@@ -175,14 +195,26 @@ bool ATrain::IsPassengerSlotFull() {
 	}
 }
 
-void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* Destination) {
+void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	Super::TrainOnReleased(Target, ButtonPressed);
+	if (IsValid(LaneRef)) {
+		bool GridGetSuccess;
+		FVector StartLocation = GridManagerRef->GetGridCellDataByCoord(this->GetActorLocation(), GridGetSuccess).WorldLocation;
+		SetActorLocation(StartLocation + FVector(0, 0, 30.0f));
+		ServiceStart(StartLocation, LaneRef, Destination);
+	} else {
+		this->Destroy();
+	}
+}
+
+void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
 	bool tmp;
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
 	// Set train direction (Down or Up)
 	SetTrainDirection(Lane->SetDirectionInit(
-		Destination,
+		D,
 		GridManagerRef->GetGridCellDataByCoord(StartLocation, tmp).WorldCoordination
 	));
 
@@ -191,7 +223,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* De
 
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;
-	NextStation = Destination->GetStationInfo();
+	NextStation = D->GetStationInfo();
 
 	// Train move start
 	AiControllerRef->Patrol();
