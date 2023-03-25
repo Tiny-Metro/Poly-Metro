@@ -532,7 +532,7 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 	return StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
 }
 
-//REFACTORING
+//REFACTORING SET LANE ARRAY
 /*
 * void ALane::RSetLaneArray(const TArray<FIntPoint>& NewStationArray) {
 
@@ -742,4 +742,24 @@ TArray<FIntPoint> ALane::GeneratePath(const FIntPoint& Start, const FIntPoint& E
 		Current += Step;
 	}
 	return Path;
+}
+
+//Refactoring SetLaneLocation
+void ALane::RSetLaneLocation() {
+
+	if (!GridManagerRef){
+		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+		return;
+	}
+
+	RLaneLocation.Empty();
+	for (const FLanePoint& Point : RLaneArray){
+		FVector VectorLocation = PointToLocation(Point.Coordination);
+		RLaneLocation.Add(VectorLocation);		
+	}
+
+}
+
+FVector ALane::PointToLocation(const FIntPoint& Point) {
+	return GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).WorldLocation;
 }

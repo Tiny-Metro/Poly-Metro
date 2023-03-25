@@ -131,7 +131,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
 
-//REFACTORING
+//REFACTORING SETLANEARRAY
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Lane")
@@ -156,4 +156,16 @@ private:
 	FIntPoint findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
 
 	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
+
+// REFACTORING SetLaneVector
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<FVector> RLaneLocation;
+
+	UFUNCTION(BlueprintCallable)
+	void RSetLaneLocation();
+
+private:
+	FVector PointToLocation(const FIntPoint& Point);
+
 };
