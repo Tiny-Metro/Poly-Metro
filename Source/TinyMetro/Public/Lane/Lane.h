@@ -184,4 +184,10 @@ public:
 	void SetLaneSpline(USplineComponent* Spline);
 
 //Refactoring HandleScaling
+public:
+	UFUNCTION(BlueprintCallable)
+	void HandleScaling(bool IsScaling);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	double RSectionLength;
 };

@@ -782,3 +782,7 @@ void ALane::SetLaneSpline(USplineComponent* Spline) {
 		Spline->SetSplinePointType(i, ESplinePointType::CurveClamped, true);
 	}
 }
+
+void ALane::HandleScaling(bool IsScaling) {
+	if (IsScaling) { RSectionLength = GetActorScale3D().X * 100; }
+}
