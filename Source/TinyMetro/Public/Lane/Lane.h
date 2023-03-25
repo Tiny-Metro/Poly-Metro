@@ -131,4 +131,29 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
 
+//REFACTORING
+
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "Lane")
+	TArray<FLanePoint> RLaneArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FIntPoint> PointArray;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
+	TArray<FIntPoint> RStationPoint;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
+	TArray<class AStation* > RRStationPoint;
+
+	UFUNCTION(BlueprintCallable)
+	void RSetLaneArray(const TArray<class AStation*>& NewStationPoint);
+//	void RSetLaneArray(const TArray<FIntPoint>& NewStationArray);
+
+private:
+	bool hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+
+	FIntPoint findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+
+	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
 };

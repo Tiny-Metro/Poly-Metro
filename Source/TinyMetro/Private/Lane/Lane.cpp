@@ -531,3 +531,215 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 	FIntPoint Result = StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
 	return StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
 }
+
+//REFACTORING
+/*
+* void ALane::RSetLaneArray(const TArray<FIntPoint>& NewStationArray) {
+
+	// Clear the existing lane array if any
+	RLaneArray.Empty();
+
+	int32 NumStations = NewStationArray.Num();
+
+	for (int32 i = 0; i < NumStations; i++) {
+		FIntPoint CurrentStation = NewStationArray[i];
+
+		FLanePoint CurrentLanePoint;
+		CurrentLanePoint.Coordination = CurrentStation;
+		CurrentLanePoint.IsStation = true;
+		CurrentLanePoint.IsBendingPoint = true;
+		CurrentLanePoint.IsThrough = false;
+
+		RLaneArray.Add(CurrentLanePoint);
+
+		if (i < NumStations - 1) {
+			FIntPoint NextStation = NewStationArray[i + 1];
+			FIntPoint Diff = NextStation - CurrentStation;
+
+			FIntPoint BendingCoord;
+			bool HasBendingPoint = hasBendingPoint(CurrentStation, NextStation);
+			
+			if (HasBendingPoint) {
+				BendingCoord = findBendingPoint(CurrentStation, NextStation);
+
+				TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
+				TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
+
+				for (const FIntPoint& Point : PathToBending) {
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+				FLanePoint BendingPoint;
+				BendingPoint.Coordination = BendingCoord;
+				BendingPoint.IsStation = false;
+				BendingPoint.IsBendingPoint = true;
+				BendingPoint.IsThrough = false;
+
+				RLaneArray.Add(BendingPoint);
+				
+				for (const FIntPoint& Point : PathFromBending)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+			}
+			else {
+				TArray<FIntPoint> PathToNext = GeneratePath(CurrentStation, NextStation);
+
+				for (const FIntPoint& Point : PathToNext)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+			}
+
+
+		}
+
+
+	}
+}
+
+*/
+void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
+
+	// Clear the existing lane array if any
+	RLaneArray.Empty();
+
+	//int32 NumStations = NewStationArray.Num();
+	int32 NumStations = NewStationPoint.Num();
+
+	for (int32 i = 0; i < NumStations; i++) {
+		
+		FIntPoint CurrentStation = NewStationPoint[i]->GetCurrentGridCellData().WorldCoordination;
+
+		FLanePoint CurrentLanePoint;
+		CurrentLanePoint.Coordination = CurrentStation;
+		CurrentLanePoint.IsStation = true;
+		CurrentLanePoint.IsBendingPoint = true;
+		CurrentLanePoint.IsThrough = false;
+
+		RLaneArray.Add(CurrentLanePoint);
+
+		if (i < NumStations - 1) {
+			FIntPoint NextStation = NewStationPoint[i+1]->GetCurrentGridCellData().WorldCoordination;
+			FIntPoint Diff = NextStation - CurrentStation;
+
+			FIntPoint BendingCoord;
+			bool HasBendingPoint = hasBendingPoint(CurrentStation, NextStation);
+			
+			if (HasBendingPoint) {
+				BendingCoord = findBendingPoint(CurrentStation, NextStation);
+
+				TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
+				TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
+
+				for (const FIntPoint& Point : PathToBending) {
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+				FLanePoint BendingPoint;
+				BendingPoint.Coordination = BendingCoord;
+				BendingPoint.IsStation = false;
+				BendingPoint.IsBendingPoint = true;
+				BendingPoint.IsThrough = false;
+
+				RLaneArray.Add(BendingPoint);
+				
+				for (const FIntPoint& Point : PathFromBending)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+			}
+			else {
+				TArray<FIntPoint> PathToNext = GeneratePath(CurrentStation, NextStation);
+
+				for (const FIntPoint& Point : PathToNext)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+			}
+
+
+		}
+
+
+	}
+}
+
+bool ALane::hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+	FIntPoint Diff = NextStation - CurrentStation;
+
+	if (Diff.X == 0) return false;
+	if (Diff.Y == 0) return false;
+	if (FMath::Abs(Diff.X) == FMath::Abs(Diff.Y)) return false;
+	return true;
+}
+
+FIntPoint ALane::findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+	FIntPoint BendingPoint;
+	
+	FIntPoint Diff = NextStation - CurrentStation;
+
+	if (FMath::Abs(Diff.X) > FMath::Abs(Diff.Y)) {
+		BendingPoint.X = CurrentStation.X + FMath::Sign(Diff.X) * FMath::Abs(Diff.Y);
+		BendingPoint.Y = NextStation.Y;
+	}
+	else {
+		BendingPoint.X = NextStation.X;
+		BendingPoint.Y = CurrentStation.Y + FMath::Sign(Diff.Y) * FMath::Abs(Diff.X);
+	}
+
+	return BendingPoint;
+}
+
+TArray<FIntPoint> ALane::GeneratePath(const FIntPoint& Start, const FIntPoint& End){
+	TArray<FIntPoint> Path;
+
+	FIntPoint Diff = End - Start;
+	FIntPoint Step(FMath::Sign(Diff.X), FMath::Sign(Diff.Y));
+	FIntPoint Current = Start + Step;
+
+	while (Current != End)
+	{
+		Path.Add(Current);
+		Current += Step;
+	}
+	return Path;
+}
