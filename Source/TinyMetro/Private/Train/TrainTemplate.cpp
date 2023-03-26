@@ -17,6 +17,10 @@ ATrainTemplate::ATrainTemplate()
 {
 	//APlayerController::bEnableClickEvents = true;
 
+	// Init train static mesh
+	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
+
+	//SetRootComponent(CreateDefaultSubobject<USceneComponent>("DefaultSceneRoot"));
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,14 +33,14 @@ ATrainTemplate::ATrainTemplate()
 	TrainMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
 	);
-
+	
 	// Add dummy material (Material index start "1")
 	PassengerMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
 	);
 
 	auto PassengerScene = CreateDefaultSubobject<USceneComponent>("Passengers");
-	PassengerScene->SetupAttachment(RootComponent);
+	PassengerScene->SetupAttachment(GetRootComponent());
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
@@ -55,6 +59,13 @@ ATrainTemplate::ATrainTemplate()
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		Passenger.Add(i, nullptr);
 	}
+
+	// Bind click, release event
+	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
+
+	//TrainMeshComponent->OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	//TrainMeshComponent->OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 }
 
 // Called when the game starts or when spawned
@@ -84,21 +95,20 @@ void ATrainTemplate::UpdatePassengerMesh() {
 	}
 }
 
-FVector ATrainTemplate::ConvertMousePositionToWorldLocation() {
+AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocation) {
 	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
 	FVector WorldPosition, WorldDirection;
 	FHitResult HitResult;
-	TArray<AActor*> tmp;
-	tmp.Add(this);
+	LineTraceIgnoreActors.AddUnique(this);
 	UGameplayStatics::DeprojectScreenToWorld(
 		UGameplayStatics::GetPlayerController(GetWorld(), 0),
 		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
 		WorldPosition, WorldDirection);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000.0f) + WorldPosition,
-		ETraceTypeQuery::TraceTypeQuery1, false, tmp, EDrawDebugTrace::Type::None,
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000000.0f) + WorldPosition,
+		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
-
-	return HitResult.Location;
+	WorldLocation = HitResult.Location;
+	return HitResult.GetActor();
 }
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
@@ -141,6 +151,7 @@ void ATrainTemplate::DropPassenger() {
 			if (i.Value != nullptr) {
 				CurrentStationPointer->GetOffPassenger(i.Value);
 				i.Value = nullptr;
+				UpdatePassengerMesh();
 			}
 		}
 	} else {
@@ -156,13 +167,36 @@ FStationInfo ATrainTemplate::GetNextStation() const {
 	return NextStation;
 }
 
+void ATrainTemplate::TrainOnClicked(AActor* Target, FKey ButtonPressed) {
+	TouchInput = true;
+	TouchTime = 0.0f;
+	OnPressedTime = UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld());
+}
 
+void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	IsActorDragged = false;
+	TouchInput = false;
+	TouchTime = 0.0f;
+}
 
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("TrainTemplate::Tick")
+	);*/
 	TotalTravel += TrainMovement->MaxWalkSpeed * DeltaTime;
+
+	if (TouchInput) {
+		// Check train pressed time
+		TouchTime += DeltaTime;
+		if (TouchTime > LongClickInterval) {
+			IsActorDragged = true;
+		} else {
+			IsActorDragged = false;
+		}
+	}
 }
 
 // Called to bind functionality to input

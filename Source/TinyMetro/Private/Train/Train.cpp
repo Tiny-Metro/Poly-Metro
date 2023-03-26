@@ -11,7 +11,48 @@
 #include "GameModes/GameModeBaseSeoul.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetSystemLibrary.h>
+#include <Kismet/KismetMathLibrary.h>
 #include <Engine/AssetManager.h>
+
+void ATrain::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("Train::Tick")
+	);*/
+
+	// Drag & Drop
+	if (IsActorDragged) {
+		DropPassenger();
+		FVector MouseToWorldLocation;
+		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+		LaneRef = Cast<ALane>(MouseToWorldActor);
+		SetTrainMaterial(LaneRef);
+		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
+			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		}
+		if (IsValid(LaneRef)) {
+			
+		}
+
+		Destination = StationManagerRef->GetNearestStation(MouseToWorldLocation, LaneRef);
+		this->SetActorLocationAndRotation(
+			MouseToWorldLocation,
+			FRotator(
+				0,
+				UKismetMathLibrary::FindLookAtRotation(MouseToWorldLocation, Destination->GetActorLocation()).Yaw,
+				0
+			)
+		);
+
+		FVector TrainForwardVector = TrainMeshComponent->GetForwardVector();
+		FRotator TrainRotationVector = TrainMeshComponent->GetComponentRotation();
+		for (int i = 0; i < Subtrains.Num(); i++) {
+			FVector NewSubtrainLocation = TrainForwardVector * TrainSafeDistance * (i + 1);
+			Subtrains[i]->SetActorLocationAndRotation(NewSubtrainLocation, TrainRotationVector);
+			//FRotator TrainWorldRotation = TrainMeshComponent->getrotationo
+		}
+	}
+}
 
 void ATrain::Test() {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
@@ -30,10 +71,10 @@ ATrain::ATrain() {
 	OverlapVolume->OnComponentEndOverlap.AddDynamic(this, &ATrain::OnOverlapEnd);
 	OverlapVolume->SetupAttachment(RootComponent);
 
-	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
+	
 
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
@@ -154,14 +195,26 @@ bool ATrain::IsPassengerSlotFull() {
 	}
 }
 
-void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* Destination) {
+void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	Super::TrainOnReleased(Target, ButtonPressed);
+	if (IsValid(LaneRef)) {
+		bool GridGetSuccess;
+		FVector StartLocation = GridManagerRef->GetGridCellDataByCoord(this->GetActorLocation(), GridGetSuccess).WorldLocation;
+		SetActorLocation(StartLocation + FVector(0, 0, 30.0f));
+		ServiceStart(StartLocation, LaneRef, Destination);
+	} else {
+		this->Destroy();
+	}
+}
+
+void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
 	bool tmp;
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
 	// Set train direction (Down or Up)
 	SetTrainDirection(Lane->SetDirectionInit(
-		Destination,
+		D,
 		GridManagerRef->GetGridCellDataByCoord(StartLocation, tmp).WorldCoordination
 	));
 
@@ -170,7 +223,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* De
 
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;
-	NextStation = Destination->GetStationInfo();
+	NextStation = D->GetStationInfo();
 
 	// Train move start
 	AiControllerRef->Patrol();

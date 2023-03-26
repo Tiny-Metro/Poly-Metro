@@ -10,7 +10,6 @@ ASubtrain::ASubtrain() {
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
 
-	TrainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Train Mesh"));
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
