@@ -8,6 +8,8 @@
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
+#include "Components/SplineMeshComponent.h"
+#include "Components/SplineComponent.h"
 #include "Lane.generated.h"
 
 UCLASS(Blueprintable)
@@ -49,8 +51,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool IsCircularLine = false;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool AlreadyDeleted = false;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -61,9 +66,15 @@ public:
 	void InitLaneMaterial(TArray<UMaterial*> Materials);
 
 	UFUNCTION(BlueprintCallable)
-	bool GetIsCircularLine();
+	bool GetIsCircularLine() const;
 	UFUNCTION(BlueprintCallable)
 	void SetIsCircularLine(bool _Circular);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetAlreadyDeleted() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetAlreadyDeleted(bool _Delete);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
@@ -131,4 +142,69 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
 
+//REFACTORING SETLANEARRAY
+
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "Lane")
+	TArray<FLanePoint> RLaneArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FIntPoint> PointArray;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
+	TArray<FIntPoint> RStationPoint;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
+	TArray<class AStation* > RRStationPoint;
+
+	UFUNCTION(BlueprintCallable)
+	void RSetLaneArray(const TArray<class AStation*>& NewStationPoint);
+//	void RSetLaneArray(const TArray<FIntPoint>& NewStationArray);
+
+private:
+	bool hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+
+	FIntPoint findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+
+	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
+
+// REFACTORING SetLaneVector
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<FVector> RLaneLocation;
+
+	UFUNCTION(BlueprintCallable)
+	void RSetLaneLocation();
+
+private:
+	FVector PointToLocation(const FIntPoint& Point);
+
+// Refactoring clearSplineMesh
+public:
+	UFUNCTION(BlueprintCallable)
+	void ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh);
+
+//	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	//TArray<USplineMeshComponent*> SplineMesh;
+
+//Refactoring SetSpline
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetLaneSpline(USplineComponent* Spline);
+
+//Refactoring HandleScaling
+public:
+	UFUNCTION(BlueprintCallable)
+	void HandleScaling(bool IsScaling);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	double RSectionLength;
+
+//Refactoring HandleFullLength
+public:
+	UFUNCTION(BlueprintCallable)
+	void HandleFullLength(bool IsFullLength, USplineComponent* Spline);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 EndLoop;
 };
