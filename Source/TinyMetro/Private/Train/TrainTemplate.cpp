@@ -174,6 +174,9 @@ void ATrainTemplate::TrainOnClicked(AActor* Target, FKey ButtonPressed) {
 }
 
 void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("TrainTemplate::OnReleased")
+	);
 	IsActorDragged = false;
 	TouchInput = false;
 	TouchTime = 0.0f;
