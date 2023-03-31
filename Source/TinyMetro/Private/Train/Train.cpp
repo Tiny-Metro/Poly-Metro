@@ -25,6 +25,9 @@ void ATrain::Tick(float DeltaTime) {
 		DropPassenger();
 		FVector MouseToWorldLocation;
 		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
 		LaneRef = Cast<ALane>(MouseToWorldActor);
 		SetTrainMaterial(LaneRef);
 		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
@@ -198,17 +201,28 @@ bool ATrain::IsPassengerSlotFull() {
 void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
 	if (IsValid(LaneRef)) {
-		bool GridGetSuccess;
-		FVector StartLocation = GridManagerRef->GetGridCellDataByCoord(this->GetActorLocation(), GridGetSuccess).WorldLocation;
-		SetActorLocation(StartLocation + FVector(0, 0, 30.0f));
+		auto tmp = LaneRef->GetNearestLanePoint(this->GetActorLocation());
+		LaneDirection Shape = tmp.LaneDirection;
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
+		FVector StartLocation = GridManagerRef->Approximate(this->GetActorLocation(), Shape);
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Release after - %lf, %lf"), StartLocation.X, StartLocation.Y));*/
+
+		SetActorLocation(StartLocation);
 		ServiceStart(StartLocation, LaneRef, Destination);
 	} else {
+		// TODO : if upgrade, return upgrade cost
 		this->Destroy();
 	}
 }
 
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
 	bool tmp;
+
+	// Set train material
+	SetTrainMaterial(LaneRef);
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
