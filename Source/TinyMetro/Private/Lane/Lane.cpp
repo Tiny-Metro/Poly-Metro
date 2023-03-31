@@ -56,6 +56,21 @@ void ALane::SetIsCircularLine(bool _Circular)
 	IsCircularLine = _Circular;
 }
 
+FLanePoint ALane::GetNearestLanePoint(FVector Location) {
+	double Distance = std::numeric_limits<double>::max();
+	FLanePoint tmp;
+	for (auto& i : LaneArray) {
+		auto Grid = GridManagerRef->GetGridCellDataByPoint(i.Coordination.X, i.Coordination.Y);
+		double tmpDist = FVector::Distance(this->GetActorLocation(), Grid.WorldLocation);
+		if (Distance > tmpDist) {
+			Distance = tmpDist;
+			tmp = i;
+		}
+	}
+
+	return tmp;
+}
+
 int32 ALane::GetLaneId() const
 {
 	return LaneId;
