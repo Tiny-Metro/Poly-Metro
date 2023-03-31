@@ -13,6 +13,8 @@ UENUM(BlueprintType)
 enum class LaneDirection : uint8 {
 	Horizontal = 0 UMETA(DisplayName = "Horizontal"),
 	Vertical = 1 UMETA(DisplayName = "Vertial"),
+	// Shape is Y = -X graph
 	DiagonalL = 2 UMETA(DisplayName = "DiagonalL"),
-	DiagonalR = 3 UMETA(DisplayName = "DiagonalR")
+	// Shape is Y = X graph
+	DiagonalR = 3 UMETA(DisplayName = "DiagonalR") 
 };
