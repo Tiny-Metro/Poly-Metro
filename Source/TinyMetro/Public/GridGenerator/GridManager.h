@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GridCellData.h"
+#include "../Lane/LaneDirection.h"
 #include "GridManager.generated.h"
 
 UCLASS()
@@ -49,6 +50,8 @@ public:
 	void SetGridStation(int X, int Y, GridStationStructure Structure);
 	UFUNCTION(BlueprintCallable)
 	void SetGridLane(int X, int Y, GridLaneStructure Structure);
+	UFUNCTION(BlueprintCallable)
+	FVector Approximate(FVector Location, LaneDirection Shape) const;
 
 private:
 	TPair<FVector2D, double> FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2);
@@ -60,6 +63,7 @@ private:
 	double GetDistance(FVector2D A, FVector2D B);
 	bool IsValidStationSpawn(int Coord);
 	bool IsValidStationSpawn(int X, int Y);
+	double Revision(double value) const;
 
 protected:
 

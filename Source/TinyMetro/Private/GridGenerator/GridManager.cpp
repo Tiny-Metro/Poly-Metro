@@ -2,6 +2,7 @@
 
 
 #include "GridGenerator/GridManager.h"
+#include "Lane/LaneDirection.h"
 #include <Kismet/KismetMathLibrary.h>
 
 // Sets default values
@@ -133,6 +134,49 @@ void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
 	GridCellData[(GridSize.X * Y) + X].LaneInfo = Structure;
 }
 
+FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
+	int Pivot = GridCellSize / 2;
+	double intercept;
+	double error;
+	switch (Shape) {
+	// Approximate Y coordination
+	case LaneDirection::Horizontal: 
+		Location.Y = Revision(Location.Y);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Horizontal")));
+		break;
+	// Approximate X coordination
+	case LaneDirection::Vertical: 
+		Location.X = Revision(Location.X);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Vertical")));
+		break;
+	// Y = -X + a
+	case LaneDirection::DiagonalL:
+		// Correct error
+		error = Location.Y + Location.X;
+		intercept = Revision(error);
+		Location.Y = Location.X + (error - intercept);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Diagonal Left")));
+		break;
+	// Y = X + a
+	case LaneDirection::DiagonalR:
+		// Correct error
+		error = Location.Y - Location.X;
+		intercept = Revision(error);
+		Location.Y = Location.X + (error - intercept);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Diagonal Right")));
+		break;
+	}
+	return Location;
+}
+
 bool AGridManager::IsValidStationSpawn(int Coord) {
 	// Out of range
 	if (Coord >= GridCellData.Num() || Coord < 0) return false;
@@ -171,6 +215,19 @@ bool AGridManager::IsValidStationSpawn(int X, int Y) {
 	}
 
 	return true;
+}
+
+double AGridManager::Revision(double value) const {
+	int Pivot = GridCellSize / 2;
+
+	int quotient = value / Pivot;
+	double lower = quotient * Pivot;
+	double upper = lower + Pivot;
+
+	if (value - lower < upper - value) value = lower;
+	else value = upper;
+
+	return value;
 }
 
 TPair<FVector2D, double> AGridManager::FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2) {
