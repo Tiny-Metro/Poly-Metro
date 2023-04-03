@@ -201,12 +201,12 @@ bool ATrain::IsPassengerSlotFull() {
 void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
 	if (IsValid(LaneRef)) {
-		auto tmp = LaneRef->GetNearestLanePoint(this->GetActorLocation());
-		LaneDirection Shape = tmp.LaneDirection;
-
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 			FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
-		FVector StartLocation = GridManagerRef->Approximate(this->GetActorLocation(), Shape);
+		FVector StartLocation = GridManagerRef->Approximate(
+			this->GetActorLocation(), 
+			LaneRef->GetLaneShape(this->GetActorLocation())
+		);
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 			FString::Printf(TEXT("Train::Release after - %lf, %lf"), StartLocation.X, StartLocation.Y));*/
 
