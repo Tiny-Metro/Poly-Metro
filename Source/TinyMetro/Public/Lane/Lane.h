@@ -67,6 +67,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FLanePoint GetNearestLanePoint(FVector Location);
+	UFUNCTION(BlueprintCallable)
+	LaneDirection GetLaneShape(FVector Location);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")

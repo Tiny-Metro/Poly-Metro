@@ -71,6 +71,57 @@ FLanePoint ALane::GetNearestLanePoint(FVector Location) {
 	return tmp;
 }
 
+LaneDirection ALane::GetLaneShape(FVector Location) {
+	FIntPoint min = LaneArray[0].Coordination;
+	FIntPoint secondMin = LaneArray[0].Coordination;
+	double distanceMin = std::numeric_limits<double>::max();
+	double secondDistanceMin = std::numeric_limits<double>::max();
+
+	for (auto& i : LaneArray) {
+		auto Grid = GridManagerRef->GetGridCellDataByPoint(i.Coordination.X, i.Coordination.Y);
+		double tmpDist = FVector::Distance(Location, Grid.WorldLocation);
+		if (tmpDist < distanceMin) {
+			secondMin = min;
+			secondDistanceMin = distanceMin;
+			min = i.Coordination;
+			distanceMin = tmpDist;
+		} else if (tmpDist < secondDistanceMin && tmpDist != distanceMin) {
+			secondMin = i.Coordination;
+			secondDistanceMin = tmpDist;
+		}
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		FString::Printf(TEXT("Lane::GetLaneShape %d, %d / %d, %d"), min.X, min.Y, secondMin.X, secondMin.Y)
+	);
+
+	auto shape = min - secondMin;
+	LaneDirection result;
+	if (shape.X == 0) { // Vertical
+		result = LaneDirection::Vertical;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Lane::GetLaneShape Vertical"))
+		);
+	} else if (shape.Y == 0) { // Horizontal
+		result = LaneDirection::Horizontal;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Lane::GetLaneShape Horizontal"))
+		);
+	} else if (shape.X * shape.Y == -1) { // Y = -X
+		result = LaneDirection::DiagonalR;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Lane::GetLaneShape DiagonalR (Y = X)"))
+		);
+	} else if (shape.X * shape.Y == 1) { // Y = X
+		result = LaneDirection::DiagonalL;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Lane::GetLaneShape DiagonalL (Y = -X)"))
+		);
+	}
+
+
+	return result;
+}
+
 int32 ALane::GetLaneId() const
 {
 	return LaneId;
