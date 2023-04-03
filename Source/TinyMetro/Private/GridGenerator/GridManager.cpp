@@ -135,46 +135,63 @@ void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
 }
 
 FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
+	FVector NewLocation(0.0f, 0.0f, 0.0f);
 	int Pivot = GridCellSize / 2;
-	double intercept;
-	double error;
+	double intercept = 0.0f;
+	double error = 0.0f;
 	switch (Shape) {
 	// Approximate Y coordination
 	case LaneDirection::Horizontal: 
-		Location.Y = Revision(Location.Y);
+		NewLocation.X = Location.X;
+		NewLocation.Y = Revision(Location.Y);
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 			FString::Printf(TEXT("Approximate::Horizontal")));
 		break;
 	// Approximate X coordination
 	case LaneDirection::Vertical: 
-		Location.X = Revision(Location.X);
+		NewLocation.X = Revision(Location.X);
+		NewLocation.Y = Location.Y;
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 			FString::Printf(TEXT("Approximate::Vertical")));
 		break;
-	// Y = -X + a
+	// Y = -X + a (Visual), Y = X + a (Mathmatical)
 	case LaneDirection::DiagonalL:
-		// Correct error
-		error = Location.Y + Location.X;
-		intercept = Revision(error);
-		Location.Y = Location.X + (error - intercept);
+		intercept = Revision(Location.Y - Location.X);
+		// Y = X + intercept
+		// Location.Y - Y = -Location.X + X
+		// Y = Location.Y + Location.X - X
+		// Location.Y + Location.X - X = X + intercept
+		// 2X = -intercept + Location.Y + Location.X
+		// X = (-intercept + Location.Y + Location.X) / 2
+		// Location.Y - Y = -Location.X + (-intercept + Location.Y + Location.X) / 2
+		// Y = Location.Y + Location.X -(-intercept + Location.Y + Location.X) / 2
+		// Y = (intercept + Location.Y + Location.X) / 2
+		NewLocation.X = (-intercept + Location.Y + Location.X) / 2;
+		NewLocation.Y = (intercept + Location.Y + Location.X) / 2;
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Approximate::Diagonal Left")));
+			FString::Printf(TEXT("Approximate::Diagonal Left : %lf, %lf & Intercept : %lf"), NewLocation.X, NewLocation.Y, intercept));
 		break;
-	// Y = X + a
+	// Y = X + a (Visual), Y = -X + a (Mathmatical)
 	case LaneDirection::DiagonalR:
-		// Correct error
-		error = Location.Y - Location.X;
-		intercept = Revision(error);
-		Location.Y = Location.X + (error - intercept);
+		intercept = Revision(Location.Y + Location.X);
+		// Y = -X + intercept
+		// Location.Y - Y = Location.X - X (a, b : new point)
+		// Y = X + Location.Y - Location.X
+		// X + Location.Y - Location.X = -X + intercept
+		// 2X = intercept - Location.Y + Location.X
+		// X = (intercept - Location.Y + Location.X) / 2
+		// Y = (intercept + Location.Y - Location.X) / 2
+		NewLocation.X = (intercept - Location.Y + Location.X) / 2;
+		NewLocation.Y = (intercept + Location.Y - Location.X) / 2;
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Approximate::Diagonal Right")));
+			FString::Printf(TEXT("Approximate::Diagonal Right : %lf, %lf & Intercept : %lf"), NewLocation.X, NewLocation.Y, intercept));
 		break;
 	}
-	return Location;
+	return NewLocation;
 }
 
 bool AGridManager::IsValidStationSpawn(int Coord) {
