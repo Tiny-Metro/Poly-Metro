@@ -221,8 +221,6 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
 	bool tmp;
 
-	// Set train material
-	SetTrainMaterial(LaneRef);
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
@@ -238,6 +236,9 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;
 	NextStation = D->GetStationInfo();
+
+	// Set train material
+	SetTrainMaterial(LaneRef);
 
 	// Train move start
 	AiControllerRef->Patrol();

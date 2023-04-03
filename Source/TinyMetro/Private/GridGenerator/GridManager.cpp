@@ -135,7 +135,10 @@ void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
 }
 
 FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		FString::Printf(TEXT("Approximate::Z coordination : %lf"), Location.Z));*/
 	FVector NewLocation(0.0f, 0.0f, 0.0f);
+	NewLocation.Z = Location.Z;
 	int Pivot = GridCellSize / 2;
 	double intercept = 0.0f;
 	double error = 0.0f;
