@@ -25,6 +25,9 @@ void ATrain::Tick(float DeltaTime) {
 		DropPassenger();
 		FVector MouseToWorldLocation;
 		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
 		LaneRef = Cast<ALane>(MouseToWorldActor);
 		SetTrainMaterial(LaneRef);
 		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
@@ -198,17 +201,29 @@ bool ATrain::IsPassengerSlotFull() {
 void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
 	if (IsValid(LaneRef)) {
-		bool GridGetSuccess;
-		FVector StartLocation = GridManagerRef->GetGridCellDataByCoord(this->GetActorLocation(), GridGetSuccess).WorldLocation;
-		SetActorLocation(StartLocation + FVector(0, 0, 30.0f));
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
+		FVector StartLocation = GridManagerRef->Approximate(
+			this->GetActorLocation(), 
+			LaneRef->GetLaneShape(this->GetActorLocation())
+		);
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Release after - %lf, %lf"), StartLocation.X, StartLocation.Y));*/
+
+		SetActorLocation(StartLocation);
 		ServiceStart(StartLocation, LaneRef, Destination);
 	} else {
+		// TODO : if upgrade, return upgrade cost
 		this->Destroy();
 	}
 }
 
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
+	Super::ServiceStart(StartLocation, Lane, D);
 	bool tmp;
+
+	StartLocation.Z = 15.0f;
+	this->SetActorLocation(StartLocation);
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
@@ -224,6 +239,9 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;
 	NextStation = D->GetStationInfo();
+
+	// Set train material
+	SetTrainMaterial(LaneRef);
 
 	// Train move start
 	AiControllerRef->Patrol();

@@ -31,7 +31,7 @@ public:
 
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<FLanePoint> LaneArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -69,6 +69,11 @@ public:
 	bool GetIsCircularLine() const;
 	UFUNCTION(BlueprintCallable)
 	void SetIsCircularLine(bool _Circular);
+	
+	UFUNCTION(BlueprintCallable)
+	FLanePoint GetNearestLanePoint(FVector Location);
+	UFUNCTION(BlueprintCallable)
+	LaneDirection GetLaneShape(FVector Location);
 
 	UFUNCTION(BlueprintCallable)
 	bool GetAlreadyDeleted() const;

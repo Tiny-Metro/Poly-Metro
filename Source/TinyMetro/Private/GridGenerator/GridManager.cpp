@@ -2,6 +2,7 @@
 
 
 #include "GridGenerator/GridManager.h"
+#include "Lane/LaneDirection.h"
 #include <Kismet/KismetMathLibrary.h>
 
 // Sets default values
@@ -133,6 +134,69 @@ void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
 	GridCellData[(GridSize.X * Y) + X].LaneInfo = Structure;
 }
 
+FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		FString::Printf(TEXT("Approximate::Z coordination : %lf"), Location.Z));
+	FVector NewLocation(0.0f, 0.0f, 0.0f);
+	NewLocation.Z = Location.Z;
+	int Pivot = GridCellSize / 2;
+	double intercept = 0.0f;
+	double error = 0.0f;
+	switch (Shape) {
+	// Approximate Y coordination
+	case LaneDirection::Horizontal: 
+		NewLocation.X = Location.X;
+		NewLocation.Y = Revision(Location.Y);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Horizontal")));
+		break;
+	// Approximate X coordination
+	case LaneDirection::Vertical: 
+		NewLocation.X = Revision(Location.X);
+		NewLocation.Y = Location.Y;
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Vertical")));
+		break;
+	// Y = -X + a (Visual), Y = X + a (Mathmatical)
+	case LaneDirection::DiagonalL:
+		intercept = Revision(Location.Y - Location.X);
+		// Y = X + intercept
+		// Location.Y - Y = -Location.X + X
+		// Y = Location.Y + Location.X - X
+		// Location.Y + Location.X - X = X + intercept
+		// 2X = -intercept + Location.Y + Location.X
+		// X = (-intercept + Location.Y + Location.X) / 2
+		// Location.Y - Y = -Location.X + (-intercept + Location.Y + Location.X) / 2
+		// Y = Location.Y + Location.X -(-intercept + Location.Y + Location.X) / 2
+		// Y = (intercept + Location.Y + Location.X) / 2
+		NewLocation.X = (-intercept + Location.Y + Location.X) / 2;
+		NewLocation.Y = (intercept + Location.Y + Location.X) / 2;
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Diagonal Left : %lf %lf to %lf, %lf & Intercept : %lf"), Location.X, Location.Y, NewLocation.X, NewLocation.Y, intercept));
+		break;
+	// Y = X + a (Visual), Y = -X + a (Mathmatical)
+	case LaneDirection::DiagonalR:
+		intercept = Revision(Location.Y + Location.X);
+		// Y = -X + intercept
+		// Location.Y - Y = Location.X - X (a, b : new point)
+		// Y = X + Location.Y - Location.X
+		// X + Location.Y - Location.X = -X + intercept
+		// 2X = intercept - Location.Y + Location.X
+		// X = (intercept - Location.Y + Location.X) / 2
+		// Y = (intercept + Location.Y - Location.X) / 2
+		NewLocation.X = (intercept - Location.Y + Location.X) / 2;
+		NewLocation.Y = (intercept + Location.Y - Location.X) / 2;
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Approximate::Diagonal Right : %lf %lf to %lf, %lf & Intercept : %lf"), Location.X, Location.Y, NewLocation.X, NewLocation.Y, intercept));
+		break;
+	}
+	return NewLocation;
+}
+
 bool AGridManager::IsValidStationSpawn(int Coord) {
 	// Out of range
 	if (Coord >= GridCellData.Num() || Coord < 0) return false;
@@ -171,6 +235,19 @@ bool AGridManager::IsValidStationSpawn(int X, int Y) {
 	}
 
 	return true;
+}
+
+double AGridManager::Revision(double value) const {
+	int Pivot = GridCellSize / 2;
+
+	double quotient = value / Pivot;
+	double lower = floor(quotient) * Pivot;
+	double upper = ceil(quotient) * Pivot;
+
+	if (value - lower < upper - value) value = lower;
+	else value = upper;
+
+	return value;
 }
 
 TPair<FVector2D, double> AGridManager::FindCircleWith2Points(FVector2D P1, FVector2D P2, int Index, int Index2) {

@@ -77,6 +77,7 @@ void ATrainTemplate::BeginPlay()
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
@@ -108,6 +109,7 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
 	WorldLocation = HitResult.Location;
+	WorldLocation.Z = 15.0f;
 	return HitResult.GetActor();
 }
 
@@ -136,6 +138,11 @@ bool ATrainTemplate::AddPassenger(UPassenger* P) {
 		}
 	}
 	return false;
+}
+
+void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
+	TrainManagerRef->AddTrain(this);
+
 }
 
 void ATrainTemplate::DespawnTrain() {
@@ -174,6 +181,9 @@ void ATrainTemplate::TrainOnClicked(AActor* Target, FKey ButtonPressed) {
 }
 
 void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+		TEXT("TrainTemplate::OnReleased")
+	);
 	IsActorDragged = false;
 	TouchInput = false;
 	TouchTime = 0.0f;
