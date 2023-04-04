@@ -77,6 +77,7 @@ void ATrainTemplate::BeginPlay()
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
@@ -137,6 +138,11 @@ bool ATrainTemplate::AddPassenger(UPassenger* P) {
 		}
 	}
 	return false;
+}
+
+void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
+	TrainManagerRef->AddTrain(this);
+
 }
 
 void ATrainTemplate::DespawnTrain() {

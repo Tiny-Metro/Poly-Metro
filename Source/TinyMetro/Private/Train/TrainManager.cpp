@@ -26,8 +26,10 @@ void ATrainManager::BeginPlay()
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
-	Train->SetTrainId(NextTrainId++);
-	Trains.Add(Train);
+	if (Trains.Find(Train) == INDEX_NONE) {
+		Train->SetTrainId(NextTrainId++);
+		Trains.AddUnique(Train);
+	}
 }
 
 void ATrainManager::SetTrainId(ATrainTemplate* Train) {

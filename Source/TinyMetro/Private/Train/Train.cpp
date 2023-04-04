@@ -219,8 +219,11 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 }
 
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
+	Super::ServiceStart(StartLocation, Lane, D);
 	bool tmp;
 
+	StartLocation.Z = 15.0f;
+	this->SetActorLocation(StartLocation);
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());

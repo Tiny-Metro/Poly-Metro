@@ -73,6 +73,10 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
+	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, UPARAM(DisplayName = "Destination")class AStation* D);
+
+
+	UFUNCTION(BlueprintCallable)
 	virtual void DespawnTrain();
 	UFUNCTION(BlueprintCallable)
 	void DropPassenger();
@@ -103,6 +107,8 @@ protected:
 	class AStationManager* StationManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATinyMetroPlayerState* PlayerStateRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATrainManager* TrainManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

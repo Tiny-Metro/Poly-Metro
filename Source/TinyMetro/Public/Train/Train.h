@@ -32,14 +32,13 @@ public:
 	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void Upgrade() override;
 	virtual bool IsPassengerSlotFull() override;
+	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* D) override;
 
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
-	UFUNCTION(BlueprintCallable)
-	void ServiceStart(FVector StartLocation, class ALane* Lane, UPARAM(DisplayName = "Destination")class AStation* D);
 	UFUNCTION()
 	void ActiveMoveTest(); 
 	UFUNCTION()
