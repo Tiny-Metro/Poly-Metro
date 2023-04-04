@@ -37,5 +37,6 @@ AActor* USpawnTrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldL
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
 	WorldLocation = HitResult.Location;
+	WorldLocation.Z = 15.0f;
 	return HitResult.GetActor();
 }

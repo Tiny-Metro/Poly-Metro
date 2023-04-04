@@ -135,8 +135,8 @@ void AGridManager::SetGridLane(int X, int Y, GridLaneStructure Structure) {
 }
 
 FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
-	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-		FString::Printf(TEXT("Approximate::Z coordination : %lf"), Location.Z));*/
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		FString::Printf(TEXT("Approximate::Z coordination : %lf"), Location.Z));
 	FVector NewLocation(0.0f, 0.0f, 0.0f);
 	NewLocation.Z = Location.Z;
 	int Pivot = GridCellSize / 2;
@@ -175,7 +175,7 @@ FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
 		NewLocation.Y = (intercept + Location.Y + Location.X) / 2;
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Approximate::Diagonal Left : %lf, %lf & Intercept : %lf"), NewLocation.X, NewLocation.Y, intercept));
+			FString::Printf(TEXT("Approximate::Diagonal Left : %lf %lf to %lf, %lf & Intercept : %lf"), Location.X, Location.Y, NewLocation.X, NewLocation.Y, intercept));
 		break;
 	// Y = X + a (Visual), Y = -X + a (Mathmatical)
 	case LaneDirection::DiagonalR:
@@ -191,7 +191,7 @@ FVector AGridManager::Approximate(FVector Location, LaneDirection Shape) const {
 		NewLocation.Y = (intercept + Location.Y - Location.X) / 2;
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Approximate::Diagonal Right : %lf, %lf & Intercept : %lf"), NewLocation.X, NewLocation.Y, intercept));
+			FString::Printf(TEXT("Approximate::Diagonal Right : %lf %lf to %lf, %lf & Intercept : %lf"), Location.X, Location.Y, NewLocation.X, NewLocation.Y, intercept));
 		break;
 	}
 	return NewLocation;
