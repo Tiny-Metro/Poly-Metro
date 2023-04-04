@@ -212,4 +212,18 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 EndLoop;
+
+// Refactoring AddSplineMeshComponent
+public:
+	UFUNCTION(BlueprintCallable)
+	void AddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* MeshMaterial;
+
+	UFUNCTION(BlueprintCallable)
+	void SetMeshMaterial();
+
+	UFUNCTION(BlueprintCallable)
+	void RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh, TArray<USplineMeshComponent*> KeepedSplineMesh);
 };

@@ -938,3 +938,87 @@ void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
 		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength));
 	}
 }
+
+//Refactoring AddSplineMeshComponent
+void ALane::AddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh) {
+	//Check whether input of this is valid
+	if (!SplineMesh || !Index || !Spline) {
+		if (!SplineMesh) UE_LOG(LogTemp, Log, TEXT("SplineMesh is invalid"));
+		if (!Index) UE_LOG(LogTemp, Log, TEXT("Index is invalid"));
+		if (!Spline) UE_LOG(LogTemp, Log, TEXT("Spline is invalid"));
+		return;
+	}
+
+	//Set Spline Mesh Component (mesh)
+	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+	SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+	//Set Material
+	SplineMeshComponent->SetMaterial(0, MeshMaterial);
+	//Set Axis
+	SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+	//Set Start & End
+	FVector StartPos = Spline->GetLocationAtDistanceAlongSpline(RSectionLength*Index, ESplineCoordinateSpace::Local);
+	FVector StartTangent = Spline->GetTangentAtDistanceAlongSpline(RSectionLength * Index, ESplineCoordinateSpace::Local);
+	float Length = StartTangent.Size();
+	float ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+
+	FVector EndPos = Spline->GetLocationAtDistanceAlongSpline(RSectionLength * (Index+1), ESplineCoordinateSpace::Local);
+	FVector EndTangent= Spline->GetTangentAtDistanceAlongSpline(RSectionLength * (Index + 1), ESplineCoordinateSpace::Local);
+	Length = EndTangent.Size();
+	ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	EndTangent = EndTangent.GetSafeNormal() * ClampedLength;
+
+	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+}
+
+void ALane::SetMeshMaterial() {
+	MeshMaterial = LaneMaterial[LaneId];
+}
+
+void ALane::RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh, TArray<USplineMeshComponent*> KeepedSplineMesh) {
+	//Check whether input of this is valid
+	if (!SplineMesh || !Index || !Spline) {
+		if (!SplineMesh) UE_LOG(LogTemp, Log, TEXT("SplineMesh is invalid"));
+		if (!Index) UE_LOG(LogTemp, Log, TEXT("Index is invalid"));
+		if (!Spline) UE_LOG(LogTemp, Log, TEXT("Spline is invalid"));
+		return;
+	}
+
+	//Set Spline Mesh Component (mesh)
+	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+	SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+
+	SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+    SplineMeshComponent->RegisterComponent();
+
+	//Set Material
+	SplineMeshComponent->SetMaterial(0, MeshMaterial);
+	//Set Axis
+	SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+	//Set Start & End
+	FVector StartPos = Spline->GetLocationAtDistanceAlongSpline(RSectionLength * Index, ESplineCoordinateSpace::Local);
+	FVector StartTangent = Spline->GetTangentAtDistanceAlongSpline(RSectionLength * Index, ESplineCoordinateSpace::Local);
+	float Length = StartTangent.Size();
+	float ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+
+	FVector EndPos = Spline->GetLocationAtDistanceAlongSpline(RSectionLength * (Index + 1), ESplineCoordinateSpace::Local);
+	FVector EndTangent = Spline->GetTangentAtDistanceAlongSpline(RSectionLength * (Index + 1), ESplineCoordinateSpace::Local);
+	Length = EndTangent.Size();
+	ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	EndTangent = EndTangent.GetSafeNormal() * ClampedLength;
+
+	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+	SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+	SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+	KeepedSplineMesh.Add(SplineMeshComponent);
+
+}
