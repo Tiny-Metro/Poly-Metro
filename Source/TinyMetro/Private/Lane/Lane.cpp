@@ -5,6 +5,8 @@
 #include "Train/TrainTemplate.h"
 #include "Station/Station.h"
 #include "GridGenerator/GridCellData.h"
+#include "Components/SplineMeshComponent.h"
+#include "Components/SplineComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -46,7 +48,7 @@ void ALane::InitLaneMaterial(TArray<UMaterial*> Materials) {
 	LaneMaterial.Append(Materials);
 }
 
-bool ALane::GetIsCircularLine()
+bool ALane::GetIsCircularLine() const
 {
 	return IsCircularLine;
 }
@@ -118,8 +120,17 @@ LaneDirection ALane::GetLaneShape(FVector Location) {
 		);
 	}
 
-
 	return result;
+}
+
+bool ALane::GetAlreadyDeleted() const
+{
+	return AlreadyDeleted;
+}
+
+void ALane::SetAlreadyDeleted(bool _Delete)
+{
+	AlreadyDeleted = _Delete;
 }
 
 int32 ALane::GetLaneId() const
@@ -362,57 +373,114 @@ FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocat
 	UE_LOG(LogTemp, Warning, TEXT("Train Direction : %d"), Direction);
 	UE_LOG(LogTemp, Warning, TEXT("Index Num : %d"), Index);
 
-	if (Direction == TrainDirection::Up) { // index get smaller
+	if (!GetIsCircularLine()) {
 
-		if (Index != 0) {
+		if (Direction == TrainDirection::Up) { // index get smaller
 
-			for (int32 i = Index -1; i >= 0; i--) {
-				if (LaneArray[i].IsStation) {
-					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Up : %d"), i);
-					return LaneArray[i].Coordination;
+			if (Index != 0) {
+
+				for (int32 i = Index - 1; i >= 0; i--) {
+					if (LaneArray[i].IsStation) {
+						UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Up : %d"), i);
+						return LaneArray[i].Coordination;
+					}
 				}
+
+				//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
+				return LaneArray[Index - 1].Coordination;
+			}
+			else {
+				Train->SetTrainDirection(TrainDirection::Down);
+				for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
+					if (LaneArray[i].IsStation) {
+						//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is 0 : %d"), i);
+						return LaneArray[i].Coordination;
+					}
+				}
+				return LaneArray[1].Coordination;
 			}
 
-			//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
-			return LaneArray[Index - 1].Coordination;
 		}
 		else {
-			Train->SetTrainDirection(TrainDirection::Down);
-			for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
-				if (LaneArray[i].IsStation) {
-					//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is 0 : %d"), i);
-					return LaneArray[i].Coordination;
+
+			if (Index != (LaneArray.Num() - 1)) {
+				for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
+					if (LaneArray[i].IsStation) {
+						UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Down : %d"), i);
+						return LaneArray[i].Coordination;
+
+					}
 				}
+				//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Index+1 : %d"), Index +1);
+				return LaneArray[Index + 1].Coordination;
 			}
-			return LaneArray[1].Coordination;
+			else {
+				Train->SetTrainDirection(TrainDirection::Up);
+				for (int32 i = Index - 1; i >= 0; i--) {
+					if (LaneArray[i].IsStation) {
+						//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is Last Index : %d"), i);
+						return LaneArray[i].Coordination;
+					}
+				}
+				//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
+				return LaneArray[Index - 1].Coordination;
+			}
 		}
-
 	}
-	else {
+	else { // circular
+		if (Direction == TrainDirection::Up) { // index get smaller
 
-		if (Index != (LaneArray.Num() - 1)) {
-			for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
-				if (LaneArray[i].IsStation) {
-					UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Down : %d"), i);
-					return LaneArray[i].Coordination;
-					
+			if (Index != 0) {
+
+				for (int32 i = Index - 1; i >= 0; i--) {
+					if (LaneArray[i].IsStation) {
+						UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Up : %d"), i);
+						return LaneArray[i].Coordination;
+					}
 				}
+
+				//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
+				return LaneArray[Index - 1].Coordination;
 			}
-			//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Index+1 : %d"), Index +1);
-			return LaneArray[Index + 1].Coordination;
+			else {
+				for (int32 i = LaneArray.Num() -2 ; i >=0; i--) {
+					if (LaneArray[i].IsStation) {
+						//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is 0 : %d"), i);
+						return LaneArray[i].Coordination;
+					}
+				}
+				return LaneArray[LaneArray.Num()-2].Coordination;
+			}
+
 		}
 		else {
-			Train->SetTrainDirection(TrainDirection::Up);
-			for (int32 i = Index - 1; i >= 0; i--) {
-				if (LaneArray[i].IsStation) {
-					//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is Last Index : %d"), i);
-					return LaneArray[i].Coordination;
+
+			if (Index != (LaneArray.Num() - 1)) {
+				for (int32 i = Index + 1; i < LaneArray.Num(); i++) {
+					if (LaneArray[i].IsStation) {
+						UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Train Direction is Down : %d"), i);
+						return LaneArray[i].Coordination;
+
+					}
 				}
+				//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / Index+1 : %d"), Index +1);
+				return LaneArray[Index + 1].Coordination;
 			}
-			//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
-			return LaneArray[Index - 1].Coordination;
+			else {
+				for (int32 i = 1; i < LaneArray.Num(); i++) {
+					if (LaneArray[i].IsStation) {
+						//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num / This Index is Last Index : %d"), i);
+						return LaneArray[i].Coordination;
+					}
+				}
+				//UE_LOG(LogTemp, Warning, TEXT("Next Location Index Num : Index-1 / %d"), Index - 1);
+				return LaneArray[1].Coordination;
+			}
 		}
 	}
+
+
+	
 
 }
 
@@ -423,11 +491,20 @@ TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation)
 
 	for (int i = 0; i < LaneArray.Num(); i++) {
 		if (Station->GetCurrentGridCellData().WorldCoordination == LaneArray[i].Coordination) {
+			UE_LOG(LogTemp, Warning, TEXT("Station Index is : %d"), i);
 			StationIndex = i;
 		}
 
 		if (CurLocation == LaneArray[i].Coordination) {
 			CurLocationIndex = i;
+		}
+	}
+
+	if (GetIsCircularLine()) {
+		if (StationIndex == LaneArray.Num() -1) {
+			if (((LaneArray.Num() - 1) - CurLocationIndex) > CurLocationIndex) {
+				StationIndex = 0;
+			}
 		}
 	}
 
@@ -596,4 +673,268 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 {
 	FIntPoint Result = StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
 	return StationPoint[Index]->GetCurrentGridCellData().WorldCoordination;
+}
+
+//REFACTORING SET LANE ARRAY
+/*
+* void ALane::RSetLaneArray(const TArray<FIntPoint>& NewStationArray) {
+
+	// Clear the existing lane array if any
+	RLaneArray.Empty();
+
+	int32 NumStations = NewStationArray.Num();
+
+	for (int32 i = 0; i < NumStations; i++) {
+		FIntPoint CurrentStation = NewStationArray[i];
+
+		FLanePoint CurrentLanePoint;
+		CurrentLanePoint.Coordination = CurrentStation;
+		CurrentLanePoint.IsStation = true;
+		CurrentLanePoint.IsBendingPoint = true;
+		CurrentLanePoint.IsThrough = false;
+
+		RLaneArray.Add(CurrentLanePoint);
+
+		if (i < NumStations - 1) {
+			FIntPoint NextStation = NewStationArray[i + 1];
+			FIntPoint Diff = NextStation - CurrentStation;
+
+			FIntPoint BendingCoord;
+			bool HasBendingPoint = hasBendingPoint(CurrentStation, NextStation);
+			
+			if (HasBendingPoint) {
+				BendingCoord = findBendingPoint(CurrentStation, NextStation);
+
+				TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
+				TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
+
+				for (const FIntPoint& Point : PathToBending) {
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+				FLanePoint BendingPoint;
+				BendingPoint.Coordination = BendingCoord;
+				BendingPoint.IsStation = false;
+				BendingPoint.IsBendingPoint = true;
+				BendingPoint.IsThrough = false;
+
+				RLaneArray.Add(BendingPoint);
+				
+				for (const FIntPoint& Point : PathFromBending)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+			}
+			else {
+				TArray<FIntPoint> PathToNext = GeneratePath(CurrentStation, NextStation);
+
+				for (const FIntPoint& Point : PathToNext)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+			}
+
+
+		}
+
+
+	}
+}
+
+*/
+void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
+
+	// Clear the existing lane array if any
+	RLaneArray.Empty();
+
+	//int32 NumStations = NewStationArray.Num();
+	int32 NumStations = NewStationPoint.Num();
+
+	for (int32 i = 0; i < NumStations; i++) {
+		
+		FIntPoint CurrentStation = NewStationPoint[i]->GetCurrentGridCellData().WorldCoordination;
+
+		FLanePoint CurrentLanePoint;
+		CurrentLanePoint.Coordination = CurrentStation;
+		CurrentLanePoint.IsStation = true;
+		CurrentLanePoint.IsBendingPoint = true;
+		CurrentLanePoint.IsThrough = false;
+
+		RLaneArray.Add(CurrentLanePoint);
+
+		if (i < NumStations - 1) {
+			FIntPoint NextStation = NewStationPoint[i+1]->GetCurrentGridCellData().WorldCoordination;
+			FIntPoint Diff = NextStation - CurrentStation;
+
+			FIntPoint BendingCoord;
+			bool HasBendingPoint = hasBendingPoint(CurrentStation, NextStation);
+			
+			if (HasBendingPoint) {
+				BendingCoord = findBendingPoint(CurrentStation, NextStation);
+
+				TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
+				TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
+
+				for (const FIntPoint& Point : PathToBending) {
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+				FLanePoint BendingPoint;
+				BendingPoint.Coordination = BendingCoord;
+				BendingPoint.IsStation = false;
+				BendingPoint.IsBendingPoint = true;
+				BendingPoint.IsThrough = false;
+
+				RLaneArray.Add(BendingPoint);
+				
+				for (const FIntPoint& Point : PathFromBending)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+
+			}
+			else {
+				TArray<FIntPoint> PathToNext = GeneratePath(CurrentStation, NextStation);
+
+				for (const FIntPoint& Point : PathToNext)
+				{
+					FLanePoint PathPoint;
+					PathPoint.Coordination = Point;
+					PathPoint.IsStation = false;
+					PathPoint.IsBendingPoint = false;
+					PathPoint.IsThrough = false;
+
+					RLaneArray.Add(PathPoint);
+				}
+			}
+
+
+		}
+
+
+	}
+}
+
+bool ALane::hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+	FIntPoint Diff = NextStation - CurrentStation;
+
+	if (Diff.X == 0) return false;
+	if (Diff.Y == 0) return false;
+	if (FMath::Abs(Diff.X) == FMath::Abs(Diff.Y)) return false;
+	return true;
+}
+
+FIntPoint ALane::findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+	FIntPoint BendingPoint;
+	
+	FIntPoint Diff = NextStation - CurrentStation;
+
+	if (FMath::Abs(Diff.X) > FMath::Abs(Diff.Y)) {
+		BendingPoint.X = CurrentStation.X + FMath::Sign(Diff.X) * FMath::Abs(Diff.Y);
+		BendingPoint.Y = NextStation.Y;
+	}
+	else {
+		BendingPoint.X = NextStation.X;
+		BendingPoint.Y = CurrentStation.Y + FMath::Sign(Diff.Y) * FMath::Abs(Diff.X);
+	}
+
+	return BendingPoint;
+}
+
+TArray<FIntPoint> ALane::GeneratePath(const FIntPoint& Start, const FIntPoint& End){
+	TArray<FIntPoint> Path;
+
+	FIntPoint Diff = End - Start;
+	FIntPoint Step(FMath::Sign(Diff.X), FMath::Sign(Diff.Y));
+	FIntPoint Current = Start + Step;
+
+	while (Current != End)
+	{
+		Path.Add(Current);
+		Current += Step;
+	}
+	return Path;
+}
+
+//Refactoring SetLaneLocation
+void ALane::RSetLaneLocation() {
+
+	if (!GridManagerRef){
+		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+		return;
+	}
+
+	RLaneLocation.Empty();
+	for (const FLanePoint& Point : RLaneArray){
+		FVector VectorLocation = PointToLocation(Point.Coordination);
+		RLaneLocation.Add(VectorLocation);		
+	}
+
+}
+
+// REFACTORING SetLaneVector
+FVector ALane::PointToLocation(const FIntPoint& Point) {
+	return GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).WorldLocation;
+}
+
+// Refactoring clearSplineMesh
+void ALane::ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh) {
+	for (USplineMeshComponent* SplineMeshComponent : SplineMesh) {
+		if (SplineMeshComponent) { SplineMeshComponent->DestroyComponent(); }
+	}
+	SplineMesh.Empty();
+}
+
+void ALane::SetLaneSpline(USplineComponent* Spline) {
+	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World,true);
+
+	for (int32 i = 0; i < RLaneLocation.Num(); i++) {
+		Spline->SetSplinePointType(i, ESplinePointType::CurveClamped, true);
+	}
+}
+
+void ALane::HandleScaling(bool IsScaling) {
+	if (IsScaling) { RSectionLength = GetActorScale3D().X * 100; }
+	else RSectionLength = 10;
+	return;
+}
+
+void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
+	if (IsFullLength) {
+		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength))-1;
+	}
+	else {
+		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength));
+	}
 }

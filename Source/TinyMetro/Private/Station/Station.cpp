@@ -205,6 +205,11 @@ bool AStation::IsValidLane(int32 LId) const
 	return false;
 }
 
+void AStation::RemoveLane(int32 LId)
+{
+	Lanes.Remove(LId);
+}
+
 
 
 void AStation::CalculateComplain() {
