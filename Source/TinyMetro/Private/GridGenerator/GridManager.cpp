@@ -240,9 +240,9 @@ bool AGridManager::IsValidStationSpawn(int X, int Y) {
 double AGridManager::Revision(double value) const {
 	int Pivot = GridCellSize / 2;
 
-	int quotient = value / Pivot;
-	double lower = quotient * Pivot;
-	double upper = lower + Pivot;
+	double quotient = value / Pivot;
+	double lower = floor(quotient) * Pivot;
+	double upper = ceil(quotient) * Pivot;
 
 	if (value - lower < upper - value) value = lower;
 	else value = upper;
