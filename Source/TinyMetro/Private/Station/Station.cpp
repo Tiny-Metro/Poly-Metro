@@ -26,6 +26,11 @@ AStation::AStation()
 	StationMeshComponent->SetupAttachment(RootComponent);
 	StationMeshComponent->SetGenerateOverlapEvents(false);
 
+	// Set station complain mesh
+	StationComplainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Station Complain Mesh"));
+	StationComplainMeshComponent->SetupAttachment(RootComponent);
+	StationComplainMeshComponent->SetGenerateOverlapEvents(false);
+
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
 		FName name = *FString::Printf(TEXT("Passenger %d"), i);
@@ -52,20 +57,25 @@ AStation::AStation()
 	for (auto& i : PassengerMeshPath) {
 		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
 	}
+	
+	// Load meshes (Complain)
+	for (auto& i : ComplainMeshPath) {
+		StationComplainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
 
 	// Load material (Station)
 	for (auto& i : StationMaterialInactivePath) {
 		StationMaterialInactive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
-	
 	for (auto& i : StationMaterialActivePath) {
 		StationMaterialActive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
-	
 	for (auto& i : StationMaterialDestroyedPath) {
 		StationMaterialDestroyed.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
 
+	// Load material (Complain)
+	ComplainMaterial = ConstructorHelpers::FObjectFinder<UMaterialInterface>(*ComplainMaterialPath).Object;
 
 	// Set overlap volume
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
@@ -89,6 +99,8 @@ void AStation::BeginPlay()
 	ComplainRoutine();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
+	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationTypeValue]);
+	InitComplainGauge();
 	UpdateStationMesh();
 	UpdatePassengerMesh();
 
@@ -226,6 +238,24 @@ void AStation::ActivateStation() {
 	// TODO :  Visible logic
 }
 
+void AStation::UpdateComplainMesh() {
+}
+
+void AStation::InitComplainGauge() {
+	// Create a dynamic material instance
+	ComplainDynamicMaterial = UMaterialInstanceDynamic::Create(ComplainMaterial, this);
+
+	// Set the GaugePer value
+	//GaugePer = 0.0f; // Replace this with the value you want to set
+	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", ComplainCurrent / ComplainMax);
+
+	StationComplainMeshComponent->SetMaterial(0, ComplainDynamicMaterial);
+}
+
+void AStation::SetComplainGauge(float Per) {
+	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", Per);
+}
+
 void AStation::UpdateStationMesh() {
 	switch (State) {
 	case StationState::Inactive :
@@ -318,7 +348,7 @@ void AStation::ComplainRoutine() {
 					FString::Printf(TEXT("AddPolicyComplain : %f"), AddPolicyComplain));
 
 			}*/
-
+			SetComplainGauge(ComplainCurrent / ComplainMax);
 
 
 			// Complain excess : Game over

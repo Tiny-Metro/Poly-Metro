@@ -46,6 +46,12 @@ public:
 	void CalculateComplain();
 	UFUNCTION(BlueprintCallable)
 	void ActivateStation();
+	UFUNCTION()
+	void UpdateComplainMesh();
+	UFUNCTION()
+	void InitComplainGauge();
+	UFUNCTION()
+	void SetComplainGauge(float Per);
 
 
 	// Station state Getter, Setter
@@ -174,8 +180,12 @@ protected:
 	USceneComponent* DefaultRoot = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* StationMeshComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UStaticMeshComponent* StationComplainMeshComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> StationMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UStaticMesh*> StationComplainMesh;
 
 	// Passenger meshes
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
@@ -194,6 +204,10 @@ protected:
 	TArray<UMaterial*> StationMaterialDestroyed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> PassengerMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UMaterialInterface* ComplainMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UMaterialInstanceDynamic* ComplainDynamicMaterial;
 
 	// Mesh, Material paths (Station)
 	UPROPERTY()
@@ -244,4 +258,19 @@ protected:
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
 		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
 	};
+
+	// Mesh of complain gauge paths
+	TArray<FString> ComplainMeshPath = {
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CircleGauge.SM_CircleGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_TriangleGauge.SM_TriangleGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_RectangleGauge.SM_RectangleGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CrossGauge.SM_CrossGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_RhombusGauge.SM_RhombusGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_OvalGauge.SM_OvalGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_DiamondGauge.SM_DiamondGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_PentagonGauge.SM_PentagonGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StarGauge.SM_StarGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_FanGauge.SM_FanGauge'"),
+	};
+	FString ComplainMaterialPath = TEXT("Material'/Game/Station/Asset/StationMaterial/M_Gauge.M_Gauge'");
 };
