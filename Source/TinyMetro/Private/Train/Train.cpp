@@ -141,6 +141,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		}
 	}
 	
+	
 }
 
 void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
@@ -163,14 +164,15 @@ FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 }
 
 void ATrain::SetTrainMaterial(ALane* Lane) {
-	if (IsValid(Lane)) {
+	Super::SetTrainMaterial(Lane);
+	/*if (IsValid(Lane)) {
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
 		for (auto& i : PassengerMeshComponent) {
 			i->SetMaterial(0, PassengerMaterial[Lane->GetLaneId()]);
 		}
 	} else {
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
-	}
+	}*/
 }
 
 void ATrain::Upgrade() {
@@ -279,10 +281,14 @@ void ATrain::GetOnPassenger(AStation* Station) {
 		} else {
 			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
+
+			AiControllerRef->Patrol();
 		}
 	} else {
 		GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 		TrainMovement->SetActive(true);
+
+		AiControllerRef->Patrol();
 	}
 }
 
@@ -336,7 +342,7 @@ void ATrain::GetOffPassenger(AStation* Station) {
 
 }
 
-void ATrain::SetSubtrain(ASubtrain* T) {
+void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.Add(T);
 }
