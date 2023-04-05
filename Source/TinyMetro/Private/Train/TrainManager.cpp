@@ -48,12 +48,12 @@ ATrainTemplate* ATrainManager::GetTrainById(int32 TrainId, TrainType& Type) {
 }
 
 ATrain* ATrainManager::GetNearestTrain(FVector CurrentLocation, class ALane* LaneRef = nullptr) {
-	double Distance = FVector::Dist(CurrentLocation, Trains[0]->GetActorLocation());
+	double Distance = std::numeric_limits<double>::max();
 	int TrainIndex = 0;
 	bool LaneValid = IsValid(LaneRef);
-	for (int i = 1; i < Trains.Num(); i++) {
+	for (int i = 0; i < Trains.Num(); i++) {
 		if (Trains[i]->IsA(ASubtrain::StaticClass())) continue;
-		//if (LaneValid && LaneRef->GetLaneId() != Trains[i]->GetServiceLaneId()) continue;
+		if (LaneValid && LaneRef->GetLaneId() != Trains[i]->GetServiceLaneId()) continue;
 		double tmp = FVector::Dist(CurrentLocation, Trains[i]->GetActorLocation());
 		if (Distance > tmp) {
 			Distance = tmp;
@@ -61,7 +61,11 @@ ATrain* ATrainManager::GetNearestTrain(FVector CurrentLocation, class ALane* Lan
 		}
 	}
 
-	return Cast<ATrain>(Trains[TrainIndex]);
+	if (Trains.IsValidIndex(TrainIndex)) {
+		return Cast<ATrain>(Trains[TrainIndex]);
+	} else {
+		return nullptr;
+	}
 }
 
 void ATrainManager::InitTrainMaterial() {
