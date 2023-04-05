@@ -909,24 +909,24 @@ FVector ALane::PointToLocation(const FIntPoint& Point) {
 }
 
 // Refactoring clearSplineMesh
-void ALane::ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh) {
-	for (USplineMeshComponent* SplineMeshComponent : SplineMesh) {
+void ALane::ClearSplineMesh() {
+	for (USplineMeshComponent* SplineMeshComponent : RKeepedSplineMesh) {
 		if (SplineMeshComponent) { SplineMeshComponent->DestroyComponent(); }
 	}
-	SplineMesh.Empty();
+	RKeepedSplineMesh.Empty();
 }
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
 	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World,true);
 
 	for (int32 i = 0; i < RLaneLocation.Num(); i++) {
-		Spline->SetSplinePointType(i, ESplinePointType::CurveClamped, true);
+		Spline->SetSplinePointType(i, ESplinePointType::Linear, true);
 	}
 }
 
-void ALane::HandleScaling(bool IsScaling) {
-	if (IsScaling) { RSectionLength = GetActorScale3D().X * 100; }
-	else RSectionLength = 10;
+void ALane::HandleScaling(bool IsScaling, float SectionLength) {
+	if (IsScaling) { RSectionLength = GetActorScale3D().X * SectionLength; }
+	else RSectionLength = SectionLength;
 	return;
 }
 
@@ -978,7 +978,7 @@ void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
 }
 
-void ALane::RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh, TArray<USplineMeshComponent*> KeepedSplineMesh) {
+void ALane::RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh) {
 	//Check whether input of this is valid
 	if (!SplineMesh || !Index || !Spline) {
 		if (!SplineMesh) UE_LOG(LogTemp, Log, TEXT("SplineMesh is invalid"));
@@ -1018,7 +1018,7 @@ void ALane::RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStat
 	SplineMeshComponent->SetMobility(EComponentMobility::Movable);
 	SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
+	RKeepedSplineMesh.Add(SplineMeshComponent);
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-	KeepedSplineMesh.Add(SplineMeshComponent);
 
 }

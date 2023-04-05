@@ -187,7 +187,7 @@ private:
 // Refactoring clearSplineMesh
 public:
 	UFUNCTION(BlueprintCallable)
-	void ClearSplineMesh(TArray<USplineMeshComponent*> SplineMesh);
+	void ClearSplineMesh();
 
 //	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	//TArray<USplineMeshComponent*> SplineMesh;
@@ -200,7 +200,7 @@ public:
 //Refactoring HandleScaling
 public:
 	UFUNCTION(BlueprintCallable)
-	void HandleScaling(bool IsScaling);
+	void HandleScaling(bool IsScaling, float SectionLength);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	double RSectionLength;
@@ -224,6 +224,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<USplineMeshComponent*> RKeepedSplineMesh;
+
+
 	UFUNCTION(BlueprintCallable)
-	void RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh, TArray<USplineMeshComponent*> KeepedSplineMesh);
+	void RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh);
 };
