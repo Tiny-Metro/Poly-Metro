@@ -6,6 +6,7 @@
 #include "GameModes/GameModeBaseSeoul.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Lane/LaneManager.h"
+#include "Lane/Lane.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -114,6 +115,14 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 }
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
+	if (IsValid(Lane)) {
+		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		for (auto& i : PassengerMeshComponent) {
+			i->SetMaterial(0, PassengerMaterial[Lane->GetLaneId()]);
+		}
+	} else {
+		TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
+	}
 }
 
 bool ATrainTemplate::IsPassengerSlotFull() {

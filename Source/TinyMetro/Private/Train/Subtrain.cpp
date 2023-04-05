@@ -24,6 +24,7 @@ void ASubtrain::Test() {
 }
 
 void ASubtrain::SetTrainMaterial(ALane* Lane) {
+	Super::SetTrainMaterial(Lane);
 }
 
 void ASubtrain::BeginPlay() {
