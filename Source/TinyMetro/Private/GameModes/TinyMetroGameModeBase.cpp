@@ -68,6 +68,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     Bank = GetWorld()->SpawnActor<ABank>();
     Timer = GetWorld()->SpawnActor<ATimer>();
     Shop = GetWorld()->SpawnActor<AShop>();
+    PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     UE_LOG(LogTemp, Log, TEXT("GameMode::StartPlay : Spawn finish"));
     Super::StartPlay();
 }
@@ -78,6 +79,7 @@ void ATinyMetroGameModeBase::BeginPlay() {
 
 void ATinyMetroGameModeBase::SetGameSpeed(float TimeDilation) {
     UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeDilation);
+    PlayerController->CustomTimeDilation = 1 / UGameplayStatics::GetGlobalTimeDilation(GetWorld());
 }
 
 AStationManager* ATinyMetroGameModeBase::GetStationManager() const {

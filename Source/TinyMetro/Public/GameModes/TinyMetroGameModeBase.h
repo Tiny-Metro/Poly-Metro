@@ -74,5 +74,7 @@ protected:
 	class ATimer* Timer;
 	UPROPERTY()
 	class AShop* Shop;
+	UPROPERTY()
+	APlayerController* PlayerController;
 
 };
