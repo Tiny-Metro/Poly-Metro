@@ -38,7 +38,7 @@ public:
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
+	void AddSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
 	UFUNCTION()
 	void ActiveMoveTest(); 
 	UFUNCTION()
