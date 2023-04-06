@@ -679,6 +679,23 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 
 	// Clear the existing lane array if any
+	for (FLanePoint& LanePoint : RLaneArray)
+	{
+		// Destroy the USplineMeshComponent instances inside the current FLanePoint
+		  // Iterate through the MeshArray of the given FLanePoint
+		for (USplineMeshComponent* SplineMeshComponent : LanePoint.MeshArray)
+		{
+			// Check if the SplineMeshComponent is valid before trying to destroy it
+			if (SplineMeshComponent)
+			{
+				// Destroy the SplineMeshComponent
+				SplineMeshComponent->DestroyComponent();
+			}
+		}
+
+		// Clear the MeshArray for the given FLanePoint
+		LanePoint.MeshArray.Empty();
+	}
 	RLaneArray.Empty();
 
 	//int32 NumStations = NewStationArray.Num();
@@ -864,6 +881,7 @@ void ALane::ClearSplineMesh() {
 	}
 	// Clear the RKeepedSplineMesh array
 	R2KeepedSplineMesh.Empty();
+
 }
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
@@ -942,6 +960,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 			FMeshComponentArray SplineMeshArray;
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 			R2KeepedSplineMesh.Add(SplineMeshArray);
+			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 
 		//Set Last Point of Spline
@@ -963,6 +982,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 			FMeshComponentArray SplineMeshArray;
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 			R2KeepedSplineMesh.Add(SplineMeshArray);
+			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+
 		}
 
 		//Set Points between
@@ -984,6 +1005,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			FMeshComponentArray SplineMeshArray;
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
+			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 			/* --- Middle Mesh (if there is any) --- */
 			if (RLaneArray[i].IsBendingPoint) {
@@ -1000,6 +1022,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 			
 				SplineMeshArray.MeshArray.Add(SplineMeshComponent);
+				RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
 			/* --- Front Mesh --- */
@@ -1026,6 +1049,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 		
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 			R2KeepedSplineMesh.Add(SplineMeshArray);
+			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
 
