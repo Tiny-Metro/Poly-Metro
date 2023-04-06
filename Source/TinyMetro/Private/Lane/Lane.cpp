@@ -869,6 +869,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 		return;
 	}
 
+	// init number of Spline points
 	int32 NumSplinePoints = Spline->GetNumberOfSplinePoints();
 
 	//Set Start & End
@@ -882,62 +883,79 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 
 	for (int32 i = 0; i < NumSplinePoints; i++) {
+		//Set First Point of Spline
 		if(i==0){
+			/* --- Front Mesh Only --- */
+
+			// Set Start/End Pos/Tangent
 			StartPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local))/2.0f);
+
 			StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			Length = StartTangent.Size();
 			ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
 			StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
-
-			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local))/2.0f);
 			EndTangent = StartTangent;
 
-			//Set Spline Mesh Component (mesh)
+			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
-
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
 			RKeepedSplineMesh.Add(SplineMeshComponent);
-
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-
 		}
-		if (0 < i && i < NumSplinePoints - 1) {
-			// Back one
+
+		//Set Last Point of Spline
+		if(i==NumSplinePoints-1){
+			/* --- Back Mesh Only --- */
+
+			// Set Start/End Pos/Tangent
 			StartPos = EndPos;
 			StartTangent = EndTangent;
 			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-			EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
-			Length = EndTangent.Size();
-			ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
-			EndTangent = EndTangent.GetSafeNormal() * ClampedLength;
-			if (RLaneArray[i].IsBendingPoint) EndTangent = StartTangent;
+
+			//Add&Set Spline Mesh Component (mesh)
+			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
+			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+			RKeepedSplineMesh.Add(SplineMeshComponent);
+			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+		}
+
+		//Set Points between
+		if (0 < i && i < NumSplinePoints - 1) {
+			/* --- Back Mesh --- */
+
+			// Set Start/End Pos/Tangent
+			StartPos = EndPos;
+			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+			StartTangent = EndTangent;
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
-
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
-			//Middle One if there is any
+
+			/* --- Middle Mesh (if there is any) --- */
 			if (RLaneArray[i].IsBendingPoint) {
+				// Set Start/End Pos/Tangent
 				StartPos = EndPos;
 				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+
+				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 				SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
-
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
 				RKeepedSplineMesh.Add(SplineMeshComponent);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-
 			}
 
-			//Front one
+			/* --- Front Mesh --- */
+
+			// Set Start/End Pos/Tangent
 			StartPos = EndPos;
 			StartTangent = EndTangent;
 			if (RLaneArray[i].IsBendingPoint) { 
@@ -949,30 +967,12 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
 			EndTangent = StartTangent;
 
-
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-		}
-		if(i==NumSplinePoints-1){
-		//Back One
-			StartPos = EndPos;
-			StartTangent = EndTangent;
-			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-
-			//Set Spline Mesh Component (mesh)
-			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
-
-			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
-			RKeepedSplineMesh.Add(SplineMeshComponent);
-			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-
 		}
 	}
 
