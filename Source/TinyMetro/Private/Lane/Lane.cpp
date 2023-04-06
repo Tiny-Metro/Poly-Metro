@@ -957,9 +957,11 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
+			/*
 			FMeshComponentArray SplineMeshArray;
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 			R2KeepedSplineMesh.Add(SplineMeshArray);
+			*/
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 
@@ -978,10 +980,11 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-		
+		/*
 			FMeshComponentArray SplineMeshArray;
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 			R2KeepedSplineMesh.Add(SplineMeshArray);
+		*/
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 		}
@@ -1002,9 +1005,10 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-
+			/*
 			FMeshComponentArray SplineMeshArray;
 			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
+			*/
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 			/* --- Middle Mesh (if there is any) --- */
@@ -1021,7 +1025,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 //				RKeepedSplineMesh.Add(SplineMeshComponent);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 			
-				SplineMeshArray.MeshArray.Add(SplineMeshComponent);
+//				SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 				RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
@@ -1047,8 +1051,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 		
-			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
-			R2KeepedSplineMesh.Add(SplineMeshArray);
+//			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
+//			R2KeepedSplineMesh.Add(SplineMeshArray);
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
