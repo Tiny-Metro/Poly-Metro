@@ -1022,3 +1022,176 @@ void ALane::RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStat
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
 }
+
+void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh) {
+
+	//Check the input parameter is valid
+	if (!Spline || !SplineMesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
+		return;
+	}
+
+	int32 NumSplinePoints = Spline->GetNumberOfSplinePoints();
+
+	//Set Start & End
+	FVector StartPos;
+	FVector StartTangent;
+	FVector EndPos;
+	FVector EndTangent;
+
+	float Length;
+	float ClampedLength;
+
+
+	for (int32 i = 0; i < NumSplinePoints; i++) {
+		if(i==0){
+			StartPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+			StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+			Length = StartTangent.Size();
+			ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+			StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+
+			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local))/2.0f);
+			EndTangent = StartTangent;
+
+			//Set Spline Mesh Component (mesh)
+			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+			SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+			SplineMeshComponent->RegisterComponent();
+
+			//Set Material
+			SplineMeshComponent->SetMaterial(0, MeshMaterial);
+			//Set Axis
+			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+			RKeepedSplineMesh.Add(SplineMeshComponent);
+			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+		}
+		if (0 < i && i < NumSplinePoints - 1) {
+			// Back one
+			StartPos = EndPos;
+			StartTangent = EndTangent;
+			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+			EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+			Length = EndTangent.Size();
+			ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+			EndTangent = EndTangent.GetSafeNormal() * ClampedLength;
+			if (RLaneArray[i].IsBendingPoint) EndTangent = StartTangent;
+
+			//Set Spline Mesh Component (mesh)
+			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+			SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+			SplineMeshComponent->RegisterComponent();
+
+			//Set Material
+			SplineMeshComponent->SetMaterial(0, MeshMaterial);
+			//Set Axis
+			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+			RKeepedSplineMesh.Add(SplineMeshComponent);
+			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+			//Middle One if there is any
+			if (RLaneArray[i].IsBendingPoint) {
+				StartPos = EndPos;
+				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+				SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+				SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+				SplineMeshComponent->RegisterComponent();
+
+				//Set Material
+				SplineMeshComponent->SetMaterial(0, MeshMaterial);
+				//Set Axis
+				SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+				SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+				SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+				RKeepedSplineMesh.Add(SplineMeshComponent);
+				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+			}
+
+			//Front one
+			StartPos = EndPos;
+			StartTangent = EndTangent;
+			if (RLaneArray[i].IsBendingPoint) { 
+				StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local); 
+				Length = EndTangent.Size();
+				ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+				StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+			}
+			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
+			EndTangent = StartTangent;
+
+
+			//Set Spline Mesh Component (mesh)
+			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+			SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+			SplineMeshComponent->RegisterComponent();
+
+			//Set Material
+			SplineMeshComponent->SetMaterial(0, MeshMaterial);
+			//Set Axis
+			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+			RKeepedSplineMesh.Add(SplineMeshComponent);
+			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+		}
+		if(i==NumSplinePoints-1){
+		//Back One
+			StartPos = EndPos;
+			StartTangent = EndTangent;
+			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+
+			//Set Spline Mesh Component (mesh)
+			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+			SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+			SplineMeshComponent->RegisterComponent();
+
+			//Set Material
+			SplineMeshComponent->SetMaterial(0, MeshMaterial);
+			//Set Axis
+			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+			RKeepedSplineMesh.Add(SplineMeshComponent);
+			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+		}
+	}
+
+}
