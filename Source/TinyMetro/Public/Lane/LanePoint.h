@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "LaneType.h"
 #include "LaneDirection.h"
+#include "Components/SplineMeshComponent.h"
 #include "LanePoint.generated.h"
 
 /**
@@ -33,4 +34,7 @@ struct TINYMETRO_API FLanePoint {
 	LaneType LaneType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	LaneDirection LaneDirection;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<USplineMeshComponent*> MeshArray;
 };

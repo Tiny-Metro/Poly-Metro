@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "LanePoint.h"
+#include "MeshComponentArray.h"
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
@@ -223,11 +224,14 @@ public:
 
 //Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
-	void R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh);
+	void R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh, UStaticMesh* ThroughSplineMesh);
 
 private:
-	FVector GetPointsBetween();
-
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
+
+//1v1 corresponding sys
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<FMeshComponentArray> R2KeepedSplineMesh;
 
 };
