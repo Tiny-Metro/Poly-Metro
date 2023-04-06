@@ -164,7 +164,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RSetLaneArray(const TArray<class AStation*>& NewStationPoint);
-//	void RSetLaneArray(const TArray<FIntPoint>& NewStationArray);
+
 
 private:
 	bool hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
@@ -189,9 +189,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClearSplineMesh();
 
-//	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	//TArray<USplineMeshComponent*> SplineMesh;
-
 //Refactoring SetSpline
 public:
 	UFUNCTION(BlueprintCallable)
@@ -215,9 +212,6 @@ public:
 
 // Refactoring AddSplineMeshComponent
 public:
-	UFUNCTION(BlueprintCallable)
-	void AddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh);
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UMaterialInterface* MeshMaterial;
 
@@ -226,10 +220,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<USplineMeshComponent*> RKeepedSplineMesh;
-
-
-	UFUNCTION(BlueprintCallable)
-	void RAddSplineMeshComponent(USplineComponent* Spline, int32 Index, UStaticMesh* SplineMesh);
 
 //Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
