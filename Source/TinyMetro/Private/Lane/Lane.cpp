@@ -894,22 +894,12 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SplineMeshComponent->SetStaticMesh(SplineMesh);
-
-			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-			SplineMeshComponent->RegisterComponent();
-
-			//Set Material
-			SplineMeshComponent->SetMaterial(0, MeshMaterial);
-			//Set Axis
-			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
 
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 
-			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
-
 			RKeepedSplineMesh.Add(SplineMeshComponent);
+
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
 		}
@@ -926,20 +916,9 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SplineMeshComponent->SetStaticMesh(SplineMesh);
-
-			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-			SplineMeshComponent->RegisterComponent();
-
-			//Set Material
-			SplineMeshComponent->SetMaterial(0, MeshMaterial);
-			//Set Axis
-			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
 
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
-			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -949,20 +928,9 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 				StartPos = EndPos;
 				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				SplineMeshComponent->SetStaticMesh(SplineMesh);
-
-				SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-				SplineMeshComponent->RegisterComponent();
-
-				//Set Material
-				SplineMeshComponent->SetMaterial(0, MeshMaterial);
-				//Set Axis
-				SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+				SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
 
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
-				SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-				SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 				RKeepedSplineMesh.Add(SplineMeshComponent);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -984,20 +952,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SplineMeshComponent->SetStaticMesh(SplineMesh);
-
-			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-			SplineMeshComponent->RegisterComponent();
-
-			//Set Material
-			SplineMeshComponent->SetMaterial(0, MeshMaterial);
-			//Set Axis
-			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
-
+			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
-			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -1010,20 +966,9 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SplineMeshComponent->SetStaticMesh(SplineMesh);
-
-			SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-			SplineMeshComponent->RegisterComponent();
-
-			//Set Material
-			SplineMeshComponent->SetMaterial(0, MeshMaterial);
-			//Set Axis
-			SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
 
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-
-			SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-			SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -1031,4 +976,19 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 		}
 	}
 
+}
+
+void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh) {
+	SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	SplineMeshComponent->SetStaticMesh(SplineMesh);
+
+	SplineMeshComponent->SetMobility(EComponentMobility::Movable);
+	//Set Material
+	SplineMeshComponent->SetMaterial(0, MeshMaterial);
+	//Set Axis
+	SplineMeshComponent->SetForwardAxis(ESplineMeshAxis::X, false);
+
+	SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
+
+	SplineMeshComponent->RegisterComponent();
 }

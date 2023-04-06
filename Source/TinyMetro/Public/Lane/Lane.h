@@ -227,4 +227,7 @@ public:
 
 private:
 	FVector GetPointsBetween();
+
+	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
+
 };
