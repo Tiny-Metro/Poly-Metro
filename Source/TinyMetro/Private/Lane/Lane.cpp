@@ -714,7 +714,10 @@ void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 					PathPoint.Coordination = Point;
 					PathPoint.IsStation = false;
 					PathPoint.IsBendingPoint = false;
-					PathPoint.IsThrough = false;
+					if(GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station) {
+						PathPoint.IsThrough = true;
+					}
+					else PathPoint.IsThrough = false;
 
 					RLaneArray.Add(PathPoint);
 				}
@@ -723,7 +726,10 @@ void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 				BendingPoint.Coordination = BendingCoord;
 				BendingPoint.IsStation = false;
 				BendingPoint.IsBendingPoint = true;
-				BendingPoint.IsThrough = false;
+				if (GridManagerRef->GetGridCellDataByPoint(BendingCoord.X, BendingCoord.Y).StationInfo == GridStationStructure::Station) {
+					BendingPoint.IsThrough = true;
+				}
+				else BendingPoint.IsThrough = false;
 
 				RLaneArray.Add(BendingPoint);
 				
@@ -733,7 +739,10 @@ void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 					PathPoint.Coordination = Point;
 					PathPoint.IsStation = false;
 					PathPoint.IsBendingPoint = false;
-					PathPoint.IsThrough = false;
+					if (GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station) {
+						PathPoint.IsThrough = true;
+					}
+					else PathPoint.IsThrough = false;
 
 					RLaneArray.Add(PathPoint);
 				}
@@ -748,7 +757,10 @@ void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 					PathPoint.Coordination = Point;
 					PathPoint.IsStation = false;
 					PathPoint.IsBendingPoint = false;
-					PathPoint.IsThrough = false;
+					if (GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station) {
+						PathPoint.IsThrough = true;
+					}
+					else PathPoint.IsThrough = false;
 
 					RLaneArray.Add(PathPoint);
 				}
@@ -860,7 +872,7 @@ void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
 }
 
-void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh) {
+void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh, UStaticMesh* ThroughSplineMesh) {
 
 	//Check the input parameter is valid
 	if (!Spline || !SplineMesh)
@@ -933,7 +945,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
+			if(RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughSplineMesh);
+			else{SetSplineMeshComponent(SplineMeshComponent, SplineMesh);}
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -947,7 +960,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
+				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughSplineMesh);
+				else { SetSplineMeshComponent(SplineMeshComponent, SplineMesh); }
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 				RKeepedSplineMesh.Add(SplineMeshComponent);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -969,7 +983,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
+			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughSplineMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, SplineMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);

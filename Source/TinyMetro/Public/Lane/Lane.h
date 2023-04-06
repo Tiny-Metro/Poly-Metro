@@ -223,7 +223,7 @@ public:
 
 //Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
-	void R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh);
+	void R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh, UStaticMesh* ThroughSplineMesh);
 
 private:
 	FVector GetPointsBetween();
