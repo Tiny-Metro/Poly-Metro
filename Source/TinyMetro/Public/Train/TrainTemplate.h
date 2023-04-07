@@ -70,6 +70,8 @@ public:
 	virtual int32 GetValidSeatCount() const;
 	UFUNCTION()
 	virtual bool AddPassenger(class UPassenger* P);
+	UFUNCTION()
+	virtual void UpdatePassengerSlot();
 
 
 	UFUNCTION(BlueprintCallable)
@@ -80,6 +82,8 @@ public:
 	virtual void DespawnTrain();
 	UFUNCTION(BlueprintCallable)
 	void DropPassenger();
+	
+	virtual void GetOffPassenger(class AStation* Station, bool* Success);
 
 	UFUNCTION()
 	FStationInfo GetCurrentStation() const;
@@ -146,10 +150,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	TArray<FVector> PassengerMeshPosition; 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
-	TArray<FVector> PassengerMeshPositionUpgrade;
+
+	TArray<FVector> PassengerMeshPosition = {};
+	TArray<FVector> PassengerMeshPositionUpgrade = {};
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	FRotator PassengerMeshRotation = FRotator(0.0f, -90.0f, 20.0f);
 

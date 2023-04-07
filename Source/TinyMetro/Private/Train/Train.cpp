@@ -63,6 +63,8 @@ void ATrain::Test() {
 }
 
 ATrain::ATrain() {
+	
+	
 	ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
 	);
@@ -77,14 +79,31 @@ ATrain::ATrain() {
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
-	
 
-	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
-		PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
-	}
+	UpdatePassengerSlot();
 }
 
 void ATrain::BeginPlay() {
+	/*PassengerMeshPosition = {
+		FVector(10.0f, 55.0f, 190.0f),
+		FVector(10.0f, -55.0f, 190.0f),
+		FVector(-100.0f, 55.0f, 190.0f),
+		FVector(-100.0f, -55.0f, 190.0f),
+		FVector(-210.0f, 55.0f, 190.0f),
+		FVector(-210.0f, -55.0f, 190.0f),
+		FVector(-320.0f, 55.0f, 190.0f),
+		FVector(-320.0f, -55.0f, 190.0f)
+	};
+	PassengerMeshPositionUpgrade = {
+		FVector(70.0f, 55.0f, 190.0f),
+		FVector(70.0f, -55.0f, 190.0f),
+		FVector(-50.0f, 55.0f, 190.0f),
+		FVector(-50.0f, -55.0f, 190.0f),
+		FVector(-160.0f, 55.0f, 190.0f),
+		FVector(-160.0f, -55.0f, 190.0f),
+		FVector(-270.0f, 55.0f, 190.0f),
+		FVector(-270.0f, -55.0f, 190.0f)
+	};*/
 	Super::BeginPlay();
 	TotalTravel = 0.0f;
 	AiControllerRef = Cast<ATrainAiController>(GetController());
@@ -113,11 +132,13 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			// Initialize check index
 			PassengerIndex = 0;
 
+			bool tmp = false;
 			// Set up delegate (Passenger get on, off)
 			GetOffDelegate.BindUObject(
 				this,
 				&ATrain::GetOffPassenger,
-				Cast<AStation>(OtherActor)
+				Cast<AStation>(OtherActor),
+				&tmp
 			);
 
 			GetOnDelegate.BindUObject(
@@ -224,7 +245,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 	Super::ServiceStart(StartLocation, Lane, D);
 	bool tmp;
 
-	StartLocation.Z = 15.0f;
+	StartLocation.Z = 20.f;
 	this->SetActorLocation(StartLocation);
 
 	// Set serviced lane id
@@ -249,6 +270,19 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 	AiControllerRef->Patrol();
 }
 
+void ATrain::UpdatePassengerSlot() {
+	Super::UpdatePassengerSlot();
+	if (IsUpgrade) {
+		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
+			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
+		}
+	} else {
+		for (int i = 0; i < PassengerMeshPosition.Num(); i++) {
+			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
+		}
+	}
+}
+
 void ATrain::ActiveMoveTest() {
 	TrainMovement->SetActive(true);
 }
@@ -258,9 +292,7 @@ void ATrain::GetOnPassenger(AStation* Station) {
 		// Log
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Staton::GetOnPassenger"));
 
-
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
-
 
 		if (RidePassenger != nullptr) {
 			PassengerIndex--;
@@ -273,11 +305,6 @@ void ATrain::GetOnPassenger(AStation* Station) {
 					}
 				}
 			} 
-			TotalPassenger++;
-
-			// Get money
-			PlayerStateRef->AddMoney(Fare);
-			UpdatePassengerMesh();
 		} else {
 			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
 			TrainMovement->SetActive(true);
@@ -292,40 +319,19 @@ void ATrain::GetOnPassenger(AStation* Station) {
 	}
 }
 
-void ATrain::GetOffPassenger(AStation* Station) {
+void ATrain::GetOffPassenger(AStation* Station, bool* Success) {
 	// Log
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
+	
+	Super::GetOffPassenger(Station, Success);
+	if ((*Success)) {
+		return;
+	}
 
-	for (int i = 0; i < CurrentPassengerSlot; i++) {
-		if (Passenger[i]) {
-			// Update passenger route
-			auto PassengerRoute = StationManagerRef->GetShortestPath(
-				CurrentStation.Id,
-				Passenger[i]->GetDestination()
-			);
-
-			//auto PassengerRoute = Passenger[i]->GetPassengerPath();
-			// Check route validation
-			// True : Route valid
-			// False(else) : Route invalid (Get off)
-			if (!PassengerRoute.IsEmpty()) {
-				// Check passenger route
-				// False : Get off (Ride other train)
-				if (PassengerRoute.Peek() == NextStation.Id) {
-					PassengerRoute.Dequeue();
-					Passenger[i]->SetPassengerPath(PassengerRoute);
-				} else {
-					Station->GetOffPassenger(Passenger[i]);
-					Passenger.Add(i, nullptr);
-					UpdatePassengerMesh();
-					return;
-				}
-			}else {
-				Station->GetOffPassenger(Passenger[i]);
-				Passenger.Add(i, nullptr);
-				UpdatePassengerMesh();
-				return;
-			}
+	for (auto& i : Subtrains) {
+		i->GetOffPassenger(Station, Success);
+		if ((*Success)) {
+			return;
 		}
 	}
 	
@@ -339,11 +345,18 @@ void ATrain::GetOffPassenger(AStation* Station) {
 		true,
 		0.0f
 	);
+}
 
+void ATrain::UpdateSubtrainDistance() {
+	int count = 1;
+	for (auto& i : Subtrains) {
+		i->SetDistanceFromTrain(480 * count++);
+	}
 }
 
 void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.Add(T);
+	UpdateSubtrainDistance();
 }
 

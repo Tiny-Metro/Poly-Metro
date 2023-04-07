@@ -65,8 +65,6 @@ ATrainTemplate::ATrainTemplate()
 	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
 	OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 
-	//TrainMeshComponent->OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
-	//TrainMeshComponent->OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 }
 
 // Called when the game starts or when spawned
@@ -110,7 +108,7 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
 	WorldLocation = HitResult.Location;
-	WorldLocation.Z = 15.0f;
+	WorldLocation.Z = 20.f;
 	return HitResult.GetActor();
 }
 
@@ -140,13 +138,30 @@ int32 ATrainTemplate::GetValidSeatCount() const {
 }
 
 bool ATrainTemplate::AddPassenger(UPassenger* P) {
-	for (int i = 0; i < Passenger.Num(); i++) {
+	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger[i] == nullptr) {
 			Passenger.Add(i, P);
+
+			TotalPassenger++;
+			// Get money
+			PlayerStateRef->AddMoney(Fare);
+			UpdatePassengerMesh();
 			return true;
 		}
 	}
 	return false;
+}
+
+void ATrainTemplate::UpdatePassengerSlot() {
+	if (IsUpgrade) {
+		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
+			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
+		}
+	} else {
+		for (int i = 0; i < PassengerMeshPosition.Num(); i++) {
+			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
+		}
+	}
 }
 
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
@@ -172,6 +187,44 @@ void ATrainTemplate::DropPassenger() {
 		}
 	} else {
 
+	}
+}
+
+void ATrainTemplate::GetOffPassenger(AStation* Station, bool* Success) {
+	(*Success) = false;
+	for (int i = 0; i < CurrentPassengerSlot; i++) {
+		if (Passenger[i]) {
+			// Update passenger route
+			auto PassengerRoute = StationManagerRef->GetShortestPath(
+				CurrentStation.Id,
+				Passenger[i]->GetDestination()
+			);
+
+			//auto PassengerRoute = Passenger[i]->GetPassengerPath();
+			// Check route validation
+			// True : Route valid
+			// False(else) : Route invalid (Get off)
+			if (!PassengerRoute.IsEmpty()) {
+				// Check passenger route
+				// False : Get off (Ride other train)
+				if (PassengerRoute.Peek() == NextStation.Id) {
+					PassengerRoute.Dequeue();
+					Passenger[i]->SetPassengerPath(PassengerRoute);
+				} else {
+					Station->GetOffPassenger(Passenger[i]);
+					Passenger.Add(i, nullptr);
+					UpdatePassengerMesh();
+					(*Success) = true;
+					return;
+				}
+			} else {
+				Station->GetOffPassenger(Passenger[i]);
+				Passenger.Add(i, nullptr);
+				UpdatePassengerMesh();
+				(*Success) = true;
+				return;
+			}
+		}
 	}
 }
 
@@ -289,7 +342,7 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 
 void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
-
+	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
 	//TODO : Mesh change
 }
 
