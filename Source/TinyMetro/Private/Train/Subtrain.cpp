@@ -12,7 +12,7 @@ ASubtrain::ASubtrain() {
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
 
-	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
+	TrainMovement->MaxWalkSpeed = 400.0f; // Default 600
 
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
