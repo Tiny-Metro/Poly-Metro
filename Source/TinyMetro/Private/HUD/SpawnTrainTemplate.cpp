@@ -20,6 +20,7 @@ void USpawnTrainTemplate::NativeConstruct() {
 	StationManagerRef = GameModeRef->GetStationManager();
 	TrainManagerRef = GameModeRef->GetTrainManager();
 	LaneManagerRef = GameModeRef->GetLaneManager();
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 }
 
