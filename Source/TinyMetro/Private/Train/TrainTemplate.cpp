@@ -166,7 +166,7 @@ void ATrainTemplate::UpdatePassengerSlot() {
 
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	TrainManagerRef->AddTrain(this);
-
+	TrainZAxis = this->GetActorLocation().Z;
 }
 
 void ATrainTemplate::DespawnTrain() {
@@ -267,6 +267,14 @@ void ATrainTemplate::Tick(float DeltaTime)
 			IsActorDragged = true;
 		} else {
 			IsActorDragged = false;
+		}
+	}
+
+	if (!IsActorDragged) {
+		auto locationTmp = GetActorLocation();
+		if (locationTmp.Z != TrainZAxis) {
+			locationTmp.Z = TrainZAxis;
+			SetActorLocation(locationTmp);
 		}
 	}
 }

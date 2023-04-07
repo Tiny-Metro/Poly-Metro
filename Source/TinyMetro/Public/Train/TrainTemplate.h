@@ -162,6 +162,9 @@ protected:
 	bool TouchInput = false;
 	UPROPERTY(BlueprintReadWrite)
 	float TrainSafeDistance = 250.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	float TrainZAxis;
+	
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
