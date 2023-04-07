@@ -26,6 +26,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	// Call by shop
+	UFUNCTION(BlueprintCallable)
 	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
 	
 	UFUNCTION(BlueprintCallable)
@@ -40,16 +42,16 @@ public:
 public:
 	//게임 플레이 시간
 	UFUNCTION()
-		float GetPlayTimeSec();
+	float GetPlayTimeSec();
 
 	UFUNCTION()
-		void SetPlayTimeSec(float elapseTimeSec);
+	void SetPlayTimeSec(float elapseTimeSec);
 
 	UFUNCTION()
-		int32 GetDay();
+	int32 GetDay();
 
 	UFUNCTION()
-		float GetDayTime();
+	float GetDayTime();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -57,6 +59,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddSales(int32 Sale);
 	void Test();
+
+	UFUNCTION(BlueprintCallable)
+	void AddItem(ItemType Item, int Amount);
+	UFUNCTION(BlueprintCallable)
+	bool UseLane();
+	UFUNCTION(BlueprintCallable)
+	bool UseTrain();
+	UFUNCTION(BlueprintCallable)
+	bool UseSubtrain();
+	UFUNCTION(BlueprintCallable)
+	bool UseBridge();
+	UFUNCTION(BlueprintCallable)
+	bool UseTunnel();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
@@ -76,7 +91,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
 	int32 ValidTrain = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidSubTrain = 0;
+	int32 ValidSubtrain = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
 	int32 ValidExpress = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
@@ -101,7 +116,7 @@ protected:
 	int32 UsingBridge = 0;	
 
 	UPROPERTY()
-		int32 DayTime;
+	int32 DayTime;
 
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class AStationManager* StationManager;
@@ -113,5 +128,5 @@ protected:
 	class ATMSaveManager* TMSaveManager;
 
 	UPROPERTY()
-		class ATinyMetroGameModeBase* TinyMetroGameModeBase;
+	class ATinyMetroGameModeBase* TinyMetroGameModeBase;
 };

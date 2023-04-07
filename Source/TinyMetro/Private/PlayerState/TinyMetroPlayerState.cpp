@@ -60,7 +60,7 @@ bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
 			ValidTrain += Amount;
 			break;
 		case ItemType::Subtrain:
-			ValidSubTrain += Amount;
+			ValidSubtrain += Amount;
 			break;
 		case ItemType::Lane:
 			ValidLane += Amount;
@@ -168,4 +168,75 @@ void ATinyMetroPlayerState::Test() {
 			FString::Printf(TEXT("PlayerState")));
 	}
   
+}
+
+void ATinyMetroPlayerState::AddItem(ItemType Item, int Amount) {
+	switch (Item) {
+	case ItemType::Lane:
+		ValidLane += Amount;
+		break;
+	case ItemType::Train:
+		ValidTrain += Amount;
+		break;
+	case ItemType::Subtrain:
+		ValidSubtrain += Amount;
+		break;
+	case ItemType::Bridge:
+		ValidBridge += Amount;
+		break;
+	case ItemType::Tunnel:
+		ValidTunnel += Amount;
+		break;
+
+	}
+}
+
+bool ATinyMetroPlayerState::UseLane() {
+	if (ValidLane <= 0) {
+		return false;
+	} else {
+		ValidLane--;
+		UsingLane++;
+		return true;
+	}
+}
+
+bool ATinyMetroPlayerState::UseTrain() {
+	if (ValidTrain <= 0) {
+		return false;
+	} else {
+		ValidTrain--;
+		UsingTrain++;
+		return true;
+	}
+}
+
+bool ATinyMetroPlayerState::UseSubtrain() {
+	if (ValidSubtrain <= 0) {
+		return false;
+	} else {
+		ValidSubtrain--;
+		UsingSubTrain++;
+		return true;
+	}
+}
+
+bool ATinyMetroPlayerState::UseBridge() {
+	if (ValidBridge <= 0) {
+		return false;
+	} else {
+		ValidBridge--;
+		UsingBridge++;
+		return true;
+	}
+}
+
+bool ATinyMetroPlayerState::UseTunnel() {
+	if (ValidTunnel <= 0) {
+		return false;
+	} else {
+		ValidTunnel--;
+		UsingTunnel++;
+		return true;
+	}
 }

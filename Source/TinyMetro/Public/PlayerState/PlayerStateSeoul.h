@@ -15,4 +15,6 @@ class TINYMETRO_API APlayerStateSeoul : public ATinyMetroPlayerState
 {
 	GENERATED_BODY()
 	
+public:
+	APlayerStateSeoul();
 };
