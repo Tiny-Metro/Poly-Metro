@@ -3,3 +3,10 @@
 
 #include "PlayerState/PlayerStateSeoul.h"
 
+APlayerStateSeoul::APlayerStateSeoul() {
+	Money = 200;
+	ValidLane = 3;
+	ValidTunnel = 2;
+	ValidBridge = 3;
+	ValidTrain = 3;
+}
