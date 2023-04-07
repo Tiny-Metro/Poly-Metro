@@ -30,6 +30,7 @@ AStation::AStation()
 	StationComplainMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Station Complain Mesh"));
 	StationComplainMeshComponent->SetupAttachment(RootComponent);
 	StationComplainMeshComponent->SetGenerateOverlapEvents(false);
+	StationComplainMeshComponent->SetWorldScale3D(FVector(1.20f));
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
