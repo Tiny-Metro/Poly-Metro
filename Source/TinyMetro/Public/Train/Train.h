@@ -33,6 +33,7 @@ public:
 	virtual void Upgrade() override;
 	virtual bool IsPassengerSlotFull() override;
 	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* D) override;
+	virtual void UpdatePassengerSlot() override;
 
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
@@ -43,8 +44,10 @@ public:
 	void ActiveMoveTest(); 
 	UFUNCTION()
 	void GetOnPassenger(class AStation* Station);
+
+	virtual void GetOffPassenger(class AStation* Station, bool* Success) override;
 	UFUNCTION()
-	void GetOffPassenger(class AStation* Station);
+	void UpdateSubtrainDistance();
 
 protected:
 
@@ -73,6 +76,7 @@ protected:
 	UPROPERTY()
 	int32 PassengerIndex = 0;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<FVector> PassengerMeshPosition = {
 		FVector(10.0f, 55.0f, 190.0f),
 		FVector(10.0f, -55.0f, 190.0f),
@@ -80,10 +84,11 @@ protected:
 		FVector(-100.0f, -55.0f, 190.0f),
 		FVector(-210.0f, 55.0f, 190.0f),
 		FVector(-210.0f, -55.0f, 190.0f),
-		FVector(10.0f, 55.0f, 190.0f),
-		FVector(10.0f, 55.0f, 190.0f)
+		FVector(-320.0f, 55.0f, 190.0f),
+		FVector(-320.0f, -55.0f, 190.0f)
 	};
 
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<FVector> PassengerMeshPositionUpgrade = {
 		FVector(70.0f, 55.0f, 190.0f),
 		FVector(70.0f, -55.0f, 190.0f),

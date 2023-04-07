@@ -2,6 +2,8 @@
 
 
 #include "Train/Subtrain.h"
+#include "Train/SubtrainAiController.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 ASubtrain::ASubtrain() {
 
@@ -10,11 +12,15 @@ ASubtrain::ASubtrain() {
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
 
+	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
+
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
+
+	UpdatePassengerSlot();
 }
 
 void ASubtrain::Test() {
@@ -27,8 +33,22 @@ void ASubtrain::SetTrainMaterial(ALane* Lane) {
 	Super::SetTrainMaterial(Lane);
 }
 
+void ASubtrain::UpdatePassengerSlot() {
+	Super::UpdatePassengerSlot();
+	if (IsUpgrade) {
+		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
+			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
+		}
+	} else {
+		for (int i = 0; i < PassengerMeshPosition.Num(); i++) {
+			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
+		}
+	}
+}
+
 void ASubtrain::BeginPlay() {
 	Super::BeginPlay();
+	AiControllerRef = Cast<ASubtrainAiController>(GetController());
 }
 
 //FVector ASubtrain::GetNextTrainPosition() {
@@ -41,4 +61,9 @@ void ASubtrain::SetOwnerTrainId(int32 TID) {
 
 int32 ASubtrain::GetOwnerTrainId() const {
 	return OwnerTrainId;
+}
+
+void ASubtrain::SetDistanceFromTrain(float Dist) {
+	DistanceFromTrain = Dist;
+	AiControllerRef->SetDistanceFromTrain(Dist);
 }

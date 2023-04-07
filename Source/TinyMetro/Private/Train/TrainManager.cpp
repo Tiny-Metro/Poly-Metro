@@ -52,12 +52,14 @@ ATrain* ATrainManager::GetNearestTrain(FVector CurrentLocation, class ALane* Lan
 	int TrainIndex = 0;
 	bool LaneValid = IsValid(LaneRef);
 	for (int i = 0; i < Trains.Num(); i++) {
-		if (Trains[i]->IsA(ASubtrain::StaticClass())) continue;
-		if (LaneValid && LaneRef->GetLaneId() != Trains[i]->GetServiceLaneId()) continue;
-		double tmp = FVector::Dist(CurrentLocation, Trains[i]->GetActorLocation());
-		if (Distance > tmp) {
-			Distance = tmp;
-			TrainIndex = i;
+		if (Trains.IsValidIndex(i)) {
+			if (Trains[i]->IsA(ASubtrain::StaticClass())) continue;
+			if (LaneValid && LaneRef->GetLaneId() != Trains[i]->GetServiceLaneId()) continue;
+			double tmp = FVector::Dist(CurrentLocation, Trains[i]->GetActorLocation());
+			if (Distance > tmp) {
+				Distance = tmp;
+				TrainIndex = i;
+			}
 		}
 	}
 
