@@ -3,6 +3,7 @@
 
 #include "Train/Subtrain.h"
 #include "Train/SubtrainAiController.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include <GameFramework/CharacterMovementComponent.h>
 
 ASubtrain::ASubtrain() {
@@ -12,7 +13,8 @@ ASubtrain::ASubtrain() {
 	);
 	TrainMesh.AddUnique(LoadTrainMesh.Object);
 
-	TrainMovement->MaxWalkSpeed = 400.0f; // Default 600
+	TrainMovement->MaxWalkSpeed = 350.0f; // Default 600
+	TrainMovement->MaxAcceleration = 3000.0f; // Default 2048
 
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
@@ -44,6 +46,11 @@ void ASubtrain::UpdatePassengerSlot() {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
 		}
 	}
+}
+
+void ASubtrain::DespawnTrain() {
+	PlayerStateRef->AddItem(ItemType::Subtrain, 1);
+	Super::DespawnTrain();
 }
 
 void ASubtrain::BeginPlay() {

@@ -26,7 +26,7 @@ ATrainTemplate::ATrainTemplate()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	TrainMovement = GetCharacterMovement();
-	TrainMovement->MaxAcceleration = 50000.0f; // Default 2048
+	TrainMovement->MaxAcceleration = 3000.0f; // Default 2048
 	TrainMovement->Mass = 1.0f; // Deafult 100
 	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
 	TrainMovement->bUseControllerDesiredRotation = true; // Default false
@@ -170,7 +170,7 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 }
 
 void ATrainTemplate::DespawnTrain() {
-	
+	this->Destroy();
 }
 
 void ATrainTemplate::DropPassenger() {

@@ -34,6 +34,7 @@ public:
 	virtual bool IsPassengerSlotFull() override;
 	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* D) override;
 	virtual void UpdatePassengerSlot() override;
+	virtual void DespawnTrain() override;
 
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;

@@ -20,6 +20,7 @@ public:
 	virtual void Test() override;
 	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void UpdatePassengerSlot() override;
+	virtual void DespawnTrain() override;
 
 	// TrainTemplate override function
 	//virtual FVector GetNextTrainPosition() override;

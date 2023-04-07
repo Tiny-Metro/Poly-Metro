@@ -9,6 +9,7 @@
 #include "Lane/LaneManager.h"
 #include "Components/BoxComponent.h"
 #include "GameModes/GameModeBaseSeoul.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/KismetMathLibrary.h>
@@ -237,7 +238,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 		ServiceStart(StartLocation, LaneRef, Destination);
 	} else {
 		// TODO : if upgrade, return upgrade cost
-		this->Destroy();
+		DespawnTrain();
 	}
 }
 
@@ -281,6 +282,11 @@ void ATrain::UpdatePassengerSlot() {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPosition[i]);
 		}
 	}
+}
+
+void ATrain::DespawnTrain() {
+	PlayerStateRef->AddItem(ItemType::Train, 1);
+	Super::DespawnTrain();
 }
 
 void ATrain::ActiveMoveTest() {
