@@ -837,22 +837,8 @@ FVector ALane::PointToLocation(const FIntPoint& Point) {
 // Refactoring clearSplineMesh
 void ALane::ClearLanePoint() {
 	// Clear the existing lane array if any
-	for (FLanePoint& LanePoint : RLaneArray)
-	{
-		// Destroy the USplineMeshComponent instances inside the current FLanePoint
-		  // Iterate through the MeshArray of the given FLanePoint
-		for (USplineMeshComponent* SplineMeshComponent : LanePoint.MeshArray)
-		{
-			// Check if the SplineMeshComponent is valid before trying to destroy it
-			if (SplineMeshComponent)
-			{
-				// Destroy the SplineMeshComponent
-				SplineMeshComponent->DestroyComponent();
-			}
-		}
-
-		// Clear the MeshArray for the given FLanePoint
-		LanePoint.MeshArray.Empty();
+	for (int32 i = 0; i < RLaneArray.Num(); i++) {
+		ClearSplineMeshAt(i);
 	}
 	RLaneArray.Empty();
 }
@@ -1026,4 +1012,13 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 void ALane::SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh) {
 	RSplineMesh = Mesh;
 	RThroughMesh = ThroughMesh;
+}
+
+void ALane::ClearSplineMeshAt(int32 Index){
+	for (USplineMeshComponent* SplineMeshComponent : RLaneArray[Index].MeshArray) {
+		if (SplineMeshComponent) {
+			SplineMeshComponent->DestroyComponent();
+		}
+	}
+}
 }

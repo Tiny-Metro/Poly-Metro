@@ -244,4 +244,6 @@ public:
 
 		UFUNCTION(BlueprintCallable)
 		void SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh);
+		UFUNCTION(BlueprintCallable)
+		void ClearSplineMeshAt(int32 Index);
 };
