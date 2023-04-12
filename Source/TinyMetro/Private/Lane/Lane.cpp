@@ -913,10 +913,10 @@ void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
 }
 
-void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh, UStaticMesh* ThroughSplineMesh) {
+void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 
 	//Check the input parameter is valid
-	if (!Spline || !SplineMesh)
+	if (!Spline)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
 		return;
@@ -952,7 +952,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
+			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -976,7 +976,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, SplineMesh);
+			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -1000,8 +1000,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if(RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughSplineMesh);
-			else{SetSplineMeshComponent(SplineMeshComponent, SplineMesh);}
+			if(RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
+			else{SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);}
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -1019,8 +1019,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughSplineMesh);
-				else { SetSplineMeshComponent(SplineMeshComponent, SplineMesh); }
+				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
+				else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //				RKeepedSplineMesh.Add(SplineMeshComponent);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -1045,8 +1045,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineM
 
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughSplineMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, SplineMesh); }
+			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 //			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
@@ -1072,4 +1072,9 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 	SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 	SplineMeshComponent->RegisterComponent();
+}
+
+void ALane::SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh) {
+	RSplineMesh = Mesh;
+	RThroughMesh = ThroughMesh;
 }

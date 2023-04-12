@@ -224,7 +224,7 @@ public:
 
 //Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
-	void R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh, UStaticMesh* ThroughSplineMesh);
+	void R2SplineMeshComponent(USplineComponent* Spline);
 
 private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
@@ -234,4 +234,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FMeshComponentArray> R2KeepedSplineMesh;
 
+	public:
+//ReFactoring Setting Mesh
+		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+		UStaticMesh* RSplineMesh;
+
+		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+		UStaticMesh* RThroughMesh;
+
+		UFUNCTION(BlueprintCallable)
+		void SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh);
 };
