@@ -117,13 +117,20 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		auto Station = Cast<AStation>(OtherActor);
 		// Check passing station
 		if (Station->GetLanes().Contains(ServiceLaneId)) {
-			// Set current Station
-			CurrentStation = Station->GetStationInfo();
-			// Set next Station
-			NextStation = LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
-				Station,
-				GetTrainDirection()
-			)->GetStationInfo();
+			// Set current, next Station
+			SetCurrentStation(Station->GetStationInfo());
+			SetNextStation(LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
+					Station,
+					GetTrainDirection()
+				)->GetStationInfo()
+			);
+			
+			// Set subtrain's current, next station
+			for (auto& i : Subtrains) {
+				i->SetCurrentStation(GetCurrentStation());
+				i->SetNextStation(GetNextStation());
+			}
+
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
