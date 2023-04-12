@@ -1074,3 +1074,58 @@ void ALane::RemoveLaneFromStart(int32 Index, const TArray<class AStation*>& Stat
 
 	RLaneArray[0].MeshArray.Add(SplineMeshComponent);
 }
+
+void ALane::RemoveLaneFromEnd(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline) {
+	RRStationPoint = StationPoints;
+
+	int32 tmpIndex = RRStationPoint.Num() -1;
+	while (tmpIndex >= Index) {
+		int32 lastIndexStation= RRStationPoint.Num() - 1;
+		RRStationPoint.RemoveAt(lastIndexStation);
+
+		//Lane Point
+		int count = 1;
+		for (int32 i = RLaneArray.Num() - 2; i >= 0; --i)
+		{
+			if (RLaneArray[i].IsStation) { break; }
+			else {
+				ClearSplineMeshAt(i);
+				RLaneArray.RemoveAt(i);
+				count++;
+			}
+		}
+
+		ClearSplineMeshAt(RLaneArray.Num() - 1);
+		RLaneArray.RemoveAt(RLaneArray.Num() - 1);
+
+		//Spline Point
+		for (int i = 0; i < count; i++) {
+			Spline->RemoveSplinePoint(Spline->GetNumberOfSplinePoints()-1);
+			RLaneLocation.RemoveAt(RLaneLocation.Num()-1);
+		}
+
+		tmpIndex++;
+	}
+
+	//Set EndPoint's Mesh Again
+	int32 lastIndex = RLaneArray.Num() - 1;
+	ClearSplineMeshAt(lastIndex);
+
+	FVector EndPos = Spline->GetLocationAtSplinePoint(lastIndex, ESplineCoordinateSpace::Local);
+	FVector StartPos = ((EndPos+ Spline->GetLocationAtSplinePoint(lastIndex-1, ESplineCoordinateSpace::Local)) / 2.0f);
+
+	FVector StartTangent = Spline->GetTangentAtSplinePoint(lastIndex-1, ESplineCoordinateSpace::Local);
+	FVector EndTangent;
+	float Length = StartTangent.Size();
+	float ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+	EndTangent = StartTangent;
+
+	//Add&Set Spline Mesh Component (mesh)
+	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+	SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+	RLaneArray[lastIndex].MeshArray.Add(SplineMeshComponent);
+}

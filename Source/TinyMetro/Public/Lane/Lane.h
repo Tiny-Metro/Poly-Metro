@@ -235,7 +235,7 @@ public:
 	TArray<FMeshComponentArray> R2KeepedSplineMesh;
 
 	public:
-//ReFactoring Setting Mesh
+//ReFactoring Setting Mesh & Remove
 		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 		UStaticMesh* RSplineMesh;
 
@@ -250,4 +250,7 @@ public:
 
 		UFUNCTION(BlueprintCallable)
 		void ClearSplineMeshAt(int32 Index);
+
+		UFUNCTION(BlueprintCallable)
+		void RemoveLaneFromEnd(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline);
 };
