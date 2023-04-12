@@ -188,7 +188,7 @@ private:
 // Refactoring clearSplineMesh
 public:
 	UFUNCTION(BlueprintCallable)
-	void ClearSplineMesh();
+	void ClearLanePoint();
 
 //Refactoring SetSpline
 public:

@@ -678,25 +678,7 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 //REFACTORING SET LANE ARRAY
 void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 
-	// Clear the existing lane array if any
-	for (FLanePoint& LanePoint : RLaneArray)
-	{
-		// Destroy the USplineMeshComponent instances inside the current FLanePoint
-		  // Iterate through the MeshArray of the given FLanePoint
-		for (USplineMeshComponent* SplineMeshComponent : LanePoint.MeshArray)
-		{
-			// Check if the SplineMeshComponent is valid before trying to destroy it
-			if (SplineMeshComponent)
-			{
-				// Destroy the SplineMeshComponent
-				SplineMeshComponent->DestroyComponent();
-			}
-		}
-
-		// Clear the MeshArray for the given FLanePoint
-		LanePoint.MeshArray.Empty();
-	}
-	RLaneArray.Empty();
+	ClearLanePoint();
 
 	//int32 NumStations = NewStationArray.Num();
 	int32 NumStations = NewStationPoint.Num();
@@ -853,20 +835,13 @@ FVector ALane::PointToLocation(const FIntPoint& Point) {
 }
 
 // Refactoring clearSplineMesh
-void ALane::ClearSplineMesh() {
-	/*
-	for (USplineMeshComponent* SplineMeshComponent : RKeepedSplineMesh) {
-		if (SplineMeshComponent) { SplineMeshComponent->DestroyComponent(); }
-	}
-	RKeepedSplineMesh.Empty();
-
-	
-	*/
-	// Iterate through the RKeepedSplineMesh array
-	for (FMeshComponentArray& MeshComponentArray : R2KeepedSplineMesh)
+void ALane::ClearLanePoint() {
+	// Clear the existing lane array if any
+	for (FLanePoint& LanePoint : RLaneArray)
 	{
-		// Iterate through the MeshArray of each FMeshComponentArray
-		for (USplineMeshComponent* SplineMeshComponent : MeshComponentArray.MeshArray)
+		// Destroy the USplineMeshComponent instances inside the current FLanePoint
+		  // Iterate through the MeshArray of the given FLanePoint
+		for (USplineMeshComponent* SplineMeshComponent : LanePoint.MeshArray)
 		{
 			// Check if the SplineMeshComponent is valid before trying to destroy it
 			if (SplineMeshComponent)
@@ -876,12 +851,10 @@ void ALane::ClearSplineMesh() {
 			}
 		}
 
-		// Clear the MeshArray for the current FMeshComponentArray
-		MeshComponentArray.MeshArray.Empty();
+		// Clear the MeshArray for the given FLanePoint
+		LanePoint.MeshArray.Empty();
 	}
-	// Clear the RKeepedSplineMesh array
-	R2KeepedSplineMesh.Empty();
-
+	RLaneArray.Empty();
 }
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
@@ -954,14 +927,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-//			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-
-			/*
-			FMeshComponentArray SplineMeshArray;
-			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
-			R2KeepedSplineMesh.Add(SplineMeshArray);
-			*/
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 
@@ -978,15 +944,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-//			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-		/*
-			FMeshComponentArray SplineMeshArray;
-			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
-			R2KeepedSplineMesh.Add(SplineMeshArray);
-		*/
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
-
 		}
 
 		//Set Points between
@@ -1003,12 +962,7 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 			if(RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
 			else{SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);}
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-//			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			/*
-			FMeshComponentArray SplineMeshArray;
-			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
-			*/
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 			/* --- Middle Mesh (if there is any) --- */
@@ -1022,10 +976,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
 				else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-//				RKeepedSplineMesh.Add(SplineMeshComponent);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 			
-//				SplineMeshArray.MeshArray.Add(SplineMeshComponent);
 				RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
@@ -1048,11 +1000,8 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
 			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-//			RKeepedSplineMesh.Add(SplineMeshComponent);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 		
-//			SplineMeshArray.MeshArray.Add(SplineMeshComponent);
-//			R2KeepedSplineMesh.Add(SplineMeshArray);
 			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
