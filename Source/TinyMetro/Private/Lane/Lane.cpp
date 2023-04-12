@@ -1021,4 +1021,56 @@ void ALane::ClearSplineMeshAt(int32 Index){
 		}
 	}
 }
+
+void ALane::RemoveLaneFromStart(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline) {
+	RRStationPoint = StationPoints;
+
+	int32 tmpIndex = 0;
+	while (tmpIndex <= Index) {
+		RRStationPoint.RemoveAt(0);
+
+		//Lane Point
+		int count = 1;
+		for (int32 i = 1; i < RLaneArray.Num(); ++i)
+		{
+			if (RLaneArray[i].IsStation) { break; }
+			else {
+				ClearSplineMeshAt(i);
+				RLaneArray.RemoveAt(i);
+				--i; // Decrement index to account for removed element
+				count++;
+			}
+		}
+
+		ClearSplineMeshAt(0);
+		RLaneArray.RemoveAt(0);
+
+		//Spline Point
+		for (int i = 0; i < count; i++) {
+			Spline->RemoveSplinePoint(0);
+			RLaneLocation.RemoveAt(0);
+		}
+
+		tmpIndex++;
+	}
+
+	//Set StartPoint's Mesh Again
+	ClearSplineMeshAt(0);
+
+	FVector StartPos = Spline->GetLocationAtSplinePoint(0, ESplineCoordinateSpace::Local);
+	FVector EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(1, ESplineCoordinateSpace::Local)) / 2.0f);
+
+	FVector StartTangent = Spline->GetTangentAtSplinePoint(0, ESplineCoordinateSpace::Local);
+	FVector EndTangent;
+	float Length = StartTangent.Size();
+	float ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+	EndTangent = StartTangent;
+
+	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+	SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+	RLaneArray[0].MeshArray.Add(SplineMeshComponent);
 }

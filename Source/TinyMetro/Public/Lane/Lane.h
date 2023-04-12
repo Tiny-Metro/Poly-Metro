@@ -244,6 +244,10 @@ public:
 
 		UFUNCTION(BlueprintCallable)
 		void SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh);
+
+		UFUNCTION(BlueprintCallable)
+		void RemoveLaneFromStart(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline);
+
 		UFUNCTION(BlueprintCallable)
 		void ClearSplineMeshAt(int32 Index);
 };
