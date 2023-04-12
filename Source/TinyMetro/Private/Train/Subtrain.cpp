@@ -2,6 +2,7 @@
 
 
 #include "Train/Subtrain.h"
+#include "Train/Train.h"
 #include "Train/SubtrainAiController.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <GameFramework/CharacterMovementComponent.h>
@@ -23,6 +24,15 @@ ASubtrain::ASubtrain() {
 	TrainMeshComponent->SetupAttachment(RootComponent);
 
 	UpdatePassengerSlot();
+}
+
+void ASubtrain::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+
+	// Drag activated
+	if (IsActorDragged) {
+		DropPassenger();
+	}
 }
 
 void ASubtrain::Test() {
@@ -73,4 +83,14 @@ int32 ASubtrain::GetOwnerTrainId() const {
 void ASubtrain::SetDistanceFromTrain(float Dist) {
 	DistanceFromTrain = Dist;
 	AiControllerRef->SetDistanceFromTrain(Dist);
+}
+
+void ASubtrain::DetachFromTrain() {
+	IsAttached = false;
+}
+
+void ASubtrain::AttachToTrain(ATrain* Train) {
+	IsAttached = true;
+	OwnerTrain = Train;
+	OwnerTrainId = Train->GetTrainId();
 }

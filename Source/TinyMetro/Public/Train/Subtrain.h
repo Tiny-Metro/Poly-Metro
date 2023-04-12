@@ -17,6 +17,7 @@ class TINYMETRO_API ASubtrain : public ATrainTemplate
 public:
 	ASubtrain();
 
+	virtual void Tick(float DeltaTime) override;
 	virtual void Test() override;
 	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void UpdatePassengerSlot() override;
@@ -31,6 +32,10 @@ public:
 	int32 GetOwnerTrainId() const;
 	UFUNCTION(BlueprintCallable)
 	void SetDistanceFromTrain(float Dist);
+	UFUNCTION(BlueprintCallable)
+	void DetachFromTrain();
+	UFUNCTION(BlueprintCallable)
+	void AttachToTrain(class ATrain* Train);
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,10 +44,14 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 OwnerTrainId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
+	class ATrain* OwnerTrain;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class ASubtrainAiController* AiControllerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float DistanceFromTrain;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
+	bool IsAttached = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<FVector> PassengerMeshPosition = {
