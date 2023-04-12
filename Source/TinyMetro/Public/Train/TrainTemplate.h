@@ -88,7 +88,11 @@ public:
 	UFUNCTION()
 	FStationInfo GetCurrentStation() const;
 	UFUNCTION()
+	void SetCurrentStation(FStationInfo Info);
+	UFUNCTION()
 	FStationInfo GetNextStation() const;
+	UFUNCTION()
+	void SetNextStation(FStationInfo Info);
 
 	// Click & Release
 	UFUNCTION()

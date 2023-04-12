@@ -232,8 +232,16 @@ FStationInfo ATrainTemplate::GetCurrentStation() const {
 	return CurrentStation;
 }
 
+void ATrainTemplate::SetCurrentStation(FStationInfo Info) {
+	CurrentStation = Info;
+}
+
 FStationInfo ATrainTemplate::GetNextStation() const {
 	return NextStation;
+}
+
+void ATrainTemplate::SetNextStation(FStationInfo Info) {
+	NextStation = Info;
 }
 
 void ATrainTemplate::TrainOnClicked(AActor* Target, FKey ButtonPressed) {
