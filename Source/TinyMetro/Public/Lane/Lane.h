@@ -253,4 +253,7 @@ public:
 
 		UFUNCTION(BlueprintCallable)
 		void RemoveLaneFromEnd(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline);
+
+		UFUNCTION(BlueprintCallable)
+		void ExtendStart(AStation* NewStation, USplineComponent* Spline);
 };
