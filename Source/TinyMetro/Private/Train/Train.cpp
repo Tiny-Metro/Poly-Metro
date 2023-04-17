@@ -82,6 +82,9 @@ ATrain::ATrain() {
 	TrainMeshComponent->SetupAttachment(RootComponent);
 
 	UpdatePassengerSlot();
+
+	CubeComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cube Mesh"));
+	CubeComponent->SetupAttachment(GetRootComponent());
 }
 
 void ATrain::BeginPlay() {
@@ -276,6 +279,10 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 
 	// Train move start
 	AiControllerRef->Patrol();
+
+	FVector cubeLocation = this->GetActorLocation();
+	cubeLocation.Z = cubeLocation.Z + 300.0f;
+	CubeComponent->SetWorldLocation(cubeLocation);
 }
 
 void ATrain::UpdatePassengerSlot() {
@@ -367,9 +374,15 @@ void ATrain::UpdateSubtrainDistance() {
 	}
 }
 
+void ATrain::DetachSubtrain(ASubtrain* T) {
+	Subtrains.Remove(T);
+	UpdateSubtrainDistance();
+}
+
 void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.Add(T);
+	T->AttachToTrain(this);
 	UpdateSubtrainDistance();
 }
 

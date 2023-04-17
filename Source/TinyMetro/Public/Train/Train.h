@@ -49,6 +49,8 @@ public:
 	virtual void GetOffPassenger(class AStation* Station, bool* Success) override;
 	UFUNCTION()
 	void UpdateSubtrainDistance();
+	UFUNCTION()
+	void DetachSubtrain(ASubtrain* T);
 
 protected:
 
@@ -62,11 +64,16 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 MaxSubtrain = 4;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<ASubtrain*> Subtrains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FVector LocationAtPreTick;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	ATrainAiController* AiControllerRef;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* CubeComponent;
 
 protected:
 	UPROPERTY(VisibleAnywhere)

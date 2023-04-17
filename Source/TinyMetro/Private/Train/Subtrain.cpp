@@ -3,9 +3,12 @@
 
 #include "Train/Subtrain.h"
 #include "Train/Train.h"
+#include "Train/TrainManager.h"
 #include "Train/SubtrainAiController.h"
+#include "Lane/Lane.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Kismet/KismetMathLibrary.h>
 
 ASubtrain::ASubtrain() {
 
@@ -32,6 +35,32 @@ void ASubtrain::Tick(float DeltaTime) {
 	// Drag activated
 	if (IsActorDragged) {
 		DropPassenger();
+		DetachFromTrain();
+		FVector MouseToWorldLocation;
+		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
+		LaneRef = Cast<ALane>(MouseToWorldActor);
+		SetTrainMaterial(LaneRef);
+		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
+			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		}
+		if (IsValid(LaneRef)) {
+
+		}
+
+		TrainRef = TrainManagerRef->GetNearestTrain(MouseToWorldLocation, LaneRef);
+		if (IsValid(TrainRef)) {
+			this->SetActorLocationAndRotation(
+				MouseToWorldLocation,
+				FRotator(
+					0,
+					UKismetMathLibrary::FindLookAtRotation(MouseToWorldLocation, TrainRef->GetActorLocation()).Yaw,
+					0
+				)
+			);
+		}
 	}
 }
 
@@ -63,6 +92,20 @@ void ASubtrain::DespawnTrain() {
 	Super::DespawnTrain();
 }
 
+void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	Super::TrainOnReleased(Target, ButtonPressed);
+	if (IsValid(LaneRef)) {
+		FVector StartLocation = GridManagerRef->Approximate(GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
+		StartLocation.Z = 20.0f;
+		SetActorLocation(StartLocation);
+		TrainRef->AddSubtrain(this);
+		ServiceStart(GetActorLocation(), LaneRef, nullptr);
+	} else {
+		DespawnTrain();
+	}
+	
+}
+
 void ASubtrain::BeginPlay() {
 	Super::BeginPlay();
 	AiControllerRef = Cast<ASubtrainAiController>(GetController());
@@ -71,6 +114,10 @@ void ASubtrain::BeginPlay() {
 //FVector ASubtrain::GetNextTrainPosition() {
 //	return FVector();
 //}
+
+void ASubtrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
+	Super::ServiceStart(StartLocation, Lane, D);
+}
 
 void ASubtrain::SetOwnerTrainId(int32 TID) {
 	OwnerTrainId = TID;
@@ -87,6 +134,11 @@ void ASubtrain::SetDistanceFromTrain(float Dist) {
 
 void ASubtrain::DetachFromTrain() {
 	IsAttached = false;
+	if (IsValid(OwnerTrain)) {
+		OwnerTrain->DetachSubtrain(this);
+	}
+	OwnerTrain = nullptr;
+	OwnerTrainId = -1;
 }
 
 void ASubtrain::AttachToTrain(ATrain* Train) {

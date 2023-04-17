@@ -22,6 +22,10 @@ public:
 	virtual void SetTrainMaterial(class ALane* Lane) override;
 	virtual void UpdatePassengerSlot() override;
 	virtual void DespawnTrain() override;
+	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, UPARAM(DisplayName = "Destination")class AStation* D) override;
+
+	// Click & Release
+	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
 
 	// TrainTemplate override function
 	//virtual FVector GetNextTrainPosition() override;
@@ -44,6 +48,8 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 OwnerTrainId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
+	class ATrain* TrainRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	class ATrain* OwnerTrain;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
