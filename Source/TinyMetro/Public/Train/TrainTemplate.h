@@ -168,7 +168,11 @@ protected:
 	float TrainSafeDistance = 250.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	float TrainZAxis;
-	
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector MouseToWorldLocation;
+	UPROPERTY(BlueprintReadWrite)
+	AActor* MouseToWorldActor;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

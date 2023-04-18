@@ -278,7 +278,22 @@ void ATrainTemplate::Tick(float DeltaTime)
 		}
 	}
 
-	if (!IsActorDragged) {
+	if (IsActorDragged) {
+		DropPassenger();
+
+		MouseToWorldLocation;
+		MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
+		LaneRef = Cast<ALane>(MouseToWorldActor);
+		SetTrainMaterial(LaneRef);
+		if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
+			MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
+			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		}
+
+	} else {
 		auto locationTmp = GetActorLocation();
 		if (locationTmp.Z != TrainZAxis) {
 			locationTmp.Z = TrainZAxis;

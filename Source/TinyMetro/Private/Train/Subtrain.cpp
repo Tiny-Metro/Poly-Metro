@@ -34,21 +34,21 @@ void ASubtrain::Tick(float DeltaTime) {
 
 	// Drag activated
 	if (IsActorDragged) {
-		DropPassenger();
 		DetachFromTrain();
-		FVector MouseToWorldLocation;
-		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+		//DropPassenger();
+		//MouseToWorldLocation;
+		//MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
 
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
-		LaneRef = Cast<ALane>(MouseToWorldActor);
-		SetTrainMaterial(LaneRef);
-		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
-			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
-		}
-		if (IsValid(LaneRef)) {
+		///*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		//	FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
+		//LaneRef = Cast<ALane>(MouseToWorldActor);
+		//SetTrainMaterial(LaneRef);
+		//if (MouseToWorldActor->IsA(AStation::StaticClass())) {
+		//	LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		//}
+		//if (IsValid(LaneRef)) {
 
-		}
+		//}
 
 		TrainRef = TrainManagerRef->GetNearestTrain(MouseToWorldLocation, LaneRef);
 		if (IsValid(TrainRef)) {

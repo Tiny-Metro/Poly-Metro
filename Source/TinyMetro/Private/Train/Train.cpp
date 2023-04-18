@@ -23,20 +23,21 @@ void ATrain::Tick(float DeltaTime) {
 
 	// Drag & Drop
 	if (IsActorDragged) {
-		DropPassenger();
-		FVector MouseToWorldLocation;
-		AActor* MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+		//DropPassenger();
+		//MouseToWorldLocation;
+		//MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
 
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
-		LaneRef = Cast<ALane>(MouseToWorldActor);
-		SetTrainMaterial(LaneRef);
-		if (MouseToWorldActor->IsA(AStation::StaticClass())) {
-			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
-		}
-		if (IsValid(LaneRef)) {
-			
-		}
+		///*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+		//	FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
+		//LaneRef = Cast<ALane>(MouseToWorldActor);
+		//SetTrainMaterial(LaneRef);
+		//if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
+		//	MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
+		//	LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		//}
+		//if (IsValid(LaneRef)) {
+		//	
+		//}
 
 		Destination = StationManagerRef->GetNearestStation(MouseToWorldLocation, LaneRef);
 		this->SetActorLocationAndRotation(
