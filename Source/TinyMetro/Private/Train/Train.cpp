@@ -135,6 +135,13 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 				i->SetNextStation(GetNextStation());
 			}
 
+			if (DeferredDespawn) {
+				for (auto& i : Subtrains) {
+					i->DespawnTrain();
+				}
+				DespawnTrain();
+			}
+
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
 
@@ -301,6 +308,9 @@ void ATrain::UpdatePassengerSlot() {
 
 void ATrain::DespawnTrain() {
 	PlayerStateRef->AddItem(ItemType::Train, 1);
+	for (auto& i : Subtrains) {
+		i->DespawnTrain();
+	}
 	Super::DespawnTrain();
 }
 

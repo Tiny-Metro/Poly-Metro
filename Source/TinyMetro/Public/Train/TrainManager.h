@@ -28,6 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddTrain(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
+	void RemoveTrain(ATrainTemplate* Train);
+	UFUNCTION(BlueprintCallable)
 	void SetTrainId(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
 	ATrainTemplate* GetTrainById(int32 TrainId, TrainType& Type);
@@ -47,7 +49,14 @@ public:
 	void PassengerMaterialDeferred();
 	UFUNCTION()
 	TArray<UMaterial*> GetPassengerMaterial() const;
+
+	UFUNCTION()
+	void RefreshTrainArray();
 	
+	UFUNCTION(BlueprintCallable)
+	void TrainDeferredDespawn(struct FStationInfo Station, class ALane* Lane);
+	UFUNCTION(BlueprintCallable)
+	TArray<ATrainTemplate*> GetStationsByDestination(struct FStationInfo Station, class ALane* Lane);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")

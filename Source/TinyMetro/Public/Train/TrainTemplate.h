@@ -100,6 +100,9 @@ public:
 	UFUNCTION()
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
 
+	UFUNCTION()
+	void SetDespawnNextStation();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
@@ -173,6 +176,9 @@ protected:
 	FVector MouseToWorldLocation;
 	UPROPERTY(BlueprintReadWrite)
 	AActor* MouseToWorldActor;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Info")
+	bool DeferredDespawn = false;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

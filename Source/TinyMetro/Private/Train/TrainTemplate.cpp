@@ -170,6 +170,8 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 }
 
 void ATrainTemplate::DespawnTrain() {
+	DropPassenger();
+	TrainManagerRef->RemoveTrain(this);
 	this->Destroy();
 }
 
@@ -257,6 +259,10 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	IsActorDragged = false;
 	TouchInput = false;
 	TouchTime = 0.0f;
+}
+
+void ATrainTemplate::SetDespawnNextStation() {
+	DeferredDespawn = true;
 }
 
 // Called every frame

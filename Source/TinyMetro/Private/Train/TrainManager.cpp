@@ -26,9 +26,16 @@ void ATrainManager::BeginPlay()
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
+	RefreshTrainArray();
 	if (Trains.Find(Train) == INDEX_NONE) {
 		Train->SetTrainId(NextTrainId++);
 		Trains.AddUnique(Train);
+	}
+}
+
+void ATrainManager::RemoveTrain(ATrainTemplate* Train) {
+	if (IsValid(Train)) {
+		Trains.Remove(Train);
 	}
 }
 
@@ -110,6 +117,40 @@ void ATrainManager::PassengerMaterialDeferred() {
 
 TArray<UMaterial*> ATrainManager::GetPassengerMaterial() const {
 	return PassengerMaterial;
+}
+
+void ATrainManager::RefreshTrainArray() {
+	for (int i = 0; i < Trains.Num(); i++) {
+		if (Trains.IsValidIndex(i)) {
+			if (!IsValid(Trains[i])) {
+				Trains.RemoveAt(i--);
+			}
+		}
+	}
+}
+
+void ATrainManager::TrainDeferredDespawn(FStationInfo Station, ALane* Lane) {
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->GetNextStation() == Station &&
+				i->GetServiceLaneId() == Lane->GetLaneId()) {
+				i->SetDespawnNextStation();
+			}
+		}
+	}
+}
+
+TArray<ATrainTemplate*> ATrainManager::GetStationsByDestination(FStationInfo Station, ALane* Lane) {
+	TArray<ATrainTemplate*> arr;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->GetNextStation() == Station &&
+				i->GetServiceLaneId() == Lane->GetLaneId()) {
+				arr.Add(i);
+			}
+		}
+	}
+	return arr;
 }
 
 // Called every frame
