@@ -256,4 +256,7 @@ public:
 
 		UFUNCTION(BlueprintCallable)
 		void ExtendStart(AStation* NewStation, USplineComponent* Spline);
+
+		UFUNCTION(BlueprintCallable)
+		void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
 };
