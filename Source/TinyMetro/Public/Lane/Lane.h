@@ -157,11 +157,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FIntPoint> PointArray;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
-	TArray<FIntPoint> RStationPoint;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
-	TArray<class AStation* > RRStationPoint;
 
 	UFUNCTION(BlueprintCallable)
 	void RSetLaneArray(const TArray<class AStation*>& NewStationPoint);
@@ -246,13 +242,13 @@ public:
 		void SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh);
 
 		UFUNCTION(BlueprintCallable)
-		void RemoveLaneFromStart(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline);
+		void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
 
 		UFUNCTION(BlueprintCallable)
 		void ClearSplineMeshAt(int32 Index);
 
 		UFUNCTION(BlueprintCallable)
-		void RemoveLaneFromEnd(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline);
+		void RemoveLaneFromEnd(int32 Index, USplineComponent* Spline);
 
 		UFUNCTION(BlueprintCallable)
 		void ExtendStart(AStation* NewStation, USplineComponent* Spline);

@@ -678,7 +678,7 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 //REFACTORING SET LANE ARRAY
 void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 
-	RRStationPoint = NewStationPoint;
+	StationPoint = NewStationPoint;
 	ClearLanePoint();
 
 	//int32 NumStations = NewStationArray.Num();
@@ -1023,12 +1023,11 @@ void ALane::ClearSplineMeshAt(int32 Index){
 	}
 }
 
-void ALane::RemoveLaneFromStart(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline) {
-	RRStationPoint = StationPoints;
+void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 
 	int32 tmpIndex = 0;
 	while (tmpIndex <= Index) {
-		RRStationPoint.RemoveAt(0);
+		StationPoint.RemoveAt(0);
 
 		//Lane Point
 		int count = 1;
@@ -1076,13 +1075,12 @@ void ALane::RemoveLaneFromStart(int32 Index, const TArray<class AStation*>& Stat
 	RLaneArray[0].MeshArray.Add(SplineMeshComponent);
 }
 
-void ALane::RemoveLaneFromEnd(int32 Index, const TArray<class AStation*>& StationPoints, USplineComponent* Spline) {
-	RRStationPoint = StationPoints;
+void ALane::RemoveLaneFromEnd(int32 Index, USplineComponent* Spline) {
 
-	int32 tmpIndex = RRStationPoint.Num() -1;
+	int32 tmpIndex = StationPoint.Num() -1;
 	while (tmpIndex >= Index) {
-		int32 lastIndexStation= RRStationPoint.Num() - 1;
-		RRStationPoint.RemoveAt(lastIndexStation);
+		int32 lastIndexStation= StationPoint.Num() - 1;
+		StationPoint.RemoveAt(lastIndexStation);
 
 		//Lane Point
 		int count = 1;
@@ -1136,8 +1134,8 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 //Destroy used-to-be first mesh
 	ClearSplineMeshAt(0);
 
-	RRStationPoint.InsertDefaulted(0, 1);
-	RRStationPoint[0] = NewStation;
+	StationPoint.InsertDefaulted(0, 1);
+	StationPoint[0] = NewStation;
 
 //Add Lane Array
 	TArray<FLanePoint> AddLaneArray;
@@ -1152,7 +1150,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 	AddLaneArray.Add(CurrentLanePoint);
 
-	FIntPoint NextStation = RRStationPoint[0]->GetCurrentGridCellData().WorldCoordination;
+	FIntPoint NextStation = StationPoint[0]->GetCurrentGridCellData().WorldCoordination;
 	FIntPoint Diff = NextStation - NewPoint;
 
 	FIntPoint BendingCoord;
@@ -1335,7 +1333,7 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	//Destroy used-to-be last mesh
 	ClearSplineMeshAt(RLaneArray.Num() -1);
 
-	RRStationPoint.Add(NewStation);
+	StationPoint.Add(NewStation);
 
 	//Add Lane Array
 	TArray<FLanePoint> AddLaneArray;
