@@ -157,11 +157,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FIntPoint> PointArray;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
-	TArray<FIntPoint> RStationPoint;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lane")
-	TArray<class AStation* > RRStationPoint;
 
 	UFUNCTION(BlueprintCallable)
 	void RSetLaneArray(const TArray<class AStation*>& NewStationPoint);
@@ -188,7 +184,7 @@ private:
 // Refactoring clearSplineMesh
 public:
 	UFUNCTION(BlueprintCallable)
-	void ClearSplineMesh();
+	void ClearLanePoint();
 
 //Refactoring SetSpline
 public:
@@ -224,7 +220,7 @@ public:
 
 //Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
-	void R2SplineMeshComponent(USplineComponent* Spline, UStaticMesh* SplineMesh, UStaticMesh* ThroughSplineMesh);
+	void R2SplineMeshComponent(USplineComponent* Spline);
 
 private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
@@ -234,4 +230,29 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FMeshComponentArray> R2KeepedSplineMesh;
 
+	public:
+//ReFactoring Setting Mesh & Remove
+		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+		UStaticMesh* RSplineMesh;
+
+		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+		UStaticMesh* RThroughMesh;
+
+		UFUNCTION(BlueprintCallable)
+		void SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh);
+
+		UFUNCTION(BlueprintCallable)
+		void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
+
+		UFUNCTION(BlueprintCallable)
+		void ClearSplineMeshAt(int32 Index);
+
+		UFUNCTION(BlueprintCallable)
+		void RemoveLaneFromEnd(int32 Index, USplineComponent* Spline);
+
+		UFUNCTION(BlueprintCallable)
+		void ExtendStart(AStation* NewStation, USplineComponent* Spline);
+
+		UFUNCTION(BlueprintCallable)
+		void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
 };
