@@ -248,7 +248,7 @@ public:
 		void ClearSplineMeshAt(int32 Index);
 
 		UFUNCTION(BlueprintCallable)
-		void RemoveLaneFromEnd(int32 Index, USplineComponent* Spline);
+		void RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline);
 
 		UFUNCTION(BlueprintCallable)
 		void ExtendStart(AStation* NewStation, USplineComponent* Spline);

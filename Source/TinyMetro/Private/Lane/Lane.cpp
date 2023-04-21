@@ -1075,9 +1075,11 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 	RLaneArray[0].MeshArray.Add(SplineMeshComponent);
 }
 
-void ALane::RemoveLaneFromEnd(int32 Index, USplineComponent* Spline) {
+void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline) {
 
-	int32 tmpIndex = StationPoint.Num() -1;
+//	int32 tmpIndex = StationPoint.Num() -1;
+	int32 tmpIndex = ExStationNum;
+
 	while (tmpIndex >= Index) {
 		//int32 lastIndexStation= StationPoint.Num() - 1;
 		//StationPoint.RemoveAt(lastIndexStation);
@@ -1103,7 +1105,7 @@ void ALane::RemoveLaneFromEnd(int32 Index, USplineComponent* Spline) {
 			RLaneLocation.RemoveAt(RLaneLocation.Num()-1);
 		}
 
-		tmpIndex++;
+		tmpIndex--;
 	}
 
 	//Set EndPoint's Mesh Again
