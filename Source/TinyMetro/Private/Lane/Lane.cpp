@@ -1027,7 +1027,7 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 
 	int32 tmpIndex = 0;
 	while (tmpIndex <= Index) {
-		StationPoint.RemoveAt(0);
+		//StationPoint.RemoveAt(0);
 
 		//Lane Point
 		int count = 1;
@@ -1079,8 +1079,8 @@ void ALane::RemoveLaneFromEnd(int32 Index, USplineComponent* Spline) {
 
 	int32 tmpIndex = StationPoint.Num() -1;
 	while (tmpIndex >= Index) {
-		int32 lastIndexStation= StationPoint.Num() - 1;
-		StationPoint.RemoveAt(lastIndexStation);
+		//int32 lastIndexStation= StationPoint.Num() - 1;
+		//StationPoint.RemoveAt(lastIndexStation);
 
 		//Lane Point
 		int count = 1;
@@ -1134,8 +1134,8 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 //Destroy used-to-be first mesh
 	ClearSplineMeshAt(0);
 
-	StationPoint.InsertDefaulted(0, 1);
-	StationPoint[0] = NewStation;
+	//StationPoint.InsertDefaulted(0, 1);
+	//StationPoint[0] = NewStation;
 
 //Add Lane Array
 	TArray<FLanePoint> AddLaneArray;
@@ -1333,7 +1333,7 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	//Destroy used-to-be last mesh
 	ClearSplineMeshAt(RLaneArray.Num() -1);
 
-	StationPoint.Add(NewStation);
+	//StationPoint.Add(NewStation);
 
 	//Add Lane Array
 	TArray<FLanePoint> AddLaneArray;
