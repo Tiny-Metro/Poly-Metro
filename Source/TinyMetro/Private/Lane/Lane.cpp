@@ -1152,7 +1152,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 	AddLaneArray.Add(CurrentLanePoint);
 
-	FIntPoint NextStation = StationPoint[0]->GetCurrentGridCellData().WorldCoordination;
+	FIntPoint NextStation = StationPoint[1]->GetCurrentGridCellData().WorldCoordination;
 	FIntPoint Diff = NextStation - NewPoint;
 
 	FIntPoint BendingCoord;
@@ -1237,8 +1237,8 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 	RLaneLocation.Insert(NewLaneLocation, 0);
 
 //Set Spline Again
-	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World, true);
-
+//	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World, true);
+	SetLaneSpline(Spline);
 //Add Spline Mesh
 
 	FVector StartPos;
@@ -1441,7 +1441,8 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	}
 
 	//Set Spline Again
-	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World, true);
+//	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World, true);
+	SetLaneSpline(Spline);
 
 	//[] Add Spline Mesh From End to New
 
