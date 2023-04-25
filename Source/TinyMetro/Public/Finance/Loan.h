@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class TINYMETRO_API ULoan : public UObject
 {
 	GENERATED_BODY()
