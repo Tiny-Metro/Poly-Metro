@@ -106,8 +106,10 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 		
 		if (IsValid(SelectedStations[i])) {
 			SelectedStations[i]->SetLanes(NextLaneNums[0]);
+			SelectedStations[i]->SetActivate(true);
 			//FIntPoint Coor = SelectedStations[i]->GetCurrentGridCellData().WorldCoordination;
 			tmpLane->StationPoint.Add(SelectedStations[i]);
+
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("SelectedStations[%d] is null"), i);
