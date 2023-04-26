@@ -15,9 +15,9 @@ struct TINYMETRO_API FPolicyData
 
 public:
 	FPolicyData() = default;
-	FPolicyData(int ServiceCostLevel, bool HandicappedSeat, bool HasCCTV, bool HasElevator, bool HasBicycle, bool HasTransfer) :
+	FPolicyData(int ServiceCostLevel, bool PrioritySeat, bool HasCCTV, bool HasElevator, bool HasBicycle, bool HasTransfer) :
 		ServiceCostLevel(ServiceCostLevel),
-		HandicappedSeat(HandicappedSeat),
+		PrioritySeat(PrioritySeat),
 		HasCCTV(HasCCTV),
 		HasElevator(HasElevator),
 		HasBicycle(HasBicycle),
@@ -25,16 +25,16 @@ public:
 
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-		int ServiceCostLevel;      // 서비스 비용 단계
+	int ServiceCostLevel;      // 서비스 비용 단계
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HandicappedSeat;  // 교통약자 좌석 배치
+	bool PrioritySeat;  // 교통약자 좌석 배치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasCCTV;          // CCTV 설치
+	bool HasCCTV;          // CCTV 설치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasElevator;      // 엘레베이터 설치
+	bool HasElevator;      // 엘레베이터 설치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasBicycle;       // 자전거 탑승 허가
+	bool HasBicycle;       // 자전거 탑승 허가
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasTransfer;      // 환승 시스템
+	bool HasTransfer;      // 환승 시스템
 
 };

@@ -23,7 +23,7 @@ void APolicy::BeginPlay()
 	stationmanager = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 
 	PolicyData.ServiceCostLevel = 3;
-	PolicyData.HandicappedSeat = false;
+	PolicyData.PrioritySeat = false;
 	PolicyData.HasCCTV = false;
 	PolicyData.HasElevator = false;
 	PolicyData.HasBicycle = false;
@@ -47,8 +47,8 @@ void APolicy::SetServiceCostLevel(int costLevel) {
 	//TODO ServiceCostlevel 함수 추가
 }
 
-void APolicy::SetHandicappedSeat( ) {
-	bool pre = PolicyData.HandicappedSeat;
+void APolicy::SetPrioritySeat(bool Flag) {
+	bool pre = PolicyData.PrioritySeat;
 
 	if (!pre) { // 전의 상태가 비활성화면
 		// TODO 핸디캡 함수 추가
@@ -57,11 +57,12 @@ void APolicy::SetHandicappedSeat( ) {
 		// TODO 핸디캡 함수 추가
 	}
 
-	PolicyData.HandicappedSeat = !pre;
+	PolicyData.PrioritySeat = !pre;
 
+	PolicyData.PrioritySeat = Flag;
 }
 
-void APolicy::SetHasCCTV() {
+void APolicy::SetCCTV(bool Flag) {
 	bool pre = PolicyData.HasCCTV;
 
 	if (!pre) { // 전의 상태가 비활성화면
@@ -72,9 +73,11 @@ void APolicy::SetHasCCTV() {
 	}
 
 	PolicyData.HasCCTV = !pre;
+
+	PolicyData.HasCCTV = Flag;
 }
 
-void APolicy::SetHasElevator( ) {
+void APolicy::SetElevator(bool Flag) {
 	bool pre = PolicyData.HasElevator;
 
 	if (!pre) { // 전의 상태가 비활성화면
@@ -85,9 +88,11 @@ void APolicy::SetHasElevator( ) {
 	}
 
 	PolicyData.HasElevator = !pre;
+
+	PolicyData.HasElevator = Flag;
 }
 
-void APolicy::SetHasBicycle( ) {
+void APolicy::SetBicycle(bool Flag) {
 	bool pre = PolicyData.HasBicycle;
 
 	if (!pre) { // 전의 상태가 비활성화면 -> 활성화되면
@@ -108,9 +113,11 @@ void APolicy::SetHasBicycle( ) {
 	}
 
 	PolicyData.HasBicycle = !pre;
+
+	PolicyData.HasBicycle = Flag;
 }
 
-void APolicy::SetHasTransfer( ) {
+void APolicy::SetTransfer(bool Flag) {
 	bool pre = PolicyData.HasTransfer;
 
 	if (!pre) { // 전의 상태가 비활성화면
@@ -122,6 +129,7 @@ void APolicy::SetHasTransfer( ) {
 
 	PolicyData.HasTransfer = !pre;
 
+	PolicyData.HasTransfer = Flag;
 }
 
 
@@ -129,23 +137,23 @@ int APolicy::GetServiceCostLevel() {
 	return PolicyData.ServiceCostLevel;
 }
 
-bool APolicy::GetHandicappedSeat() {
-	return PolicyData.HandicappedSeat;
+bool APolicy::GetPrioritySeat() {
+	return PolicyData.PrioritySeat;
 }
 
-bool APolicy::GetHasCCTV() {
+bool APolicy::GetCCTV() {
 	return PolicyData.HasCCTV;
 }
 
-bool APolicy::GetHasElevator() {
+bool APolicy::GetElevator() {
 	return PolicyData.HasElevator;
 }
 
-bool APolicy::GetHasBicycle() {
+bool APolicy::GetBicycle() {
 	return PolicyData.HasBicycle;
 }
 
-bool APolicy::GetHasTransfer() {
+bool APolicy::GetTransfer() {
 	return PolicyData.HasTransfer;
 }
 
@@ -163,7 +171,7 @@ int APolicy::GetCostForServiceLevel() {
 }
 
 int APolicy::GetCostForCCTV() {
-	if (GetHasCCTV()) {
+	if (GetCCTV()) {
 		return 5;
 	}
 	else {
@@ -172,7 +180,7 @@ int APolicy::GetCostForCCTV() {
 }
 
 int APolicy::GetCostForElevator() {
-	if (GetHasElevator()) {
+	if (GetElevator()) {
 		return 10;
 	}
 	else {
@@ -185,23 +193,23 @@ int32 APolicy::CalculateComplainPercentage() {
 
 	int32 currentPercentage = 0; //음수면 감소량
 
-	if (GetHandicappedSeat()) {
+	if (GetPrioritySeat()) {
 		currentPercentage -= 5;
 	}
 
-	if (GetHasCCTV()) {
+	if (GetCCTV()) {
 		currentPercentage -= 10;
 	}
 
-	if (GetHasElevator()) {
+	if (GetElevator()) {
 		currentPercentage -= 15;
 	}
 
-	if (GetHasBicycle()) {
+	if (GetBicycle()) {
 		currentPercentage += 10;
 	}
 
-	if (GetHasTransfer()) {
+	if (GetTransfer()) {
 		currentPercentage -= 20;
 	}
 

@@ -420,7 +420,7 @@ void AStation::SpawnPassenger() {
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
 
-	if (Policy->GetHandicappedSeat()) {
+	if (Policy->GetPrioritySeat()) {
 		tmp->SetFree();
 	}
 

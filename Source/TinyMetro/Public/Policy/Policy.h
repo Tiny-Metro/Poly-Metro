@@ -27,12 +27,12 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public :
-	UPROPERTY()
+protected :
+	UPROPERTY(VisibleAnywhere, Category = "Policy data")
 	FPolicyData PolicyData;
 
 	UPROPERTY()
-	AStationManager* stationmanager;
+	AStationManager* StationManagerRef;
 
 public :
 	UPROPERTY()
@@ -43,41 +43,41 @@ public :
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		void SetServiceCostLevel(int costLevel);
+	void SetServiceCostLevel(int costLevel);
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		void SetHandicappedSeat();
+	void SetPrioritySeat(bool Flag);
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		void SetHasCCTV();
+	void SetCCTV(bool Flag);
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		void SetHasElevator( );
+	void SetElevator(bool Flag);
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		void SetHasBicycle( );
+	void SetBicycle(bool Flag);
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		void SetHasTransfer( );
+	void SetTransfer(bool Flag);
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		int GetServiceCostLevel();
+	int GetServiceCostLevel();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		bool GetHandicappedSeat();
+	bool GetPrioritySeat();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		bool GetHasCCTV();
+	bool GetCCTV();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		bool GetHasElevator();
+	bool GetElevator();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		bool GetHasBicycle();
+	bool GetBicycle();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		bool GetHasTransfer();
+	bool GetTransfer();
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		int GetComplainForServiceLevel();
+	int GetComplainForServiceLevel();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		int GetCostForServiceLevel();
+	int GetCostForServiceLevel();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		int GetCostForCCTV();
+	int GetCostForCCTV();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
-		int GetCostForElevator();
+	int GetCostForElevator();
 
 	// TODO: HUD 에서 버튼 누르면 바로 반영되게 Set으로 각각 설정
 
@@ -86,4 +86,9 @@ public :
 
 public:
 	void InitPolicy();
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Policy data")
+	float TotalComplainIncrease = 0.0f;
+
 };
