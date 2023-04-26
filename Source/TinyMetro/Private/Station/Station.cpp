@@ -143,7 +143,7 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 	ComplainCurrent = StationValues.ComplainCurrent;
 	StationId = StationValues.StationId;
 	if (StationValues.IsActive) {
-		ActivateStation();
+		SetActivate(true);
 	};
 	SetStationType(StationValues.StationTypeValue);
 	SetGridCellData(StationValues.GridCellData);
@@ -228,13 +228,11 @@ void AStation::RemoveLane(int32 LId)
 void AStation::CalculateComplain() {
 }
 
-void AStation::ActivateStation() {
-	IsActive = true;
-	State = StationState::Active;
+void AStation::SetActivate(bool Flag) {
+	IsActive = Flag;
+	State = Flag ? StationState::Active : StationState::Inactive;
 	
-	if (IsValid(this)) {
-		UpdateStationMesh();
-	}
+	UpdateStationMesh();
 
 	// TODO :  Visible logic
 }

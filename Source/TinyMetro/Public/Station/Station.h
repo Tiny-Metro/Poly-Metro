@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CalculateComplain();
 	UFUNCTION(BlueprintCallable)
-	void ActivateStation();
+	void SetActivate(bool Flag);
 	UFUNCTION()
 	void UpdateComplainMesh();
 	UFUNCTION()

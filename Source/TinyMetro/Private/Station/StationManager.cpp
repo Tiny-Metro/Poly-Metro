@@ -203,7 +203,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationInfo(StationId++, Type);
 
 	if (ActivateFlag) {
-		tmp->ActivateStation();
+		tmp->SetActivate(true);
 	}
 	tmp->FinishSpawning(SpawnTransform);
 
