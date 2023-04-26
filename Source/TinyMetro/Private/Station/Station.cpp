@@ -233,8 +233,6 @@ void AStation::SetActivate(bool Flag) {
 	State = Flag ? StationState::Active : StationState::Inactive;
 	
 	UpdateStationMesh();
-	
-	UE_LOG(LogTemp, Warning, TEXT("Activate ::  %s"), Flag ? TEXT("true") : TEXT("false"));
 
 	// TODO :  Visible logic
 }
