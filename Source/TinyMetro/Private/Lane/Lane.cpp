@@ -3,6 +3,7 @@
 
 #include "Lane/Lane.h"
 #include "Train/TrainTemplate.h"
+#include "Train/TrainManager.h"
 #include "Station/Station.h"
 #include "GridGenerator/GridCellData.h"
 #include "Components/SplineMeshComponent.h"
@@ -19,6 +20,7 @@ ALane::ALane()
 	
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 
+	TrainManagerRef = Cast<ATrainManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrainManager::StaticClass()));
 
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
@@ -349,6 +351,10 @@ void ALane::LaneCreating_Implementation() {}
 void ALane::InitializeNewLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
+
+void ALane::FinishRemovingLaneAtStart_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+
+void ALane::FinishRemovingLaneAtEnd_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
 
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {
