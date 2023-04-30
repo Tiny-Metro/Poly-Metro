@@ -133,6 +133,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	Lanes.Add(NextLaneNums[0], tmpLane);
 	//Lanes.Add(tmpLane);
 
+	tmpLane->SpawnTrain();
+
 	UE_LOG(LogTemp, Warning, TEXT("StationPoint Num : %d"), tmpLane->StationPoint.Num());
 
 	UE_LOG(LogTemp, Warning, TEXT("New LaneNum : %d"), NextLaneNums[0]);

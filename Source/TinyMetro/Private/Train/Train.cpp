@@ -283,7 +283,9 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 	NextStation = D->GetStationInfo();
 
 	// Set train material
+	LaneRef = Lane;
 	SetTrainMaterial(LaneRef);
+	
 
 	// Train move start
 	AiControllerRef->Patrol();

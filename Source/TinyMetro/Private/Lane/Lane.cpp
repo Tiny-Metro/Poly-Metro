@@ -4,10 +4,13 @@
 #include "Lane/Lane.h"
 #include "Train/TrainTemplate.h"
 #include "Train/TrainManager.h"
+#include "Train/Train.h"
 #include "Station/Station.h"
 #include "GridGenerator/GridCellData.h"
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/Controller.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -31,6 +34,8 @@ ALane::ALane()
 void ALane::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	
 }
 
@@ -531,6 +536,30 @@ TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation)
 
 void ALane::SpawnTrain()
 {
+	
+
+	if (TinyMetroPlayerState->UseTrain()) {
+
+		AStation* Destination = StationPoint[1];
+
+		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
+
+		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+		UClass* SpawnClass = SpawnActor->StaticClass();
+
+		FActorSpawnParameters SpawnParams;
+		FTransform SpawnTransform;
+
+		FVector SpawnLocation = StationPoint[0]->GetCurrentGridCellData().WorldLocation;
+		SpawnLocation = { SpawnLocation.X, SpawnLocation.Y, 20 };
+
+		SpawnTransform.SetLocation(SpawnLocation);
+
+		ATrain* Train = Cast<ATrain>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+
+
+		Train->ServiceStart(Train->GetActorLocation(), this, Destination);
+	}
 }
 
 AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)

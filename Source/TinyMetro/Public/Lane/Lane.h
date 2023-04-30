@@ -47,6 +47,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATrainManager* TrainManagerRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroPlayerState* TinyMetroPlayerState;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	int32 LaneId;
@@ -124,7 +127,7 @@ public:
 	void InitializeNewLane();
 	virtual void InitializeNewLane_Implementation();
 
-
+public : // BlueprintNativeEvent
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ExtendLane();
 	virtual void ExtendLane_Implementation();
@@ -135,6 +138,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FinishRemovingLaneAtEnd(const TArray <class AStation*>& Stations, const int32 Index);
 	
+public: // About Train
 
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction);
