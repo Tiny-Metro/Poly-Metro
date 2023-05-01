@@ -536,29 +536,51 @@ TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation)
 
 void ALane::SpawnTrain()
 {
-	
-
 	if (TinyMetroPlayerState->UseTrain()) {
 
-		AStation* Destination = StationPoint[1];
+		UWorld* world = GetWorld();
 
-		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
+		
 
-		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-		UClass* SpawnClass = SpawnActor->StaticClass();
+		if (world != nullptr)
+		{
+			world->GetTimerManager().SetTimer(
+				SpawnTrainCheckTimer,
+				FTimerDelegate::CreateLambda([&]() {
 
-		FActorSpawnParameters SpawnParams;
-		FTransform SpawnTransform;
+					UE_LOG(LogTemp, Warning, TEXT("SpawnTrain Timer"));
+					
+					AStation* Destination = StationPoint[1];
 
-		FVector SpawnLocation = StationPoint[0]->GetCurrentGridCellData().WorldLocation;
-		SpawnLocation = { SpawnLocation.X, SpawnLocation.Y, 20 };
+					UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
 
-		SpawnTransform.SetLocation(SpawnLocation);
+					UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+					UClass* SpawnClass = SpawnActor->StaticClass();
 
-		ATrain* Train = Cast<ATrain>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+					FActorSpawnParameters SpawnParams;
+					FTransform SpawnTransform;
+
+					FVector SpawnLocation = StationPoint[0]->GetCurrentGridCellData().WorldLocation;
+					SpawnLocation = { SpawnLocation.X, SpawnLocation.Y, 20 };
+
+					SpawnTransform.SetLocation(SpawnLocation);
+
+					ATrain* Train = Cast<ATrain>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
 
 
-		Train->ServiceStart(Train->GetActorLocation(), this, Destination);
+					Train->ServiceStart(Train->GetActorLocation(), this, Destination);
+					
+					}),
+				1.0f,
+				false,
+				1.0f
+			);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("ERROR! SpawnTrain Timer"));
+		}
+
+		
 	}
 }
 

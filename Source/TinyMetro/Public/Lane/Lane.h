@@ -64,6 +64,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool AlreadyDeleted = false;
 
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle SpawnTrainCheckTimer;
+
+
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetLaneId() const;
