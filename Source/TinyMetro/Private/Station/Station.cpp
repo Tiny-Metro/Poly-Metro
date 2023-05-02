@@ -207,9 +207,24 @@ void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate) {
 				AdditionalPassengerSpawnProbability -= rate;
 				}),
 			dueDate,
-					false,
-					0.0f
-					);
+			false,
+			0.0f
+		);
+	}
+}
+
+void AStation::AddFreePassengerSpawnProbability(float rate, int32 dueDate) {
+	FreePassengerSpawnProbability += rate;
+	if (dueDate != -1) {
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerComplain,
+			FTimerDelegate::CreateLambda([&]() {
+				FreePassengerSpawnProbability -= rate;
+				}),
+			dueDate,
+			false,
+			0.0f
+		);
 	}
 }
   
@@ -222,8 +237,6 @@ void AStation::RemoveLane(int32 LId)
 {
 	Lanes.Remove(LId);
 }
-
-
 
 void AStation::CalculateComplain() {
 }
@@ -255,6 +268,25 @@ void AStation::InitComplainGauge() {
 
 void AStation::SetComplainGauge(float Per) {
 	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", Per);
+}
+
+void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
+	ComplainIncreaseRate += Rate;
+	if (Period != -1) {
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerComplain,
+			FTimerDelegate::CreateLambda([&]() {
+				AdditionalPassengerSpawnProbability -= Rate;
+				}),
+			Period,
+			false,
+			0.0f
+		);
+	}
+}
+
+void AStation::MaintenanceCost(int32 Cost) {
+
 }
 
 void AStation::UpdateStationMesh() {
@@ -292,7 +324,7 @@ void AStation::DecreaseComplain(double ReduceRate) {
 }
 
 void AStation::DecreaseComplain(int32 ReduceValue) {
-	ComplainCurrent -= ReduceValue;
+	ComplainCurrent -= (ReduceValue * ComplainIncreaseRate);
 }
 
 int32 AStation::GetComplain() const {
@@ -307,6 +339,10 @@ TArray<int32> AStation::GetLanes()
 void AStation::SetLanes(int32 AdditionalLaneId)
 {
 	Lanes.Add(AdditionalLaneId);
+}
+
+void AStation::SetTransfer(bool Flag) {
+	TransferStation = Flag;
 }
 
 FStationInfo AStation::GetStationInfo()
@@ -325,19 +361,15 @@ void AStation::ComplainRoutine() {
 		TimerComplain,
 		FTimerDelegate::CreateLambda([&]() {
 			SpawnDay++;
-
-			int AddPolicyComplainForLevel = Policy->GetComplainForServiceLevel();
-
-			float AddPolicyComplain = AddPolicyComplainForLevel + abs(AddPolicyComplainForLevel) * Policy->CalculateComplainPercentage();
 			
 			// Passenger complain
 			if (Passenger.Num() > ComplainPassengerNum) {
-				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) + AddPolicyComplain;
+				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
 			}
 
 			// Not activate
 			if (!IsActive && SpawnDay > ComplainSpawnDay) {
-				ComplainCurrent += ComplainFromInactive + AddPolicyComplain;
+				ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
 			}
 
 			/*
@@ -419,8 +451,7 @@ void AStation::SpawnPassenger() {
 	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
-
-	if (Policy->GetPrioritySeat()) {
+	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
 		tmp->SetFree();
 	}
 
