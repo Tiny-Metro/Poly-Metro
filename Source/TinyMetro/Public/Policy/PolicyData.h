@@ -14,7 +14,14 @@ struct TINYMETRO_API FPolicyData
 
 
 public:
-	FPolicyData() = default;
+	FPolicyData() {
+		ServiceCostLevel = 3;
+		PrioritySeat = false;
+		HasCCTV = false;
+		HasElevator = false;
+		HasBicycle = false;
+		HasTransfer = false;
+	}
 	FPolicyData(int ServiceCostLevel, bool PrioritySeat, bool HasCCTV, bool HasElevator, bool HasBicycle, bool HasTransfer) :
 		ServiceCostLevel(ServiceCostLevel),
 		PrioritySeat(PrioritySeat),
