@@ -52,7 +52,11 @@ public:
 	void InitComplainGauge();
 	UFUNCTION()
 	void SetComplainGauge(float Per);
+	UFUNCTION()
+	void AddComplainIncreaseRate(float Rate, int32 Period);
 
+	UFUNCTION()
+	void MaintenanceCost(int32 Cost);
 
 	// Station state Getter, Setter
 	UFUNCTION(BlueprintCallable)
@@ -93,6 +97,7 @@ public:
 	void GetOffPassenger(class UPassenger* P);
     
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
+	void AddFreePassengerSpawnProbability(float rate, int32 dueDate);
 
 	void DecreaseComplain(double ReduceRate);
 	void DecreaseComplain(int32 ReduceValue);
@@ -100,7 +105,9 @@ public:
 	int32 GetComplain() const;
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
-	
+
+	UFUNCTION()
+	void SetTransfer(bool Flag);
 
 	FStationInfo GetStationInfo();
 	void SetStationInfo(int32 Id, StationType Type);
@@ -127,6 +134,8 @@ protected:
 	int32 ComplainPassengerNum = 5;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	int32 ComplainSpawnDay = 10;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	float ComplainIncreaseRate = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	int32 PassengerSpawnRequire = 6000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
@@ -137,6 +146,8 @@ protected:
 	double PassengerSpawnProbability = 0.6;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double AdditionalPassengerSpawnProbability = 1.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	float FreePassengerSpawnProbability = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -163,6 +174,8 @@ protected:
 	TArray<int32> Lanes;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FStationInfo StationInfo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	bool TransferStation = false;;
 
 
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")

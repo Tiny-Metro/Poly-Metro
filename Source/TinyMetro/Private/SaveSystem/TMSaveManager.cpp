@@ -231,7 +231,7 @@ void ATMSaveManager::SpawnStations(FStationValuesStruct StationValues) {
 	//AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, _GridCellData.WorldLocation, stationmanager->GetActorRotation(), SpawnParams));
 	AStation* tmp = Cast<AStation>(stationmanager->GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
 	tmp->LoadStationValue(StationValues);
-	tmp->SetPolicy(stationmanager->Policy);
+	tmp->SetPolicy(stationmanager->PolicyRef);
 
 	tmp->FinishSpawning(SpawnTransform);
 
