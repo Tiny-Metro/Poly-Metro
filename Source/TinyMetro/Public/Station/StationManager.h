@@ -92,6 +92,23 @@ public:
 
 	PathQueue GetShortestPath(int32 Start, StationType Type);
 
+	UFUNCTION(BlueprintCallable)
+	void AddPassengerSpawnProbability(float Rate, int32 Period);
+	UFUNCTION(BlueprintCallable)
+	void AddFreePassengerSpawnProbability(float Rate, int32 Period);
+	UFUNCTION(BlueprintCallable)
+	void AddComplainIncreaseRate(float Rate, int32 Period);
+	UFUNCTION(BlueprintCallable)
+	void SetServiceData(FServiceData _ServiceData);
+
+	UFUNCTION()
+	void WeeklyTask() const;
+	UFUNCTION()
+	void DailyTask() const;
+
+	UFUNCTION()
+	void SetTransfer(bool Flag);
+
 private:
 	AStation* GetNearestStationByType(int32 Start, StationType Type);
 	void FloydWarshall();
@@ -119,7 +136,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	ATinyMetroGameModeBase* GameMode;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	APolicy* Policy;
+	APolicy* PolicyRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -153,16 +170,19 @@ protected:
 	int32 StationId = 0;
 
 	//Policy Timer
-	UPROPERTY(BlueprintReadOnly)
+	/*UPROPERTY(BlueprintReadOnly)
 	FTimerHandle PolicyTimerStation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 PolicyCostRequire = 10000;
+	int32 PolicyCostRequire = 10000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 PolicyCostPerSec = 1000;
+	int32 PolicyCostPerSec = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 PolicyCostCurrent = 0;
+	int32 PolicyCostCurrent = 0;*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		ATinyMetroPlayerState* PlayerState;
+	ATinyMetroPlayerState* PlayerState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FServiceData ServiceData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAdjList* AdjList;

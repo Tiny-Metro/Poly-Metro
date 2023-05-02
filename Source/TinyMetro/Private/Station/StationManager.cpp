@@ -30,7 +30,7 @@ void AStationManager::BeginPlay()
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	//Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
-	Policy = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetPolicy();
+	PolicyRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetPolicy();
 
 	//MaxStationCount = GridManager->GetGridSize()
 	auto GridSize = GridManager->GetGridSize();
@@ -42,7 +42,7 @@ void AStationManager::BeginPlay()
 	} else {
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Invalid"));
 	}
-	if (IsValid(Policy)) {
+	if (IsValid(PolicyRef)) {
 		UE_LOG(LogTemp, Log, TEXT("Policy Valid"));
 	} else {
 		UE_LOG(LogTemp, Log, TEXT("Policy Invalid"));
@@ -50,7 +50,6 @@ void AStationManager::BeginPlay()
 
 
 	StationSpawnRoutine();
-	PolicyMaintenanceRoutine();
 
 
 
@@ -198,7 +197,6 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationType(Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetStationId(StationId);
-	tmp->SetPolicy(Policy);
 
 	tmp->SetStationInfo(StationId++, Type);
 
@@ -207,10 +205,6 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	}
 	tmp->FinishSpawning(SpawnTransform);
 
-	if (Policy->GetBicycle())
-	{
-		tmp->AddPassengerSpawnProbability(0.1, -1);
-	}
 
 	Station.Add(tmp);
 	GridManager->SetGridStructure(
@@ -286,13 +280,13 @@ void AStationManager::StationSpawnRoutine() {
 }
 
 void AStationManager::PolicyMaintenanceRoutine() {
-	GetWorld()->GetTimerManager().SetTimer(
+	/*GetWorld()->GetTimerManager().SetTimer(
 		PolicyTimerStation,
 		FTimerDelegate::CreateLambda([&]() {
 			PolicyCostCurrent += PolicyCostPerSec;
 			if (PolicyCostCurrent >= PolicyCostRequire) {
 				
-				int32 MaintenanceCost = Policy->GetCostForCCTV() + Policy->GetCostForElevator() + Policy->GetCostForServiceLevel();
+				int32 MaintenanceCost = PolicyRef->GetTotalCost();
 
 				PlayerState->AddMoney(-(MaintenanceCost));
 
@@ -310,7 +304,7 @@ void AStationManager::PolicyMaintenanceRoutine() {
 		1.0f,
 		true,
 		1.0f
-	);
+	);*/
 }
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
@@ -377,6 +371,76 @@ PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
 		return PathQueue();
 	}
 	return ShortestPath[Start][Type];
+}
+
+void AStationManager::AddPassengerSpawnProbability(float Rate, int32 Period) {
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) {
+				i->AddPassengerSpawnProbability(Rate, Period);
+			}
+		}
+	}
+}
+
+void AStationManager::AddFreePassengerSpawnProbability(float Rate, int32 Period) {
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) {
+				i->AddFreePassengerSpawnProbability(Rate, Period);
+			}
+		}
+	}
+}
+
+void AStationManager::AddComplainIncreaseRate(float Rate, int32 Period) {
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) {
+				i->AddComplainIncreaseRate(Rate, Period);
+			}
+		}
+	}
+}
+
+void AStationManager::SetServiceData(FServiceData _ServiceData) {
+	ServiceData = _ServiceData;
+}
+
+void AStationManager::WeeklyTask() const {
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) {
+				// Add weekly tasks
+				
+				// From policy (Cost)
+				PlayerState->AddMoney(PolicyRef->GetTotalCost());
+			}
+		}
+	}
+}
+
+void AStationManager::DailyTask() const {
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) {
+				// Add weekly tasks
+
+				// From service level (Complain)
+				i->DecreaseComplain(-ServiceData.DailyComplain);
+			}
+		}
+	}
+}
+
+void AStationManager::SetTransfer(bool Flag) {
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) {
+				i->SetTransfer(Flag);
+			}
+		}
+	}
 }
 
 AStation* AStationManager::GetNearestStationByType(int32 Start, StationType Type) {
