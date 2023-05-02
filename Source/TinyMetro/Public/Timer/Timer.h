@@ -25,5 +25,18 @@ public:
 
 public:
 	UPROPERTY()
-		float ElapseTimeSec;
+	float ElapseTimeSec;
+
+protected:
+	UPROPERTY()
+	class AStationManager* StationManagerRef;
+	UPROPERTY()
+	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	int32 Daytime;
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	float DayCounter = 0.0f;
+	UPROPERTY(VisibleAnywhere, Category = "Info")
+	float WeekCounter = 0.0f;
+
 };
