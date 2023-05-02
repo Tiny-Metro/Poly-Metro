@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PolicyData.h"
+#include "ServiceData.h"
 #include "Policy.generated.h"
 
 
@@ -35,10 +36,15 @@ protected :
 	AStationManager* StationManagerRef;
 
 public :
-	UPROPERTY()
-	TArray<int> ComplainArrayForServiceLevel = { 0,2,1,0,-1,-2 };
-	UPROPERTY()
-	TArray<int> CostArrayForServiceLevel = { 0,0,1,2,3,4 };
+	UPROPERTY(VisibleAnywhere, Category = "Policy data")
+	TArray<FServiceData> ServiceLevel = {
+		FServiceData(),
+		FServiceData(1, 2, 0),
+		FServiceData(2, 1, 1),
+		FServiceData(3, 0, 2),
+		FServiceData(4, -1, 3),
+		FServiceData(5, -2, 4)
+	};
 	
 
 public :
@@ -78,6 +84,8 @@ public :
 	int GetCostForCCTV();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
 	int GetCostForElevator();
+	UFUNCTION(BlueprintCallable, Category = "Policy")
+	int GetTotalCost();
 
 	// TODO: HUD 에서 버튼 누르면 바로 반영되게 Set으로 각각 설정
 
@@ -90,5 +98,7 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Policy data")
 	float TotalComplainIncrease = 0.0f;
+	UPROPERTY(VisibleAnywhere, Category = "Policy data")
+	int32 TotalCost = 0.0f;
 
 };

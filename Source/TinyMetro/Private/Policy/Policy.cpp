@@ -19,16 +19,7 @@ void APolicy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//stationmanager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-	stationmanager = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
-
-	PolicyData.ServiceCostLevel = 3;
-	PolicyData.PrioritySeat = false;
-	PolicyData.HasCCTV = false;
-	PolicyData.HasElevator = false;
-	PolicyData.HasBicycle = false;
-	PolicyData.HasTransfer = false;
-
+	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 
 	InitPolicy();
 	
@@ -44,94 +35,36 @@ void APolicy::Tick(float DeltaTime)
 void APolicy::SetServiceCostLevel(int costLevel) {
 	PolicyData.ServiceCostLevel = costLevel;
 
-	//TODO ServiceCostlevel 함수 추가
+	StationManagerRef->SetServiceData(ServiceLevel[costLevel]);
 }
 
 void APolicy::SetPrioritySeat(bool Flag) {
-	bool pre = PolicyData.PrioritySeat;
-
-	if (!pre) { // 전의 상태가 비활성화면
-		// TODO 핸디캡 함수 추가
-	}
-	else { // 전의 상태가 활성화
-		// TODO 핸디캡 함수 추가
-	}
-
-	PolicyData.PrioritySeat = !pre;
-
 	PolicyData.PrioritySeat = Flag;
+	StationManagerRef->AddComplainIncreaseRate(-0.05 * (Flag ? 1 : -1), -1);
+	StationManagerRef->AddFreePassengerSpawnProbability(0.2 * (Flag ? 1 : -1), -1);
 }
 
 void APolicy::SetCCTV(bool Flag) {
-	bool pre = PolicyData.HasCCTV;
-
-	if (!pre) { // 전의 상태가 비활성화면
-		// TODO cctv 함수 추가
-	}
-	else { // 전의 상태가 활성화
-		// TODO cctv 함수 추가
-	}
-
-	PolicyData.HasCCTV = !pre;
-
 	PolicyData.HasCCTV = Flag;
+	StationManagerRef->AddComplainIncreaseRate(-0.1 * (Flag ? 1 : -1), -1);
 }
 
 void APolicy::SetElevator(bool Flag) {
-	bool pre = PolicyData.HasElevator;
-
-	if (!pre) { // 전의 상태가 비활성화면
-		// TODO elevator 함수 추가
-	}
-	else { // 전의 상태가 활성화
-		// TODO elevator 함수 추가
-	}
-
-	PolicyData.HasElevator = !pre;
-
 	PolicyData.HasElevator = Flag;
+	StationManagerRef->AddComplainIncreaseRate(-0.15 * (Flag ? 1 : -1), -1);
 }
 
 void APolicy::SetBicycle(bool Flag) {
-	bool pre = PolicyData.HasBicycle;
-
-	if (!pre) { // 전의 상태가 비활성화면 -> 활성화되면
-
-		//승객 수 10% 증가
-
-		for (int i = 0; i < stationmanager->Station.Num(); i++)
-		{
-			stationmanager->Station[0]->AddPassengerSpawnProbability(0.1, -1);
-		}
-	}
-	else { // 전의 상태가 활성화
-		
-		for (int i = 0; i < stationmanager->Station.Num(); i++)
-		{
-			stationmanager->Station[0]->AddPassengerSpawnProbability(-0.1, -1);
-		}
-	}
-
-	PolicyData.HasBicycle = !pre;
-
 	PolicyData.HasBicycle = Flag;
+	StationManagerRef->AddPassengerSpawnProbability(0.1 * (Flag ? 1 : -1), -1);
+	StationManagerRef->AddComplainIncreaseRate(0.1 * (Flag ? 1 : -1), -1);
 }
 
 void APolicy::SetTransfer(bool Flag) {
-	bool pre = PolicyData.HasTransfer;
-
-	if (!pre) { // 전의 상태가 비활성화면
-		// TODO transfer 함수 추가
-	}
-	else { // 전의 상태가 활성화
-		// TODO transfer 함수 추가
-	}
-
-	PolicyData.HasTransfer = !pre;
-
 	PolicyData.HasTransfer = Flag;
+	StationManagerRef->AddComplainIncreaseRate(-0.2 * (Flag ? 1 : -1), -1);
+	StationManagerRef->SetTransfer(Flag);
 }
-
 
 int APolicy::GetServiceCostLevel() {
 	return PolicyData.ServiceCostLevel;
@@ -158,34 +91,25 @@ bool APolicy::GetTransfer() {
 }
 
 int APolicy::GetComplainForServiceLevel() {
-
-	int ComplainAmount = ComplainArrayForServiceLevel[GetServiceCostLevel()];
-
-	return ComplainAmount;
+	return ServiceLevel[GetServiceCostLevel()].DailyComplain;
 }
 
 int APolicy::GetCostForServiceLevel() {
-	int Cost = CostArrayForServiceLevel[GetServiceCostLevel()];
-
-	return Cost;
+	return ServiceLevel[GetServiceCostLevel()].WeeklyCost;
 }
 
 int APolicy::GetCostForCCTV() {
-	if (GetCCTV()) {
-		return 5;
-	}
-	else {
-		return 0;
-	}
+	return GetCCTV() ? 5 : 0;
 }
 
 int APolicy::GetCostForElevator() {
-	if (GetElevator()) {
-		return 10;
-	}
-	else {
-		return 0;
-	}
+	return GetElevator() ? 10 : 0;
+}
+
+int APolicy::GetTotalCost() {
+	return GetCostForServiceLevel() + 
+		GetCostForCCTV() + 
+		GetCostForElevator();
 }
 
 
@@ -218,4 +142,10 @@ int32 APolicy::CalculateComplainPercentage() {
 
 
 void APolicy::InitPolicy() {
+	PolicyData.ServiceCostLevel = 3;
+	PolicyData.PrioritySeat = false;
+	PolicyData.HasCCTV = false;
+	PolicyData.HasElevator = false;
+	PolicyData.HasBicycle = false;
+	PolicyData.HasTransfer = false;
 }
