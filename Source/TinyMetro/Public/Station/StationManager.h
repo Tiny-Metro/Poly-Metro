@@ -102,9 +102,9 @@ public:
 	void SetServiceData(FServiceData _ServiceData);
 
 	UFUNCTION()
-	void WeeklyTask() const;
+	void WeeklyTask();
 	UFUNCTION()
-	void DailyTask() const;
+	void DailyTask();
 
 	UFUNCTION()
 	void SetTransfer(bool Flag);

@@ -5,6 +5,7 @@
 #include "Lane/Lane.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationInfo.h"
+#include "Timer/Timer.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -25,12 +26,13 @@ void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	//PlayerState = GetWorld()->GetControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
 	//PlayerState = Cast<ATinyMetroPlayerState>(GetWorld()->GetPawnIterator()->Get()->GetPlayerState());
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	//Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
-	PolicyRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetPolicy();
+	PolicyRef = GameMode->GetPolicy();
 
 	//MaxStationCount = GridManager->GetGridSize()
 	auto GridSize = GridManager->GetGridSize();
@@ -82,7 +84,6 @@ void AStationManager::BeginPlay()
 	// Spawn default 3 stationsstat
 	// Get GameMode, Get coord and station type
 	//GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
-	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	InitData = GameMode->GetInitData();
 
@@ -112,6 +113,9 @@ void AStationManager::BeginPlay()
 	/*for (int i = 0; i < 300; i++) {
 		GetWorld()->SpawnActor<AStation>();
 	}*/
+
+	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
+	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
 }
 
@@ -407,7 +411,13 @@ void AStationManager::SetServiceData(FServiceData _ServiceData) {
 	ServiceData = _ServiceData;
 }
 
-void AStationManager::WeeklyTask() const {
+void AStationManager::WeeklyTask() {
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			15.0f,
+			FColor::Yellow,
+			FString::Printf(TEXT("StationManager::WeeklyTask")));
 	for (auto& i : Station) {
 		if (IsValid(i)) {
 			if (i->GetStationState() == StationState::Active) {
@@ -420,7 +430,13 @@ void AStationManager::WeeklyTask() const {
 	}
 }
 
-void AStationManager::DailyTask() const {
+void AStationManager::DailyTask() {
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			15.0f,
+			FColor::Yellow,
+			FString::Printf(TEXT("StationManager::DailyTask")));
 	for (auto& i : Station) {
 		if (IsValid(i)) {
 			if (i->GetStationState() == StationState::Active) {
