@@ -53,7 +53,7 @@ void ABank::BeginPlay()
 
 	// Set investment data
 	InitInvestment();
-	UpdateInvestment();
+	//UpdateInvestment();
 	AvailInvestment.Emplace(FMath::RandRange(0, Investment.Num() - 1));
 
 }
@@ -138,18 +138,39 @@ UInvestment* ABank::CreateInvestment(FInvestmentData Data, TFunction<bool(void)>
 	return temp;
 }
 
+// Replace investment at Index
+// If Index = -1, add investment at last
+// If investment are full, remove old investment
 void ABank::ChangeInvestment(int Index = -1) {
 	int AvailIndex;
 	bool flag = true;
+	int removeIndex = -1;
+
+	// Select remove index
+	for (auto& i : AvailInvestment) {
+		if (!Investment[i]->GetIsActivate()) {
+			removeIndex = i;
+			break;
+		}
+	}
+	
+	// If all investment are activated, change nothing
+	if (removeIndex == -1) return;
+
 	do {
+		// Pick random number
+		// If random number not included AvailInvestment
+		// Random number insert the AvailInvestment
 		AvailIndex = FMath::RandRange(0, Investment.Num() - 1);
 		if (AvailInvestment.Find(AvailIndex) == INDEX_NONE) {
 			if (Index == -1) {
 				AvailInvestment.Add(AvailIndex);
-				AvailInvestment.RemoveAt(0);
+				if (AvailInvestment.Num() > MaxInvestmetStock) {
+					AvailInvestment.RemoveAt(AvailInvestment.Find(removeIndex));
+				}
 			} else {
 				AvailInvestment.Insert(AvailIndex, Index);
-				if (InvestmentStock >= MaxInvestmetStock) {
+				if (AvailInvestment.Num() > MaxInvestmetStock) {
 					AvailInvestment.RemoveAt(Index + 1);
 				}
 			}
@@ -158,6 +179,7 @@ void ABank::ChangeInvestment(int Index = -1) {
 	} while (flag);
 }
 
+// Replace all investment except activated one
 void ABank::ChangeAllInvestment() {
 	TArray<int32> Temp;
 	int AvailIndex;
@@ -186,7 +208,11 @@ void ABank::ChangeAllInvestment() {
 }
 
 void ABank::UpdateInvestment() {
-	GetWorld()->GetTimerManager().SetTimer(
+	if (InvestmentStock < MaxInvestmetStock) {
+		InvestmentStock++;
+	} 
+	this->ChangeInvestment();
+	/*GetWorld()->GetTimerManager().SetTimer(
 		InvestmentUpdateHandle,
 		FTimerDelegate::CreateLambda([&InvestmentStock = InvestmentStock, this]() {
 			if (InvestmentStock < MaxInvestmetStock) {
@@ -199,10 +225,9 @@ void ABank::UpdateInvestment() {
 		Daytime * 7,
 		true,
 		(Daytime * 7) - (FMath::Fmod(GetWorld()->GetTimeSeconds(), Daytime * 7))
-	);
+	);*/
 }
 
-// Called every frame
 void ABank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

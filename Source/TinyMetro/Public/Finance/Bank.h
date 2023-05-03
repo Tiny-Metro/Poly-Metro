@@ -38,6 +38,9 @@ public:
 	TArray<UInvestment*> GetAvailableInvestment() const;
 	UFUNCTION(BlueprintCallable)
 	TArray<UInvestment*> RefreshInvestment();
+	UFUNCTION(BlueprintCallable)
+	void UpdateInvestment();
+
 
 protected:
 	// Function loan
@@ -47,7 +50,6 @@ protected:
 	// Function investment
 	void InitInvestment();
 	UInvestment* CreateInvestment(FInvestmentData Data, TFunction<bool(void)> Func);
-	void UpdateInvestment();
 	void ChangeInvestment(int Index);
 	void ChangeAllInvestment();
 
