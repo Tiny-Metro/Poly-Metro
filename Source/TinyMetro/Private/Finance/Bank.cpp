@@ -122,6 +122,26 @@ void ABank::InitInvestment() {
 
 		return false;
 		}));
+	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 50, 150, 70, TEXT("Message : 6")), []() {
+
+		return false;
+		}));
+	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 50, 150, 70, TEXT("Message : 7")), []() {
+
+		return false;
+		}));
+	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 50, 150, 70, TEXT("Message : 8")), []() {
+
+		return false;
+		}));
+	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 50, 150, 70, TEXT("Message : 9")), []() {
+
+		return false;
+		}));
+	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 50, 150, 70, TEXT("Message : 10")), []() {
+
+		return false;
+		}));
 
 	for (auto& i : InvestmentArr) {
 		Investment.Add(this->CreateInvestment(i.Key, i.Value));
