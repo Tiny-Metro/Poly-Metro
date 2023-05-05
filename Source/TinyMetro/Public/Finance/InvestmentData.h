@@ -14,20 +14,32 @@ struct TINYMETRO_API FInvestmentData
 {
 	GENERATED_BODY()
 	FInvestmentData() = default;
-	FInvestmentData(int32 TimeRequire, int32 InvestmentFee, int32 Award, int32 Reward, FString Message) :
+	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString DepositMessage, FString AwardMessage, FString RewardMessage, TFunction<void(void)> TestFunc) :
+		Title(Title),
+		Content(Content),
 		TimeRequire(TimeRequire),
-		InvestmentFee(InvestmentFee),
-		Award(Award),
-		Reward(Reward),
-		Message(Message) { }
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		DepositMessage(DepositMessage),
+		AwardMessage(AwardMessage),
+		RewardMessage(RewardMessage),
+		TestFunc(TestFunc){ }
+
+	// Investmet title
+	UPROPERTY(BlueprintReadOnly)
+	FString Title;
+	// Detail explain
+	UPROPERTY(BlueprintReadOnly)
+	FString Content;
+	UPROPERTY(BlueprintReadOnly)
 	int32 TimeRequire;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 InvestmentFee;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Award;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Reward;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Message;
+	// Deposit of investment
+	UPROPERTY(BlueprintReadOnly)
+	FString DepositMessage;
+	// Investment success
+	UPROPERTY(BlueprintReadOnly)
+	FString AwardMessage;
+	// Investment fail
+	UPROPERTY(BlueprintReadOnly)
+	FString RewardMessage;
+
+	TFunction<void(void)> TestFunc;
 };
