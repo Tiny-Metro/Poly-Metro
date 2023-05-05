@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "InvestmentData.h"
+#include "InvestmentState.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
 #include "Investment.generated.h"
 
@@ -25,7 +26,7 @@ public:
 	void InvestmentSuccess();
 	void InvestmentFail();
 	void InitInvestment();
-	void SetAvailable(bool B);
+	void InvestmentStart();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -33,7 +34,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsActivate() const;
 	UFUNCTION(BlueprintCallable)
-	bool GetAvailable();
+	InvestmentState GetState() const;
 	UFUNCTION(BlueprintCallable)
 	void ActivateInvestment();
 	//UFUNCTION(BlueprintCallable)
@@ -50,7 +51,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	bool IsActivate = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	bool IsAvailable = false;
+	InvestmentState State;
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroPlayerState* PlayerState;
 	UPROPERTY(BlueprintReadOnly)

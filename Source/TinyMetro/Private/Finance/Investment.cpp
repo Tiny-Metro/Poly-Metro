@@ -23,18 +23,20 @@ void UInvestment::SetSuccessFunction(TFunction<bool(void)> Func) {
 	CheckSuccess = Func;
 }
 
-void UInvestment::SetAvailable(bool B) {
-	IsAvailable = B;
-}
-
 void UInvestment::InvestmentSuccess() {
-	
+
+	State = InvestmentState::Success;
 	InitInvestment();
 }
 
 void UInvestment::InvestmentFail() {
 
+	State = InvestmentState::Fail;
 	InitInvestment();
+}
+
+void UInvestment::InvestmentStart() {
+	State = InvestmentState::Processing;
 }
 
 void UInvestment::InitInvestment() {
@@ -83,6 +85,6 @@ bool UInvestment::GetIsActivate() const {
 	return IsActivate;
 }
 
-bool UInvestment::GetAvailable() {
-	return IsAvailable;
+InvestmentState UInvestment::GetState() const {
+	return State;
 }
