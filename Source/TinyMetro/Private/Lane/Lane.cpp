@@ -3,10 +3,14 @@
 
 #include "Lane/Lane.h"
 #include "Train/TrainTemplate.h"
+#include "Train/TrainManager.h"
+#include "Train/Train.h"
 #include "Station/Station.h"
 #include "GridGenerator/GridCellData.h"
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/Controller.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -19,6 +23,7 @@ ALane::ALane()
 	
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 
+	TrainManagerRef = Cast<ATrainManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrainManager::StaticClass()));
 
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
@@ -29,6 +34,8 @@ ALane::ALane()
 void ALane::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	
 }
 
@@ -350,6 +357,10 @@ void ALane::InitializeNewLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
+void ALane::FinishRemovingLaneAtStart_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+
+void ALane::FinishRemovingLaneAtEnd_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {
 	int32 Index = -1;
@@ -525,6 +536,52 @@ TrainDirection ALane::SetDirectionInit(AStation* Station, FIntPoint CurLocation)
 
 void ALane::SpawnTrain()
 {
+	if (TinyMetroPlayerState->UseTrain()) {
+
+		UWorld* world = GetWorld();
+
+		
+
+		if (world != nullptr)
+		{
+			world->GetTimerManager().SetTimer(
+				SpawnTrainCheckTimer,
+				FTimerDelegate::CreateLambda([&]() {
+
+					UE_LOG(LogTemp, Warning, TEXT("SpawnTrain Timer"));
+					
+					AStation* Destination = StationPoint[1];
+
+					UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
+
+					UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+					UClass* SpawnClass = SpawnActor->StaticClass();
+
+					FActorSpawnParameters SpawnParams;
+					FTransform SpawnTransform;
+
+					FVector SpawnLocation = StationPoint[0]->GetCurrentGridCellData().WorldLocation;
+					SpawnLocation = { SpawnLocation.X, SpawnLocation.Y, 20 };
+
+					SpawnTransform.SetLocation(SpawnLocation);
+
+					ATrain* Train = Cast<ATrain>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+
+
+					Train->ServiceStart(Train->GetActorLocation(), this, Destination);
+					
+					}),
+				1.0f,
+				false,
+				1.0f
+			);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("ERROR! SpawnTrain Timer"));
+		}
+
+		
+	}
 }
 
 AStation* ALane::GetNextStation(AStation* CurrStation, TrainDirection Direction)
