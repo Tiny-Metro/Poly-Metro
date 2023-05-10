@@ -88,6 +88,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveLane(int32 LId);
 
+	UFUNCTION(BlueprintCallable)
+	TMap<StationType, int32> GetSpawnPassengerStatistics() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetWaitPassenger() const;
+	
 	//UFUNCTION()
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -186,6 +191,46 @@ protected:
 	float PassengerX_Distance = 90;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
 	float PassengerY_Distance = 45;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> SpawnPassengerNotFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> SpawnPassengerFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
 
 protected:
 	// Station meshses

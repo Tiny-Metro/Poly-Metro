@@ -407,6 +407,42 @@ void AStationManager::SetServiceData(FServiceData _ServiceData) {
 	ServiceData = _ServiceData;
 }
 
+void AStationManager::NotifySpawnPassenger(StationType Type, bool IsFree) {
+	if (IsFree) {
+		TotalSpawnPassengerFree[Type]++;
+	} else {
+		TotalSpawnPassengerNotFree[Type]++;
+	}
+	TotalSpawnPassenger[Type]++;
+}
+
+TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 StationId = -1) {
+	TMap<StationType, int32> result;
+	TotalPassenger = 0;
+	WaitPassenger = 0;
+	if (StationId == -1) {
+		result = TotalSpawnPassenger;
+		for (auto& i : Station) {
+			WaitPassenger += i->GetWaitPassenger();
+		}
+	} else {
+		auto station = GetStationById(StationId);
+		if (IsValid(station)) {
+			result = station->GetSpawnPassengerStatistics();
+			WaitPassenger = station->GetWaitPassenger();
+		} else {
+			WaitPassenger = -1;
+			UE_LOG(LogTemp, Error, TEXT("Invalid station ID"));
+		}
+	}
+	
+	for (auto& i : result) {
+		TotalPassenger += i.Value;
+	}
+
+	return result;
+}
+
 void AStationManager::WeeklyTask() const {
 	for (auto& i : Station) {
 		if (IsValid(i)) {

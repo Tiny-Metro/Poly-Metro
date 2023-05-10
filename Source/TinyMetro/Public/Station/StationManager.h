@@ -101,6 +101,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetServiceData(FServiceData _ServiceData);
 
+	UFUNCTION(BlueprintCallable)
+	void NotifySpawnPassenger(StationType Type, bool IsFree);
+	UFUNCTION(BlueprintCallable)
+	TMap<StationType, int32> GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 StationId = -1);
+	
+
 	UFUNCTION()
 	void WeeklyTask() const;
 	UFUNCTION()
@@ -168,6 +174,46 @@ protected:
 	int32 StationSpawnRange = 7;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassengerNotFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassengerFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
 
 	//Policy Timer
 	/*UPROPERTY(BlueprintReadOnly)

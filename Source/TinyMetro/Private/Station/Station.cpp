@@ -238,6 +238,14 @@ void AStation::RemoveLane(int32 LId)
 	Lanes.Remove(LId);
 }
 
+TMap<StationType, int32> AStation::GetSpawnPassengerStatistics() const {
+	return TotalSpawnPassenger;
+}
+
+int32 AStation::GetWaitPassenger() const {
+	return Passenger.Num();
+}
+
 void AStation::CalculateComplain() {
 }
 
@@ -452,7 +460,17 @@ void AStation::SpawnPassenger() {
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
 		tmp->SetFree();
 	}
+	
+	if (tmp->GetFree()) {
+		SpawnPassengerFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
+	} else {
+		SpawnPassengerNotFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
+	}
+	TotalSpawnPassenger[tmp->GetDestination()]++;
 
+	
 	Passenger.Add(MoveTemp(tmp));
 
 	//Log
