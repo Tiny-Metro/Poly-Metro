@@ -24,6 +24,10 @@ void UPassenger::SetFree() {
 	IsFree = RandomFree[result];
 }
 
+bool UPassenger::GetFree() const {
+	return IsFree;
+}
+
 void UPassenger::SetPassengerPath(PathQueue Path) {
 	ShortestPath = Path;
 }
