@@ -60,11 +60,11 @@ FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) 
 		const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("StationType"), true);
 		for (auto& i : passengerStatistics) {
 			result += enumPtr->GetNameStringByIndex((int32)i.Key);
+			result += " : " + FString::FromInt(i.Value) + "\n";
 		}
-		result += FString::Printf(TEXT("Wait Passenger : %d\n"), WaitPassenger);
 	}
 
-	return FString();
+	return result;
 }
 
 FString AConsoleProcessor::CmdMoney(TArray<FString> Cmd, bool& Success) {
@@ -146,5 +146,5 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 	}
 
 	Success = true;
-	return splitStr[0];
+	return Result;
 }
