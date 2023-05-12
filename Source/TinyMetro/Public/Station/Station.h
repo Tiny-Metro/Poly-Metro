@@ -56,6 +56,10 @@ public:
 	void AddComplainIncreaseRate(float Rate, int32 Period);
 	UFUNCTION()
 	void SetComplainIncreaseEnable(bool Flag);
+	UFUNCTION()
+	void SetComplainByRate(float Rate);
+	UFUNCTION()
+	void AddComplain(float Value, bool IsFixedValue = false);
 
 	UFUNCTION()
 	void MaintenanceCost(int32 Cost);

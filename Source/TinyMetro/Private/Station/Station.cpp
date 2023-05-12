@@ -295,6 +295,14 @@ void AStation::SetComplainIncreaseEnable(bool Flag) {
 	IsComplainIncreaseEnable = Flag;
 }
 
+void AStation::SetComplainByRate(float Rate) {
+	ComplainCurrent *= Rate;
+}
+
+void AStation::AddComplain(float Value, bool IsFixedValue) {
+	ComplainCurrent += (Value * (IsFixedValue ? 1.0f : ComplainIncreaseRate));
+}
+
 void AStation::MaintenanceCost(int32 Cost) {
 
 }
