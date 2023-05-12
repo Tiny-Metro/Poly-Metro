@@ -295,7 +295,6 @@ FString AConsoleProcessor::CmdComplainAdd(TArray<FString> Cmd, bool& Success) {
 	case 2: // complain_add {n}
 		if (Cmd[1].IsNumeric()) {
 			for (auto& i : StationManagerRef->GetAllStations()) {
-				FCString::Atof(*Cmd[1]);
 				i->AddComplain(FCString::Atof(*Cmd[1]));
 			}
 		} else {
