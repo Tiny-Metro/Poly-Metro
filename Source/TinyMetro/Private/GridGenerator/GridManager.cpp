@@ -89,6 +89,8 @@ FGridCellData AGridManager::GetGridCellDataByIndex(int Index) const {
 	return GridCellData[Index];
 }
 
+// Not fully-random process
+// Select random grid cell within a certain range
 FGridCellData AGridManager::GetGridCellDataRandom() {
 	TPair<FVector2D, double> Temp = FindCircle();
 	FIntPoint Point(Temp.Key.X, Temp.Key.Y);
