@@ -107,7 +107,10 @@ public:
 	void NotifySpawnPassenger(StationType Type, bool IsFree);
 	UFUNCTION(BlueprintCallable)
 	TMap<StationType, int32> GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, UPARAM(DisplayName = "StationId")int32 SID = -1);
-	
+	UFUNCTION()
+	void SetPassengerSpawnEnable(bool Flag);
+	UFUNCTION()
+	bool GetPassengerSpawnEnable() const;
 
 	UFUNCTION()
 	void WeeklyTask() const;
@@ -216,6 +219,8 @@ protected:
 		TPair<StationType, int32>(StationType::Star, 0),
 		TPair<StationType, int32>(StationType::Fan, 0)
 	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	bool IsPassengerSpawnEnable = true;
 
 	//Policy Timer
 	/*UPROPERTY(BlueprintReadOnly)

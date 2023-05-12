@@ -105,6 +105,10 @@ public:
 	void DespawnPassenger(StationType Destination);
 	UFUNCTION()
 	void DespawnRandomPassenger();
+	UFUNCTION()
+	void SetPassengerSpawnEnable(bool Flag);
+	UFUNCTION()
+	bool GetPassengerSpawnEnable() const;
 	
 	//UFUNCTION()
 	/*Return passenger at Index
@@ -167,7 +171,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double AdditionalPassengerSpawnProbability = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbability = 0.0f;
+	float FreePassengerSpawnProbability = 0.0f;;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	bool IsPassengerSpawnEnable = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")

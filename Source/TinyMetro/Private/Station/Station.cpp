@@ -289,6 +289,14 @@ void AStation::DespawnRandomPassenger() {
 	UpdatePassengerMesh();
 }
 
+void AStation::SetPassengerSpawnEnable(bool Flag) {
+	IsPassengerSpawnEnable = Flag;
+}
+
+bool AStation::GetPassengerSpawnEnable() const {
+	return IsPassengerSpawnEnable;
+}
+
 void AStation::CalculateComplain() {
 }
 
@@ -484,8 +492,10 @@ void AStation::PassengerSpawnRoutine() {
 			PassengerSpawnCurrent += PassengerSpawnPerSec;
 
 			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
-				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
-					SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
+				if (IsPassengerSpawnEnable) {
+					if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
+						SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
+					}
 				}
 
 				PassengerSpawnCurrent = 0.0f;

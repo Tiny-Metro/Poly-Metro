@@ -199,6 +199,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId);
 
 	tmp->SetStationInfo(StationId++, Type);
+	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
 
 	if (ActivateFlag) {
 		tmp->SetActivate(true);
@@ -418,6 +419,17 @@ void AStationManager::NotifySpawnPassenger(StationType Type, bool IsFree) {
 		TotalSpawnPassengerNotFree[Type]++;
 	}
 	TotalSpawnPassenger[Type]++;
+}
+
+void AStationManager::SetPassengerSpawnEnable(bool Flag) {
+	IsPassengerSpawnEnable = Flag;
+	for (auto& i : Station) {
+		i->SetPassengerSpawnEnable(Flag);
+	}
+}
+
+bool AStationManager::GetPassengerSpawnEnable() const {
+	return IsPassengerSpawnEnable;
 }
 
 TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 SID) {
