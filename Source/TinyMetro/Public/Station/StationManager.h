@@ -104,7 +104,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void NotifySpawnPassenger(StationType Type, bool IsFree);
 	UFUNCTION(BlueprintCallable)
-	TMap<StationType, int32> GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 StationId = -1);
+	TMap<StationType, int32> GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, UPARAM(DisplayName = "StationId")int32 SID = -1);
 	
 
 	UFUNCTION()

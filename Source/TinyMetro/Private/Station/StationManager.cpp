@@ -416,17 +416,17 @@ void AStationManager::NotifySpawnPassenger(StationType Type, bool IsFree) {
 	TotalSpawnPassenger[Type]++;
 }
 
-TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 StationId = -1) {
+TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 SID) {
 	TMap<StationType, int32> result;
 	TotalPassenger = 0;
 	WaitPassenger = 0;
-	if (StationId == -1) {
+	if (SID == -1) {
 		result = TotalSpawnPassenger;
 		for (auto& i : Station) {
 			WaitPassenger += i->GetWaitPassenger();
 		}
 	} else {
-		auto station = GetStationById(StationId);
+		auto station = GetStationById(SID);
 		if (IsValid(station)) {
 			result = station->GetSpawnPassengerStatistics();
 			WaitPassenger = station->GetWaitPassenger();
