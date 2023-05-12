@@ -287,7 +287,35 @@ FString AConsoleProcessor::CmdComplainOff(TArray<FString> Cmd, bool& Success) {
 	return result;
 }
 
+// complain_add {n} : Add {n} complain all station
+// complain_add {n} {id} Add {n} complain {id}'s station
 FString AConsoleProcessor::CmdComplainAdd(TArray<FString> Cmd, bool& Success) {
+	FString result = TEXT("Complain add : ");
+	switch (Cmd.Num()) {
+	case 2: // complain_add {n}
+		if (Cmd[1].IsNumeric()) {
+			for (auto& i : StationManagerRef->GetAllStations()) {
+				FCString::Atof(*Cmd[1]);
+				i->AddComplain(FCString::Atof(*Cmd[1]));
+			}
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	case 3: // complain_add {n} {id}
+		if (Cmd[1].IsNumeric() && Cmd[2].IsNumeric()) {
+			StationManagerRef->GetStationById(FCString::Atoi(*Cmd[2]))->AddComplain(FCString::Atof(*Cmd[1]));
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
 	return FString();
 }
 
@@ -341,6 +369,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdComplainOff(splitStr, Success);
 		} else if (splitStr[0] == TEXT("complain_on")) {
 			Result = CmdComplainOn(splitStr, Success);
+		} else if (splitStr[0] == TEXT("add_complain")) {
+			Result = CmdComplainAdd(splitStr, Success);
 		}
 	}
 
