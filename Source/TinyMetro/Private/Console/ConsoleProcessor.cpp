@@ -5,6 +5,7 @@
 #include "Station/StationManager.h"
 #include "GridGenerator/GridManager.h"
 #include "Finance/Bank.h"
+#include "Timer/Timer.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -24,6 +25,7 @@ void AConsoleProcessor::BeginPlay()
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	BankRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetBank();
+	TimerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTimer();
 }
 
 void AConsoleProcessor::TextTest(FText Txt) {
@@ -318,7 +320,27 @@ FString AConsoleProcessor::CmdComplainAdd(TArray<FString> Cmd, bool& Success) {
 	return FString();
 }
 
+// skip_time :  Set time next midnight
+// skip_time {n} : Set time {n} day after midnight
 FString AConsoleProcessor::CmdSkipTime(TArray<FString> Cmd, bool& Success) {
+	FString result = TEXT("Skip time : ");
+	switch (Cmd.Num()) {
+	case 1: // skip_time
+		TimerRef->SkipTime();
+		break;
+	case 2: // skip_time {n}
+		if (Cmd[1].IsNumeric()) {
+			TimerRef->SkipTime(FCString::Atof(*Cmd[1]));
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
 	return FString();
 }
 
@@ -370,6 +392,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdComplainOn(splitStr, Success);
 		} else if (splitStr[0] == TEXT("add_complain")) {
 			Result = CmdComplainAdd(splitStr, Success);
+		} else if (splitStr[0] == TEXT("skip_time")) {
+			Result = CmdSkipTime(splitStr, Success);
 		}
 	}
 

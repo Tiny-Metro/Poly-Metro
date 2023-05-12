@@ -52,5 +52,7 @@ protected:
 	class AGridManager* GridManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ABank* BankRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATimer* TimerRef;
 
 };
