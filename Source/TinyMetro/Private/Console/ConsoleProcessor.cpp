@@ -442,8 +442,34 @@ FString AConsoleProcessor::CmdDeletePassenger(TArray<FString> Cmd, bool& Success
 	return result;
 }
 
+// passenger_generate : Show passenger spawn state (true or false)
+// passenger_generate {true|false} : Set passenger spawn to {true|false}
 FString AConsoleProcessor::CmdTogglePassengerSpawn(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Passenger generate : ");
+	bool flag;
+	switch (Cmd.Num()) {
+	case 1: // passenger_generate
+		flag = StationManagerRef->GetPassengerSpawnEnable();
+		result += TEXT("Passenger spawn enable = ");
+		result += flag ? TEXT("true") : TEXT("false");
+		break;
+	case 2: // passenger_generate {true|false}
+		if (Cmd[1] == TEXT("true")) {
+			StationManagerRef->SetPassengerSpawnEnable(true);
+			result += TEXT("Set true");
+		} else if (Cmd[1] == TEXT("false")) {
+			StationManagerRef->SetPassengerSpawnEnable(false);
+			result += TEXT("Set false");
+		} else {
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
+	return result;
 }
 
 FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
@@ -488,6 +514,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdAddPassenger(splitStr, Success);
 		} else if (splitStr[0] == TEXT("del_passenger")) {
 			Result = CmdDeletePassenger(splitStr, Success);
+		} else if (splitStr[0] == TEXT("passenger_generate")) {
+			Result = CmdTogglePassengerSpawn(splitStr, Success);
 		}
 	}
 
