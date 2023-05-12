@@ -46,4 +46,7 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class AStationManager* StationManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATinyMetroPlayerState* PlayerStateRef;
+
 };

@@ -19,6 +19,7 @@ void AConsoleProcessor::BeginPlay()
 {
 	Super::BeginPlay();
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 }
 
@@ -68,7 +69,17 @@ FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) 
 }
 
 FString AConsoleProcessor::CmdMoney(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	if (Cmd.IsValidIndex(1)) {
+		if (Cmd[1].IsNumeric()) {
+			PlayerStateRef->AddMoney(FCString::Atoi(*Cmd[1]));
+			Success = true;
+		} else {
+			Success = false;
+		}
+	} else {
+		Success = false;
+	}
+	return Success ? "Success" : "Fail";
 }
 
 FString AConsoleProcessor::CmdOccurEvent(TArray<FString> Cmd, bool& Success) {
@@ -140,8 +151,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 	} else {
 		if (splitStr[0] == TEXT("passenger_info")) {
 			Result = CmdPassengerInfo(splitStr, Success);
-		} else if (splitStr[0] == TEXT("")) {
-
+		} else if (splitStr[0] == TEXT("money")) {
+			Result = CmdMoney(splitStr, Success);
 		}
 	}
 
