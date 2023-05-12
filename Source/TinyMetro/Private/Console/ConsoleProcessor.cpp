@@ -317,7 +317,7 @@ FString AConsoleProcessor::CmdComplainAdd(TArray<FString> Cmd, bool& Success) {
 		result += TEXT("Incorrect input");
 		break;
 	}
-	return FString();
+	return result;
 }
 
 // skip_time :  Set time next midnight
@@ -341,11 +341,56 @@ FString AConsoleProcessor::CmdSkipTime(TArray<FString> Cmd, bool& Success) {
 		result += TEXT("Incorrect input");
 		break;
 	}
-	return FString();
+	return result;
 }
 
+// add_passenger : Add random 1 passenger all station
+// add_passenger {type} : Add {type} 1 passenger all station
+// add_passenger {id} : Add random 1 passneger {id} station
+// add_passenger {type} {id} : Add {type} 1 passenger {id} station
 FString AConsoleProcessor::CmdAddPassenger(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Add passenger : ");
+	StationType sType;
+	switch (Cmd.Num()) {
+	case 1: // add_passenger
+		for (auto& i : StationManagerRef->GetAllStations()) {
+			i->SpawnPassenger(StationManagerRef->GetRandomStationType());
+		}
+		result += TEXT("Add 1 passenger all stations");
+		break;
+	case 2: // add_passenger {type} or add_passenger {id}
+		if (Cmd[1].IsNumeric()) { // add_passenger {id}
+			StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]))->SpawnPassenger(StationManagerRef->GetRandomStationType());
+			result += TEXT("Add 1 passenger on station");
+		} else {
+			sType = StationManagerRef->StationTypeFromString(Cmd[1], Success);
+			if (Success) { // add_passenger {type}
+				for (auto& i : StationManagerRef->GetAllStations()) {
+					i->SpawnPassenger(sType);
+				}
+				result += TEXT("Add passenger all station");
+			} else {
+				Success = false;
+				result += TEXT("Incorrect input");
+			}
+		}
+		break;
+	case 3: // add_passenger {type} {id}
+		sType = StationManagerRef->StationTypeFromString(Cmd[1], Success);
+		if (Success && Cmd[2].IsNumeric()) {
+			StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]))->SpawnPassenger(sType);
+			result += TEXT("Add passenger on station");
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
+	return result;
 }
 
 FString AConsoleProcessor::CmdDeletePassenger(TArray<FString> Cmd, bool& Success) {
@@ -394,6 +439,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdComplainAdd(splitStr, Success);
 		} else if (splitStr[0] == TEXT("skip_time")) {
 			Result = CmdSkipTime(splitStr, Success);
+		} else if (splitStr[0] == TEXT("add_passenger")) {
+			Result = CmdAddPassenger(splitStr, Success);
 		}
 	}
 
