@@ -223,8 +223,36 @@ FString AConsoleProcessor::CmdComplainOn(TArray<FString> Cmd, bool& Success) {
 	return FString();
 }
 
+// complain_off : Stop increase complain all stations
+// compalin_off {id} Stop increase complain {id}'s station
 FString AConsoleProcessor::CmdComplainOff(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Complain off : ");
+	switch (Cmd.Num()) {
+	case 1: // complain_off
+		for (auto& i : StationManagerRef->GetAllStations()) {
+			i->SetComplainIncreaseEnable(false);
+		}
+		break;
+	case 2: // complain_off {id}
+		if (Cmd[1].IsNumeric()) {
+			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
+			if (IsValid(stationRef)) {
+				stationRef->SetComplainIncreaseEnable(false);
+			} else {
+				Success = false;
+				result += TEXT("Invalid station");
+			}
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
+	return result;
 }
 
 FString AConsoleProcessor::CmdComplainAdd(TArray<FString> Cmd, bool& Success) {
@@ -277,6 +305,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			// TODO : investment_fail command
 		} else if (splitStr[0] == TEXT("repay")) {
 			Result = CmdRepay(splitStr, Success);
+		} else if (splitStr[0] == TEXT("complain_off")) {
+			Result = CmdComplainOff(splitStr, Success);
 		}
 	}
 

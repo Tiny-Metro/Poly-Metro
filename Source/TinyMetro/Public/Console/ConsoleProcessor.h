@@ -50,5 +50,7 @@ protected:
 	class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class AGridManager* GridManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ABank* BankRef;
 
 };
