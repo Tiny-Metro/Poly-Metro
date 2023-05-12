@@ -62,7 +62,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
-	StationType GetRandomStationType();
+	StationType GetRandomStationType(); 
+	UFUNCTION(BlueprintCallable)
+	StationType StationTypeFromString(FString Str, bool& Success) const;
 	
 
 protected:

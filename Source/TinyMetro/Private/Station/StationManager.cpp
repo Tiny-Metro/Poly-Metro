@@ -573,6 +573,36 @@ StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }
 
+StationType AStationManager::StationTypeFromString(FString Str, bool& Success) const {
+	Success = true;
+	StationType result;
+	Str = Str.ToLower();
+	if (Str == TEXT("circle")) {
+		result = StationType::Circle;
+	} else if (Str == TEXT("triangle")) {
+		result = StationType::Triangle;
+	} else if (Str == TEXT("rectangle")) {
+		result = StationType::Rectangle;
+	} else if (Str == TEXT("cross")) {
+		result = StationType::Cross;
+	} else if (Str == TEXT("rhombus")) {
+		result = StationType::Rhombus;
+	} else if (Str == TEXT("oval")) {
+		result = StationType::Oval;
+	} else if (Str == TEXT("diamond")) {
+		result = StationType::Diamond;
+	} else if (Str == TEXT("pentagon")) {
+		result = StationType::Pentagon;
+	} else if (Str == TEXT("star")) {
+		result = StationType::Star;
+	} else if (Str == TEXT("fan")) {
+		result = StationType::Fan;
+	} else {
+		Success = false;
+	}
+	return result;
+}
+
 // Called every frame
 void AStationManager::Tick(float DeltaTime)
 {
