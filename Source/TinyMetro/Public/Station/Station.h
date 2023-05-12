@@ -101,6 +101,10 @@ public:
 
 	UFUNCTION()
 	void SpawnPassenger(StationType Destination);
+	UFUNCTION()
+	void DespawnPassenger(StationType Destination);
+	UFUNCTION()
+	void DespawnRandomPassenger();
 	
 	//UFUNCTION()
 	/*Return passenger at Index

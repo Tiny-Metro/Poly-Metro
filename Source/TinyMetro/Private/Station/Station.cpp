@@ -271,6 +271,24 @@ void AStation::SpawnPassenger(StationType Destination) {
 	UpdatePassengerMesh();
 }
 
+void AStation::DespawnPassenger(StationType Destination) {
+	for (auto& i : Passenger) {
+		if (i->GetDestination() == Destination) {
+			Passenger.Remove(i);
+			break;
+		}
+	}
+	UpdatePassengerMesh();
+}
+
+void AStation::DespawnRandomPassenger() {
+	int64 removeIndex = FMath::RandRange(0, Passenger.Num() - 1);
+	if (Passenger.IsValidIndex(removeIndex)) {
+		Passenger.RemoveAt(removeIndex);
+	}
+	UpdatePassengerMesh();
+}
+
 void AStation::CalculateComplain() {
 }
 
