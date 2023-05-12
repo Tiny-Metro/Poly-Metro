@@ -54,6 +54,8 @@ public:
 	void SetComplainGauge(float Per);
 	UFUNCTION()
 	void AddComplainIncreaseRate(float Rate, int32 Period);
+	UFUNCTION()
+	void SetComplainIncreaseEnable(bool Flag);
 
 	UFUNCTION()
 	void MaintenanceCost(int32 Cost);
@@ -141,6 +143,8 @@ protected:
 	int32 ComplainSpawnDay = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	float ComplainIncreaseRate = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	bool IsComplainIncreaseEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	int32 PassengerSpawnRequire = 6000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")

@@ -291,6 +291,10 @@ void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
 	}
 }
 
+void AStation::SetComplainIncreaseEnable(bool Flag) {
+	IsComplainIncreaseEnable = Flag;
+}
+
 void AStation::MaintenanceCost(int32 Cost) {
 
 }
@@ -368,16 +372,18 @@ void AStation::ComplainRoutine() {
 		FTimerDelegate::CreateLambda([&]() {
 			SpawnDay++;
 			
-			// Passenger complain
-			if (Passenger.Num() > ComplainPassengerNum) {
-				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
-			}
+			if (IsComplainIncreaseEnable) {
+				// Passenger complain
+				if (Passenger.Num() > ComplainPassengerNum) {
+					ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
+				}
 
-			// Not activate
-			if (!IsActive && SpawnDay > ComplainSpawnDay) {
-				ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
+				// Not activate
+				if (!IsActive && SpawnDay > ComplainSpawnDay) {
+					ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
+				}
 			}
-
+			
 			/*
 			if (GEngine) {
 				GEngine->AddOnScreenDebugMessage(
