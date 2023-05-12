@@ -4,6 +4,7 @@
 #include "Console/ConsoleProcessor.h"
 #include "Station/StationManager.h"
 #include "GridGenerator/GridManager.h"
+#include "Finance/Bank.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -22,7 +23,7 @@ void AConsoleProcessor::BeginPlay()
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-
+	BankRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetBank();
 }
 
 void AConsoleProcessor::TextTest(FText Txt) {
@@ -162,10 +163,34 @@ FString AConsoleProcessor::CmdDeleteLane(TArray<FString> Cmd, bool& Success) {
 	return FString();
 }
 
+// investment_clear : Success all investment
+// investment_clear {n} : Success {n}th investment
 FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Success) {
+	// TODO : After finish investment
+	//FString result = TEXT("Investment clear : ");
+	//switch (Cmd.Num()) {
+	//case 1: // investment_clear
+	//	for (auto& i : BankRef->GetAvailableInvestment()) {
+
+	//	}
+	//	break;
+	//case 2: // investment_clear {n}
+	//	if (Cmd[1].IsNumeric()) {
+
+	//	} else {
+	//		Success = false;
+	//		result += TEXT("Fail");
+	//	}
+	//	break;
+	//default: // Fail
+	//	Success = false;
+	//	result += TEXT("Fail");
+	//}
 	return FString();
 }
 
+// investment_fail : Fail all investment
+// investment_fail {n} : Fail {n}th investment
 FString AConsoleProcessor::CmdInvestmentFail(TArray<FString> Cmd, bool& Success) {
 	return FString();
 }
@@ -219,9 +244,17 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 		} else if (splitStr[0] == TEXT("money")) {
 			Result = CmdMoney(splitStr, Success);
 		} else if (splitStr[0] == TEXT("event")) {
-			// TODO : Occur event
+			// TODO : event command
 		} else if (splitStr[0] == TEXT("add_station")) {
 			Result = CmdAddStation(splitStr, Success);
+		} else if (splitStr[0] == TEXT("del_station")) {
+			// TODO : del_station command
+		} else if (splitStr[0] == TEXT("del_lane")) {
+			// TODO : del_lane command
+		} else if (splitStr[0] == TEXT("investment_clear")) {
+			// TODO : investment_clear command
+		} else if (splitStr[0] == TEXT("investment_fail")) {
+			// TODO : investment_fail command
 		}
 	}
 
