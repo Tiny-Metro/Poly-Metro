@@ -246,6 +246,31 @@ int32 AStation::GetWaitPassenger() const {
 	return Passenger.Num();
 }
 
+void AStation::SpawnPassenger(StationType Destination) {
+	UPassenger* tmp = UPassenger::ConstructPassenger(
+		Destination
+	);
+	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
+	//UPassenger* tmp = NewObject<UPassenger>();
+	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
+		tmp->SetFree();
+	}
+
+	if (tmp->GetFree()) {
+		SpawnPassengerFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
+	} else {
+		SpawnPassengerNotFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
+	}
+	TotalSpawnPassenger[tmp->GetDestination()]++;
+
+
+	Passenger.Add(MoveTemp(tmp));
+	UpdatePassengerMesh();
+}
+
 void AStation::CalculateComplain() {
 }
 
@@ -442,8 +467,7 @@ void AStation::PassengerSpawnRoutine() {
 
 			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
-					SpawnPassenger();
-					UpdatePassengerMesh();
+					SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
 				}
 
 				PassengerSpawnCurrent = 0.0f;
@@ -463,6 +487,7 @@ void AStation::PassengerSpawnRoutine() {
 		);
 }
 
+// Not used
 void AStation::SpawnPassenger() {
 	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationTypeValue);
 	UPassenger* tmp = UPassenger::ConstructPassenger(

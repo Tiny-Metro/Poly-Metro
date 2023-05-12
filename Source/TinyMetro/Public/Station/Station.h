@@ -98,6 +98,9 @@ public:
 	TMap<StationType, int32> GetSpawnPassengerStatistics() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetWaitPassenger() const;
+
+	UFUNCTION()
+	void SpawnPassenger(StationType Destination);
 	
 	//UFUNCTION()
 	/*Return passenger at Index
