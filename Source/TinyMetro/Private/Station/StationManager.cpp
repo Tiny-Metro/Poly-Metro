@@ -199,6 +199,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationId(StationId);
 
 	tmp->SetStationInfo(StationId++, Type);
+	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
 
 	if (ActivateFlag) {
 		tmp->SetActivate(true);
@@ -363,6 +364,10 @@ AStation* AStationManager::GetStationById(int32 Id) {
 	return nullptr;
 }
 
+TArray<AStation*> AStationManager::GetAllStations() {
+	return Station;
+}
+
 PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
 	if (ShortestPath.Find(Start) == nullptr) {
 		return PathQueue();
@@ -405,6 +410,53 @@ void AStationManager::AddComplainIncreaseRate(float Rate, int32 Period) {
 
 void AStationManager::SetServiceData(FServiceData _ServiceData) {
 	ServiceData = _ServiceData;
+}
+
+void AStationManager::NotifySpawnPassenger(StationType Type, bool IsFree) {
+	if (IsFree) {
+		TotalSpawnPassengerFree[Type]++;
+	} else {
+		TotalSpawnPassengerNotFree[Type]++;
+	}
+	TotalSpawnPassenger[Type]++;
+}
+
+void AStationManager::SetPassengerSpawnEnable(bool Flag) {
+	IsPassengerSpawnEnable = Flag;
+	for (auto& i : Station) {
+		i->SetPassengerSpawnEnable(Flag);
+	}
+}
+
+bool AStationManager::GetPassengerSpawnEnable() const {
+	return IsPassengerSpawnEnable;
+}
+
+TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 SID) {
+	TMap<StationType, int32> result;
+	TotalPassenger = 0;
+	WaitPassenger = 0;
+	if (SID == -1) {
+		result = TotalSpawnPassenger;
+		for (auto& i : Station) {
+			WaitPassenger += i->GetWaitPassenger();
+		}
+	} else {
+		auto station = GetStationById(SID);
+		if (IsValid(station)) {
+			result = station->GetSpawnPassengerStatistics();
+			WaitPassenger = station->GetWaitPassenger();
+		} else {
+			WaitPassenger = -1;
+			UE_LOG(LogTemp, Error, TEXT("Invalid station ID"));
+		}
+	}
+	
+	for (auto& i : result) {
+		TotalPassenger += i.Value;
+	}
+
+	return result;
 }
 
 void AStationManager::WeeklyTask() const {
@@ -535,6 +587,36 @@ void AStationManager::PrintPath(int32 Start, StationType Type, TQueue<int32>* Pa
 
 StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
+}
+
+StationType AStationManager::StationTypeFromString(FString Str, bool& Success) const {
+	Success = true;
+	StationType result;
+	Str = Str.ToLower();
+	if (Str == TEXT("circle")) {
+		result = StationType::Circle;
+	} else if (Str == TEXT("triangle")) {
+		result = StationType::Triangle;
+	} else if (Str == TEXT("rectangle")) {
+		result = StationType::Rectangle;
+	} else if (Str == TEXT("cross")) {
+		result = StationType::Cross;
+	} else if (Str == TEXT("rhombus")) {
+		result = StationType::Rhombus;
+	} else if (Str == TEXT("oval")) {
+		result = StationType::Oval;
+	} else if (Str == TEXT("diamond")) {
+		result = StationType::Diamond;
+	} else if (Str == TEXT("pentagon")) {
+		result = StationType::Pentagon;
+	} else if (Str == TEXT("star")) {
+		result = StationType::Star;
+	} else if (Str == TEXT("fan")) {
+		result = StationType::Fan;
+	} else {
+		Success = false;
+	}
+	return result;
 }
 
 // Called every frame

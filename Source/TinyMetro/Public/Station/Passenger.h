@@ -40,6 +40,8 @@ protected:
 public:
 	UFUNCTION()
 	void SetFree();
+	UFUNCTION()
+	bool GetFree() const;
 
 	void SetPassengerPath(PathQueue Path);
 	PathQueue GetPassengerPath();

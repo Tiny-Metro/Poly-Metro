@@ -59,12 +59,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
-
-protected:
 	UFUNCTION(BlueprintCallable)
 	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
 	UFUNCTION(BlueprintCallable)
-	StationType GetRandomStationType();
+	StationType GetRandomStationType(); 
+	UFUNCTION(BlueprintCallable)
+	StationType StationTypeFromString(FString Str, bool& Success) const;
 	
 
 protected:
@@ -89,6 +89,8 @@ public:
 	AStation* GetStationByStationInfo(FStationInfo Info);
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationById(int32 Id);
+	UFUNCTION(BlueprintCallable)
+	TArray<AStation*> GetAllStations();
 
 	PathQueue GetShortestPath(int32 Start, StationType Type);
 
@@ -100,6 +102,15 @@ public:
 	void AddComplainIncreaseRate(float Rate, int32 Period);
 	UFUNCTION(BlueprintCallable)
 	void SetServiceData(FServiceData _ServiceData);
+
+	UFUNCTION(BlueprintCallable)
+	void NotifySpawnPassenger(StationType Type, bool IsFree);
+	UFUNCTION(BlueprintCallable)
+	TMap<StationType, int32> GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, UPARAM(DisplayName = "StationId")int32 SID = -1);
+	UFUNCTION()
+	void SetPassengerSpawnEnable(bool Flag);
+	UFUNCTION()
+	bool GetPassengerSpawnEnable() const;
 
 	UFUNCTION()
 	void WeeklyTask() const;
@@ -168,6 +179,48 @@ protected:
 	int32 StationSpawnRange = 7;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassengerNotFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassengerFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	bool IsPassengerSpawnEnable = true;
 
 	//Policy Timer
 	/*UPROPERTY(BlueprintReadOnly)
