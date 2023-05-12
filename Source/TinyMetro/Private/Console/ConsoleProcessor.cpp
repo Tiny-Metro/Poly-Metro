@@ -219,8 +219,38 @@ FString AConsoleProcessor::CmdRepay(TArray<FString> Cmd, bool& Success) {
 	return result;
 }
 
+// complain_on : Start increase complain all stations
+// compalin_on {id} Start increase complain {id}'s station
 FString AConsoleProcessor::CmdComplainOn(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Complain on : ");
+	switch (Cmd.Num()) {
+	case 1: // complain_on
+		for (auto& i : StationManagerRef->GetAllStations()) {
+			i->SetComplainIncreaseEnable(true);
+		}
+		result += TEXT("Success");
+		break;
+	case 2: // complain_on {id}
+		if (Cmd[1].IsNumeric()) {
+			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
+			if (IsValid(stationRef)) {
+				stationRef->SetComplainIncreaseEnable(true);
+				result += TEXT("Success");
+			} else {
+				Success = false;
+				result += TEXT("Invalid station");
+			}
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
+	return result;
 }
 
 // complain_off : Stop increase complain all stations
@@ -232,12 +262,14 @@ FString AConsoleProcessor::CmdComplainOff(TArray<FString> Cmd, bool& Success) {
 		for (auto& i : StationManagerRef->GetAllStations()) {
 			i->SetComplainIncreaseEnable(false);
 		}
+		result += TEXT("Success");
 		break;
 	case 2: // complain_off {id}
 		if (Cmd[1].IsNumeric()) {
 			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
 			if (IsValid(stationRef)) {
 				stationRef->SetComplainIncreaseEnable(false);
+				result += TEXT("Success");
 			} else {
 				Success = false;
 				result += TEXT("Invalid station");
@@ -307,6 +339,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdRepay(splitStr, Success);
 		} else if (splitStr[0] == TEXT("complain_off")) {
 			Result = CmdComplainOff(splitStr, Success);
+		} else if (splitStr[0] == TEXT("complain_on")) {
+			Result = CmdComplainOn(splitStr, Success);
 		}
 	}
 
