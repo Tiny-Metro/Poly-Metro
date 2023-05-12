@@ -117,7 +117,7 @@ FString AConsoleProcessor::CmdAddStation(TArray<FString> Cmd, bool& Success) {
 			);
 			result += TEXT("Success");
 		} else {
-			result += TEXT("Fail");
+			result += TEXT("Incorrect input");
 		}
 		break;
 	case 3: // add_station {x} {y}
@@ -130,7 +130,7 @@ FString AConsoleProcessor::CmdAddStation(TArray<FString> Cmd, bool& Success) {
 			result += TEXT("Success");
 		} else {
 			Success = false;
-			result += TEXT("Fail");
+			result += TEXT("Incorrect input");
 		}
 		break;
 	case 4: // add_station {x} {y} {station type}
@@ -144,12 +144,12 @@ FString AConsoleProcessor::CmdAddStation(TArray<FString> Cmd, bool& Success) {
 			result += TEXT("Success");
 		} else {
 			Success = false;
-			result += TEXT("Fail");
+			result += TEXT("Incorrect input");
 		}
 		break;
 	default:
 		Success = false;
-		result += TEXT("Fail");
+		result += TEXT("Incorrect input");
 		break;
 	}
 	return result;
@@ -195,8 +195,28 @@ FString AConsoleProcessor::CmdInvestmentFail(TArray<FString> Cmd, bool& Success)
 	return FString();
 }
 
+// repay : Repay all loan
+// repay {id} : Repay loan selected {id}
 FString AConsoleProcessor::CmdRepay(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Repay : ");
+	switch (Cmd.Num()) {
+	case 1: // repay
+		break;
+	case 2: // repay {id}
+		if (Cmd[1].IsNumeric()) {
+
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
+
+	return result;
 }
 
 FString AConsoleProcessor::CmdComplainOn(TArray<FString> Cmd, bool& Success) {
@@ -255,6 +275,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			// TODO : investment_clear command
 		} else if (splitStr[0] == TEXT("investment_fail")) {
 			// TODO : investment_fail command
+		} else if (splitStr[0] == TEXT("repay")) {
+			Result = CmdRepay(splitStr, Success);
 		}
 	}
 
