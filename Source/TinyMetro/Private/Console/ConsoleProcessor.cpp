@@ -3,6 +3,7 @@
 
 #include "Console/ConsoleProcessor.h"
 #include "Station/StationManager.h"
+#include "GridGenerator/GridManager.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -20,6 +21,7 @@ void AConsoleProcessor::BeginPlay()
 	Super::BeginPlay();
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
 }
 
@@ -69,6 +71,7 @@ FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) 
 }
 
 FString AConsoleProcessor::CmdMoney(TArray<FString> Cmd, bool& Success) {
+	FString result = TEXT("Add Money : ");
 	if (Cmd.IsValidIndex(1)) {
 		if (Cmd[1].IsNumeric()) {
 			PlayerStateRef->AddMoney(FCString::Atoi(*Cmd[1]));
@@ -79,15 +82,76 @@ FString AConsoleProcessor::CmdMoney(TArray<FString> Cmd, bool& Success) {
 	} else {
 		Success = false;
 	}
-	return Success ? "Success" : "Fail";
+	result += Success ? TEXT("Success") : TEXT("Fail");
+	return result;
 }
 
 FString AConsoleProcessor::CmdOccurEvent(TArray<FString> Cmd, bool& Success) {
 	return FString();
 }
 
+// add_station : Spawn random station at random point
+// add_station {station type} : Spawn {station type} station at random point
+// add_station {x} {y} : Spawn random station at {x}, {y} point
+// add_station {x} {y} {station type} : Spawn {station type} station at {x}, {y} point
 FString AConsoleProcessor::CmdAddStation(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Add Station : ");
+	StationType sType;
+	switch (Cmd.Num()) {
+	case 1: // add_station
+		StationManagerRef->SpawnStation(
+			GridManagerRef->GetGridCellDataRandom(),
+			StationManagerRef->GetRandomStationType(),
+			false
+		);
+		result += TEXT("Success");
+		break;
+	case 2: // add_station {station type}
+		sType = StationManagerRef->StationTypeFromString(Cmd[1], Success);
+		if (Success) {
+			StationManagerRef->SpawnStation(
+				GridManagerRef->GetGridCellDataRandom(),
+				sType,
+				false
+			);
+			result += TEXT("Success");
+		} else {
+			result += TEXT("Fail");
+		}
+		break;
+	case 3: // add_station {x} {y}
+		if (Cmd[1].IsNumeric() && Cmd[2].IsNumeric()) {
+			StationManagerRef->SpawnStation(
+				GridManagerRef->GetGridCellDataByPoint(FCString::Atoi(*Cmd[1]), FCString::Atoi(*Cmd[2])),
+				StationManagerRef->GetRandomStationType(),
+				false
+			);
+			result += TEXT("Success");
+		} else {
+			Success = false;
+			result += TEXT("Fail");
+		}
+		break;
+	case 4: // add_station {x} {y} {station type}
+		sType = StationManagerRef->StationTypeFromString(Cmd[3], Success);
+		if (Cmd[1].IsNumeric() && Cmd[2].IsNumeric() && Success) {
+			StationManagerRef->SpawnStation(
+				GridManagerRef->GetGridCellDataByPoint(FCString::Atoi(*Cmd[1]), FCString::Atoi(*Cmd[2])),
+				sType,
+				false
+			);
+			result += TEXT("Success");
+		} else {
+			Success = false;
+			result += TEXT("Fail");
+		}
+		break;
+	default:
+		Success = false;
+		result += TEXT("Fail");
+		break;
+	}
+	return result;
 }
 
 FString AConsoleProcessor::CmdDeleteStation(TArray<FString> Cmd, bool& Success) {
@@ -142,6 +206,7 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 	TArray<FString> splitStr;
 	FString Result;
 	int arrSize = Cmd.ParseIntoArray(splitStr, TEXT(" "));
+	Success = true; // Initialize
 	for (auto& i : splitStr) {
 		i = i.ToLower();
 	}
@@ -153,6 +218,10 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdPassengerInfo(splitStr, Success);
 		} else if (splitStr[0] == TEXT("money")) {
 			Result = CmdMoney(splitStr, Success);
+		} else if (splitStr[0] == TEXT("event")) {
+			// TODO : Occur event
+		} else if (splitStr[0] == TEXT("add_station")) {
+			Result = CmdAddStation(splitStr, Success);
 		}
 	}
 

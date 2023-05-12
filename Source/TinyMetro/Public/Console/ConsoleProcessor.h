@@ -48,5 +48,7 @@ protected:
 	class AStationManager* StationManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATinyMetroPlayerState* PlayerStateRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class AGridManager* GridManagerRef;
 
 };
