@@ -393,8 +393,53 @@ FString AConsoleProcessor::CmdAddPassenger(TArray<FString> Cmd, bool& Success) {
 	return result;
 }
 
+// del_passenger : Remove random passenger for all stations
+// del_passenger {type} : Remove {type} passenger for all stations
+// del_passenger {id} : Remove random passenger for {id} station
+// del_passenger {type} {id} : Remove {type} passenger for {id} station
 FString AConsoleProcessor::CmdDeletePassenger(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Add passenger : ");
+	StationType sType;
+	switch (Cmd.Num()) {
+	case 1: // del_passenger
+		for (auto& i : StationManagerRef->GetAllStations()) {
+			i->DespawnRandomPassenger();
+		}
+		result += TEXT("Remove random passenger for all stations");
+		break;
+	case 2: // del_passenger {type} or del_passenger {id}
+		if (Cmd[1].IsNumeric()) { // del_passenger {id}
+			StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]))->DespawnRandomPassenger();
+			result += TEXT("Remove random passenger for a station");
+		} else {
+			sType = StationManagerRef->StationTypeFromString(Cmd[1], Success);
+			if (Success) { // del_passenger {type}
+				for (auto& i : StationManagerRef->GetAllStations()) {
+					i->DespawnPassenger(sType);
+				}
+				result += TEXT("Remove type passenger for all stations");
+			} else {
+				Success = false;
+				result += TEXT("Incorrect input");
+			}
+		}
+		break;
+	case 3: // del_passenger {type} {id}
+		sType = StationManagerRef->StationTypeFromString(Cmd[1], Success);
+		if (Success && Cmd[2].IsNumeric()) {
+			StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]))->DespawnPassenger(sType);
+			result += TEXT("Remove type passenger for a station");
+		} else {
+			Success = false;
+			result += TEXT("Incorrect input");
+		}
+		break;
+	default: // Incorrect input
+		Success = false;
+		result += TEXT("Incorrect input");
+		break;
+	}
+	return result;
 }
 
 FString AConsoleProcessor::CmdTogglePassengerSpawn(TArray<FString> Cmd, bool& Success) {
@@ -441,6 +486,8 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 			Result = CmdSkipTime(splitStr, Success);
 		} else if (splitStr[0] == TEXT("add_passenger")) {
 			Result = CmdAddPassenger(splitStr, Success);
+		} else if (splitStr[0] == TEXT("del_passenger")) {
+			Result = CmdDeletePassenger(splitStr, Success);
 		}
 	}
 
