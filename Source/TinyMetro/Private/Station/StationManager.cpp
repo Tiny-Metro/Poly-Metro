@@ -363,6 +363,10 @@ AStation* AStationManager::GetStationById(int32 Id) {
 	return nullptr;
 }
 
+TArray<AStation*> AStationManager::GetAllStations() {
+	return Station;
+}
+
 PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
 	if (ShortestPath.Find(Start) == nullptr) {
 		return PathQueue();

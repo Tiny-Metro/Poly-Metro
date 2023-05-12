@@ -89,6 +89,8 @@ public:
 	AStation* GetStationByStationInfo(FStationInfo Info);
 	UFUNCTION(BlueprintCallable)
 	AStation* GetStationById(int32 Id);
+	UFUNCTION(BlueprintCallable)
+	TArray<AStation*> GetAllStations();
 
 	PathQueue GetShortestPath(int32 Start, StationType Type);
 
