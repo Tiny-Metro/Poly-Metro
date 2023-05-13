@@ -44,6 +44,25 @@ void ALane::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	//Delay Removing
+	if (DoesLaneToBeRemoved)
+	{
+		FinishClearingLane();
+		DoesLaneToBeRemoved = false;
+	}
+
+	if (DoesStationsToBeRemovedAtStart)
+	{
+
+	}
+
+	if (DoesStationsToBeRemovedAtEnd)
+	{ 
+		FinishRemovingLaneAtEnd();
+		DoesStationsToBeRemovedAtEnd = false;
+	}
+
 }
 
 void ALane::SetLaneId(int _LaneId)
@@ -359,7 +378,39 @@ void ALane::ExtendLane_Implementation() {}
 
 void ALane::FinishRemovingLaneAtStart_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
 
-void ALane::FinishRemovingLaneAtEnd_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+void ALane::FinishRemovingLaneAtEnd_Implementation() {}
+
+void ALane::FinishClearingLane_Implementation() {}
+
+
+
+bool ALane::CheckTrainsByDestination(const TArray <class AStation*>& Stations)
+{
+	bool res = false;
+
+	for (AStation* Station : Stations)
+	{
+		int32 tmp = TrainManagerRef->GetStationsByDestination(Station->GetStationInfo(), this).Num();
+
+
+		if (tmp != 0)
+		{
+			res = true;
+			break;
+		}
+	}
+
+	return res;
+}
+
+void ALane::NotifyTrainsOfRemoving(const TArray<class AStation*>& Stations)
+{
+	for (AStation* Station : Stations)
+	{
+		TrainManagerRef->TrainDeferredDespawn(Station->GetStationInfo(), this);
+		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, FString::Printf(TEXT("DEBUG")));
+	}
+}
 
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {

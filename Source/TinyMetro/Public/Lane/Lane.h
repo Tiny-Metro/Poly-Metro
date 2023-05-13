@@ -140,10 +140,41 @@ public : // BlueprintNativeEvent
 	void FinishRemovingLaneAtStart(const TArray <class AStation*>& Stations, const int32 Index);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void FinishRemovingLaneAtEnd(const TArray <class AStation*>& Stations, const int32 Index);
-	
-public: // About Train
+	void FinishRemovingLaneAtEnd();
+	virtual void FinishRemovingLaneAtEnd_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FinishClearingLane();
+	virtual void FinishClearingLane_Implementation();
+
+public: //Delay Removing
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationsToBeRemovedAtEnd;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationsToBeRemovedAtStart;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationPointBeforeRemoved;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool DoesStationsToBeRemovedAtStart= false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool DoesStationsToBeRemovedAtEnd = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool DoesLaneToBeRemoved = false;
+
+	UFUNCTION(BlueprintCallable)
+	bool CheckTrainsByDestination(const TArray <class AStation*>& Stations);
+
+	UFUNCTION(BlueprintCallable)
+	void NotifyTrainsOfRemoving(const TArray <class AStation*>& Stations);
+
+
+public: // About Train
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction);
 
