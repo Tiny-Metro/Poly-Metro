@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "InvestmentResult.h"
 #include "InvestmentData.generated.h"
 
 /**
@@ -14,14 +15,13 @@ struct TINYMETRO_API FInvestmentData
 {
 	GENERATED_BODY()
 	FInvestmentData() = default;
-	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString DepositMessage, FString AwardMessage, FString RewardMessage, TFunction<void(void)> TestFunc) :
+	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString DepositMessage, FString AwardMessage, FString RewardMessage) :
 		Title(Title),
 		Content(Content),
 		TimeRequire(TimeRequire),
 		DepositMessage(DepositMessage),
 		AwardMessage(AwardMessage),
-		RewardMessage(RewardMessage),
-		TestFunc(TestFunc){ }
+		RewardMessage(RewardMessage){ }
 
 	// Investmet title
 	UPROPERTY(BlueprintReadOnly)
@@ -40,6 +40,4 @@ struct TINYMETRO_API FInvestmentData
 	// Investment fail
 	UPROPERTY(BlueprintReadOnly)
 	FString RewardMessage;
-
-	TFunction<void(void)> TestFunc;
 };
