@@ -3,36 +3,40 @@
 
 #include "Finance/Investment.h"
 
-void UInvestment::SetInvestmentData(FInvestmentData Data) {
-	InvestmentData = Data;
+UInvestment* UInvestment::CreateInvestment(FInvestmentData Data, int32 Daytime, TFunction<void(void)> Start, TFunction<void(void)> Success, TFunction<void(void)> Fail, TFunction<InvestmentState(void)> Check){
+	UInvestment* Obj = NewObject<UInvestment>();
+	Obj->SetInvestmentData(Data);
+	Obj->SetDaytime(Daytime);
+	Obj->SetAcceptAction(Start);
+	Obj->SetSuccessAction(Success);
+	Obj->SetFailAction(Fail);
+	Obj->SetStateCheckFunction(Check);
+	
+	return Obj;
 }
 
 void UInvestment::SetDaytime(int32 T) {
 	Daytime = T;
 }
 
-void UInvestment::SetPlayerState(ATinyMetroPlayerState* P) {
-	PlayerState = P;
+void UInvestment::SetInvestmentData(FInvestmentData Data) {
+	InvestmentData = Data;
 }
 
-void UInvestment::SetWorld(UWorld* W) {
-	World = W;
+void UInvestment::SetAcceptAction(TFunction<void(void)> Action) {
+	AcceptAction = Action;
 }
 
-void UInvestment::SetSuccessFunction(TFunction<bool(void)> Func) {
-	CheckSuccess = Func;
+void UInvestment::SetSuccessAction(TFunction<void(void)> Action) {
+	SuccessAction = Action;
 }
 
-void UInvestment::InvestmentSuccess() {
-
-	State = InvestmentState::Success;
-	InitInvestment();
+void UInvestment::SetFailAction(TFunction<void(void)> Action) {
+	FailAction = Action;
 }
 
-void UInvestment::InvestmentFail() {
-
-	State = InvestmentState::Fail;
-	InitInvestment();
+void UInvestment::SetStateCheckFunction(TFunction<InvestmentState(void)> Check) {
+	ConditionCheckFunction = Check;
 }
 
 void UInvestment::InvestmentStart() {
@@ -40,49 +44,39 @@ void UInvestment::InvestmentStart() {
 }
 
 void UInvestment::InitInvestment() {
-	World->GetTimerManager().ClearTimer(InvestmentTimeHandle);
-	World->GetTimerManager().ClearTimer(InvestmentSuccessHandle);
-	IsActivate = false;
+	State = InvestmentState::Ready;
 	RemainTime = InvestmentData.TimeRequire;
 }
 
-void UInvestment::ActivateInvestment() {
-	IsActivate = true;
-	World->GetTimerManager().SetTimer(
-		InvestmentTimeHandle,
-		FTimerDelegate::CreateLambda([&RemainTime = RemainTime, this]() {
-			if (RemainTime == 0) {
-				this->InvestmentFail();
-			} else {
-				RemainTime--;
+InvestmentState UInvestment::CheckInvestmentProcess(float DeltaTime) {
+	if (State == InvestmentState::Processing) {
+		switch (ConditionCheckFunction()) {
+		case InvestmentState::Fail:
+			FailAction();
+			return InvestmentState::Fail;
+		case InvestmentState::Success:
+			if (ElapseTime >= Daytime * InvestmentData.TimeRequire) { // Time over : Success
+				SuccessAction();
+				return InvestmentState::Success;
+			} else { // Process investment
+				return InvestmentState::Processing;
 			}
-			
+		default:
+			return InvestmentState::Processing;
+		}
+	}
 
-			}),
-		Daytime,
-		true,
-		Daytime - (FMath::Fmod(World->GetTimeSeconds(), Daytime))
-	);
+	return InvestmentState::Ready;
+}
 
-	World->GetTimerManager().SetTimer(
-		InvestmentSuccessHandle,
-		FTimerDelegate::CreateLambda([&CheckSuccess = CheckSuccess, this]() {
-			if (CheckSuccess()) {
-				this->InvestmentSuccess();
-			}
-		}),
-		0.3f,
-		true,
-		0.0f
-	);
+void UInvestment::NotifyDailyTask() {
+	if (State == InvestmentState::Processing) {
+		ElapseTime += Daytime;
+	}
 }
 
 FInvestmentData UInvestment::GetInvestmentData() const {
 	return InvestmentData;
-}
-
-bool UInvestment::GetIsActivate() const {
-	return IsActivate;
 }
 
 InvestmentState UInvestment::GetState() const {
