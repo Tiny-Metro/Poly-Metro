@@ -26,7 +26,7 @@ TArray<UInvestment*> ABank::GetAllInvestment() const {
 
 TArray<UInvestment*> ABank::GetAvailableInvestment() const {
 	TArray<UInvestment*> temp;
-	for (auto i : AvailInvestment) {
+	for (auto& i : AvailInvestment) {
 		temp.Emplace(Investment[i]);
 	}
 	return temp;
@@ -100,13 +100,236 @@ void ABank::InitLoan() {
 }
 
 void ABank::InitInvestment() {
-	TArray<TPair<FInvestmentData, TFunction<bool(void)>>> InvestmentArr;
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("0환승 시스템 요청"),
+			TEXT("0대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
 
-	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 300, 300, 100, TEXT("Message : 1")), []() {
+		},
+		[]() {
 
-		return false;
-		}));
-	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(10, 300, 500, 700, TEXT("Message : 2")), []() {
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("1환승 시스템 요청"),
+			TEXT("1대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("2환승 시스템 요청"),
+			TEXT("2대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("3환승 시스템 요청"),
+			TEXT("3대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("4환승 시스템 요청"),
+			TEXT("4대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("5환승 시스템 요청"),
+			TEXT("5대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("6환승 시스템 요청"),
+			TEXT("6대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("7환승 시스템 요청"),
+			TEXT("7대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("8환승 시스템 요청"),
+			TEXT("8대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+	Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("9환승 시스템 요청"),
+			TEXT("9대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다."),
+			20,
+			TEXT("+300"),
+			TEXT("+300"),
+			TEXT("-300")),
+		Daytime,
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+
+		},
+		[]() {
+			return InvestmentState::Processing;
+		}
+	));
+
+	//InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(
+	//	Tmp,
+	//	[]() {
+
+	//		return false;
+	//		}
+	//	)
+	//);
+	/*InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(10, 300, 500, 700, TEXT("Message : 2")), []() {
 
 		return false;
 		}));
@@ -141,22 +364,22 @@ void ABank::InitInvestment() {
 	InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(FInvestmentData(20, 50, 150, 70, TEXT("Message : 10")), []() {
 
 		return false;
-		}));
+		}));*/
 
-	for (auto& i : InvestmentArr) {
+	/*for (auto& i : InvestmentArr) {
 		Investment.Add(this->CreateInvestment(i.Key, i.Value));
-	}
+	}*/
 }
 
-UInvestment* ABank::CreateInvestment(FInvestmentData Data, TFunction<bool(void)> Func) {
-	UInvestment* temp = NewObject<UInvestment>();
-	temp->SetInvestmentData(Data);
-	temp->SetDaytime(Daytime);
-	temp->SetPlayerState(PlayerState);
-	temp->SetWorld(GetWorld());
-	temp->SetSuccessFunction(Func);
-	return temp;
-}
+//UInvestment* ABank::CreateInvestment(FInvestmentData Data, TFunction<InvestmentResult(void)> Func) {
+//	UInvestment* temp = NewObject<UInvestment>();
+//	temp->SetInvestmentData(Data);
+//	temp->SetDaytime(Daytime);
+//	temp->SetPlayerState(PlayerState);
+//	temp->SetWorld(GetWorld());
+//	temp->SetSuccessFunction(Func);
+//	return temp;
+//}
 
 // Replace investment at Index
 // If Index = -1, add investment at last
@@ -168,7 +391,7 @@ void ABank::ChangeInvestment(int Index = -1) {
 
 	// Select remove index
 	for (auto& i : AvailInvestment) {
-		if (!Investment[i]->GetIsActivate()) {
+		if (Investment[i]->GetState() != InvestmentState::Processing) {
 			removeIndex = i;
 			break;
 		}
@@ -207,7 +430,7 @@ void ABank::ChangeAllInvestment() {
 	do {
 		AvailIndex = FMath::RandRange(0, Investment.Num() - 1);
 		int Idx = AvailInvestment[Flag];
-		if (Investment[Idx]->GetIsActivate()) {
+		if (Investment[Idx]->GetState() == InvestmentState::Processing) {
 			Temp.Emplace(Idx);
 			Flag++;
 		} else {
@@ -246,6 +469,12 @@ void ABank::UpdateInvestment() {
 		true,
 		(Daytime * 7) - (FMath::Fmod(GetWorld()->GetTimeSeconds(), Daytime * 7))
 	);*/
+}
+
+void ABank::DailyTask() {
+	for (auto& i : Investment) {
+		i->NotifyDailyTask();
+	}
 }
 
 void ABank::Tick(float DeltaTime)

@@ -40,6 +40,8 @@ public:
 	TArray<UInvestment*> RefreshInvestment();
 	UFUNCTION(BlueprintCallable)
 	void UpdateInvestment();
+	UFUNCTION(BlueprintCallable)
+	void DailyTask();
 
 
 protected:
@@ -49,7 +51,7 @@ protected:
 protected:
 	// Function investment
 	void InitInvestment();
-	UInvestment* CreateInvestment(FInvestmentData Data, TFunction<bool(void)> Func);
+	//UInvestment* CreateInvestment(FInvestmentData Data, TFunction<InvestmentResult(void)> Func);
 	void ChangeInvestment(int Index);
 	void ChangeAllInvestment();
 
