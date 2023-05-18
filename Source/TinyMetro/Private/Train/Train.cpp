@@ -121,6 +121,17 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		auto Station = Cast<AStation>(OtherActor);
 		// Check passing station
 		if (Station->GetLanes().Contains(ServiceLaneId)) {
+
+			
+
+			if (DeferredDespawn) {
+				for (auto& i : Subtrains) {
+					i->DespawnTrain();
+				}
+				DespawnTrain();
+				return;
+			}
+
 			// Set current, next Station
 			SetCurrentStation(Station->GetStationInfo());
 			SetNextStation(LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(

@@ -173,6 +173,9 @@ public: //Delay Removing
 	UFUNCTION(BlueprintCallable)
 	void NotifyTrainsOfRemoving(const TArray <class AStation*>& Stations);
 
+	UFUNCTION(BlueprintCallable)
+	void ModifyStationInfoWhenRemoving(const TArray <class AStation*>& Stations);
+
 
 public: // About Train
 	UFUNCTION(BlueprintCallable)
@@ -199,7 +202,7 @@ public: // About Train
 //REFACTORING SETLANEARRAY
 
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Lane")
+	UPROPERTY(BlueprintReadWrite,VisibleAnyWhere, Category = "Lane")
 	TArray<FLanePoint> RLaneArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

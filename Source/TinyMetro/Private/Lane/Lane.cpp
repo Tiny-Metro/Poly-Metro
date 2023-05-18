@@ -59,8 +59,8 @@ void ALane::Tick(float DeltaTime)
 
 	if (DoesStationsToBeRemovedAtEnd)
 	{ 
+		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("Stations Have To Be Removed At End"));
 		FinishRemovingLaneAtEnd();
-		DoesStationsToBeRemovedAtEnd = false;
 	}
 
 }
@@ -409,6 +409,16 @@ void ALane::NotifyTrainsOfRemoving(const TArray<class AStation*>& Stations)
 	{
 		TrainManagerRef->TrainDeferredDespawn(Station->GetStationInfo(), this);
 		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, FString::Printf(TEXT("DEBUG")));
+	}
+}
+
+void ALane::ModifyStationInfoWhenRemoving(const TArray <class AStation*>& Stations)
+{
+	for (AStation* Station : Stations)
+	{
+		
+		Station->SetActivate(false);
+		Station->RemoveLane(LaneId);
 	}
 }
 
