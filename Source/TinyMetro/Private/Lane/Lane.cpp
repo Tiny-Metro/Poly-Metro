@@ -53,7 +53,7 @@ void ALane::Tick(float DeltaTime)
 
 	if (DoesStationsToBeRemovedAtStart)
 	{
-
+		FinishRemovingLaneAtStart();
 	}
 
 	if (DoesStationsToBeRemovedAtEnd)
@@ -375,7 +375,7 @@ void ALane::InitializeNewLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
-void ALane::FinishRemovingLaneAtStart_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+void ALane::FinishRemovingLaneAtStart_Implementation() {}
 
 void ALane::FinishRemovingLaneAtEnd_Implementation() {}
 
@@ -419,6 +419,23 @@ void ALane::ModifyStationInfoWhenRemoving(const TArray <class AStation*>& Statio
 		Station->SetActivate(false);
 		Station->RemoveLane(LaneId);
 	}
+}
+
+TArray<class AStation *> ALane::CollectEveryStations()
+{
+	TArray<AStation* > EveryStations;
+
+	for(auto Station : StationPointBeforeRemovedStart)
+	{
+		EveryStations.Add(Station);
+	}
+
+	for(auto Station : StationPointBeforeRemovedEnd)
+	{
+		EveryStations.AddUnique(Station);
+	}
+
+	return EveryStations;
 }
 
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)

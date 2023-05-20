@@ -137,7 +137,8 @@ public : // BlueprintNativeEvent
 	virtual void ExtendLane_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void FinishRemovingLaneAtStart(const TArray <class AStation*>& Stations, const int32 Index);
+	void FinishRemovingLaneAtStart();
+	virtual void FinishRemovingLaneAtStart_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FinishRemovingLaneAtEnd();
@@ -156,7 +157,10 @@ public: //Delay Removing
 	TArray <AStation*> StationsToBeRemovedAtStart;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray <AStation*> StationPointBeforeRemoved;
+	TArray <AStation*> StationPointBeforeRemovedEnd;
+	
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationPointBeforeRemovedStart;
 
 	UPROPERTY(BlueprintReadWrite)
 	bool DoesStationsToBeRemovedAtStart= false;
@@ -175,6 +179,9 @@ public: //Delay Removing
 
 	UFUNCTION(BlueprintCallable)
 	void ModifyStationInfoWhenRemoving(const TArray <class AStation*>& Stations);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<class AStation*> CollectEveryStations();
 
 
 public: // About Train
