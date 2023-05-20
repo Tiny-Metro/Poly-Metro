@@ -49,7 +49,6 @@ void ALane::Tick(float DeltaTime)
 	if (DoesLaneToBeRemoved)
 	{
 		FinishClearingLane();
-		DoesLaneToBeRemoved = false;
 	}
 
 	if (DoesStationsToBeRemovedAtStart)
