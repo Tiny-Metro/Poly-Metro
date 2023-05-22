@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../../GridGenerator/GridManager.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -32,4 +33,17 @@ public:
 	void DisconnectBT(const TArray<FIntPoint>& points);
 	virtual void DisconnectBT_Implementation(const TArray<FIntPoint>& points);
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AGridManager* GridManagerRef;
+
+
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CreateNewBridge(const TArray<FIntPoint>& points);
+	virtual void CreateNewBridge_Implementation(const TArray<FIntPoint>& points);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CreateNewTunnel(const TArray<FIntPoint>& points);
+	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points);
 };
