@@ -5,7 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../../GridGenerator/GridManager.h"
-//#include "StructureData.h"
+#include "../../PlayerState/TinyMetroPlayerState.h"
+#include "ConnectorType.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -38,9 +39,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 
-//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-//	TArray<FStructureData> BNTArray;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ATinyMetroPlayerState* PlayerStateRef;
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -50,4 +50,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CreateNewTunnel(const TArray<FIntPoint>& points);
 	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points);
+
+	
+	UFUNCTION(BlueprintCallable)
+	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points);
+
+	UFUNCTION(BlueprintCallable)
+	void ReturnItem(ConnectorType type);
+	/*
+	*/
 };
