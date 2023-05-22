@@ -153,6 +153,19 @@ TArray<ATrainTemplate*> ATrainManager::GetStationsByDestination(FStationInfo Sta
 	return arr;
 }
 
+int32 ATrainManager::GetStationCountByDestination(FStationInfo Station, ALane* Lane) {
+	TArray<ATrainTemplate*> arr;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->GetNextStation() == Station &&
+				i->GetServiceLaneId() == Lane->GetLaneId()) {
+				arr.Add(i);
+			}
+		}
+	}
+	return arr.Num();
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {
