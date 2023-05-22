@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../../GridGenerator/GridManager.h"
+//#include "StructureData.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -36,6 +37,9 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
+
+//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+//	TArray<FStructureData> BNTArray;
 
 
 public:
