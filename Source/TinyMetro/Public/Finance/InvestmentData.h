@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "InvestmentResult.h"
 #include "InvestmentData.generated.h"
 
 /**
@@ -15,29 +14,34 @@ struct TINYMETRO_API FInvestmentData
 {
 	GENERATED_BODY()
 	FInvestmentData() = default;
-	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString DepositMessage, FString AwardMessage, FString RewardMessage) :
+	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString RequireText, FString AcceptMessage, FString AwardMessage, FString RewardMessage) :
 		Title(Title),
 		Content(Content),
 		TimeRequire(TimeRequire),
-		DepositMessage(DepositMessage),
+		RequireText(RequireText),
+		AcceptMessage(AcceptMessage),
 		AwardMessage(AwardMessage),
 		RewardMessage(RewardMessage){ }
 
 	// Investmet title
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString Title;
-	// Detail explain
-	UPROPERTY(BlueprintReadOnly)
+	// Flavor text
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString Content;
-	UPROPERTY(BlueprintReadOnly)
+	// Require day
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 TimeRequire;
+	// Require condition
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString RequireText;
 	// Deposit of investment
-	UPROPERTY(BlueprintReadOnly)
-	FString DepositMessage;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString AcceptMessage;
 	// Investment success
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString AwardMessage;
 	// Investment fail
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString RewardMessage;
 };
