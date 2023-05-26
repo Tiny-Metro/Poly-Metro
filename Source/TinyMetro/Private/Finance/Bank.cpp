@@ -3,6 +3,8 @@
 
 #include "Finance/Bank.h"
 #include "Sample/SampleTimer.h"
+#include "Station/StationManager.h"
+#include "Finance/InvestmentLuaState.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -42,11 +44,17 @@ void ABank::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Set daytime
-	Daytime = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetDaytime();
+	// Set GameMode
+	GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
 
 	// Set PlayerState
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
+	// Set daytime
+	Daytime = GameModeRef->GetDaytime();
+
+	// Set lua state
+	LuaState = UInvestmentLuaState::CreateInstance(GetWorld());
 
 	// Set loan data
 	InitLoan();
@@ -100,226 +108,272 @@ void ABank::InitLoan() {
 }
 
 void ABank::InitInvestment() {
+
+	TArray<FString> findFiles;
+	FString scriptDir = FPaths::ProjectContentDir()
+		.Append(TEXT("Script"))
+		.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
+		.Append(TEXT("Investment"));
+	FRegexPattern pattern(TEXT("Investment\\.[1-9]\\d{3}\\.lua"));
+	FPlatformFileManager::Get().GetPlatformFile().FindFiles(findFiles, *scriptDir, TEXT("lua"));
+	for (auto& i : findFiles) {
+		FRegexMatcher matcher(pattern, i);
+		if (matcher.FindNext()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
+				FString::Printf(TEXT("Files : %s"), *FPaths::GetCleanFilename(i)));
+			Investment.Add(UInvestment::CreateInvestment(FPaths::GetCleanFilename(i), LuaState, GetWorld()));
+		}
+	}
+	
+	/*Investment.Add(UInvestment::CreateInvestment(
+		FInvestmentData(
+			TEXT("í™˜ìŠ¹ ì‹œìŠ¤í…œ ìš”ì²­"),
+			TEXT("ëŒ€ì¤‘êµí†µ ê°„ í™˜ìŠ¹ ì‹œìŠ¤í…œì„ ë„ìž…í•´ì•¼ í•œë‹¤ëŠ” ëª©ì†Œë¦¬ê°€ ì»¤ì§€ê³  ìžˆìŠµë‹ˆë‹¤. ì •ë¶€ì—ì„œëŠ” í™˜ìŠ¹ ì‹œìŠ¤í…œì„ 20ì¼ê°„ ì‹œë²” ë„ìž…í•˜ëŠ” ë°©ì•ˆì„ ê³ ë ¤í•˜ê³  ìžˆìŠµë‹ˆë‹¤."),
+			20,
+			TEXT("í™˜ìŠ¹ ì‹œìŠ¤í…œ 20ì¼ ë™ì•ˆ í™œì„±í™”"),
+			TEXT("+300$"),
+			TEXT("+300$, 7ì¼ê°„ ìŠ¹ê° 20% ì¦ê°€"),
+			TEXT("-300$, 7ì¼ê°„ ìŠ¹ê° 20% ê°ì†Œ")),
+		Daytime,
+		[PlayerState = PlayerState]() {
+			PlayerState->AddMoney(300);
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 0"));
+		},
+		[PlayerState = PlayerState, StationManagerRef = GameModeRef->GetStationManager()]() {
+			PlayerState->AddMoney(300);
+			StationManagerRef->AddPassengerSpawnProbability(0.2f, 7);
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 0"));
+		},
+		[PlayerState = PlayerState, StationManagerRef = GameModeRef->GetStationManager()]() {
+			PlayerState->AddMoney(-600);
+			StationManagerRef->AddPassengerSpawnProbability(-0.2f, 7);
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 0"));
+		},
+		[PolicyRef = GameModeRef->GetPolicy()]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 0"));
+			if (PolicyRef->GetTransfer()) {
+				return InvestmentState::Success;
+			} else {
+				return InvestmentState::Fail;
+			}
+		}
+	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("0È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("0´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
-			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("ì—­ í›„ë³´ì§€ í™œì„±í™”"),
+			TEXT("â€œìš°ë¦¬ ì§‘ ì•žì—ë„ ì—­ì„ ë§Œë“¤ì–´ ë‹¬ë¼!â€ ì—­ ì¶”ê°€ ê±´ì„¤ì— ëŒ€í•œ ìš”êµ¬ê°€ ì‡„ë„í•˜ê³  ìžˆìŠµë‹ˆë‹¤. ìƒˆ ì—­ ê±´ì„¤ì— ì—¬ëŸ¬ íšŒì‚¬ë“¤ì´ íˆ¬ìží•˜ê² ë‹¤ê³  ì œì•ˆí–ˆìŠµë‹ˆë‹¤."),
+			10,
+			TEXT("10ì¼ ì´ë‚´ ì—­ í›„ë³´ì§€ í™œì„±í™”"),
+			TEXT("+300$"),
+			TEXT("+500$, ì—­ í›„ë³´ì§€ì˜ ë¶ˆë§Œë„ 5% ê°ì†Œ"),
+			TEXT("-100$, ì—­ í›„ë³´ì§€ì˜ ë¶ˆë§Œë„ 5% ì¦ê°€")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 1"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 1"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 1"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 1"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("1È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("1´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
+			TEXT("ì—˜ë¦¬ë² ì´í„° ì„¤ì¹˜"),
+			TEXT("ë…¸ì•½ìžì™€ ìž¥ì• ì¸ ë“± êµí†µì•½ìžë“¤ì´ ì—­ì„ ì´ìš©í•˜ëŠ”ë° ì–´ë ¤ì›€ì„ ê²ªê³  ìžˆìŠµë‹ˆë‹¤. ì •ë¶€ì—ì„œëŠ” ì—˜ë¦¬ë² ì´í„° ì„¤ì¹˜ì— ëŒ€í•´ ì§€ì›ì„ ì•½ì†í–ˆìŠµë‹ˆë‹¤."),
 			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("20ì¼ ì´ë‚´ ì—˜ë¦¬ë² ì´í„° ì„¤ì¹˜"),
+			TEXT("+1,000$, ìŠ¹ê° 50% ì¦ê°€"),
+			TEXT("+3,000$"),
+			TEXT("-2,000$")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 2"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 2"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 2"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 2"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("2È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("2´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
+			TEXT("CCTV ì„¤ì¹˜"),
+			TEXT("ì§€í•˜ì²  ë²”ì£„ê°€ ê¸°ìŠ¹ì„ ë¶€ë¦¬ê³  ìžˆìŠµë‹ˆë‹¤. ë²”ì£„ìœ¨ì„ ë‚®ì¶”ê¸° ìœ„í•´ CCTVë¥¼ ì„¤ì¹˜í•´ì•¼ í•œë‹¤ëŠ” ì˜ê²¬ì´ ì œê¸°ë˜ì—ˆìŠµë‹ˆë‹¤."),
 			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("20ì¼ ì´ë‚´ CCTV ì„¤ì¹˜"),
+			TEXT("+1,000$, ìŠ¹ê° 50% ì¦ê°€"),
+			TEXT("+3,000$"),
+			TEXT("-2,000$")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 3"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 3"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 3"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 3"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("3È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("3´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
+			TEXT("ë…¸ì•½ìžì„/ìž„ì‚°ë¶€ì„ ì„¤ì¹˜"),
+			TEXT("êµí†µì•½ìžë¥¼ ìœ„í•´ ë…¸ì•½ìžì„ê³¼ ìž„ì‚°ë¶€ì„ì„ ì„¤ì¹˜í•´ì•¼ í•œë‹¤ëŠ” ì˜ê²¬ì´ ëŒ€ë‘ë˜ê³  ìžˆìŠµë‹ˆë‹¤."),
 			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("20ì¼ ì´ë‚´ ë…¸ì•½ìžì„/ìž„ì‚°ë¶€ì„ ì„¤ì¹˜"),
+			TEXT("+1,000$, ìŠ¹ê° 50% ì¦ê°€"),
+			TEXT("+3,000$"),
+			TEXT("-2,000$")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 4"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 4"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 4"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 4"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("4È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("4´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
+			TEXT("ë…¸ì„  ì¶”ê°€"),
+			TEXT("ë„ì‹œê°€ ì„±ìž¥í•´ë‚˜ê°ì— ë”°ë¼ ìƒˆë¡œìš´ ë…¸ì„  ê°œí†µì˜ í•„ìš”ì„±ì´ ì œê¸°ë˜ì—ˆìŠµë‹ˆë‹¤. ìƒˆ ë…¸ì„ ì„ ê±´ì„¤í•˜ëŠ”ë° íˆ¬ìží•˜ê¸° ìœ„í•œ ì»¨ì†Œì‹œì—„ì´ êµ¬ì„±ë˜ì—ˆìŠµë‹ˆë‹¤."),
 			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("20ì¼ ì´ë‚´ ì‹ ê·œ ë…¸ì„  ìƒì„±"),
+			TEXT("+300$"),
+			TEXT("+1,500$"),
+			TEXT("-500$")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 5"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 5"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 5"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 5"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("5È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("5´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
-			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("ë™ì°¨ ì¶”ê°€"),
+			TEXT("í˜¸ì„ ì— ìŠ¹ê°ì´ ëª°ë ¤ ë°°ì°¨ ê°„ê²©ì— ëŒ€í•œ ë¶ˆë§Œì´ ê¸‰ì¦í•˜ê³  ìžˆìŠµë‹ˆë‹¤. ë™ì°¨ë¥¼ ì¶”ê°€ì ìœ¼ë¡œ ë°°ì¹˜í•˜ëŠ” ë°©ì•ˆì— ëŒ€í•´ ê³ ë ¤í•´ì•¼ í•  ì‹œì ìž…ë‹ˆë‹¤."),
+			10,
+			TEXT("10ì¼ ì´ë‚´ í•´ë‹¹ ë…¸ì„ ì— ë™ì°¨ 1ê°œ ì¶”ê°€"),
+			TEXT("+50$"),
+			TEXT("+150$"),
+			TEXT("-70$")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 6"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 6"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 6"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 6"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("6È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("6´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
-			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("ìŠ¹ê° ìˆ˜ì†¡"),
+			TEXT("ëŒ€ì¤‘êµí†µ í™˜ê²½ í‰ê°€ ê¸°ê°„ìž…ë‹ˆë‹¤. ìŠ¹ê°ì„ ìµœëŒ€í•œ ë§Žì´ ëª©ì ì§€ë¡œ ëª¨ì…” ì¢‹ì€ í‰ê°€ë¥¼ ë°›ë„ë¡ ë…¸ë ¥í•´ì•¼ í•©ë‹ˆë‹¤."),
+			10,
+			TEXT("10ì¼ ì´ë‚´ ìŠ¹ê° Nëª… ëª©í‘œ ì§€ì—­ìœ¼ë¡œ ìˆ˜ì†¡"),
+			TEXT("ìŠ¹ê° 40% ì¦ê°€"),
+			TEXT("+100$, í•´ë‹¹ ì—­ ë¶ˆë§Œë„ 5% ê°ì†Œ"),
+			TEXT("-40$, ì—­ ë¶ˆë§Œë„ 5% ì¦ê°€")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 7"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 7"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 7"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 7"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("7È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("7´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
+			TEXT("ë™ì°¨/ê°ì°¨ ì—…ê·¸ë ˆì´ë“œ"),
+			TEXT("ìŠ¹ê°ë“¤ì´ ì¢ì€ ì—´ì°¨ ì•ˆì—ì„œ ì‹ ìŒí•˜ê³  ìžˆìŠµë‹ˆë‹¤. ì—´ì°¨ì˜ ìˆ˜ì†¡ ì¸ì›ì„ ëŠ˜ë¦¬ê¸° ìœ„í•´ ìƒˆ ì—´ì°¨ ë„ìž…ì´ ê³ ë ¤ë˜ê³  ìžˆìŠµë‹ˆë‹¤."),
 			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
+			TEXT("10ì¼ ì´ë‚´ ë™ì°¨ í˜¹ì€ ê°ì°¨ 3ê°œ ì—…ê·¸ë ˆì´ë“œ"),
+			TEXT("+100$"),
+			TEXT("+500$"),
+			TEXT("-300$")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 8"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 8"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 8"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 8"));
 			return InvestmentState::Processing;
 		}
 	));
 	Investment.Add(UInvestment::CreateInvestment(
 		FInvestmentData(
-			TEXT("8È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("8´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
+			TEXT("9í™˜ìŠ¹ ì‹œìŠ¤í…œ ìš”ì²­"),
+			TEXT("9ëŒ€ì¤‘êµí†µ ê°„ í™˜ìŠ¹ ì‹œìŠ¤í…œì„ ë„ìž…í•´ì•¼ í•œë‹¤ëŠ” ëª©ì†Œë¦¬ê°€ ì»¤ì§€ê³  ìžˆìŠµë‹ˆë‹¤. ì •ë¶€ì—ì„œëŠ” í™˜ìŠ¹ ì‹œìŠ¤í…œì„ 20ì¼ê°„ ì‹œë²” ë„ìž…í•˜ëŠ” ë°©ì•ˆì„ ê³ ë ¤í•˜ê³  ìžˆìŠµë‹ˆë‹¤."),
 			20,
+			TEXT("+300"),
 			TEXT("+300"),
 			TEXT("+300"),
 			TEXT("-300")),
 		Daytime,
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Start 9"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Success 9"));
 		},
 		[]() {
-
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Fail 9"));
 		},
 		[]() {
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, TEXT("Check 9"));
 			return InvestmentState::Processing;
 		}
-	));
-	Investment.Add(UInvestment::CreateInvestment(
-		FInvestmentData(
-			TEXT("9È¯½Â ½Ã½ºÅÛ ¿äÃ»"),
-			TEXT("9´ëÁß±³Åë °£ È¯½Â ½Ã½ºÅÛÀ» µµÀÔÇØ¾ß ÇÑ´Ù´Â ¸ñ¼Ò¸®°¡ Ä¿Áö°í ÀÖ½À´Ï´Ù. Á¤ºÎ¿¡¼­´Â È¯½Â ½Ã½ºÅÛÀ» 20ÀÏ°£ ½Ã¹ü µµÀÔÇÏ´Â ¹æ¾ÈÀ» °í·ÁÇÏ°í ÀÖ½À´Ï´Ù."),
-			20,
-			TEXT("+300"),
-			TEXT("+300"),
-			TEXT("-300")),
-		Daytime,
-		[]() {
-
-		},
-		[]() {
-
-		},
-		[]() {
-
-		},
-		[]() {
-			return InvestmentState::Processing;
-		}
-	));
+	));*/
 
 	//InvestmentArr.Add(TPair<FInvestmentData, TFunction<bool(void)>>(
 	//	Tmp,

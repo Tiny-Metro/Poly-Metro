@@ -61,6 +61,10 @@ protected:
 	int32 Daytime;
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroPlayerState* PlayerState;
+	UPROPERTY(BlueprintReadOnly)
+	ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere)
+	class UInvestmentLuaState* LuaState;
 
 protected:
 	// For loan
