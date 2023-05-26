@@ -2,16 +2,23 @@
 
 
 #include "Finance/Investment.h"
+#include "Finance/InvestmentLuaState.h"
+#include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 
-UInvestment* UInvestment::CreateInvestment(FInvestmentData Data, int32 Daytime, TFunction<void(void)> Start, TFunction<void(void)> Success, TFunction<void(void)> Fail, TFunction<InvestmentState(void)> Check){
+UInvestment::UInvestment() {
+	ScriptDirectory = TEXT("Script");
+	ScriptDirectory.Append(FGenericPlatformMisc::GetDefaultPathSeparator());
+	ScriptDirectory.Append(TEXT("Investment"));
+	ScriptDirectory.Append(FGenericPlatformMisc::GetDefaultPathSeparator());
+}
+
+UInvestment* UInvestment::CreateInvestment(FString ScriptFileName, UInvestmentLuaState* LuaState, UWorld* WorldContextObject){
 	UInvestment* Obj = NewObject<UInvestment>();
-	Obj->SetInvestmentData(Data);
-	Obj->SetDaytime(Daytime);
-	Obj->SetAcceptAction(Start);
-	Obj->SetSuccessAction(Success);
-	Obj->SetFailAction(Fail);
-	Obj->SetStateCheckFunction(Check);
-	
+	Obj->ScriptFileName = ScriptFileName;
+	Obj->LuaState = LuaState;
+	Obj->WorldRef = WorldContextObject;
+	Obj->InitInvestment();
+
 	return Obj;
 }
 
@@ -24,7 +31,7 @@ void UInvestment::SetInvestmentData(FInvestmentData Data) {
 }
 
 void UInvestment::SetAcceptAction(TFunction<void(void)> Action) {
-	AcceptAction = Action;
+	StartAction = Action;
 }
 
 void UInvestment::SetSuccessAction(TFunction<void(void)> Action) {
@@ -40,10 +47,38 @@ void UInvestment::SetStateCheckFunction(TFunction<InvestmentState(void)> Check) 
 }
 
 void UInvestment::InvestmentStart() {
+	auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetClass(),
+		TEXT("InvestmentStart"), TArray<FLuaValue>());
 	State = InvestmentState::Processing;
 }
 
 void UInvestment::InitInvestment() {
+	auto readLua = ULuaBlueprintFunctionLibrary::LuaRunFile(WorldRef, LuaState->GetSelfLuaState(),
+		ScriptDirectory.Append(ScriptFileName), false);
+
+	InvestmentData = FInvestmentData(
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("title"))),
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("content"))),
+		readLua.GetField(TEXT("time_require")).ToInteger(),
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("require_message"))),
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("accept_message"))),
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("award_message"))),
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("reward_message")))
+	);
+
+	ResetInvestment();
+
+	/*auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetSelfLuaState(),
+		TEXT("Test"), TArray<FLuaValue>());*/
+	
+	/*if (GEngine) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
+			FString::Printf(TEXT("%s : %s, Title : %s"), *ScriptFileName, *luaFunction.ToString(), *ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("title")))));
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("title"))));
+	}*/
+}
+
+void UInvestment::ResetInvestment() {
 	State = InvestmentState::Ready;
 	RemainTime = InvestmentData.TimeRequire;
 }

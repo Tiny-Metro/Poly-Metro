@@ -6,7 +6,6 @@
 #include "UObject/NoExportTypes.h"
 #include "InvestmentData.h"
 #include "InvestmentState.h"
-#include "InvestmentResult.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
 #include "Investment.generated.h"
 
@@ -19,14 +18,18 @@ class TINYMETRO_API UInvestment : public UObject
 	GENERATED_BODY()
 
 public:
-	static UInvestment* CreateInvestment(FInvestmentData Data, int32 Daytime, TFunction<void(void)> Start, TFunction<void(void)> Success, TFunction<void(void)> Fail, TFunction<InvestmentState(void)> Check);
+	UInvestment();
+	static UInvestment* CreateInvestment(FString ScriptFileName, class UInvestmentLuaState* LuaState, UWorld* WorldContextObject);
 	void SetDaytime(int32 T);
 	void SetInvestmentData(FInvestmentData Data);
 	void SetAcceptAction(TFunction<void(void)> Action);
 	void SetSuccessAction(TFunction<void(void)> Action);
 	void SetFailAction(TFunction<void(void)> Action);
 	void SetStateCheckFunction(TFunction<InvestmentState(void)> Check);
+	UFUNCTION()
 	void InitInvestment();
+	UFUNCTION()
+	void ResetInvestment();
 
 	UFUNCTION(BlueprintCallable)
 	void InvestmentStart();
@@ -40,11 +43,20 @@ public:
 	InvestmentState CheckInvestmentProcess(float DeltaTime);
 	UFUNCTION(BlueprintCallable)
 	void NotifyDailyTask();
+
 	//UFUNCTION(BlueprintCallable)
 	//void DisableInvestment();
 
 
 protected:
+	UPROPERTY()
+	UWorld* WorldRef;
+	UPROPERTY()
+	FString ScriptFileName;
+	UPROPERTY()
+	FString ScriptDirectory;
+
+	class UInvestmentLuaState* LuaState;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FInvestmentData InvestmentData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
@@ -56,7 +68,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	InvestmentState State = InvestmentState::Ready;
 
-	TFunction<void(void)> AcceptAction;
+	TFunction<void(void)> StartAction;
 	TFunction<void(void)> SuccessAction;
 	TFunction<void(void)> FailAction;
 	TFunction<InvestmentState(void)> ConditionCheckFunction;
