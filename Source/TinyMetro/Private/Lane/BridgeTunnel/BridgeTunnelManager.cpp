@@ -35,33 +35,32 @@ void ABridgeTunnelManager::CreateNewTunnel_Implementation(const TArray<FIntPoint
 
 
 void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntPoint>& points) {
+	if (IsPointsValid(points) == false) {
+		UE_LOG(LogTemp, Warning, TEXT("The givien pointsArray is invalid"));
+		return; 
+	}
+
 	switch (type)
 	{
 	case ConnectorType::Bridge:
-		if (PlayerStateRef->UseBridge()) {
-			CreateNewBridge(points);
-		}
-		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Bridge")); }
-		
+		if (PlayerStateRef->UseBridge()) { CreateNewBridge(points); }
+		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Bridge")); }		
 		break;
 
 	case ConnectorType::Tunnel:
-		if (PlayerStateRef->UseTunnel()) {
-			CreateNewTunnel(points);
-		}
+		if (PlayerStateRef->UseTunnel()) { CreateNewTunnel(points); }
 		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Tunnel")); }
 		break;
 	default:
 		break;
 	}
-
 }
 void ABridgeTunnelManager::ReturnItem(ConnectorType type) {
 	
 	switch (type) {
 	case ConnectorType::Bridge:
 		PlayerStateRef->AddItem(ItemType::Bridge, 1);
-		break;
+		break;  
 	case ConnectorType::Tunnel:
 		PlayerStateRef->AddItem(ItemType::Tunnel, 1);
 		break;
@@ -69,4 +68,15 @@ void ABridgeTunnelManager::ReturnItem(ConnectorType type) {
 		break;
 	}
 }
-*/
+
+
+bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
+	//check if it is empty
+	if(points.IsEmpty()) return false;
+	// check if the element is only one
+	if(points.Num() <= 1) return false;
+	// check if last = first
+	if(points[0]==points.Last()) return false;
+
+	return true;
+}

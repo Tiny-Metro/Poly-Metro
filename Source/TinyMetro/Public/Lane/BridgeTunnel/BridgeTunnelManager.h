@@ -50,13 +50,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CreateNewTunnel(const TArray<FIntPoint>& points);
 	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points);
-
 	
 	UFUNCTION(BlueprintCallable)
 	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points);
 
 	UFUNCTION(BlueprintCallable)
 	void ReturnItem(ConnectorType type);
-	/*
-	*/
+
+private:
+
+	bool IsPointsValid(const TArray<FIntPoint>& points);
 };
