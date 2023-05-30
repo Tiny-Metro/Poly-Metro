@@ -317,12 +317,12 @@ StationType AStation::GetStationType() const {
 	return StationTypeValue;
 }
 
-void AStation::DecreaseComplain(double ReduceRate) {
-	ComplainCurrent /= ReduceRate;
+void AStation::AddComplain(double ReduceRate) {
+	ComplainCurrent *= ReduceRate;
 }
 
-void AStation::DecreaseComplain(int32 ReduceValue) {
-	ComplainCurrent -= (ReduceValue * ComplainIncreaseRate);
+void AStation::AddComplain(int32 ReduceValue) {
+	ComplainCurrent += (ReduceValue * ComplainIncreaseRate);
 }
 
 int32 AStation::GetComplain() const {

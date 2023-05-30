@@ -99,8 +99,8 @@ public:
 	void AddPassengerSpawnProbability(float rate, int32 dueDate);
 	void AddFreePassengerSpawnProbability(float rate, int32 dueDate);
 
-	void DecreaseComplain(double ReduceRate);
-	void DecreaseComplain(int32 ReduceValue);
+	void AddComplain(double ReduceRate);
+	void AddComplain(int32 ReduceValue);
 
 	int32 GetComplain() const;
 	TArray<int32> GetLanes();
