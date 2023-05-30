@@ -109,6 +109,27 @@ public:
 	UFUNCTION()
 	void SetTransfer(bool Flag);
 
+	UFUNCTION()
+	int32 GetStationCount() const;
+	UFUNCTION()
+	int32 GetActiveStationCount() const;
+	UFUNCTION()
+	int32 GetInactiveStationCount() const;
+	UFUNCTION()
+	int32 GetDestroyedStationCount() const;
+	UFUNCTION()
+	int32 GetTypeStationCount(StationType Type) const;
+	UFUNCTION()
+	FStationInfo GetRandomStationInfo() const;
+	UFUNCTION()
+	FStationInfo GetRandomActiveStationInfo() const;
+	UFUNCTION()
+	FStationInfo GetRandomInactiveStationInfo() const;
+	UFUNCTION()
+	FStationInfo GetRandomDestroyedStationInfo() const;
+	UFUNCTION()
+	FStationInfo GetRandomTypeStationInfo(StationType Type) const;
+
 private:
 	AStation* GetNearestStationByType(int32 Start, StationType Type);
 	void FloydWarshall();

@@ -459,6 +459,94 @@ void AStationManager::SetTransfer(bool Flag) {
 	}
 }
 
+int32 AStationManager::GetStationCount() const {
+	return Station.Num();
+}
+
+int32 AStationManager::GetActiveStationCount() const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Active) result++;
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetInactiveStationCount() const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Inactive) result++;
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetDestroyedStationCount() const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationState() == StationState::Destroyed) result++;
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetTypeStationCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (IsValid(i)) {
+			if (i->GetStationType() == Type) result++;
+		}
+	}
+	return result;
+}
+
+FStationInfo AStationManager::GetRandomStationInfo() const {
+	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	do {
+		randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	} while (!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]));
+	return Station[randomIndex]->GetStationInfo();
+}
+
+FStationInfo AStationManager::GetRandomActiveStationInfo() const {
+	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	do {
+		randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
+		&& Station[randomIndex]->GetStationState() == StationState::Active);
+	return Station[randomIndex]->GetStationInfo();
+}
+
+FStationInfo AStationManager::GetRandomInactiveStationInfo() const {
+	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	do {
+		randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
+		&& Station[randomIndex]->GetStationState() == StationState::Inactive);
+	return Station[randomIndex]->GetStationInfo();
+}
+
+FStationInfo AStationManager::GetRandomDestroyedStationInfo() const {
+	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	do {
+		randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
+		&& Station[randomIndex]->GetStationState() == StationState::Destroyed);
+	return Station[randomIndex]->GetStationInfo();
+}
+
+FStationInfo AStationManager::GetRandomTypeStationInfo(StationType Type) const {
+	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	do {
+		randomIndex = FMath::RandRange(0, Station.Num() - 1);
+	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
+		&& Station[randomIndex]->GetStationType() == Type);
+	return Station[randomIndex]->GetStationInfo();
+}
+
 AStation* AStationManager::GetNearestStationByType(int32 Start, StationType Type) {
 	int32 StationNum = Station.Num();
 	int32 NearestStationId = -1;
