@@ -21,8 +21,16 @@ struct TINYMETRO_API FConnectorData
 	TArray<FIntPoint> PointArr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		ConnectorType Type;
+	ConnectorType Type;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TWeakObjectPtr<ABridgeTunnel> ConnectorREF;
+	TWeakObjectPtr<ABridgeTunnel> ConnectorREF;
+
+	bool operator==(const FConnectorData& Other) const
+	{
+		return PointArr == Other.PointArr &&
+			Type == Other.Type &&
+			ConnectorREF == Other.ConnectorREF;
+	}
+
 };

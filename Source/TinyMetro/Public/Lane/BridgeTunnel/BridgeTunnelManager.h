@@ -71,6 +71,6 @@ public:
 	TArray<FConnectorData> Connectors;
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteConnector(ConnectorType type, const TArray<FIntPoint> points);
+	void DeleteConnector(ConnectorType type, const TArray<FIntPoint>& points);
 
 };

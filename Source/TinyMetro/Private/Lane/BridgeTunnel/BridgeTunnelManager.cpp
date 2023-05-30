@@ -122,6 +122,8 @@ bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 
 FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TArray<FIntPoint> points) {
 	TArray<FIntPoint> processedPoints = ProcessArray(points);
+	TArray<FIntPoint> reversedPoints = processedPoints;
+	Algo::Reverse(reversedPoints);
 
 	for (FConnectorData& connector : Connectors) {
 		if (type == connector.Type && connector.PointArr == processedPoints) {
@@ -132,10 +134,10 @@ FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TA
 	return nullptr;
 }
 
-void ABridgeTunnelManager::DeleteConnector(ConnectorType type, const TArray<FIntPoint> points) {
+void ABridgeTunnelManager::DeleteConnector(ConnectorType type, const TArray<FIntPoint>& points) {
 	FConnectorData* ConnectorToDelete = FindConnector(type, points);
-	if (ConnectorToDelete) {
+	if (ConnectorToDelete != nullptr) {
 		ConnectorToDelete->ConnectorREF->Destroy();
-	//	Connectors.Remove(*ConnectorToDelete);
+		Connectors.Remove(*ConnectorToDelete);
 	}
 }
