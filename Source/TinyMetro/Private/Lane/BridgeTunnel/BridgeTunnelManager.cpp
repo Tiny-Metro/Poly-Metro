@@ -35,17 +35,16 @@ void ABridgeTunnelManager::CreateNewTunnel_Implementation(const TArray<FIntPoint
 
 
 void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntPoint>& points) {
-	if (IsPointsValid(points) == false) {
+	if (!IsPointsValid(points)) {
 		UE_LOG(LogTemp, Warning, TEXT("The givien pointsArray is invalid"));
 		return; 
 	}
 
-	FConnectorData* findConnector = FindConnector(type, points);
+	FConnectorData* existingConnector = FindConnector(type, points);
 
-	if (findConnector != nullptr)
-	{ 
-		findConnector->ConnectorREF->count++;
-		return; 
+	if (existingConnector != nullptr) {
+		existingConnector->ConnectorREF->count++;
+		return;
 	}
 
 	TArray<FIntPoint> Points = ProcessArray(points);
@@ -53,13 +52,21 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 	switch (type)
 	{
 	case ConnectorType::Bridge:
-		if (PlayerStateRef->UseBridge()) { CreateNewBridge(Points); }
-		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Bridge")); }		
+		if (PlayerStateRef->UseBridge()) { 
+			CreateNewBridge(Points);
+		}
+		else { 
+			UE_LOG(LogTemp, Warning, TEXT("No Valid Bridge")); 
+		}		
 		break;
 
 	case ConnectorType::Tunnel:
-		if (PlayerStateRef->UseTunnel()) { CreateNewTunnel(Points); }
-		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Tunnel")); }
+		if (PlayerStateRef->UseTunnel()) { 
+			CreateNewTunnel(Points); 
+		}
+		else { 
+			UE_LOG(LogTemp, Warning, TEXT("No Valid Tunnel")); 
+		}
 		break;
 	default:
 		break;
