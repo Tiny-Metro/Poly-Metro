@@ -7,6 +7,7 @@
 #include "../../GridGenerator/GridManager.h"
 #include "../../PlayerState/TinyMetroPlayerState.h"
 #include "ConnectorType.h"
+#include "ConnectorData.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -68,5 +69,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FConnectorData> Connectors;
+
+	UFUNCTION(BlueprintCallable)
+	void DeleteConnector(ConnectorType type, const TArray<FIntPoint> points);
 
 };

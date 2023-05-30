@@ -132,3 +132,10 @@ FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TA
 	return nullptr;
 }
 
+void ABridgeTunnelManager::DeleteConnector(ConnectorType type, const TArray<FIntPoint> points) {
+	FConnectorData* ConnectorToDelete = FindConnector(type, points);
+	if (ConnectorToDelete) {
+		ConnectorToDelete->ConnectorREF->Destroy();
+	//	Connectors.Remove(*ConnectorToDelete);
+	}
+}
