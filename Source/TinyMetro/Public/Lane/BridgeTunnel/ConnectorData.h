@@ -17,8 +17,8 @@ struct TINYMETRO_API FConnectorData
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FIntPoint> PointArr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FIntPoint> PointArr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ConnectorType Type;

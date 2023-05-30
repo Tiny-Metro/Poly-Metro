@@ -40,6 +40,14 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 		return; 
 	}
 
+	FConnectorData* findConnector = FindConnector(type, points);
+
+	if (findConnector != nullptr)
+	{ 
+		findConnector->ConnectorREF->count++;
+		return; 
+	}
+
 	TArray<FIntPoint> Points = ProcessArray(points);
 
 	switch (type)
@@ -111,3 +119,16 @@ bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 
 	return true;
 }
+
+FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TArray<FIntPoint> points) {
+	TArray<FIntPoint> processedPoints = ProcessArray(points);
+
+	for (FConnectorData& connector : Connectors) {
+		if (type == connector.Type && connector.PointArr == processedPoints) {
+			return &connector;
+		}
+	}
+
+	return nullptr;
+}
+

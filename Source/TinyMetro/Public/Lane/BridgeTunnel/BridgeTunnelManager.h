@@ -61,4 +61,12 @@ private:
 	TArray<FIntPoint> ProcessArray(const TArray<FIntPoint>& points);
 
 	bool IsPointsValid(const TArray<FIntPoint>& points);
+
+public:
+	FConnectorData* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FConnectorData> Connectors;
+
 };
