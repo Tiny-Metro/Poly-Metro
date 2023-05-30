@@ -40,15 +40,17 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 		return; 
 	}
 
+	TArray<FIntPoint> Points = ProcessArray(points);
+
 	switch (type)
 	{
 	case ConnectorType::Bridge:
-		if (PlayerStateRef->UseBridge()) { CreateNewBridge(points); }
+		if (PlayerStateRef->UseBridge()) { CreateNewBridge(Points); }
 		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Bridge")); }		
 		break;
 
 	case ConnectorType::Tunnel:
-		if (PlayerStateRef->UseTunnel()) { CreateNewTunnel(points); }
+		if (PlayerStateRef->UseTunnel()) { CreateNewTunnel(Points); }
 		else { UE_LOG(LogTemp, Warning, TEXT("No Valid Tunnel")); }
 		break;
 	default:
@@ -69,6 +71,26 @@ void ABridgeTunnelManager::ReturnItem(ConnectorType type) {
 	}
 }
 
+TArray<FIntPoint> ABridgeTunnelManager::ProcessArray(const TArray<FIntPoint>& points) {
+	TArray<FIntPoint> PointArray;
+
+	PointArray.Add(points[0]);
+	for (int i = 1; i < points.Num(); i++)
+	{
+		if(i == points.Num() -1 ){
+			PointArray.Add(points[i]);
+			break;
+		}
+
+		FIntPoint curr = FIntPoint(points[i].X - points[i-1].X, points[i].Y - points[i-1].Y);
+		FIntPoint next = FIntPoint(points[i+1].X - points[i].X, points[i + 1].Y - points[i].Y);
+		if (curr != next) {
+			PointArray.Add(points[i]);
+		}
+	}
+
+	return PointArray;
+}
 
 bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 	//check if it is empty
@@ -77,6 +99,15 @@ bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 	if(points.Num() <= 1) return false;
 	// check if last = first
 	if(points[0]==points.Last()) return false;
+
+	// Check if any points of array is out of range
+	FIntPoint GridSize = GridManagerRef->GetGridSize();
+	for (int i = 0; i < points.Num(); i++)
+	{
+		FIntPoint point = points[i];
+		if (point.X > GridSize.X || point.X < 0) { return false; }
+		if (point.Y > GridSize.Y || point.Y < 0) { return false; }
+	}
 
 	return true;
 }

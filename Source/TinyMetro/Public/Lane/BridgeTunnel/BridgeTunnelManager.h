@@ -58,6 +58,7 @@ public:
 	void ReturnItem(ConnectorType type);
 
 private:
+	TArray<FIntPoint> ProcessArray(const TArray<FIntPoint>& points);
 
 	bool IsPointsValid(const TArray<FIntPoint>& points);
 };
