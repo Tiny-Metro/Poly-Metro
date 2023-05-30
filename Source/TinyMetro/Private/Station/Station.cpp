@@ -238,6 +238,65 @@ void AStation::RemoveLane(int32 LId)
 	Lanes.Remove(LId);
 }
 
+TMap<StationType, int32> AStation::GetSpawnPassengerStatistics() const {
+	return TotalSpawnPassenger;
+}
+
+int32 AStation::GetWaitPassenger() const {
+	return Passenger.Num();
+}
+
+void AStation::SpawnPassenger(StationType Destination) {
+	UPassenger* tmp = UPassenger::ConstructPassenger(
+		Destination
+	);
+	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
+	//UPassenger* tmp = NewObject<UPassenger>();
+	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
+		tmp->SetFree();
+	}
+
+	if (tmp->GetFree()) {
+		SpawnPassengerFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
+	} else {
+		SpawnPassengerNotFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
+	}
+	TotalSpawnPassenger[tmp->GetDestination()]++;
+
+
+	Passenger.Add(MoveTemp(tmp));
+	UpdatePassengerMesh();
+}
+
+void AStation::DespawnPassenger(StationType Destination) {
+	for (auto& i : Passenger) {
+		if (i->GetDestination() == Destination) {
+			Passenger.Remove(i);
+			break;
+		}
+	}
+	UpdatePassengerMesh();
+}
+
+void AStation::DespawnRandomPassenger() {
+	int64 removeIndex = FMath::RandRange(0, Passenger.Num() - 1);
+	if (Passenger.IsValidIndex(removeIndex)) {
+		Passenger.RemoveAt(removeIndex);
+	}
+	UpdatePassengerMesh();
+}
+
+void AStation::SetPassengerSpawnEnable(bool Flag) {
+	IsPassengerSpawnEnable = Flag;
+}
+
+bool AStation::GetPassengerSpawnEnable() const {
+	return IsPassengerSpawnEnable;
+}
+
 void AStation::CalculateComplain() {
 }
 
@@ -281,6 +340,18 @@ void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
 			0.0f
 		);
 	}
+}
+
+void AStation::SetComplainIncreaseEnable(bool Flag) {
+	IsComplainIncreaseEnable = Flag;
+}
+
+void AStation::SetComplainByRate(float Rate) {
+	ComplainCurrent *= Rate;
+}
+
+void AStation::AddComplain(float Value, bool IsFixedValue) {
+	ComplainCurrent += (Value * (IsFixedValue ? 1.0f : ComplainIncreaseRate));
 }
 
 void AStation::MaintenanceCost(int32 Cost) {
@@ -360,16 +431,18 @@ void AStation::ComplainRoutine() {
 		FTimerDelegate::CreateLambda([&]() {
 			SpawnDay++;
 			
-			// Passenger complain
-			if (Passenger.Num() > ComplainPassengerNum) {
-				ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
-			}
+			if (IsComplainIncreaseEnable) {
+				// Passenger complain
+				if (Passenger.Num() > ComplainPassengerNum) {
+					ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
+				}
 
-			// Not activate
-			if (!IsActive && SpawnDay > ComplainSpawnDay) {
-				ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
+				// Not activate
+				if (!IsActive && SpawnDay > ComplainSpawnDay) {
+					ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
+				}
 			}
-
+			
 			/*
 			if (GEngine) {
 				GEngine->AddOnScreenDebugMessage(
@@ -419,9 +492,10 @@ void AStation::PassengerSpawnRoutine() {
 			PassengerSpawnCurrent += PassengerSpawnPerSec;
 
 			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
-				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
-					SpawnPassenger();
-					UpdatePassengerMesh();
+				if (IsPassengerSpawnEnable) {
+					if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
+						SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
+					}
 				}
 
 				PassengerSpawnCurrent = 0.0f;
@@ -441,6 +515,7 @@ void AStation::PassengerSpawnRoutine() {
 		);
 }
 
+// Not used
 void AStation::SpawnPassenger() {
 	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationTypeValue);
 	UPassenger* tmp = UPassenger::ConstructPassenger(
@@ -452,7 +527,17 @@ void AStation::SpawnPassenger() {
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
 		tmp->SetFree();
 	}
+	
+	if (tmp->GetFree()) {
+		SpawnPassengerFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
+	} else {
+		SpawnPassengerNotFree[tmp->GetDestination()]++;
+		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
+	}
+	TotalSpawnPassenger[tmp->GetDestination()]++;
 
+	
 	Passenger.Add(MoveTemp(tmp));
 
 	//Log

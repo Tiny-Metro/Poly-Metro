@@ -54,6 +54,12 @@ public:
 	void SetComplainGauge(float Per);
 	UFUNCTION()
 	void AddComplainIncreaseRate(float Rate, int32 Period);
+	UFUNCTION()
+	void SetComplainIncreaseEnable(bool Flag);
+	UFUNCTION()
+	void SetComplainByRate(float Rate);
+	UFUNCTION()
+	void AddComplain(float Value, bool IsFixedValue = false);
 
 	UFUNCTION()
 	void MaintenanceCost(int32 Cost);
@@ -88,6 +94,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveLane(int32 LId);
 
+	UFUNCTION(BlueprintCallable)
+	TMap<StationType, int32> GetSpawnPassengerStatistics() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetWaitPassenger() const;
+
+	UFUNCTION()
+	void SpawnPassenger(StationType Destination);
+	UFUNCTION()
+	void DespawnPassenger(StationType Destination);
+	UFUNCTION()
+	void DespawnRandomPassenger();
+	UFUNCTION()
+	void SetPassengerSpawnEnable(bool Flag);
+	UFUNCTION()
+	bool GetPassengerSpawnEnable() const;
+	
 	//UFUNCTION()
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -136,6 +158,8 @@ protected:
 	int32 ComplainSpawnDay = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	float ComplainIncreaseRate = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	bool IsComplainIncreaseEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	int32 PassengerSpawnRequire = 6000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
@@ -147,7 +171,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double AdditionalPassengerSpawnProbability = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbability = 0.0f;
+	float FreePassengerSpawnProbability = 0.0f;;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	bool IsPassengerSpawnEnable = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationId = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -186,6 +212,46 @@ protected:
 	float PassengerX_Distance = 90;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
 	float PassengerY_Distance = 45;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> SpawnPassengerNotFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> SpawnPassengerFree = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> TotalSpawnPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
 
 protected:
 	// Station meshses

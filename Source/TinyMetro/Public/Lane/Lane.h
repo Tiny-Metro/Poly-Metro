@@ -44,6 +44,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALaneManager* LaneManagerRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATrainManager* TrainManagerRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroPlayerState* TinyMetroPlayerState;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	int32 LaneId;
@@ -57,6 +63,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool AlreadyDeleted = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle SpawnTrainCheckTimer;
+
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -118,14 +128,21 @@ public:
 	virtual void LaneCreating_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void InitializeNewLane();
+	void InitializeNewLane();
 	virtual void InitializeNewLane_Implementation();
 
+public : // BlueprintNativeEvent
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ExtendLane();
+	virtual void ExtendLane_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void ExtendLane();
-	virtual void ExtendLane_Implementation();
+	void FinishRemovingLaneAtStart(const TArray <class AStation*>& Stations, const int32 Index);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FinishRemovingLaneAtEnd(const TArray <class AStation*>& Stations, const int32 Index);
 	
+public: // About Train
 
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction);

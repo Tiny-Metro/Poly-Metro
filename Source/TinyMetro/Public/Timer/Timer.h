@@ -26,8 +26,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SkipTime(int32 Skipday = 1);
+
 public:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 	float ElapseTimeSec;
 	UPROPERTY(BlueprintAssignable)
 	FDailyTask DailyTask;
@@ -46,4 +49,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	float WeekCounter = 0.0f;
 
+	UPROPERTY(VisibleAnywhere, Category = "Develop")
+	float SkiptimeTarget = 0.0f;
+	UPROPERTY(VisibleAnywhere, Category = "Develop")
+	bool SkiptimeFlag = false;
 };

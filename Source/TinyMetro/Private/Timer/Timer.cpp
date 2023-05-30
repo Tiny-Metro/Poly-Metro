@@ -45,5 +45,16 @@ void ATimer::Tick(float DeltaTime)
 		WeeklyTask.Broadcast();
 		WeekCounter -= (Daytime * 7);
 	}
+
+	if (SkiptimeTarget <= ElapseTimeSec && SkiptimeFlag) {
+		GameModeRef->SetGameSpeed(1.0f);
+		SkiptimeFlag = false;
+	}
+}
+
+void ATimer::SkipTime(int32 Skipday) {
+	SkiptimeTarget = ((int32)(ElapseTimeSec / Daytime) + Skipday) * Daytime; // Next day time
+	SkiptimeFlag = true;
+	GameModeRef->SetGameSpeed(1000.0f);
 }
 
