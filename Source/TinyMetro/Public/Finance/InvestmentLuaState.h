@@ -51,7 +51,27 @@ public:
 
 	// Station effect
 	UFUNCTION()
+	FLuaValue GetStationCount() const;
+	UFUNCTION()
+	FLuaValue GetActiveStationCount() const;
+	UFUNCTION()
+	FLuaValue GetInactiveStationCount() const;
+	UFUNCTION()
+	FLuaValue GetDestroyedStationCount() const;
+	UFUNCTION()
+	FLuaValue GetTypeStationCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetRandomStationType() const;
+	UFUNCTION()
 	FLuaValue GetRandomStationId() const;
+	UFUNCTION()
+	FLuaValue GetRandomActiveStationId() const;
+	UFUNCTION()
+	FLuaValue GetRandomInactiveStationId() const;
+	UFUNCTION()
+	FLuaValue GetRandomDestroyedStationId() const;
+	UFUNCTION()
+	FLuaValue GetRandomTypeStationId(FLuaValue Type) const;
 	UFUNCTION()
 	void AddComplainFixedValue(FLuaValue StationId, FLuaValue Complain);
 	UFUNCTION()
@@ -59,17 +79,33 @@ public:
 
 	// Passenger effect
 	UFUNCTION()
+	FLuaValue GetArrivePassengerCount() const;
+	UFUNCTION()
+	FLuaValue GetNotArrivePassengerCount() const;
+	UFUNCTION()
+	FLuaValue GetNotArrivePassengerCountByType(FLuaValue Type) const;
+	UFUNCTION()
 	void AddPassengerSpawn(FLuaValue Rate) const;
-
-	// Train effect
-	UFUNCTION()
-	FLuaValue GetNumOfAllTrain() const;
-	UFUNCTION()
-	FLuaValue GetNumOfTrain(FLuaValue LaneId) const;
 
 	// Lane effect
 	UFUNCTION()
-	FLuaValue GetNumOfLane() const;
+	FLuaValue GetLaneCount() const;
+	UFUNCTION()
+	FLuaValue GetRandomLaneId() const;
+
+	// Train effect
+	UFUNCTION()
+	FLuaValue GetTrainCount() const;
+	UFUNCTION()
+	FLuaValue GetMainTrainCount() const;
+	UFUNCTION()
+	FLuaValue GetSubTrainCount() const;
+	UFUNCTION()
+	FLuaValue GetTrainCountByLane(FLuaValue Id) const;
+	UFUNCTION()
+	FLuaValue GetMainTrainCountByLane(FLuaValue Id) const;
+	UFUNCTION()
+	FLuaValue GetSubTrainCountByLane(FLuaValue Id) const;
 
 protected:
 	UPROPERTY()
@@ -78,4 +114,6 @@ protected:
 	mutable class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY()
 	mutable class APolicy* PolicyRef;
+	UPROPERTY()
+	mutable class AStationManager* StationManagerRef;
 };
