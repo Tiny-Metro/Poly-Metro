@@ -72,7 +72,20 @@ public:
 	TArray<FConnectorData> Connectors;
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteConnector(ConnectorType type, const TArray<FIntPoint>& points);
+	void DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points);
 	UFUNCTION(BlueprintCallable)
-	void DeleteConenctor(ABridgeTunnel* ConnectorREF);
+	void DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF);
+
+	UFUNCTION(BlueprintCallable)
+	void DeleteConnector(FConnectorData connectorData);
+
+
+	UFUNCTION(BlueprintCallable)
+	void DisconnectConnector(FConnectorData connectorData);
+
+	UFUNCTION(BlueprintCallable)
+	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points);
+
+	UFUNCTION(BlueprintCallable)
+	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF);
 };

@@ -43,7 +43,7 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 	FConnectorData* existingConnector = FindConnector(type, points);
 
 	if (existingConnector != nullptr) {
-		existingConnector->ConnectorREF->count++;
+		existingConnector->ConnectorREF->CountUp();
 		return;
 	}
 
@@ -147,23 +147,42 @@ FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TA
 		if (type == connector.Type && connector.PointArr == processedPoints) {
 			return &connector;
 		}
+		if (type == connector.Type && connector.PointArr == reversedPoints) {
+			return &connector;
+		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 	return nullptr;
 }
 
-void ABridgeTunnelManager::DeleteConnector(ConnectorType type, const TArray<FIntPoint>& points) {
+void ABridgeTunnelManager::DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
 	FConnectorData* ConnectorToDelete = FindConnector(type, points);
 	if (ConnectorToDelete != nullptr) {
 		ConnectorToDelete->ConnectorREF->Destroy();
 		Connectors.Remove(*ConnectorToDelete);
 	}
 }
-void ABridgeTunnelManager::DeleteConenctor(ABridgeTunnel* ConnectorREF) {
+void ABridgeTunnelManager::DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF) {
 	FConnectorData* ConnectorToDelete = FindConnector(ConnectorREF);
 	if (ConnectorToDelete != nullptr) {
 		ConnectorToDelete->ConnectorREF->Destroy();
 		Connectors.Remove(*ConnectorToDelete);
 	}
+}
+void ABridgeTunnelManager::DeleteConnector(FConnectorData connectorData) {
+		connectorData.ConnectorREF->Destroy();
+		Connectors.Remove(connectorData);
+}
+void ABridgeTunnelManager::DisconnectConnector(FConnectorData connectorData) {
+	connectorData.ConnectorREF->CountDown();
+}
+
+void ABridgeTunnelManager::DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
+	FConnectorData* ConnectorToDelete = FindConnector(type, points);
+	DisconnectConnector(*ConnectorToDelete);
+}
+void ABridgeTunnelManager::DisconnectByActorRef(ABridgeTunnel* ConnectorREF) {
+	FConnectorData* ConnectorToDelete = FindConnector(ConnectorREF);
+	DisconnectConnector(*ConnectorToDelete);
 }
