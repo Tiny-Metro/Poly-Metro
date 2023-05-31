@@ -61,6 +61,7 @@ public:
 	UFUNCTION()
 	void AddComplain(float Value, bool IsFixedValue = false);
 
+	// Mainenance
 	UFUNCTION()
 	void MaintenanceCost(int32 Cost);
 
@@ -88,17 +89,45 @@ public:
 	void UpdateStationMesh();
 	UFUNCTION(BlueprintCallable)
 	void LoadStationValue(FStationValuesStruct StationValues);
+
+	// Lane
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
-
 	UFUNCTION(BlueprintCallable)
 	void RemoveLane(int32 LId);
 
+	// Station statistics
 	UFUNCTION(BlueprintCallable)
 	TMap<StationType, int32> GetSpawnPassengerStatistics() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetSpawnTotalPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetSpawnPaidPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetSpawnFreePassenger() const;
+	UFUNCTION()
+	int32 GetArriveTotalPassengerCount() const;
+	UFUNCTION()
+	int32 GetArrivePaidPassengerCount() const;
+	UFUNCTION()
+	int32 GetArriveFreePassengerCount() const;
+	UFUNCTION()
+	int32 GetWaitTotalPassengerCount() const;
+	UFUNCTION()
+	int32 GetWaitPaidPassengerCount() const;
+	UFUNCTION()
+	int32 GetWaitFreePassengerCount() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetDestroyedTotalPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetDestroyedPaidPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetDestroyedFreePassenger() const;
+
 	UFUNCTION(BlueprintCallable)
 	int32 GetWaitPassenger() const;
 
+	// Passenger
 	UFUNCTION()
 	void SpawnPassenger(StationType Destination);
 	UFUNCTION()
@@ -110,7 +139,6 @@ public:
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
 	
-	//UFUNCTION()
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
 	Value is bool of Index's validation. return true when index is valid
@@ -214,7 +242,7 @@ protected:
 	float PassengerY_Distance = 45;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> SpawnPassengerNotFree = {
+	TMap<StationType, int32> SpawnPaidPassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
 		TPair<StationType, int32>(StationType::Rectangle, 0),
@@ -227,7 +255,7 @@ protected:
 		TPair<StationType, int32>(StationType::Fan, 0)
 	};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> SpawnPassengerFree = {
+	TMap<StationType, int32> SpawnFreePassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
 		TPair<StationType, int32>(StationType::Rectangle, 0),
@@ -241,6 +269,36 @@ protected:
 	};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> TotalSpawnPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	int32 ArrivePaidPassenger = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	int32 ArriveFreePassenger = 0; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> DestroyedPaidPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> DestroyedFreePassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
 		TPair<StationType, int32>(StationType::Rectangle, 0),

@@ -191,6 +191,11 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 void AStation::GetOffPassenger(UPassenger* P) {
 	if (P->GetDestination() == this->StationTypeValue) {
 		// Passenger arrive destination
+		if (P->GetFree()) {
+			ArriveFreePassenger++;
+		} else {
+			ArrivePaidPassenger++;
+		}
 		P = nullptr;
 	} else {
 		Passenger.Add(P);
@@ -242,6 +247,80 @@ TMap<StationType, int32> AStation::GetSpawnPassengerStatistics() const {
 	return TotalSpawnPassenger;
 }
 
+TMap<StationType, int32> AStation::GetSpawnTotalPassenger() const {
+	TMap<StationType, int32> result;
+	for (auto i : SpawnPaidPassenger) {
+		result[i.Key] += i.Value;
+	}
+	for (auto i : SpawnFreePassenger) {
+		result[i.Key] += i.Value;
+	}
+	return result;
+}
+
+TMap<StationType, int32> AStation::GetSpawnPaidPassenger() const {
+	return SpawnPaidPassenger;
+}
+
+TMap<StationType, int32> AStation::GetSpawnFreePassenger() const {
+	return SpawnFreePassenger;
+}
+
+int32 AStation::GetArriveTotalPassengerCount() const {
+	return GetArrivePaidPassengerCount() + GetArriveFreePassengerCount();
+}
+
+int32 AStation::GetArrivePaidPassengerCount() const {
+	return ArrivePaidPassenger;
+}
+
+int32 AStation::GetArriveFreePassengerCount() const {
+	return ArriveFreePassenger;
+}
+
+int32 AStation::GetWaitTotalPassengerCount() const {
+	return GetWaitFreePassengerCount() + GetWaitPaidPassengerCount();
+}
+
+int32 AStation::GetWaitPaidPassengerCount() const {
+	int32 result = 0;
+	for (auto& i : Passenger) {
+		if (!i->GetFree()) {
+			result++;
+		}
+	}
+	return result;
+}
+
+int32 AStation::GetWaitFreePassengerCount() const {
+	int32 result = 0;
+	for (auto& i : Passenger) {
+		if (i->GetFree()) {
+			result++;
+		}
+	}
+	return result;
+}
+
+TMap<StationType, int32> AStation::GetDestroyedTotalPassenger() const {
+	TMap<StationType, int32> result;
+	for (auto i : DestroyedPaidPassenger) {
+		result[i.Key] += i.Value;
+	}
+	for (auto i : DestroyedFreePassenger) {
+		result[i.Key] += i.Value;
+	}
+	return result;
+}
+
+TMap<StationType, int32> AStation::GetDestroyedPaidPassenger() const {
+	return DestroyedPaidPassenger;
+}
+
+TMap<StationType, int32> AStation::GetDestroyedFreePassenger() const {
+	return DestroyedFreePassenger;
+}
+
 int32 AStation::GetWaitPassenger() const {
 	return Passenger.Num();
 }
@@ -258,10 +337,10 @@ void AStation::SpawnPassenger(StationType Destination) {
 	}
 
 	if (tmp->GetFree()) {
-		SpawnPassengerFree[tmp->GetDestination()]++;
+		SpawnFreePassenger[tmp->GetDestination()]++;
 		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
 	} else {
-		SpawnPassengerNotFree[tmp->GetDestination()]++;
+		SpawnPaidPassenger[tmp->GetDestination()]++;
 		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
 	}
 	TotalSpawnPassenger[tmp->GetDestination()]++;
@@ -516,6 +595,7 @@ void AStation::PassengerSpawnRoutine() {
 }
 
 // Not used
+// Replcaed by SpawnPassenger(StationType)
 void AStation::SpawnPassenger() {
 	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationTypeValue);
 	UPassenger* tmp = UPassenger::ConstructPassenger(
@@ -529,10 +609,10 @@ void AStation::SpawnPassenger() {
 	}
 	
 	if (tmp->GetFree()) {
-		SpawnPassengerFree[tmp->GetDestination()]++;
+		SpawnFreePassenger[tmp->GetDestination()]++;
 		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
 	} else {
-		SpawnPassengerNotFree[tmp->GetDestination()]++;
+		SpawnPaidPassenger[tmp->GetDestination()]++;
 		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
 	}
 	TotalSpawnPassenger[tmp->GetDestination()]++;

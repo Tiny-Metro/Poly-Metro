@@ -436,6 +436,201 @@ bool AStationManager::GetPassengerSpawnEnable() const {
 	return IsPassengerSpawnEnable;
 }
 
+int32 AStationManager::GetTotalPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		auto passenger = i->GetSpawnTotalPassenger();
+		if (Type == StationType::None) {
+			for (auto& j : passenger) {
+				result += j.Value;
+			}
+		} else {
+			result += passenger[Type];
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetFreePassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		auto passenger = i->GetSpawnFreePassenger();
+		if (Type == StationType::None) {
+			for (auto& j : passenger) {
+				result += j.Value;
+			}
+		} else {
+			result += passenger[Type];
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetPaidPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		auto passenger = i->GetSpawnPaidPassenger();
+		if (Type == StationType::None) {
+			for (auto& j : passenger) {
+				result += j.Value;
+			}
+		} else {
+			result += passenger[Type];
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetArriveTotalPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (Type == StationType::None) {
+			result += i->GetArriveTotalPassengerCount();
+		} else {
+			if (i->GetStationType() == Type) {
+				result += i->GetArriveTotalPassengerCount();
+			}
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetArriveFreePassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (Type == StationType::None) {
+			result += i->GetArriveFreePassengerCount();
+		} else {
+			if (i->GetStationType() == Type) {
+				result += i->GetArriveFreePassengerCount();
+			}
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetArrivePaidPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (Type == StationType::None) {
+			result += i->GetArrivePaidPassengerCount();
+		} else {
+			if (i->GetStationType() == Type) {
+				result += i->GetArrivePaidPassengerCount();
+			}
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetWaitTotalPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (Type == StationType::None) {
+			result += i->GetWaitTotalPassengerCount();
+		} else {
+			if (i->GetStationType() == Type) {
+				result += i->GetWaitTotalPassengerCount();
+			}
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetWaitFreePassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (Type == StationType::None) {
+			result += i->GetWaitFreePassengerCount();
+		} else {
+			if (i->GetStationType() == Type) {
+				result += i->GetWaitFreePassengerCount();
+			}
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetWaitPaidPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		if (Type == StationType::None) {
+			result += i->GetWaitPaidPassengerCount();
+		} else {
+			if (i->GetStationType() == Type) {
+				result += i->GetWaitPaidPassengerCount();
+			}
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetDestroyedTotalPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		auto passenger = i->GetDestroyedTotalPassenger();
+		if (Type == StationType::None) {
+			for (auto& j : passenger) {
+				result += j.Value;
+			}
+		} else {
+			result += passenger[Type];
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetDestroyedFreePassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		auto passenger = i->GetDestroyedFreePassenger();
+		if (Type == StationType::None) {
+			for (auto& j : passenger) {
+				result += j.Value;
+			}
+		} else {
+			result += passenger[Type];
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetDestroyedPaidPassengerCount(StationType Type) const {
+	int32 result = 0;
+	for (auto& i : Station) {
+		auto passenger = i->GetDestroyedPaidPassenger();
+		if (Type == StationType::None) {
+			for (auto& j : passenger) {
+				result += j.Value;
+			}
+		} else {
+			result += passenger[Type];
+		}
+	}
+	return result;
+}
+
+int32 AStationManager::GetRideTotalPassengerCount(StationType Type) const {
+	return GetTotalPassengerCount(Type) 
+		- GetArriveTotalPassengerCount(Type)
+		- GetWaitTotalPassengerCount(Type)
+		- GetDestroyedTotalPassengerCount(Type);
+}
+
+int32 AStationManager::GetRideFreePassengerCount(StationType Type) const {
+	return GetFreePassengerCount(Type)
+		- GetArriveFreePassengerCount(Type)
+		- GetWaitFreePassengerCount(Type)
+		- GetDestroyedFreePassengerCount(Type);
+}
+
+int32 AStationManager::GetRidePaidPassengerCount(StationType Type) const {
+	return GetPaidPassengerCount(Type)
+		- GetArrivePaidPassengerCount(Type)
+		- GetWaitPaidPassengerCount(Type)
+		- GetDestroyedPaidPassengerCount(Type);
+}
+
 TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 SID) {
 	TMap<StationType, int32> result;
 	TotalPassenger = 0;
@@ -463,7 +658,7 @@ TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& Tot
 	return result;
 }
 
-void AStationManager::WeeklyTask() const {
+void AStationManager::WeeklyTask() {
 	for (auto& i : Station) {
 		if (IsValid(i)) {
 			if (i->GetStationState() == StationState::Active) {
@@ -489,7 +684,7 @@ void AStationManager::DailyTask() {
 				// Add weekly tasks
 
 				// From service level (Complain)
-				i->DecreaseComplain(-ServiceData.DailyComplain);
+				i->AddComplain(-ServiceData.DailyComplain);
 			}
 		}
 	}
@@ -687,7 +882,7 @@ StationType AStationManager::GetRandomStationType() {
 	return StationSpawnTable[FMath::RandRange(0, StationSpawnRange)];
 }
 
-StationType AStationManager::StationTypeFromString(FString Str, bool& Success) const {
+StationType AStationManager::StationTypeFromString(FString Str, bool& Success) {
 	Success = true;
 	StationType result;
 	Str = Str.ToLower();
@@ -711,6 +906,35 @@ StationType AStationManager::StationTypeFromString(FString Str, bool& Success) c
 		result = StationType::Star;
 	} else if (Str == TEXT("fan")) {
 		result = StationType::Fan;
+	} else {
+		Success = false;
+	}
+	return result;
+}
+
+FString AStationManager::StationTypeToString(StationType Type, bool& Success) {
+	Success = true;
+	FString result;
+	if (Type == StationType::Circle){
+		result = TEXT("Circle");
+	} else if (Type == StationType::Triangle) {
+		result = TEXT("Triangle");
+	} else if (Type == StationType::Rectangle) {
+		result = TEXT("Rectangle");
+	} else if (Type == StationType::Cross) {
+		result = TEXT("Cross");
+	} else if (Type == StationType::Rhombus) {
+		result = TEXT("Rhombus");
+	} else if (Type == StationType::Oval) {
+		result = TEXT("Oval");
+	} else if (Type == StationType::Diamond) {
+		result = TEXT("Diamond");
+	} else if (Type == StationType::Pentagon) {
+		result = TEXT("Pentagon");
+	} else if (Type == StationType::Star) {
+		result = TEXT("Star");
+	} else if (Type == StationType::Fan) {
+		result = TEXT("Fan");
 	} else {
 		Success = false;
 	}

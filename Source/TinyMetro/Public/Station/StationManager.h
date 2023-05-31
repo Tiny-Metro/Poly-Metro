@@ -64,7 +64,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType(); 
 	UFUNCTION(BlueprintCallable)
-	StationType StationTypeFromString(FString Str, bool& Success) const;
+	static StationType StationTypeFromString(FString Str, bool& Success);
+	UFUNCTION(BlueprintCallable)
+	static FString StationTypeToString(StationType Type, bool& Success);
 	
 
 protected:
@@ -111,6 +113,38 @@ public:
 	void SetPassengerSpawnEnable(bool Flag);
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
+
+	// Passenger statistics
+	UFUNCTION()
+	int32 GetTotalPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetFreePassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetPaidPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetArriveTotalPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetArriveFreePassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetArrivePaidPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetWaitTotalPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetWaitFreePassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetWaitPaidPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetDestroyedTotalPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetDestroyedFreePassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetDestroyedPaidPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetRideTotalPassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetRideFreePassengerCount(StationType Type = StationType::None) const;
+	UFUNCTION()
+	int32 GetRidePaidPassengerCount(StationType Type = StationType::None) const;
 
 	UFUNCTION()
 	void WeeklyTask();
