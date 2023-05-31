@@ -127,6 +127,17 @@ bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 	return true;
 }
 
+FConnectorData* ABridgeTunnelManager::FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF) {
+
+	for (FConnectorData& connector : Connectors) {
+		if (ConnectorREF == connector.ConnectorREF) {
+			return &connector;
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
+	return nullptr;
+}
 FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TArray<FIntPoint> points) {
 	TArray<FIntPoint> processedPoints = ProcessArray(points);
 	TArray<FIntPoint> reversedPoints = processedPoints;
@@ -138,11 +149,19 @@ FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TA
 		}
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 	return nullptr;
 }
 
 void ABridgeTunnelManager::DeleteConnector(ConnectorType type, const TArray<FIntPoint>& points) {
 	FConnectorData* ConnectorToDelete = FindConnector(type, points);
+	if (ConnectorToDelete != nullptr) {
+		ConnectorToDelete->ConnectorREF->Destroy();
+		Connectors.Remove(*ConnectorToDelete);
+	}
+}
+void ABridgeTunnelManager::DeleteConenctor(ABridgeTunnel* ConnectorREF) {
+	FConnectorData* ConnectorToDelete = FindConnector(ConnectorREF);
 	if (ConnectorToDelete != nullptr) {
 		ConnectorToDelete->ConnectorREF->Destroy();
 		Connectors.Remove(*ConnectorToDelete);

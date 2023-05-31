@@ -65,6 +65,7 @@ private:
 
 public:
 	FConnectorData* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
+	FConnectorData* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -72,5 +73,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DeleteConnector(ConnectorType type, const TArray<FIntPoint>& points);
-
+	UFUNCTION(BlueprintCallable)
+	void DeleteConenctor(ABridgeTunnel* ConnectorREF);
 };
