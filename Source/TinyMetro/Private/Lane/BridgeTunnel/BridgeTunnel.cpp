@@ -24,4 +24,5 @@ void ABridgeTunnel::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
+void ABridgeTunnel::CountUp_Implementation() {};
+void ABridgeTunnel::CountDown_Implementation() {};

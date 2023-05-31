@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "BridgeTunnel.generated.h"
 
 UCLASS()
@@ -26,4 +27,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 count;
 
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CountUp();
+	virtual void CountUp_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CountDown();
+	virtual void CountDown_Implementation();
 };
