@@ -153,6 +153,52 @@ TArray<ATrainTemplate*> ATrainManager::GetStationsByDestination(FStationInfo Sta
 	return arr;
 }
 
+int32 ATrainManager::GetTrainCount(int32 LaneId) const {
+	int32 result = 0;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (LaneId == -1) {
+				result++;
+			} else {
+				if (i->GetServiceLaneId() == LaneId) result++;
+			}
+		}
+	}
+	return result;
+}
+
+int32 ATrainManager::GetMainTrainCount(int32 LaneId) const {
+	int32 result = 0;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->IsA(ATrain::StaticClass())) {
+				if (LaneId == -1) {
+					result++;
+				} else {
+					if (i->GetServiceLaneId() == LaneId) result++;
+				}
+			}
+		}
+	}
+	return result;
+}
+
+int32 ATrainManager::GetSubTrainCount(int32 LaneId) const {
+	int32 result = 0;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->IsA(ASubtrain::StaticClass())) {
+				if (LaneId == -1) {
+					result++;
+				} else {
+					if (i->GetServiceLaneId() == LaneId) result++;
+				}
+			}
+		}
+	}
+	return result;
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {

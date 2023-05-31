@@ -58,6 +58,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<ATrainTemplate*> GetStationsByDestination(struct FStationInfo Station, class ALane* Lane);
 
+	UFUNCTION()
+	int32 GetTrainCount(int32 LaneId = -1) const;
+	UFUNCTION()
+	int32 GetMainTrainCount(int32 LaneId = -1) const;
+	UFUNCTION()
+	int32 GetSubTrainCount(int32 LaneId = -1) const;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
