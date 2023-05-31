@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../../GridGenerator/GridManager.h"
+#include "../../PlayerState/TinyMetroPlayerState.h"
+#include "ConnectorType.h"
+#include "ConnectorData.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -32,4 +36,56 @@ public:
 	void DisconnectBT(const TArray<FIntPoint>& points);
 	virtual void DisconnectBT_Implementation(const TArray<FIntPoint>& points);
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AGridManager* GridManagerRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ATinyMetroPlayerState* PlayerStateRef;
+
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CreateNewBridge(const TArray<FIntPoint>& points);
+	virtual void CreateNewBridge_Implementation(const TArray<FIntPoint>& points);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CreateNewTunnel(const TArray<FIntPoint>& points);
+	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points);
+	
+	UFUNCTION(BlueprintCallable)
+	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points);
+
+	UFUNCTION(BlueprintCallable)
+	void ReturnItem(ConnectorType type);
+
+private:
+	TArray<FIntPoint> ProcessArray(const TArray<FIntPoint>& points);
+
+	bool IsPointsValid(const TArray<FIntPoint>& points);
+
+public:
+	FConnectorData* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
+	FConnectorData* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FConnectorData> Connectors;
+
+	UFUNCTION(BlueprintCallable)
+	void DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points);
+	UFUNCTION(BlueprintCallable)
+	void DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF);
+
+	UFUNCTION(BlueprintCallable)
+	void DeleteConnector(FConnectorData connectorData);
+
+
+	UFUNCTION(BlueprintCallable)
+	void DisconnectConnector(FConnectorData connectorData);
+
+	UFUNCTION(BlueprintCallable)
+	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points);
+
+	UFUNCTION(BlueprintCallable)
+	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF);
 };
