@@ -26,6 +26,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	int32 GetLaneCount() const;
+	UFUNCTION()
+	int32 GetRandomLaneId() const;
+
 public:
 	//UPROPERTY(BlueprintReadWrite)
 	//int32 NextLaneId = 1;
