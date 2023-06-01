@@ -284,3 +284,178 @@ void UInvestmentLuaState::AddComplainByRate(FLuaValue StationId, FLuaValue Rate)
     }
     StationManagerRef->GetStationById(StationId.ToInteger())->AddComplain(Rate.ToFloat());
 }
+
+FLuaValue UInvestmentLuaState::GetTotalPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetTotalPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetFreePassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetFreePassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetPaidPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetPaidPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetArriveTotalPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetArriveTotalPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetArriveFreePassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetArriveFreePassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetArrivePaidPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetArrivePaidPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetWaitTotalPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetWaitTotalPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetWaitFreePassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetWaitFreePassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetWaitPaidPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetWaitPaidPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetDestroyedTotalPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetDestroyedTotalPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetDestroyedFreePassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetDestroyedFreePassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetDestroyedPaidPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetDestroyedPaidPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetRideTotalPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetRideTotalPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetRideFreePassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetRideFreePassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+FLuaValue UInvestmentLuaState::GetRidePaidPassengerCount(FLuaValue Type) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    bool success;
+    return FLuaValue(StationManagerRef->GetRidePaidPassengerCount(AStationManager::StationTypeFromString(Type.ToString(), success)));
+}
+
+void UInvestmentLuaState::AddPassengerSpawn(FLuaValue Rate) const {
+    if (!IsValid(StationManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        StationManagerRef = GameModeRef->GetStationManager();
+    }
+    StationManagerRef->SetPassengerSpawnSpeed(Rate.ToFloat());
+}
