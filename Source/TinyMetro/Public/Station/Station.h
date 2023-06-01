@@ -191,7 +191,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	bool IsComplainIncreaseEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	float PassengerSpawnRequire = 6000;
+	float PassengerSpawnRequire = 6.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
