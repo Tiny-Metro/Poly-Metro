@@ -61,9 +61,15 @@ public:
 	UFUNCTION()
 	int32 GetTrainCount(int32 LaneId = -1) const;
 	UFUNCTION()
+	int32 GetTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId = -1) const;
+	UFUNCTION()
 	int32 GetMainTrainCount(int32 LaneId = -1) const;
 	UFUNCTION()
+	int32 GetMainTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId = -1) const;
+	UFUNCTION()
 	int32 GetSubTrainCount(int32 LaneId = -1) const;
+	UFUNCTION()
+	int32 GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId = -1) const;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")

@@ -167,6 +167,20 @@ int32 ATrainManager::GetTrainCount(int32 LaneId) const {
 	return result;
 }
 
+int32 ATrainManager::GetTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId) const {
+	int32 result = 0;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (LaneId == -1 && (i->GetIsUpgrade() == Upgrade)) {
+				result++;
+			} else {
+				if (i->GetServiceLaneId() == LaneId && (i->GetIsUpgrade() == Upgrade)) result++;
+			}
+		}
+	}
+	return result;
+}
+
 int32 ATrainManager::GetMainTrainCount(int32 LaneId) const {
 	int32 result = 0;
 	for (auto& i : Trains) {
@@ -183,6 +197,22 @@ int32 ATrainManager::GetMainTrainCount(int32 LaneId) const {
 	return result;
 }
 
+int32 ATrainManager::GetMainTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId) const {
+	int32 result = 0;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->IsA(ATrain::StaticClass())) {
+				if (LaneId == -1 && (i->GetIsUpgrade() == Upgrade)) {
+					result++;
+				} else {
+					if (i->GetServiceLaneId() == LaneId && (i->GetIsUpgrade() == Upgrade)) result++;
+				}
+			}
+		}
+	}
+	return result;
+}
+
 int32 ATrainManager::GetSubTrainCount(int32 LaneId) const {
 	int32 result = 0;
 	for (auto& i : Trains) {
@@ -192,6 +222,22 @@ int32 ATrainManager::GetSubTrainCount(int32 LaneId) const {
 					result++;
 				} else {
 					if (i->GetServiceLaneId() == LaneId) result++;
+				}
+			}
+		}
+	}
+	return result;
+}
+
+int32 ATrainManager::GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId) const {
+	int32 result = 0;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->IsA(ASubtrain::StaticClass())) {
+				if (LaneId == -1 && (i->GetIsUpgrade() == Upgrade)) {
+					result++;
+				} else {
+					if (i->GetServiceLaneId() == LaneId && (i->GetIsUpgrade() == Upgrade)) result++;
 				}
 			}
 		}
