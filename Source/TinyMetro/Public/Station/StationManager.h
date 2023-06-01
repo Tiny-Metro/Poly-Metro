@@ -236,7 +236,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 StationSpawnRange = 7;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	int32 StationId = 0;
+	int32 NextStationId = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> TotalSpawnPassengerNotFree = {

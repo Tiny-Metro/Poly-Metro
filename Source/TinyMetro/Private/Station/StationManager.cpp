@@ -200,9 +200,9 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
 	tmp->SetStationType(Type);
 	tmp->SetGridCellData(GridCellData);
-	tmp->SetStationId(StationId);
+	tmp->SetStationId(NextStationId);
 
-	tmp->SetStationInfo(StationId++, Type);
+	tmp->SetStationInfo(NextStationId++, Type);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
 
 	if (ActivateFlag) {
