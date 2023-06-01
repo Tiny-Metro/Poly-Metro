@@ -351,6 +351,7 @@ protected:
 	// Mesh, Material paths (Station)
 	UPROPERTY()
 	TArray<FString> StationMeshPath = {
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationNone'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationTriangle.SM_StationTriangle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRectangle.SM_StationRectangle'"),
@@ -381,6 +382,7 @@ protected:
 	// Mesh, Material paths (Passenger)
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerNone'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
@@ -400,6 +402,7 @@ protected:
 
 	// Mesh of complain gauge paths
 	TArray<FString> ComplainMeshPath = {
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CircleGauge.SM_NoneGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CircleGauge.SM_CircleGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_TriangleGauge.SM_TriangleGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_RectangleGauge.SM_RectangleGauge'"),
