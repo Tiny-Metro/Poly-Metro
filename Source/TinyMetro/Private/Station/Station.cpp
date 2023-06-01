@@ -96,7 +96,6 @@ void AStation::BeginPlay()
 	StationManager = GameMode->GetStationManager();
 	Daytime = GameMode->GetDaytime();
 
-	PassengerSpawnRoutine();
 	ComplainRoutine();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
@@ -111,6 +110,8 @@ void AStation::BeginPlay()
 void AStation::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	PassengerSpawnRoutine(DeltaTime);
 }
 
 void AStation::SetStationId(int32 Id) {
@@ -564,34 +565,44 @@ void AStation::UpdatePassengerMesh() {
 	}
 }
 
-void AStation::PassengerSpawnRoutine() {
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerSpawnPassenger,
-		FTimerDelegate::CreateLambda([&]() {
-			PassengerSpawnCurrent += PassengerSpawnPerSec;
-
-			if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
-				if (IsPassengerSpawnEnable) {
-					if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
-						SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
-					}
-				}
-
-				PassengerSpawnCurrent = 0.0f;
+void AStation::PassengerSpawnRoutine(float DeltaTime) {
+	PassengerSpawnCurrent += DeltaTime * PassengerSpawnSpeed;
+	if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
+		if (IsPassengerSpawnEnable) {
+			if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
+				SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
 			}
+		}
+		PassengerSpawnCurrent -= PassengerSpawnRequire;
+	}
 
-			//Log
-			//if (GEngine)
-			//	GEngine->AddOnScreenDebugMessage(
-			//		-1,
-			//		15.0f,
-			//		FColor::Yellow,
-			//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
-		}),
-		1.0f, // Repeat delay
-		true, // Repeat
-		1.0f // First delay
-		);
+	//GetWorld()->GetTimerManager().SetTimer(
+	//	TimerSpawnPassenger,
+	//	FTimerDelegate::CreateLambda([&]() {
+	//		PassengerSpawnCurrent += PassengerSpawnPerSec;
+
+	//		if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
+	//			if (IsPassengerSpawnEnable) {
+	//				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
+	//					SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
+	//				}
+	//			}
+
+	//			PassengerSpawnCurrent = 0.0f;
+	//		}
+
+	//		//Log
+	//		//if (GEngine)
+	//		//	GEngine->AddOnScreenDebugMessage(
+	//		//		-1,
+	//		//		15.0f,
+	//		//		FColor::Yellow,
+	//		//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
+	//	}),
+	//	1.0f, // Repeat delay
+	//	true, // Repeat
+	//	1.0f // First delay
+	//	);
 }
 
 // Not used

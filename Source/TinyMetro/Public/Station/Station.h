@@ -163,7 +163,7 @@ public:
 	void SetStationInfo(int32 Id, StationType Type);
 
 protected:
-	void PassengerSpawnRoutine();
+	void PassengerSpawnRoutine(float DeltaTime);
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
 	void ComplainRoutine();
@@ -189,11 +189,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	bool IsComplainIncreaseEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 PassengerSpawnRequire = 6000;
+	float PassengerSpawnRequire = 6000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	int32 PassengerSpawnPerSec = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 PassengerSpawnCurrent = 0;
+	float PassengerSpawnCurrent = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
+	float PassengerSpawnSpeed = 1.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double PassengerSpawnProbability = 0.6;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
