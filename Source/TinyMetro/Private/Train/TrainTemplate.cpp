@@ -383,6 +383,10 @@ void ATrainTemplate::Upgrade() {
 	//TODO : Mesh change
 }
 
+bool ATrainTemplate::GetIsUpgrade() const {
+	return IsUpgrade;
+}
+
 void ATrainTemplate::Test() {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 		TEXT("Test() : TrainTemplate"));
