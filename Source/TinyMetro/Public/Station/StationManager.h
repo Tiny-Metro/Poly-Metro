@@ -152,6 +152,9 @@ public:
 	void DailyTask();
 
 	UFUNCTION()
+	void SetPassengerSpawnSpeed(float Speed, int32 StationId = -1);
+
+	UFUNCTION()
 	void SetTransfer(bool Flag);
 
 	UFUNCTION()

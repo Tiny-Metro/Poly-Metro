@@ -138,6 +138,8 @@ public:
 	void SetPassengerSpawnEnable(bool Flag);
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
+	UFUNCTION()
+	void SetPassengerSpawnSpeed(float Speed);
 	
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -190,8 +192,6 @@ protected:
 	bool IsComplainIncreaseEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnRequire = 6000;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 PassengerSpawnPerSec = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")

@@ -690,6 +690,23 @@ void AStationManager::DailyTask() {
 	}
 }
 
+// Call AStation::SetPassengerSpawnSpeed
+// Default value of StationId = -1, apply all station
+void AStationManager::SetPassengerSpawnSpeed(float Speed, int32 StationId) {
+	if (StationId == -1) {
+		for (auto& i : Station) {
+			if (IsValid(i)) {
+				i->SetPassengerSpawnSpeed(Speed);
+			}
+		}
+	} else {
+		auto tmp = GetStationById(StationId);
+		if (IsValid(tmp)) {
+			tmp->SetPassengerSpawnSpeed(Speed);
+		}
+	}
+}
+
 void AStationManager::SetTransfer(bool Flag) {
 	for (auto& i : Station) {
 		if (IsValid(i)) {

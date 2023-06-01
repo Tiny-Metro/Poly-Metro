@@ -377,6 +377,13 @@ bool AStation::GetPassengerSpawnEnable() const {
 	return IsPassengerSpawnEnable;
 }
 
+// Set Passenger's spawn speed
+// float Speed : multiple by Delta time
+// ex) Speed = 1.0 -> Normal speed
+void AStation::SetPassengerSpawnSpeed(float Speed) {
+	PassengerSpawnSpeed = Speed;
+}
+
 void AStation::CalculateComplain() {
 }
 
