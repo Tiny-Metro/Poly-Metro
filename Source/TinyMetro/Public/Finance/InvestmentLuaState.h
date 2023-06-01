@@ -79,11 +79,35 @@ public:
 
 	// Passenger effect
 	UFUNCTION()
-	FLuaValue GetArrivePassengerCount() const;
+	FLuaValue GetTotalPassengerCount(FLuaValue Type) const;
 	UFUNCTION()
-	FLuaValue GetNotArrivePassengerCount() const;
+	FLuaValue GetFreePassengerCount(FLuaValue Type) const;
 	UFUNCTION()
-	FLuaValue GetNotArrivePassengerCountByType(FLuaValue Type) const;
+	FLuaValue GetPaidPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetArriveTotalPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetArriveFreePassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetArrivePaidPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetWaitTotalPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetWaitFreePassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetWaitPaidPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetDestroyedTotalPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetDestroyedFreePassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetDestroyedPaidPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetRideTotalPassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetRideFreePassengerCount(FLuaValue Type) const;
+	UFUNCTION()
+	FLuaValue GetRidePaidPassengerCount(FLuaValue Type) const;
 	UFUNCTION()
 	void AddPassengerSpawn(FLuaValue Rate) const;
 
@@ -97,15 +121,27 @@ public:
 	UFUNCTION()
 	FLuaValue GetTrainCount() const;
 	UFUNCTION()
+	FLuaValue GetUpgradeTrainCount() const;
+	UFUNCTION()
 	FLuaValue GetMainTrainCount() const;
+	UFUNCTION()
+	FLuaValue GetUpgradeMainTrainCount() const;
 	UFUNCTION()
 	FLuaValue GetSubTrainCount() const;
 	UFUNCTION()
+	FLuaValue GetUpgradeSubTrainCount() const;
+	UFUNCTION()
 	FLuaValue GetTrainCountByLane(FLuaValue Id) const;
+	UFUNCTION()
+	FLuaValue GetUpgradeTrainCountByLane(FLuaValue Id) const;
 	UFUNCTION()
 	FLuaValue GetMainTrainCountByLane(FLuaValue Id) const;
 	UFUNCTION()
+	FLuaValue GetUpgradeMainTrainCountByLane(FLuaValue Id) const;
+	UFUNCTION()
 	FLuaValue GetSubTrainCountByLane(FLuaValue Id) const;
+	UFUNCTION()
+	FLuaValue GetUpgradeSubTrainCountByLane(FLuaValue Id) const;
 
 protected:
 	UPROPERTY()
@@ -116,4 +152,8 @@ protected:
 	mutable class APolicy* PolicyRef;
 	UPROPERTY()
 	mutable class AStationManager* StationManagerRef;
+	UPROPERTY()
+	mutable class ALaneManager* LaneManagerRef;
+	UPROPERTY()
+	mutable class ATrainManager* TrainManagerRef;
 };

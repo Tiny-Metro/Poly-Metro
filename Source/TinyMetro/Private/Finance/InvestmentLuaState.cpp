@@ -6,6 +6,8 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Policy/Policy.h"
 #include "Station/StationManager.h"
+#include "Lane/LaneManager.h"
+#include "Train/TrainManager.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -458,4 +460,144 @@ void UInvestmentLuaState::AddPassengerSpawn(FLuaValue Rate) const {
         StationManagerRef = GameModeRef->GetStationManager();
     }
     StationManagerRef->SetPassengerSpawnSpeed(Rate.ToFloat());
+}
+
+FLuaValue UInvestmentLuaState::GetLaneCount() const {
+    if (!IsValid(LaneManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        LaneManagerRef = GameModeRef->GetLaneManager();
+    }
+    return FLuaValue(LaneManagerRef->GetLaneCount());
+}
+
+FLuaValue UInvestmentLuaState::GetRandomLaneId() const {
+    if (!IsValid(LaneManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        LaneManagerRef = GameModeRef->GetLaneManager();
+    }
+    return FLuaValue(LaneManagerRef->GetRandomLaneId());
+}
+
+FLuaValue UInvestmentLuaState::GetTrainCount() const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetTrainCount());
+}
+
+FLuaValue UInvestmentLuaState::GetUpgradeTrainCount() const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetTrainCountFilterByUpgrade(true));
+}
+
+FLuaValue UInvestmentLuaState::GetMainTrainCount() const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetMainTrainCount());
+}
+
+FLuaValue UInvestmentLuaState::GetUpgradeMainTrainCount() const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetMainTrainCountFilterByUpgrade(true));
+}
+
+FLuaValue UInvestmentLuaState::GetSubTrainCount() const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetSubTrainCount());
+}
+
+FLuaValue UInvestmentLuaState::GetUpgradeSubTrainCount() const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetSubTrainCountFilterByUpgrade(true));
+}
+
+FLuaValue UInvestmentLuaState::GetTrainCountByLane(FLuaValue Id) const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetTrainCount(Id.ToInteger()));
+}
+
+FLuaValue UInvestmentLuaState::GetUpgradeTrainCountByLane(FLuaValue Id) const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetTrainCountFilterByUpgrade(true, Id.ToInteger()));
+}
+
+FLuaValue UInvestmentLuaState::GetMainTrainCountByLane(FLuaValue Id) const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetMainTrainCount(Id.ToInteger()));
+}
+
+FLuaValue UInvestmentLuaState::GetUpgradeMainTrainCountByLane(FLuaValue Id) const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetMainTrainCountFilterByUpgrade(true, Id.ToInteger()));
+}
+
+FLuaValue UInvestmentLuaState::GetSubTrainCountByLane(FLuaValue Id) const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetSubTrainCount(Id.ToInteger()));
+}
+
+FLuaValue UInvestmentLuaState::GetUpgradeSubTrainCountByLane(FLuaValue Id) const {
+    if (!IsValid(TrainManagerRef)) {
+        if (!IsValid(GameModeRef)) {
+            GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+        }
+        TrainManagerRef = GameModeRef->GetTrainManager();
+    }
+    return FLuaValue(TrainManagerRef->GetSubTrainCountFilterByUpgrade(true, Id.ToInteger()));
 }
