@@ -15,7 +15,75 @@ UInvestmentLuaState::UInvestmentLuaState() {
     //Table.Add(TEXT("get_number"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UMyLuaState, GetNumber)));
     //Table.Add(TEXT("SomeValue"), FLuaValue(777));
     bRawLuaFunctionCall = true;
+    
+    // API : Player
     Table.Add(TEXT("AddMoney"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, AddMoney, FLuaValue)));
+
+    // API : Policy
+    Table.Add(TEXT("GetServiceLevel"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetServiceLevel)));
+    Table.Add(TEXT("SetServiceLevel"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, SetServiceLevel, FLuaValue)));
+    Table.Add(TEXT("GetPrioritySeat"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetPrioritySeat)));
+    Table.Add(TEXT("SetPrioritySeat"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, SetPrioritySeat, FLuaValue)));
+    Table.Add(TEXT("GetCCTV"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetCCTV)));
+    Table.Add(TEXT("SetCCTV"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, SetCCTV, FLuaValue)));
+    Table.Add(TEXT("GetElevator"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetElevator)));
+    Table.Add(TEXT("SetElevator"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, SetElevator, FLuaValue)));
+    Table.Add(TEXT("GetBicycle"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetBicycle)));
+    Table.Add(TEXT("SetBicycle"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, SetBicycle, FLuaValue)));
+    Table.Add(TEXT("GetTransfer"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetTransfer)));
+    Table.Add(TEXT("SetTransfer"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, SetTransfer, FLuaValue)));
+
+    // API : Station
+    Table.Add(TEXT("GetStationCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetStationCount)));
+    Table.Add(TEXT("GetActiveStationCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetActiveStationCount)));
+    Table.Add(TEXT("GetInactiveStationCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetInactiveStationCount)));
+    Table.Add(TEXT("GetDestroyedStationCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetDestroyedStationCount)));
+    Table.Add(TEXT("GetTypeStationCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTypeStationCount, FLuaValue)));
+    Table.Add(TEXT("GetRandomStationId"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetRandomStationId)));
+    Table.Add(TEXT("GetRandomActiveStationId"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetRandomActiveStationId)));
+    Table.Add(TEXT("GetRandomInactiveStationId"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetRandomInactiveStationId)));
+    Table.Add(TEXT("GetRandomDestroyedStationId"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetRandomDestroyedStationId)));
+    Table.Add(TEXT("GetRandomTypeStationId"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetRandomTypeStationId, FLuaValue)));
+    Table.Add(TEXT("AddComplainFixedValue"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UInvestmentLuaState, AddComplainFixedValue, FLuaValue, FLuaValue)));
+    Table.Add(TEXT("AddComplainByRate"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UInvestmentLuaState, AddComplainByRate, FLuaValue, FLuaValue)));
+
+    // API : Passenger
+    Table.Add(TEXT("GetTotalPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTotalPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetFreePassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetFreePassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetPaidPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetPaidPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetArriveTotalPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetArriveTotalPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetArriveFreePassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetArriveFreePassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetArrivePaidPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetArrivePaidPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetWaitTotalPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetWaitTotalPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetWaitFreePassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetWaitFreePassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetWaitPaidPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetWaitPaidPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetDestroyedTotalPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetDestroyedTotalPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetDestroyedFreePassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetDestroyedFreePassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetDestroyedPaidPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetDestroyedPaidPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetRideTotalPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetRideTotalPassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetRideFreePassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetRideFreePassengerCount, FLuaValue)));
+    Table.Add(TEXT("GetRidePaidPassengerCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetRidePaidPassengerCount, FLuaValue)));
+    Table.Add(TEXT("AddPassengerSpawn"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, AddPassengerSpawn, FLuaValue)));
+
+    // API : Lane
+    Table.Add(TEXT("GetLaneCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetLaneCount)));
+    Table.Add(TEXT("GetRandomLaneId"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetRandomLaneId)));
+
+    // API : Train
+    Table.Add(TEXT("GetTrainCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetTrainCount)));
+    Table.Add(TEXT("GetUpgradeTrainCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetUpgradeTrainCount)));
+    Table.Add(TEXT("GetMainTrainCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetMainTrainCount)));
+    Table.Add(TEXT("GetUpgradeMainTrainCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetUpgradeMainTrainCount)));
+    Table.Add(TEXT("GetSubTrainCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetSubTrainCount)));
+    Table.Add(TEXT("GetUpgradeSubTrainCount"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UInvestmentLuaState, GetUpgradeSubTrainCount)));
+    Table.Add(TEXT("GetTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTrainCountByLane, FLuaValue)));
+    Table.Add(TEXT("GetUpgradeTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetUpgradeTrainCountByLane, FLuaValue)));
+    Table.Add(TEXT("GetMainTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetMainTrainCountByLane, FLuaValue)));
+    Table.Add(TEXT("GetUpgradeMainTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetUpgradeMainTrainCountByLane, FLuaValue)));
+    Table.Add(TEXT("GetSubTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetSubTrainCountByLane, FLuaValue)));
+    Table.Add(TEXT("GetUpgradeSubTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetUpgradeSubTrainCountByLane, FLuaValue)));
+
+    // Test Table
     Table.Add(TEXT(""), FLuaValue(0));
 }
 
