@@ -25,6 +25,8 @@ ALane::ALane()
 
 	TrainManagerRef = Cast<ATrainManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrainManager::StaticClass()));
 
+	BTMangerREF = Cast<ABridgeTunnelManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ABridgeTunnelManager::StaticClass()));;
+
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
@@ -743,6 +745,9 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 
 	for (int32 i = 0; i < NumStations; i++) 
 	{
+		TArray<FLanePoint> LaneBlock;
+		LaneBlock.Empty();
+
 		if (i == NumStations - 1)
 		{
 			AStation* CurrentStationPtr = NewStationPoint[i];
@@ -752,8 +757,9 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			CurrentLanePoint.IsStation = true;
 			CurrentLanePoint.IsBendingPoint = true;
 			CurrentLanePoint.IsThrough = false;
-			PreLaneArray.Add(CurrentLanePoint);
+			LaneBlock.Add(CurrentLanePoint);
 
+			PreLaneArray.Append(LaneBlock);
 			break;
 		}
 
@@ -772,7 +778,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 		CurrentLanePoint.IsStation = true;
 		CurrentLanePoint.IsBendingPoint = true;
 		CurrentLanePoint.IsThrough = false;
-		PreLaneArray.Add(CurrentLanePoint);
+		LaneBlock.Add(CurrentLanePoint);
 
 		if (IsBending)
 		{
@@ -785,16 +791,16 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			// Add PathToBending points to LaneArray
 			for (const FIntPoint& Point : PathToBending) 
 			{
-				AddLanePoint(Point, false, PreLaneArray);
+				AddLanePoint(Point, false, LaneBlock);
 			}
 
 			// Add BendingPoint to LaneArray
-			AddLanePoint(BendingCoord, true, PreLaneArray);
+			AddLanePoint(BendingCoord, true, LaneBlock);
 
 			// Add PathFromBending points to LaneArray
 			for (const FIntPoint& Point : PathFromBending) 
 			{
-				AddLanePoint(Point, false, PreLaneArray);
+				AddLanePoint(Point, false, LaneBlock);
 			}
 		}
 		else 
@@ -804,10 +810,28 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			// Add PathToNext points to LaneArray
 			for (const FIntPoint& Point : PathToNext) 
 			{
-				AddLanePoint(Point, false, PreLaneArray);
+				AddLanePoint(Point, false, LaneBlock);
 			}
 		}
+
+		PreLaneArray.Append(LaneBlock);
 	}
+
+
+	// check if tunnel&bridge - and can be used
+	SetWaterHillArea(PreLaneArray);
+
+	for (int i = 0; i < WaterArea.Num(); i++) 
+	{		
+		BTMangerREF->BuildConnector(ConnectorType::Bridge, WaterArea[i]);
+	}
+	for (int i = 0; i < HillArea.Num(); i++)
+	{
+		BTMangerREF->BuildConnector(ConnectorType::Tunnel, HillArea[i]);
+	}
+
+	/*
+	*/
 
 	// Done
 	StationPoint = NewStationPoint;
@@ -816,7 +840,181 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 
 }
 
-bool ALane::hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock)
+{
+	TArray<FIntPoint> WaterPoints;
+	TArray<FIntPoint> HillPoints;
+
+	TArray<int> WaterIndex;
+	TArray<int> HillIndex;
+
+	for (int i =0; i < LaneBlock.Num(); i++)
+	{
+		
+		FIntPoint Coord = LaneBlock[i].Coordination;
+
+		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Coord.X, Coord.Y);
+
+		switch (GridCellData.GridType)
+		{
+		case GridType::Ground:
+			break;
+		case GridType::Water:
+			if (WaterIndex.IsEmpty())
+			{
+				WaterPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			if (WaterIndex.Num() >= 1 && WaterIndex.Last() + 1 != i)
+			{
+				WaterPoints.Add(LaneBlock[WaterIndex.Last() + 1].Coordination);
+				WaterPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			WaterIndex.Add(i);
+			WaterPoints.Add(Coord);
+			break;
+		case GridType::Hill:
+			if (HillIndex.IsEmpty())
+			{
+				HillPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			if (HillIndex.Num() >= 1 && HillIndex.Last() + 1 != i)
+			{
+				HillPoints.Add(LaneBlock[HillIndex.Last() + 1].Coordination);
+				HillPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			HillIndex.Add(i);
+			HillPoints.Add(Coord);
+			break;
+		}
+
+	}
+
+	if (WaterIndex.Num() > 0)
+	{
+		WaterPoints.Add(LaneBlock[WaterIndex.Last() + 1].Coordination);
+	}
+	if (HillIndex.Num() > 0)
+	{
+		HillPoints.Add(LaneBlock[HillIndex.Last() + 1].Coordination);
+	}
+
+	SetArea(WaterPoints, WaterArea);
+	SetArea(HillPoints, HillArea);
+}
+
+void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray)
+{
+	int32 NumPoints = Points.Num();
+
+	if (NumPoints == 0)
+	{
+		return;
+	}
+
+	TArray<FIntPoint> Area;
+	Area.Add(Points[0]);
+
+	for (int32 i = 1; i < NumPoints; i++)
+	{
+		const FIntPoint& CurrentCoord = Points[i];
+		const FIntPoint& PrevCoord = Points[i - 1];
+
+		int32 XDiff = FMath::Abs(CurrentCoord.X - PrevCoord.X);
+		int32 YDiff = FMath::Abs(CurrentCoord.Y - PrevCoord.Y);
+
+		if (XDiff <= 1 && YDiff <= 1)
+		{
+			// Coordinates are within the range of (-1, -1) and (1, 1), indicating continuity
+			Area.Add(CurrentCoord);
+		}
+		else
+		{
+			// Coordinates are not continuous
+			AreaArray.Add(Area);
+			Area.Empty();
+			Area.Add(CurrentCoord);
+		}
+	}
+
+	AreaArray.Add(Area);
+}
+
+/*
+
+void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock){
+	TArray<FIntPoint> WaterPoints;
+	TArray<FIntPoint> HillPoints;
+
+	for (const FLanePoint& Point : LaneBlock)
+	{
+		FIntPoint Cord = Point.Coordination;
+		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Cord.X, Cord.Y);
+
+		switch (GridCellData.GridType) {
+		case GridType::Ground:
+			break;
+		case GridType::Water:
+			WaterPoints.Add(Cord);
+			break;
+		case GridType::Hill:
+			HillPoints.Add(Cord);
+			break;
+		}
+	}
+
+	int NumWater = WaterPoints.Num();
+
+	if (NumWater = 1)
+	{
+		WaterArea.Add(WaterPoints);
+	}
+
+	TArray<FIntPoint> Points;
+	for (int i = 0; i < NumWater - 1; i++)
+	{
+		FIntPoint CurrentCoord = WaterPoints[i];
+		FIntPoint NextCoord = WaterPoints[i + 1];
+
+		int XDiff = FMath::Abs(CurrentCoord.X - NextCoord.X);
+		int YDiff = FMath::Abs(CurrentCoord.Y - NextCoord.Y);
+
+		if (XDiff <= 1 && YDiff <= 1)
+		{
+			// Coordinates are within the range of (-1, -1) and (1, 1), indicating continuity
+			Points.Add(CurrentCoord);
+		}
+		else
+		{
+			// Coordinates are not continuous
+			Points.Add(CurrentCoord);
+			WaterArea.Add(Points);
+			Points.Empty();
+		}
+
+	}
+
+	if (FMath::Abs(WaterPoints[NumWater - 2].X - WaterPoints[NumWater - 1].X) > 1 ||
+			FMath::Abs(WaterPoints[NumWater - 2].Y - WaterPoints[NumWater - 1].Y) > 1)
+	{	// when last one is not continous with second last one
+		WaterArea.Add(Points);
+		Points.Empty();
+
+		Points.Add(WaterPoints[NumWater - 1]);
+		WaterArea.Add(Points);
+		Points.Empty();
+	}
+	else
+	{// when last one is not continous with second last one
+		WaterArea.Add(Points);
+		Points.Add(WaterPoints[NumWater - 1]);
+		Points.Empty();
+	}
+
+
+}
+*/
+
+bool ALane::HasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
 	FIntPoint Diff = NextStation - CurrentStation;
 
 	if (Diff.X == 0) return false;

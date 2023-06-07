@@ -9,6 +9,7 @@
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
+#include "BridgeTunnel/BridgeTunnelManager.h"
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "Lane.generated.h"
@@ -49,6 +50,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATinyMetroPlayerState* TinyMetroPlayerState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ABridgeTunnelManager* BTMangerREF;
+
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -256,4 +261,11 @@ private:
 private:
 	bool IsPointsValid();
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
+
+private:
+	void SetWaterHillArea(TArray<FLanePoint>& LaneBlock);
+	void SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray);
+
+	TArray<TArray<FIntPoint>> WaterArea;
+	TArray<TArray<FIntPoint>> HillArea;
 };
