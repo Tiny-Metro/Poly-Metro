@@ -165,12 +165,7 @@ public: // About Train
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
 
-//REFACTORING SETLANEARRAY
-
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Lane")
-	TArray<FLanePoint> RLaneArray;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FIntPoint> PointArray;
 
@@ -179,16 +174,18 @@ public:
 
 
 private:
-	bool hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+	bool HasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+	bool HasBendingPoint(FIntPoint Diff);
 
-	FIntPoint findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+	FIntPoint FindBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
 
 	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
 
-// REFACTORING SetLaneVector
+	void AddLanePoint(const FIntPoint& Point, bool IsBendingPoint, TArray<FLanePoint>& TargetArray);
+	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FVector> RLaneLocation;
+	TArray<FVector> LaneLocation;
 
 	UFUNCTION(BlueprintCallable)
 	void SetLaneLocation();
@@ -196,25 +193,21 @@ public:
 private:
 	FVector PointToLocation(const FIntPoint& Point);
 
-// Refactoring clearSplineMesh
 public:
 	UFUNCTION(BlueprintCallable)
 	void ClearLanePoint();
 
-//Refactoring SetSpline
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaneSpline(USplineComponent* Spline);
 
-//Refactoring HandleScaling
 public:
 	UFUNCTION(BlueprintCallable)
-	void HandleScaling(bool IsScaling, float SectionLength);
+	void HandleScaling(bool IsScaling, float Length);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	double RSectionLength;
+	double SectionLength;
 
-//Refactoring HandleFullLength
 public:
 	UFUNCTION(BlueprintCallable)
 	void HandleFullLength(bool IsFullLength, USplineComponent* Spline);
@@ -222,7 +215,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 EndLoop;
 
-// Refactoring AddSplineMeshComponent
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UMaterialInterface* MeshMaterial;
@@ -230,8 +222,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();
 
-
-//Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
 	void SetSplineMeshes(USplineComponent* Spline);
 
@@ -239,7 +229,6 @@ private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
 
 	public:
-//ReFactoring Setting Mesh & Remove
 		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 		UStaticMesh* LaneMesh;
 
@@ -263,4 +252,8 @@ private:
 
 		UFUNCTION(BlueprintCallable)
 		void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
+
+private:
+	bool IsPointsValid();
+	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
 };
