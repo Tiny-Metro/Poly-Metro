@@ -111,7 +111,7 @@ bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 	//check if it is empty
 	if(points.IsEmpty()) return false;
 	// check if the element is only one
-	if(points.Num() <= 1) return false;
+	if(points.Num() < 1) return false;
 	// check if last = first
 	if(points[0]==points.Last()) return false;
 
