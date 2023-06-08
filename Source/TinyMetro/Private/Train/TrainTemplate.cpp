@@ -165,6 +165,7 @@ void ATrainTemplate::UpdatePassengerSlot() {
 }
 
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
+	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
 }
