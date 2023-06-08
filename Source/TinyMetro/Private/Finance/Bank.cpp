@@ -119,8 +119,8 @@ void ABank::InitInvestment() {
 	for (auto& i : findFiles) {
 		FRegexMatcher matcher(pattern, i);
 		if (matcher.FindNext()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
-				FString::Printf(TEXT("Files : %s"), *FPaths::GetCleanFilename(i)));
+			/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
+				FString::Printf(TEXT("Files : %s"), *FPaths::GetCleanFilename(i)));*/
 			Investment.Add(UInvestment::CreateInvestment(FPaths::GetCleanFilename(i), LuaState, GetWorld()));
 		}
 	}
