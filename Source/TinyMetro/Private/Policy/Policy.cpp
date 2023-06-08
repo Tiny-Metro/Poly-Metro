@@ -41,7 +41,8 @@ void APolicy::SetServiceCostLevel(int costLevel) {
 void APolicy::SetPrioritySeat(bool Flag) {
 	PolicyData.PrioritySeat = Flag;
 	StationManagerRef->AddComplainIncreaseRate(-0.05 * (Flag ? 1 : -1), -1);
-	StationManagerRef->AddFreePassengerSpawnProbability(0.2 * (Flag ? 1 : -1), -1);
+	// TODO : Imple in StationManager
+	//StationManagerRef->AddFreePassengerSpawnProbability(0.2 * (Flag ? 1 : -1), -1);
 }
 
 void APolicy::SetCCTV(bool Flag) {
@@ -56,7 +57,8 @@ void APolicy::SetElevator(bool Flag) {
 
 void APolicy::SetBicycle(bool Flag) {
 	PolicyData.HasBicycle = Flag;
-	StationManagerRef->AddPassengerSpawnProbability(0.1 * (Flag ? 1 : -1), -1);
+	// TODO : Imple in StationManager
+	//StationManagerRef->AddPassengerSpawnProbability(0.1 * (Flag ? 1 : -1), -1);
 	StationManagerRef->AddComplainIncreaseRate(0.1 * (Flag ? 1 : -1), -1);
 }
 

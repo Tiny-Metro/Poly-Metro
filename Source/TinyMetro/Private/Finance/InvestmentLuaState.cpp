@@ -527,7 +527,8 @@ void UInvestmentLuaState::AddPassengerSpawn(FLuaValue Rate) const {
         }
         StationManagerRef = GameModeRef->GetStationManager();
     }
-    StationManagerRef->SetPassengerSpawnSpeed(Rate.ToFloat());
+    // TODO : Imple in StationManager
+    //StationManagerRef->AddPassengerSpawnSpeed(Rate.ToFloat());
 }
 
 FLuaValue UInvestmentLuaState::GetLaneCount() const {
