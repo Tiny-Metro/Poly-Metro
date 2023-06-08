@@ -255,6 +255,24 @@ int32 ATrainManager::GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId)
 	return result;
 }
 
+float ATrainManager::GetCostUpgradeTrain() const {
+	return CostUpgradeTrain;
+}
+
+float ATrainManager::GetCostUpgradeSubtrain() const {
+	return CostUpgradeSubtrain;
+}
+
+// If something change when Train upgrade, imple init
+void ATrainManager::ReportTrainUpgrade() {
+	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportTrainUprade : Train Upgrade"))
+}
+
+// If something change when Subtrain upgrade, imple init
+void ATrainManager::ReportSubtrainUpgrade() {
+	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportSubtrainUprade : Subtrain Upgrade"))
+}
+
 // Called every frame
 void ATrainManager::Tick(float DeltaTime)
 {

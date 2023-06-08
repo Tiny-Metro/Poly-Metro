@@ -35,6 +35,8 @@ public:
 	virtual void UpdatePassengerSlot() override;
 	virtual void DespawnTrain() override;
 	virtual void UpdateTrainMesh() override;
+	virtual void Upgrade() override;
+	virtual bool CanUpgrade() const override;
 
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;

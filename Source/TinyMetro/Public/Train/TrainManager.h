@@ -71,6 +71,18 @@ public:
 	UFUNCTION()
 	int32 GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId = -1) const;
 
+	// Get upgrade cost
+	UFUNCTION()
+	float GetCostUpgradeTrain() const;
+	UFUNCTION()
+	float GetCostUpgradeSubtrain() const;
+
+	// Call when (sub)train upgrade
+	UFUNCTION()
+	void ReportTrainUpgrade();
+	UFUNCTION()
+	void ReportSubtrainUpgrade();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
@@ -88,4 +100,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UTrainInfoWidget* TrainInfoWidget;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float CostUpgradeTrain = 200.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float CostUpgradeSubtrain = 200.0f;
 };

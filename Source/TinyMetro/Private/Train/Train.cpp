@@ -2,6 +2,7 @@
 
 
 #include "Train/Train.h"
+#include "Train/TrainManager.h"
 #include "Train/SubtrainAiController.h"
 #include "Station/Station.h"
 #include "Station/PathQueue.h"
@@ -318,6 +319,19 @@ void ATrain::UpdateTrainMesh() {
 	Super::UpdateTrainMesh();
 	TrainMeshComponent->SetStaticMesh(TrainMesh[IsUpgrade]);
 	SetTrainMaterial(LaneRef);
+}
+
+void ATrain::Upgrade() {
+	Super::Upgrade();
+	TrainManagerRef->ReportTrainUpgrade();
+}
+
+bool ATrain::CanUpgrade() const {
+	if (PlayerStateRef->GetMoney() < TrainManagerRef->GetCostUpgradeTrain()) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 void ATrain::ActiveMoveTest() {

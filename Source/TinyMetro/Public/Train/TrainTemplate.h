@@ -79,6 +79,8 @@ public:
 	virtual void UpdatePassengerSlot();
 	UFUNCTION()
 	virtual void UpdateTrainMesh();
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanUpgrade() const;
 
 
 	UFUNCTION(BlueprintCallable)

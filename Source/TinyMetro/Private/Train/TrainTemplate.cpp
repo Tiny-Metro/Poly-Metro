@@ -168,6 +168,10 @@ void ATrainTemplate::UpdatePassengerSlot() {
 void ATrainTemplate::UpdateTrainMesh() {
 }
 
+bool ATrainTemplate::CanUpgrade() const {
+	return false;
+}
+
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Destination = D;
 	TrainManagerRef->AddTrain(this);

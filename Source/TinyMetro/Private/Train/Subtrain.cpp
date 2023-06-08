@@ -117,6 +117,19 @@ void ASubtrain::UpdateTrainMesh() {
 	}
 }
 
+void ASubtrain::Upgrade() {
+	Super::Upgrade();
+	TrainManagerRef->ReportSubtrainUpgrade();
+}
+
+bool ASubtrain::CanUpgrade() const {
+	if (PlayerStateRef->GetMoney() < TrainManagerRef->GetCostUpgradeSubtrain()) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
 void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
 	if (IsValid(LaneRef)) {
