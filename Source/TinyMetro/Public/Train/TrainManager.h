@@ -85,5 +85,7 @@ public:
 	TArray<UMaterial*> PassengerMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> PassengerMaterialPath;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UTrainInfoWidget* TrainInfoWidget;
 
 };

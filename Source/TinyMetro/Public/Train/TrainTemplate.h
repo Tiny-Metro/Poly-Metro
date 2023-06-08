@@ -98,12 +98,15 @@ public:
 
 	// Click & Release
 	UFUNCTION()
-	virtual void TrainOnClicked(AActor* Target, FKey ButtonPressed);
+	virtual void TrainOnPressed(AActor* Target, FKey ButtonPressed);
 	UFUNCTION()
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
 
 	UFUNCTION()
 	void SetDespawnNextStation();
+
+	UFUNCTION()
+	void SetTrainInfoWidget(class UTrainInfoWidget* Widget);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -181,6 +184,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Info")
 	bool DeferredDespawn = false;
+
+	// Info widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UTrainInfoWidget* TrainInfoWidget;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
