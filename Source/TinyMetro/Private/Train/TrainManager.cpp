@@ -264,11 +264,15 @@ float ATrainManager::GetCostUpgradeSubtrain() const {
 }
 
 // If something change when Train upgrade, imple init
+// Only after upgrade
+// Not imple use money for upgrade
 void ATrainManager::ReportTrainUpgrade() {
 	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportTrainUprade : Train Upgrade"))
 }
 
 // If something change when Subtrain upgrade, imple init
+// Only after upgrade
+// Not imple use money for upgrade
 void ATrainManager::ReportSubtrainUpgrade() {
 	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportSubtrainUprade : Subtrain Upgrade"))
 }
