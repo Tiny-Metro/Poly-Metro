@@ -222,16 +222,6 @@ void ATrain::SetTrainMaterial(ALane* Lane) {
 	}*/
 }
 
-void ATrain::Upgrade() {
-	Super::Upgrade();
-	// Change mesh
-	//TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
-	// Set flag
-	//IsUpgrade = true;
-	// Set passenger slot
-	//CurrentPassengerSlot = MaxPassengerSlotUpgrade;
-}
-
 bool ATrain::IsPassengerSlotFull() {
 	int32 ValidSeat = GetValidSeatCount();
 	for (auto& i : Subtrains) {

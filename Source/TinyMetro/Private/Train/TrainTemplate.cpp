@@ -29,7 +29,7 @@ ATrainTemplate::ATrainTemplate()
 	TrainMovement = GetCharacterMovement();
 	TrainMovement->MaxAcceleration = 3000.0f; // Default 2048
 	TrainMovement->Mass = 1.0f; // Deafult 100
-	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
+	TrainMovement->MaxWalkSpeed = TRAIN_DEFAULT_SPEED; // Default 600
 	TrainMovement->bUseControllerDesiredRotation = true; // Default false
 
 	TrainMaterial.AddUnique(
@@ -172,6 +172,7 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	ServiceLaneId = Lane->GetLaneId();
 	UpdateTrainMesh();
 }
 
@@ -396,6 +397,7 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
+	TrainMovement->MaxWalkSpeed = TRAIN_UPGRADE_SPEED;
 	UpdateTrainMesh();
 }
 

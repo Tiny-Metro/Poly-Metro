@@ -8,6 +8,9 @@
 #include "../Station/StationInfo.h"
 #include "TrainTemplate.generated.h"
 
+#define TRAIN_DEFAULT_SPEED 300.0f
+#define TRAIN_UPGRADE_SPEED 400.0f
+
 UCLASS(Config = Game)
 class TINYMETRO_API ATrainTemplate : public ACharacter
 {
