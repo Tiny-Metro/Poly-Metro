@@ -23,6 +23,9 @@ public:
 	virtual void UpdatePassengerSlot() override;
 	virtual void DespawnTrain() override;
 	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, UPARAM(DisplayName = "Destination")class AStation* D) override;
+	virtual void UpdateTrainMesh() override;
+	virtual void Upgrade() override;
+	virtual bool CanUpgrade() const override;
 
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
@@ -82,4 +85,26 @@ protected:
 		FVector(-170.0f, 55.0f, 190.0f),
 		FVector(-170.0f, -55.0f, 190.0f)
 	};
+
+	// Used when main train non-upgrade
+	// Index 0 : Non upgrade mesh
+	// Index 1 : Upgrade mesh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<FString> SubtrainMeshPath = {
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort.SM_SubtrainShort'"),
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainLong.SM_SubtrainLong'")
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<UStaticMesh*> SubtrainMesh;
+
+	// Used when main train upgrade
+	// Index 0 : Non upgrade mesh
+	// Index 1 : Upgrade mesh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<FString> UpgradeSubtrainMeshPath = {
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort_Upgrade.SM_SubtrainShort_Upgrade'"),
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainLong_Upgrade.SM_SubtrainLong_Upgrade'")
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<UStaticMesh*> UpgradeSubtrainMesh;
 };

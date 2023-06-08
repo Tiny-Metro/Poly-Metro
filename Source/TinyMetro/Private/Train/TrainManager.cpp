@@ -5,6 +5,8 @@
 #include "Train/Train.h"
 #include "Train/Subtrain.h"
 #include "Lane/Lane.h"
+#include "Train/TrainInfoWidget.h"
+#include <Blueprint/UserWidget.h>
 #include "GameModes/TinyMetroGameModeBase.h"
 #include <Engine/AssetManager.h>
 
@@ -23,12 +25,20 @@ void ATrainManager::BeginPlay()
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
+
+	FSoftClassPath MyWidgetClassRef(TEXT("Blueprint'/Game/Stage/UI/HUD/WBP_TrainInfoWidget.WBP_TrainInfoWidget_C'"));
+	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
+		TrainInfoWidget = CreateWidget<UTrainInfoWidget>(GetWorld(), MyWidgetClass);
+		TrainInfoWidget->AddToViewport();
+		TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
 	RefreshTrainArray();
 	if (Trains.Find(Train) == INDEX_NONE) {
 		Train->SetTrainId(NextTrainId++);
+		Train->SetTrainInfoWidget(TrainInfoWidget);
 		Trains.AddUnique(Train);
 	}
 }
@@ -243,6 +253,28 @@ int32 ATrainManager::GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId)
 		}
 	}
 	return result;
+}
+
+float ATrainManager::GetCostUpgradeTrain() const {
+	return CostUpgradeTrain;
+}
+
+float ATrainManager::GetCostUpgradeSubtrain() const {
+	return CostUpgradeSubtrain;
+}
+
+// If something change when Train upgrade, imple init
+// Only after upgrade
+// Not imple use money for upgrade
+void ATrainManager::ReportTrainUpgrade() {
+	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportTrainUprade : Train Upgrade"))
+}
+
+// If something change when Subtrain upgrade, imple init
+// Only after upgrade
+// Not imple use money for upgrade
+void ATrainManager::ReportSubtrainUpgrade() {
+	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportSubtrainUprade : Subtrain Upgrade"))
 }
 
 // Called every frame

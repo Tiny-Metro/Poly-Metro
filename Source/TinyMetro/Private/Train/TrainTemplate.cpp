@@ -3,6 +3,7 @@
 
 #include "Train/TrainTemplate.h"
 #include "Train/TrainManager.h"
+#include "Train/TrainInfoWidget.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Lane/LaneManager.h"
@@ -28,7 +29,7 @@ ATrainTemplate::ATrainTemplate()
 	TrainMovement = GetCharacterMovement();
 	TrainMovement->MaxAcceleration = 3000.0f; // Default 2048
 	TrainMovement->Mass = 1.0f; // Deafult 100
-	TrainMovement->MaxWalkSpeed = 300.0f; // Default 600
+	TrainMovement->MaxWalkSpeed = TRAIN_DEFAULT_SPEED; // Default 600
 	TrainMovement->bUseControllerDesiredRotation = true; // Default false
 
 	TrainMaterial.AddUnique(
@@ -62,7 +63,7 @@ ATrainTemplate::ATrainTemplate()
 	}
 
 	// Bind click, release event
-	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnClicked);
+	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnPressed);
 	OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 
 }
@@ -80,7 +81,7 @@ void ATrainTemplate::BeginPlay()
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
-	InitTrainMesh();
+	//InitTrainMesh();
 
 }
 
@@ -164,10 +165,19 @@ void ATrainTemplate::UpdatePassengerSlot() {
 	}
 }
 
+void ATrainTemplate::UpdateTrainMesh() {
+}
+
+bool ATrainTemplate::CanUpgrade() const {
+	return false;
+}
+
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	ServiceLaneId = Lane->GetLaneId();
+	UpdateTrainMesh();
 }
 
 void ATrainTemplate::DespawnTrain() {
@@ -247,16 +257,22 @@ void ATrainTemplate::SetNextStation(FStationInfo Info) {
 	NextStation = Info;
 }
 
-void ATrainTemplate::TrainOnClicked(AActor* Target, FKey ButtonPressed) {
+void ATrainTemplate::TrainOnPressed(AActor* Target, FKey ButtonPressed) {
 	TouchInput = true;
 	TouchTime = 0.0f;
 	OnPressedTime = UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld());
 }
 
 void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 		TEXT("TrainTemplate::OnReleased")
-	);
+	);*/
+	if (TouchTime < LongClickInterval) {
+		TrainInfoWidget->ShowWidget(this);
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
+			TEXT("TrainTemplate::OnClick")
+		);*/
+	}
 	IsActorDragged = false;
 	TouchInput = false;
 	TouchTime = 0.0f;
@@ -264,6 +280,10 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 
 void ATrainTemplate::SetDespawnNextStation() {
 	DeferredDespawn = true;
+}
+
+void ATrainTemplate::SetTrainInfoWidget(UTrainInfoWidget* Widget) {
+	TrainInfoWidget = Widget;
 }
 
 // Called every frame
@@ -328,13 +348,13 @@ void ATrainTemplate::InitTrainMaterial() {
 	TrainMaterial.Append(tmp);
 }
 
-void ATrainTemplate::InitTrainMesh() {
-	auto& AssetLoader = UAssetManager::GetStreamableManager();
-	AssetLoader.RequestAsyncLoad(
-		TrainMeshPath,
-		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
-	);
-}
+//void ATrainTemplate::InitTrainMesh() {
+//	auto& AssetLoader = UAssetManager::GetStreamableManager();
+//	AssetLoader.RequestAsyncLoad(
+//		TrainMeshPath,
+//		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
+//	);
+//}
 
 void ATrainTemplate::TrainMaterialDeferred() {
 	for (auto& i : TrainMaterialPath) {
@@ -343,11 +363,11 @@ void ATrainTemplate::TrainMaterialDeferred() {
 	}
 }
 
-void ATrainTemplate::TrainMeshDeferred() {
-	for (auto& i : TrainMeshPath) {
-		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
-	}
-}
+//void ATrainTemplate::TrainMeshDeferred() {
+//	for (auto& i : TrainMeshPath) {
+//		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
+//	}
+//}
 
 void ATrainTemplate::InitPassengerMaterial() {
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetPassengerMaterial();
@@ -381,7 +401,8 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
-	//TODO : Mesh change
+	TrainMovement->MaxWalkSpeed = TRAIN_UPGRADE_SPEED;
+	UpdateTrainMesh();
 }
 
 bool ATrainTemplate::GetIsUpgrade() const {

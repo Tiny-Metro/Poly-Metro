@@ -8,6 +8,9 @@
 #include "../Station/StationInfo.h"
 #include "TrainTemplate.generated.h"
 
+#define TRAIN_DEFAULT_SPEED 300.0f
+#define TRAIN_UPGRADE_SPEED 400.0f
+
 UCLASS(Config = Game)
 class TINYMETRO_API ATrainTemplate : public ACharacter
 {
@@ -33,12 +36,12 @@ public:
 
 	UFUNCTION()
 	void InitTrainMaterial();
-	UFUNCTION()
-	void InitTrainMesh();
+	/*UFUNCTION()
+	void InitTrainMesh();*/
 	UFUNCTION()
 	void TrainMaterialDeferred();
-	UFUNCTION()
-	void TrainMeshDeferred();
+	/*UFUNCTION()
+	void TrainMeshDeferred();*/
 	UFUNCTION()
 	void InitPassengerMaterial();
 	
@@ -74,6 +77,10 @@ public:
 	virtual bool AddPassenger(class UPassenger* P);
 	UFUNCTION()
 	virtual void UpdatePassengerSlot();
+	UFUNCTION()
+	virtual void UpdateTrainMesh();
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanUpgrade() const;
 
 
 	UFUNCTION(BlueprintCallable)
@@ -98,12 +105,15 @@ public:
 
 	// Click & Release
 	UFUNCTION()
-	virtual void TrainOnClicked(AActor* Target, FKey ButtonPressed);
+	virtual void TrainOnPressed(AActor* Target, FKey ButtonPressed);
 	UFUNCTION()
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
 
 	UFUNCTION()
 	void SetDespawnNextStation();
+
+	UFUNCTION()
+	void SetTrainInfoWidget(class UTrainInfoWidget* Widget);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -182,6 +192,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Info")
 	bool DeferredDespawn = false;
 
+	// Info widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UTrainInfoWidget* TrainInfoWidget;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* TrainMeshComponent;
@@ -191,10 +205,10 @@ protected:
 	TArray<UMaterial*> TrainMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString TrainDefaultMaterialPath = "Material'/Game/Train/TrainMatrial/M_DefaultTrain.M_DefaultTrain'";
-	UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	/*UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> TrainMeshPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<UStaticMesh*> TrainMesh;
+	TArray<UStaticMesh*> TrainMesh;*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCharacterMovementComponent* TrainMovement;
 
