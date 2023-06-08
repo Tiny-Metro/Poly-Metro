@@ -96,10 +96,40 @@ public:
 
 	PathQueue GetShortestPath(int32 Start, StationType Type);
 
-	UFUNCTION(BlueprintCallable)
-	void AddPassengerSpawnProbability(float Rate, int32 Period);
-	UFUNCTION(BlueprintCallable)
-	void AddFreePassengerSpawnProbability(float Rate, int32 Period);
+	// Passenger Spawn
+	UFUNCTION()
+	void PassengerPropertyTick(float DeltaTime);
+	UFUNCTION()
+	float GetDefaultPassengerSpawnSpeed() const;
+	UFUNCTION()
+	float GetDefaultPassengerSpawnProbability() const;
+	UFUNCTION()
+	float GetDefaultFreePassengerSpawnProbability() const;
+	UFUNCTION()
+	float GetPassengerSpawnSpeed(StationType Type) const;
+	/*UFUNCTION()
+	float GetPassengerSpawnProbability(StationType Type) const;
+	UFUNCTION()
+	float GetFreePassengerSpawnProbability(StationType Type) const;
+	UFUNCTION()
+	void AddPassengerSpawnSpeed(float Rate, StationType Typpe, int32 Day = -1);
+	UFUNCTION()
+	void MultiplePassengerSpawnSpedd(float Rate, StationType Type, int32 Day = -1);
+	UFUNCTION()
+	void SetPassengerSpawnSpeed(float Rate, StationType Type);
+	UFUNCTION()
+	void AddPassengerSpawnProbability(float Rate, StationType Type, int32 Day = -1);
+	UFUNCTION()
+	void MultiplePassengerSpawnProbability(float Rate, StationType Type, int32 Day = -1);
+	UFUNCTION()
+	void SetPassengerSpawnProbability(float Rate, StationType Type);
+	UFUNCTION()
+	void AddFreePassengerSpawnProbability(float Rate, StationType Type, int32 Day = -1);
+	UFUNCTION()
+	void MultipleFreePassengerSpawnProbability(float Rate, StationType Type, int32 Day = -1);
+	UFUNCTION()
+	void SetFreePassengerSpawnProbability(float Rate, StationType Type);*/
+	
 	UFUNCTION(BlueprintCallable)
 	void AddComplainIncreaseRate(float Rate, int32 Period);
 	UFUNCTION(BlueprintCallable)
@@ -150,9 +180,6 @@ public:
 	void WeeklyTask();
 	UFUNCTION()
 	void DailyTask();
-
-	UFUNCTION()
-	void SetPassengerSpawnSpeed(float Speed, int32 StationId = -1);
 
 	UFUNCTION()
 	void SetTransfer(bool Flag);
@@ -238,7 +265,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 NextStationId = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	// Passenger statistics
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger Statistics")
 	TMap<StationType, int32> TotalSpawnPassengerNotFree = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
@@ -251,7 +279,7 @@ protected:
 		TPair<StationType, int32>(StationType::Star, 0),
 		TPair<StationType, int32>(StationType::Fan, 0)
 	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger Statistics")
 	TMap<StationType, int32> TotalSpawnPassengerFree = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
@@ -264,7 +292,7 @@ protected:
 		TPair<StationType, int32>(StationType::Star, 0),
 		TPair<StationType, int32>(StationType::Fan, 0)
 	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger Statistics")
 	TMap<StationType, int32> TotalSpawnPassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
@@ -277,8 +305,247 @@ protected:
 		TPair<StationType, int32>(StationType::Star, 0),
 		TPair<StationType, int32>(StationType::Fan, 0)
 	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+
+	// Passenger spawn
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
 	bool IsPassengerSpawnEnable = true;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
+	float DefaultPassengerSpawnSpeed = 6.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
+	float DefaultPassengerSpawnProbability = 0.6f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
+	float DefaultFreePassengerSpawnProbability = 0.2f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
+	TMap<StationType, float> PassengerSpawnSpeed = {
+		TPair<StationType, float>(StationType::Circle, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Triangle, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Rectangle, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Cross, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Rhombus, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Oval, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Diamond, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Pentagon, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Star, DefaultPassengerSpawnSpeed),
+		TPair<StationType, float>(StationType::Fan, DefaultPassengerSpawnSpeed)
+	};
+	TMap<StationType, TArray<TPair<float, float>>> AddPassengerSpawnSpeedArr = {
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Circle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Triangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rectangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Cross,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rhombus,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Oval,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Diamond,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Pentagon,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Star,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Fan,
+			TArray<TPair<float,float>>())
+	};
+	TMap<StationType, TArray<TPair<float, float>>> MultiplePassengerSpawnSpeedArr = {
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Circle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Triangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rectangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Cross,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rhombus,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Oval,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Diamond,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Pentagon,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Star,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Fan,
+			TArray<TPair<float,float>>())
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
+	TMap<StationType, float> PassegnerSpawnProbability = {
+		TPair<StationType, float>(StationType::Circle, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Triangle, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Rectangle, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Cross, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Rhombus, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Oval, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Diamond, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Pentagon, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Star, DefaultPassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Fan, DefaultPassengerSpawnProbability)
+	}; 
+	TMap<StationType, TArray<TPair<float, float>>> AddPassengerSpawnProbabilityArr = {
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Circle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Triangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rectangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Cross,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rhombus,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Oval,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Diamond,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Pentagon,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Star,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Fan,
+			TArray<TPair<float,float>>())
+	};
+	TMap<StationType, TArray<TPair<float, float>>> MultiplePassengerSpawnProbabilityArr = {
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Circle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Triangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rectangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Cross,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rhombus,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Oval,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Diamond,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Pentagon,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Star,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Fan,
+			TArray<TPair<float,float>>())
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger Spawn")
+	TMap<StationType, float> FreePassegnerSpawnProbability = {
+		TPair<StationType, float>(StationType::Circle, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Triangle, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Rectangle, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Cross, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Rhombus, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Oval, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Diamond, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Pentagon, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Star, DefaultFreePassengerSpawnProbability),
+		TPair<StationType, float>(StationType::Fan, DefaultFreePassengerSpawnProbability)
+	};
+	TMap<StationType, TArray<TPair<float, float>>> AddFreePassengerSpawnProbabilityArr = {
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Circle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Triangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rectangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Cross,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rhombus,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Oval,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Diamond,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Pentagon,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Star,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Fan,
+			TArray<TPair<float,float>>())
+	};
+	TMap<StationType, TArray<TPair<float, float>>> MultipleFreePassengerSpawnProbabilityArr = {
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Circle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Triangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rectangle,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Cross,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Rhombus,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Oval,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Diamond,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Pentagon,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Star,
+			TArray<TPair<float,float>>()),
+		TPair<StationType, TArray<TPair<float, float>>>(
+			StationType::Fan,
+			TArray<TPair<float,float>>())
+	};
 
 	//Policy Timer
 	/*UPROPERTY(BlueprintReadOnly)

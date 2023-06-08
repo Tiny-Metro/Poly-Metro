@@ -382,23 +382,39 @@ PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
 	return ShortestPath[Start][Type];
 }
 
-void AStationManager::AddPassengerSpawnProbability(float Rate, int32 Period) {
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Active) {
-				i->AddPassengerSpawnProbability(Rate, Period);
-			}
-		}
-	}
+void AStationManager::PassengerPropertyTick(float DeltaTime) {
 }
 
-void AStationManager::AddFreePassengerSpawnProbability(float Rate, int32 Period) {
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Active) {
-				i->AddFreePassengerSpawnProbability(Rate, Period);
-			}
+float AStationManager::GetDefaultPassengerSpawnSpeed() const {
+	return DefaultPassengerSpawnSpeed;
+}
+
+float AStationManager::GetDefaultPassengerSpawnProbability() const {
+	return DefaultPassengerSpawnProbability;
+}
+
+float AStationManager::GetDefaultFreePassengerSpawnProbability() const {
+	return DefaultFreePassengerSpawnProbability;
+}
+
+float AStationManager::GetPassengerSpawnSpeed(StationType Type) const {
+	if (Type == StationType::None) {
+		return GetDefaultPassengerSpawnSpeed();
+	} else {
+		float addFactor = 0.0f;
+		float multiFactor = 1.0f;
+
+		// Calc multiple factor
+		for (auto& i : MultiplePassengerSpawnSpeedArr[Type]) {
+			multiFactor *= i.Key;
 		}
+
+		// Calc add factor
+		for (auto& i : AddPassengerSpawnSpeedArr[Type]) {
+			addFactor += i.Key;
+		}
+
+		return PassengerSpawnSpeed[Type] * multiFactor + addFactor;
 	}
 }
 
@@ -686,23 +702,6 @@ void AStationManager::DailyTask() {
 				// From service level (Complain)
 				i->AddComplain(-ServiceData.DailyComplain);
 			}
-		}
-	}
-}
-
-// Call AStation::SetPassengerSpawnSpeed
-// Default value of StationId = -1, apply all station
-void AStationManager::SetPassengerSpawnSpeed(float Speed, int32 StationId) {
-	if (StationId == -1) {
-		for (auto& i : Station) {
-			if (IsValid(i)) {
-				i->SetPassengerSpawnSpeed(Speed);
-			}
-		}
-	} else {
-		auto tmp = GetStationById(StationId);
-		if (IsValid(tmp)) {
-			tmp->SetPassengerSpawnSpeed(Speed);
 		}
 	}
 }

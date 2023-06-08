@@ -203,36 +203,6 @@ void AStation::GetOffPassenger(UPassenger* P) {
 	}
 	UpdatePassengerMesh();
 }
-
-void AStation::AddPassengerSpawnProbability(float rate, int32 dueDate) {
-	AdditionalPassengerSpawnProbability += rate;
-	if (dueDate != -1) {
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerComplain,
-			FTimerDelegate::CreateLambda([&]() {
-				AdditionalPassengerSpawnProbability -= rate;
-				}),
-			dueDate,
-			false,
-			0.0f
-		);
-	}
-}
-
-void AStation::AddFreePassengerSpawnProbability(float rate, int32 dueDate) {
-	FreePassengerSpawnProbability += rate;
-	if (dueDate != -1) {
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerComplain,
-			FTimerDelegate::CreateLambda([&]() {
-				FreePassengerSpawnProbability -= rate;
-				}),
-			dueDate,
-			false,
-			0.0f
-		);
-	}
-}
   
 bool AStation::IsValidLane(int32 LId) const
 {
@@ -375,13 +345,6 @@ void AStation::SetPassengerSpawnEnable(bool Flag) {
 
 bool AStation::GetPassengerSpawnEnable() const {
 	return IsPassengerSpawnEnable;
-}
-
-// Set Passenger's spawn speed
-// float Speed : multiple by Delta time
-// ex) Speed = 1.0 -> Normal speed
-void AStation::SetPassengerSpawnSpeed(float Speed) {
-	PassengerSpawnSpeed = Speed;
 }
 
 void AStation::CalculateComplain() {
@@ -582,34 +545,6 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 		}
 		PassengerSpawnCurrent -= PassengerSpawnRequire;
 	}
-
-	//GetWorld()->GetTimerManager().SetTimer(
-	//	TimerSpawnPassenger,
-	//	FTimerDelegate::CreateLambda([&]() {
-	//		PassengerSpawnCurrent += PassengerSpawnPerSec;
-
-	//		if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
-	//			if (IsPassengerSpawnEnable) {
-	//				if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
-	//					SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
-	//				}
-	//			}
-
-	//			PassengerSpawnCurrent = 0.0f;
-	//		}
-
-	//		//Log
-	//		//if (GEngine)
-	//		//	GEngine->AddOnScreenDebugMessage(
-	//		//		-1,
-	//		//		15.0f,
-	//		//		FColor::Yellow,
-	//		//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
-	//	}),
-	//	1.0f, // Repeat delay
-	//	true, // Repeat
-	//	1.0f // First delay
-	//	);
 }
 
 // Not used
@@ -619,9 +554,7 @@ void AStation::SpawnPassenger() {
 	UPassenger* tmp = UPassenger::ConstructPassenger(
 		NewPassengerDestination
 	);
-	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
-	//UPassenger* tmp = NewObject<UPassenger>();
-	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
 		tmp->SetFree();
 	}

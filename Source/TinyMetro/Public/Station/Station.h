@@ -138,8 +138,6 @@ public:
 	void SetPassengerSpawnEnable(bool Flag);
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
-	UFUNCTION()
-	void SetPassengerSpawnSpeed(float Speed);
 	
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -148,8 +146,6 @@ public:
 	UPassenger* GetOnPassenger(int32 Index, class ATrainTemplate* Train);
 	void GetOffPassenger(class UPassenger* P);
     
-	void AddPassengerSpawnProbability(float rate, int32 dueDate);
-	void AddFreePassengerSpawnProbability(float rate, int32 dueDate);
 
 	void AddComplain(double ReduceRate);
 	void AddComplain(int32 ReduceValue);
@@ -201,7 +197,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double AdditionalPassengerSpawnProbability = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbability = 0.0f;;
+	float FreePassengerSpawnProbability = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	bool IsPassengerSpawnEnable = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -234,13 +230,14 @@ protected:
 	bool TransferStation = false;;
 
 
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	// Passenger mesh
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	int32 MaxPassengerSpawn = 15;
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	FVector PassengerMeshDefaultPosition = FVector(180.0f, 0.0f, 10.0f);
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	float PassengerX_Distance = 90;
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	float PassengerY_Distance = 45;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
@@ -351,7 +348,7 @@ protected:
 	// Mesh, Material paths (Station)
 	UPROPERTY()
 	TArray<FString> StationMeshPath = {
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationNone'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationNone.SM_StationNone'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationTriangle.SM_StationTriangle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRectangle.SM_StationRectangle'"),
@@ -382,7 +379,7 @@ protected:
 	// Mesh, Material paths (Passenger)
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {
-		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerNone'"),
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerNone.SM_PassengerNone'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
@@ -402,7 +399,7 @@ protected:
 
 	// Mesh of complain gauge paths
 	TArray<FString> ComplainMeshPath = {
-		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CircleGauge.SM_NoneGauge'"),
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_NoneGauge.SM_NoneGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CircleGauge.SM_CircleGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_TriangleGauge.SM_TriangleGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_RectangleGauge.SM_RectangleGauge'"),
