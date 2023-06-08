@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "InvestmentData.h"
+#include "InvestmentState.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
 #include "Investment.generated.h"
 
@@ -17,48 +18,58 @@ class TINYMETRO_API UInvestment : public UObject
 	GENERATED_BODY()
 
 public:
-	void SetInvestmentData(FInvestmentData Data);
+	UInvestment();
+	static UInvestment* CreateInvestment(FString ScriptFileName, class UInvestmentLuaState* LuaState, UWorld* WorldContextObject);
 	void SetDaytime(int32 T);
-	void SetPlayerState(ATinyMetroPlayerState* P);
-	void SetWorld(UWorld* W);
-	void SetSuccessFunction(TFunction<bool(void)> Func);
-	void InvestmentSuccess();
-	void InvestmentFail();
+	void SetInvestmentData(FInvestmentData Data);
+	void SetAcceptAction(TFunction<void(void)> Action);
+	void SetSuccessAction(TFunction<void(void)> Action);
+	void SetFailAction(TFunction<void(void)> Action);
+	void SetStateCheckFunction(TFunction<InvestmentState(void)> Check);
+	UFUNCTION()
 	void InitInvestment();
-	void SetAvailable(bool B);
+	UFUNCTION()
+	void ResetInvestment();
 
+	UFUNCTION(BlueprintCallable)
+	void InvestmentStart();
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	FInvestmentData GetInvestmentData() const;
 	UFUNCTION(BlueprintCallable)
-	bool GetIsActivate() const;
+	InvestmentState GetState() const;
 	UFUNCTION(BlueprintCallable)
-	bool GetAvailable();
+	InvestmentState CheckInvestmentProcess(float DeltaTime);
 	UFUNCTION(BlueprintCallable)
-	void ActivateInvestment();
+	void NotifyDailyTask();
+
 	//UFUNCTION(BlueprintCallable)
 	//void DisableInvestment();
 
 
 protected:
+	UPROPERTY()
+	UWorld* WorldRef;
+	UPROPERTY()
+	FString ScriptFileName;
+	UPROPERTY()
+	FString ScriptDirectory;
+
+	class UInvestmentLuaState* LuaState;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FInvestmentData InvestmentData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	int32 Daytime;
+	int32 Daytime = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 RemainTime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	bool IsActivate = false;
+	float ElapseTime = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	bool IsAvailable = false;
-	UPROPERTY(BlueprintReadOnly)
-	ATinyMetroPlayerState* PlayerState;
-	UPROPERTY(BlueprintReadOnly)
-	UWorld* World;
-	UPROPERTY(BlueprintReadOnly)
-	FTimerHandle InvestmentSuccessHandle;
-	UPROPERTY(BlueprintReadOnly)
-	FTimerHandle InvestmentTimeHandle;
+	InvestmentState State = InvestmentState::Ready;
 
-	TFunction<bool(void)> CheckSuccess;
+	TFunction<void(void)> StartAction;
+	TFunction<void(void)> SuccessAction;
+	TFunction<void(void)> FailAction;
+	TFunction<InvestmentState(void)> ConditionCheckFunction;
 };

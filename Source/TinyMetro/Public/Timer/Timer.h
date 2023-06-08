@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Timer.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDailyTask);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeeklyTask);
+
 UCLASS()
 class TINYMETRO_API ATimer : public AActor
 {
@@ -29,6 +32,10 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 	float ElapseTimeSec;
+	UPROPERTY(BlueprintAssignable)
+	FDailyTask DailyTask;
+	UPROPERTY(BlueprintAssignable)
+	FWeeklyTask WeeklyTask;
 
 protected:
 	UPROPERTY()

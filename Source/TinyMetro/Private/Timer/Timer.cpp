@@ -21,7 +21,7 @@ void ATimer::BeginPlay()
 
 	// Get GameMode, set daytime
 	GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
-	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	//StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	Daytime = GameModeRef->GetDaytime();
 }
 
@@ -36,13 +36,13 @@ void ATimer::Tick(float DeltaTime)
 
 	// Daily check
 	if (DayCounter >= Daytime) {
-		StationManagerRef->DailyTask();
+		DailyTask.Broadcast();
 		DayCounter -= Daytime;
 	}
 
 	// Weekly check
 	if (WeekCounter >= (Daytime * 7)) {
-		StationManagerRef->WeeklyTask();
+		WeeklyTask.Broadcast();
 		WeekCounter -= (Daytime * 7);
 	}
 

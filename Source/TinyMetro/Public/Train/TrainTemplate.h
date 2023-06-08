@@ -57,6 +57,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Upgrade();
 	UFUNCTION(BlueprintCallable)
+	bool GetIsUpgrade() const;
+	UFUNCTION(BlueprintCallable)
 	virtual void Test();
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetNextTrainDestination(FVector CurLocation);

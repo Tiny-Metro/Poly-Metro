@@ -165,6 +165,7 @@ void ATrainTemplate::UpdatePassengerSlot() {
 }
 
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
+	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
 }
@@ -381,6 +382,10 @@ void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
 	//TODO : Mesh change
+}
+
+bool ATrainTemplate::GetIsUpgrade() const {
+	return IsUpgrade;
 }
 
 void ATrainTemplate::Test() {

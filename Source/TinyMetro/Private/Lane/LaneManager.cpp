@@ -31,6 +31,24 @@ void ALaneManager::Tick(float DeltaTime)
 
 }
 
+int32 ALaneManager::GetLaneCount() const {
+	int32 result = 0;
+	for (auto& i : Lanes) {
+		if (IsValid(i.Value)) {
+			result++;
+		}
+	}
+	return result;
+}
+
+int32 ALaneManager::GetRandomLaneId() const {
+	int32 randId = FMath::RandRange(0, Lanes.Num() - 1);
+	do {
+		randId = FMath::RandRange(0, Lanes.Num() - 1);
+	} while (!IsValid(Lanes[randId]));
+	return randId;
+}
+
 
 void ALaneManager::SetCanAssginBridge(bool AssginBridge)
 {

@@ -96,7 +96,7 @@ void ATMSaveManager::SaveStationManager() {
 	}
 
 	StationSaveData->StationSpawnCurrent = stationmanager->StationSpawnCurrent;
-	StationSaveData->ManagerStationId = stationmanager->StationId;
+	StationSaveData->ManagerStationId = stationmanager->NextStationId;
 
 	int32 size = stationmanager->Station.Num();
 
@@ -164,7 +164,7 @@ void ATMSaveManager::LoadStationManager() {
 		}
 
 		stationmanager->StationSpawnCurrent = StationLoadData->StationSpawnCurrent;
-		stationmanager->StationId = StationLoadData->ManagerStationId;
+		stationmanager->NextStationId = StationLoadData->ManagerStationId;
 
 		stationmanager->Station.Empty();
 

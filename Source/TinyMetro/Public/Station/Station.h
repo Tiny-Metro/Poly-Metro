@@ -61,6 +61,7 @@ public:
 	UFUNCTION()
 	void AddComplain(float Value, bool IsFixedValue = false);
 
+	// Mainenance
 	UFUNCTION()
 	void MaintenanceCost(int32 Cost);
 
@@ -88,17 +89,45 @@ public:
 	void UpdateStationMesh();
 	UFUNCTION(BlueprintCallable)
 	void LoadStationValue(FStationValuesStruct StationValues);
+
+	// Lane
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
-
 	UFUNCTION(BlueprintCallable)
 	void RemoveLane(int32 LId);
 
+	// Station statistics
 	UFUNCTION(BlueprintCallable)
 	TMap<StationType, int32> GetSpawnPassengerStatistics() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetSpawnTotalPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetSpawnPaidPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetSpawnFreePassenger() const;
+	UFUNCTION()
+	int32 GetArriveTotalPassengerCount() const;
+	UFUNCTION()
+	int32 GetArrivePaidPassengerCount() const;
+	UFUNCTION()
+	int32 GetArriveFreePassengerCount() const;
+	UFUNCTION()
+	int32 GetWaitTotalPassengerCount() const;
+	UFUNCTION()
+	int32 GetWaitPaidPassengerCount() const;
+	UFUNCTION()
+	int32 GetWaitFreePassengerCount() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetDestroyedTotalPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetDestroyedPaidPassenger() const;
+	UFUNCTION()
+	TMap<StationType, int32> GetDestroyedFreePassenger() const;
+
 	UFUNCTION(BlueprintCallable)
 	int32 GetWaitPassenger() const;
 
+	// Passenger
 	UFUNCTION()
 	void SpawnPassenger(StationType Destination);
 	UFUNCTION()
@@ -110,7 +139,6 @@ public:
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
 	
-	//UFUNCTION()
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
 	Value is bool of Index's validation. return true when index is valid
@@ -118,11 +146,9 @@ public:
 	UPassenger* GetOnPassenger(int32 Index, class ATrainTemplate* Train);
 	void GetOffPassenger(class UPassenger* P);
     
-	void AddPassengerSpawnProbability(float rate, int32 dueDate);
-	void AddFreePassengerSpawnProbability(float rate, int32 dueDate);
 
-	void DecreaseComplain(double ReduceRate);
-	void DecreaseComplain(int32 ReduceValue);
+	void AddComplain(double ReduceRate);
+	void AddComplain(int32 ReduceValue);
 
 	int32 GetComplain() const;
 	TArray<int32> GetLanes();
@@ -135,7 +161,7 @@ public:
 	void SetStationInfo(int32 Id, StationType Type);
 
 protected:
-	void PassengerSpawnRoutine();
+	void PassengerSpawnRoutine(float DeltaTime);
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
 	void ComplainRoutine();
@@ -161,17 +187,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	bool IsComplainIncreaseEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 PassengerSpawnRequire = 6000;
+	float PassengerSpawnRequire = 6.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 PassengerSpawnPerSec = 1000;
+	float PassengerSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 PassengerSpawnCurrent = 0;
+	float PassengerSpawnSpeed = 1.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double PassengerSpawnProbability = 0.6;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	double AdditionalPassengerSpawnProbability = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbability = 0.0f;;
+	float FreePassengerSpawnProbability = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	bool IsPassengerSpawnEnable = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -204,17 +230,18 @@ protected:
 	bool TransferStation = false;;
 
 
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	// Passenger mesh
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	int32 MaxPassengerSpawn = 15;
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	FVector PassengerMeshDefaultPosition = FVector(180.0f, 0.0f, 10.0f);
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	float PassengerX_Distance = 90;
-	UPROPERTY(BlueprintReadWrite, Category = "Passenger")
+	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	float PassengerY_Distance = 45;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> SpawnPassengerNotFree = {
+	TMap<StationType, int32> SpawnPaidPassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
 		TPair<StationType, int32>(StationType::Rectangle, 0),
@@ -227,7 +254,7 @@ protected:
 		TPair<StationType, int32>(StationType::Fan, 0)
 	};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> SpawnPassengerFree = {
+	TMap<StationType, int32> SpawnFreePassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
 		TPair<StationType, int32>(StationType::Rectangle, 0),
@@ -241,6 +268,36 @@ protected:
 	};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> TotalSpawnPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	int32 ArrivePaidPassenger = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	int32 ArriveFreePassenger = 0; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> DestroyedPaidPassenger = {
+		TPair<StationType, int32>(StationType::Circle, 0),
+		TPair<StationType, int32>(StationType::Triangle, 0),
+		TPair<StationType, int32>(StationType::Rectangle, 0),
+		TPair<StationType, int32>(StationType::Cross, 0),
+		TPair<StationType, int32>(StationType::Rhombus, 0),
+		TPair<StationType, int32>(StationType::Oval, 0),
+		TPair<StationType, int32>(StationType::Diamond, 0),
+		TPair<StationType, int32>(StationType::Pentagon, 0),
+		TPair<StationType, int32>(StationType::Star, 0),
+		TPair<StationType, int32>(StationType::Fan, 0)
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
+	TMap<StationType, int32> DestroyedFreePassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
 		TPair<StationType, int32>(StationType::Triangle, 0),
 		TPair<StationType, int32>(StationType::Rectangle, 0),
@@ -291,6 +348,7 @@ protected:
 	// Mesh, Material paths (Station)
 	UPROPERTY()
 	TArray<FString> StationMeshPath = {
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationNone.SM_StationNone'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationCircle.SM_StationCircle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationTriangle.SM_StationTriangle'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_StationRectangle.SM_StationRectangle'"),
@@ -321,6 +379,7 @@ protected:
 	// Mesh, Material paths (Passenger)
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerNone.SM_PassengerNone'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),
@@ -340,6 +399,7 @@ protected:
 
 	// Mesh of complain gauge paths
 	TArray<FString> ComplainMeshPath = {
+		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_NoneGauge.SM_NoneGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_CircleGauge.SM_CircleGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_TriangleGauge.SM_TriangleGauge'"),
 		TEXT("StaticMesh'/Game/Station/Asset/StatonMesh/SM_RectangleGauge.SM_RectangleGauge'"),

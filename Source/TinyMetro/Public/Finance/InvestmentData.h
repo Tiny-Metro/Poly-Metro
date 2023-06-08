@@ -14,20 +14,34 @@ struct TINYMETRO_API FInvestmentData
 {
 	GENERATED_BODY()
 	FInvestmentData() = default;
-	FInvestmentData(int32 TimeRequire, int32 InvestmentFee, int32 Award, int32 Reward, FString Message) :
+	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString RequireText, FString AcceptMessage, FString AwardMessage, FString RewardMessage) :
+		Title(Title),
+		Content(Content),
 		TimeRequire(TimeRequire),
-		InvestmentFee(InvestmentFee),
-		Award(Award),
-		Reward(Reward),
-		Message(Message) { }
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		RequireText(RequireText),
+		AcceptMessage(AcceptMessage),
+		AwardMessage(AwardMessage),
+		RewardMessage(RewardMessage){ }
+
+	// Investmet title
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString Title;
+	// Flavor text
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString Content;
+	// Require day
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 TimeRequire;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 InvestmentFee;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Award;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Reward;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Message;
+	// Require condition
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString RequireText;
+	// Deposit of investment
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString AcceptMessage;
+	// Investment success
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString AwardMessage;
+	// Investment fail
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString RewardMessage;
 };

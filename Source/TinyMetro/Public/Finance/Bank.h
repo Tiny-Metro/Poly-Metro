@@ -38,6 +38,11 @@ public:
 	TArray<UInvestment*> GetAvailableInvestment() const;
 	UFUNCTION(BlueprintCallable)
 	TArray<UInvestment*> RefreshInvestment();
+	UFUNCTION(BlueprintCallable)
+	void UpdateInvestment();
+	UFUNCTION(BlueprintCallable)
+	void DailyTask();
+
 
 protected:
 	// Function loan
@@ -46,8 +51,7 @@ protected:
 protected:
 	// Function investment
 	void InitInvestment();
-	UInvestment* CreateInvestment(FInvestmentData Data, TFunction<bool(void)> Func);
-	void UpdateInvestment();
+	//UInvestment* CreateInvestment(FInvestmentData Data, TFunction<InvestmentResult(void)> Func);
 	void ChangeInvestment(int Index);
 	void ChangeAllInvestment();
 
@@ -57,6 +61,10 @@ protected:
 	int32 Daytime;
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroPlayerState* PlayerState;
+	UPROPERTY(BlueprintReadOnly)
+	ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere)
+	class UInvestmentLuaState* LuaState;
 
 protected:
 	// For loan
