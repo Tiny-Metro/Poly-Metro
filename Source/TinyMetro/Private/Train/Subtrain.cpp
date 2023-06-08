@@ -119,6 +119,8 @@ void ASubtrain::UpdateTrainMesh() {
 
 void ASubtrain::Upgrade() {
 	Super::Upgrade();
+	// TODO : Money function division
+	PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeSubtrain());
 	TrainManagerRef->ReportSubtrainUpgrade();
 }
 
