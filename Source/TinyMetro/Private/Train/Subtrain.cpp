@@ -12,19 +12,31 @@
 
 ASubtrain::ASubtrain() {
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
+	// Load meshes (Subtrain)
+	for (auto& i : SubtrainMeshPath) {
+		SubtrainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+
+	// Load meshes (UpgradeSubtrain)
+	for (auto& i : UpgradeSubtrainMeshPath) {
+		UpgradeSubtrainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort.SM_SubtrainShort'")
 	);
-	TrainMesh.AddUnique(LoadTrainMesh.Object);
+	TrainMesh.AddUnique(LoadTrainMesh.Object);*/
 
 	TrainMovement->MaxWalkSpeed = 350.0f; // Default 600
 	TrainMovement->MaxAcceleration = 3000.0f; // Default 2048
 
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
-	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
+	TrainMeshComponent->SetStaticMesh(SubtrainMesh[0]);
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);
+
+
 
 	UpdatePassengerSlot();
 }
@@ -90,6 +102,19 @@ void ASubtrain::UpdatePassengerSlot() {
 void ASubtrain::DespawnTrain() {
 	PlayerStateRef->AddItem(ItemType::Subtrain, 1);
 	Super::DespawnTrain();
+}
+
+void ASubtrain::UpdateTrainMesh() {
+	Super::UpdateTrainMesh();
+	if (IsValid(OwnerTrain)) {
+		if (OwnerTrain->GetIsUpgrade()) {
+			TrainMeshComponent->SetStaticMesh(UpgradeSubtrainMesh[IsUpgrade]);
+		} else {
+			TrainMeshComponent->SetStaticMesh(SubtrainMesh[IsUpgrade]);
+		}
+	} else {
+		TrainMeshComponent->SetStaticMesh(SubtrainMesh[IsUpgrade]);
+	}
 }
 
 void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {

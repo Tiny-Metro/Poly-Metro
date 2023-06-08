@@ -81,7 +81,7 @@ void ATrainTemplate::BeginPlay()
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
-	InitTrainMesh();
+	//InitTrainMesh();
 
 }
 
@@ -165,10 +165,14 @@ void ATrainTemplate::UpdatePassengerSlot() {
 	}
 }
 
+void ATrainTemplate::UpdateTrainMesh() {
+}
+
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	UpdateTrainMesh();
 }
 
 void ATrainTemplate::DespawnTrain() {
@@ -339,13 +343,13 @@ void ATrainTemplate::InitTrainMaterial() {
 	TrainMaterial.Append(tmp);
 }
 
-void ATrainTemplate::InitTrainMesh() {
-	auto& AssetLoader = UAssetManager::GetStreamableManager();
-	AssetLoader.RequestAsyncLoad(
-		TrainMeshPath,
-		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
-	);
-}
+//void ATrainTemplate::InitTrainMesh() {
+//	auto& AssetLoader = UAssetManager::GetStreamableManager();
+//	AssetLoader.RequestAsyncLoad(
+//		TrainMeshPath,
+//		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
+//	);
+//}
 
 void ATrainTemplate::TrainMaterialDeferred() {
 	for (auto& i : TrainMaterialPath) {
@@ -354,11 +358,11 @@ void ATrainTemplate::TrainMaterialDeferred() {
 	}
 }
 
-void ATrainTemplate::TrainMeshDeferred() {
-	for (auto& i : TrainMeshPath) {
-		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
-	}
-}
+//void ATrainTemplate::TrainMeshDeferred() {
+//	for (auto& i : TrainMeshPath) {
+//		TrainMesh.AddUnique(Cast<UStaticMesh>(i.ResolveObject()));
+//	}
+//}
 
 void ATrainTemplate::InitPassengerMaterial() {
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetPassengerMaterial();
@@ -392,7 +396,7 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
-	//TODO : Mesh change
+	UpdateTrainMesh();
 }
 
 bool ATrainTemplate::GetIsUpgrade() const {

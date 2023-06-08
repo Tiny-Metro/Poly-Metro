@@ -30,11 +30,11 @@ public:
 	// TrainTemplate override function
 	virtual FVector GetNextTrainDestination(FVector CurLocation) override;
 	virtual void SetTrainMaterial(class ALane* Lane) override;
-	virtual void Upgrade() override;
 	virtual bool IsPassengerSlotFull() override;
 	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, class AStation* D) override;
 	virtual void UpdatePassengerSlot() override;
 	virtual void DespawnTrain() override;
+	virtual void UpdateTrainMesh() override;
 
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
@@ -108,6 +108,16 @@ protected:
 		FVector(-270.0f, -55.0f, 190.0f)
 	};
 
+	// Index 0 : Non upgrade mesh
+	// Index 1 : Upgrade mesh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<FString> TrainMeshPath = {
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'"),
+		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_TrainUpgrade.SM_TrainUpgrade'")
+	};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	TArray<UStaticMesh*> TrainMesh;
+
 private:
 	UPROPERTY()
 	FTimerHandle GetOnHandle;
@@ -115,4 +125,6 @@ private:
 	UPROPERTY()
 	FTimerHandle GetOffHandle;
 	FTimerDelegate GetOffDelegate;
+
+
 };

@@ -33,12 +33,12 @@ public:
 
 	UFUNCTION()
 	void InitTrainMaterial();
-	UFUNCTION()
-	void InitTrainMesh();
+	/*UFUNCTION()
+	void InitTrainMesh();*/
 	UFUNCTION()
 	void TrainMaterialDeferred();
-	UFUNCTION()
-	void TrainMeshDeferred();
+	/*UFUNCTION()
+	void TrainMeshDeferred();*/
 	UFUNCTION()
 	void InitPassengerMaterial();
 	
@@ -74,6 +74,8 @@ public:
 	virtual bool AddPassenger(class UPassenger* P);
 	UFUNCTION()
 	virtual void UpdatePassengerSlot();
+	UFUNCTION()
+	virtual void UpdateTrainMesh();
 
 
 	UFUNCTION(BlueprintCallable)
@@ -198,10 +200,10 @@ protected:
 	TArray<UMaterial*> TrainMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString TrainDefaultMaterialPath = "Material'/Game/Train/TrainMatrial/M_DefaultTrain.M_DefaultTrain'";
-	UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
+	/*UPROPERTY(Config, VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> TrainMeshPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<UStaticMesh*> TrainMesh;
+	TArray<UStaticMesh*> TrainMesh;*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCharacterMovementComponent* TrainMovement;
 

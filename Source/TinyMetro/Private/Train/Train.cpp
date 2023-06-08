@@ -66,11 +66,16 @@ void ATrain::Test() {
 
 ATrain::ATrain() {
 	
-	
-	ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
+
+	// Load meshes (Train)
+	for (auto& i : TrainMeshPath) {
+		TrainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	}
+
+	/*ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
 	);
-	TrainMesh.AddUnique(LoadTrainMesh.Object);
+	TrainMesh.AddUnique(LoadTrainMesh.Object);*/
 	
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	OverlapVolume->InitBoxExtent(FVector(10,20,30));
@@ -79,8 +84,10 @@ ATrain::ATrain() {
 	OverlapVolume->SetupAttachment(RootComponent);
 
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
-	TrainMeshComponent->SetStaticMesh(LoadTrainMesh.Object);
+	TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
 	TrainMeshComponent->SetupAttachment(RootComponent);
+
+
 
 	UpdatePassengerSlot();
 
@@ -216,12 +223,13 @@ void ATrain::SetTrainMaterial(ALane* Lane) {
 }
 
 void ATrain::Upgrade() {
+	Super::Upgrade();
 	// Change mesh
-	TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
+	//TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
 	// Set flag
-	IsUpgrade = true;
+	//IsUpgrade = true;
 	// Set passenger slot
-	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
+	//CurrentPassengerSlot = MaxPassengerSlotUpgrade;
 }
 
 bool ATrain::IsPassengerSlotFull() {
@@ -314,6 +322,12 @@ void ATrain::DespawnTrain() {
 		i->DespawnTrain();
 	}
 	Super::DespawnTrain();
+}
+
+void ATrain::UpdateTrainMesh() {
+	Super::UpdateTrainMesh();
+	TrainMeshComponent->SetStaticMesh(TrainMesh[IsUpgrade]);
+	SetTrainMaterial(LaneRef);
 }
 
 void ATrain::ActiveMoveTest() {
