@@ -195,6 +195,9 @@ protected:
 	// Info widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UTrainInfoWidget* TrainInfoWidget;
+	
+	// Check click & longclick
+	bool IsSingleClick = false;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

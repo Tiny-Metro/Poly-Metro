@@ -241,7 +241,9 @@ bool ATrain::IsPassengerSlotFull() {
 
 void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
-	if (IsValid(LaneRef)) {
+
+	// Drag & Drop operation
+	if (IsValid(LaneRef) && !IsSingleClick) {
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 			FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
 		FVector StartLocation = GridManagerRef->Approximate(
@@ -257,6 +259,9 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 		// TODO : if upgrade, return upgrade cost
 		DespawnTrain();
 	}
+	
+	// Reset single click checker
+	IsSingleClick = false;
 }
 
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
