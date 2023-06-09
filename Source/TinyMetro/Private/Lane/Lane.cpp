@@ -821,6 +821,9 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	// check if tunnel&bridge - and can be used
 	SetWaterHillArea(PreLaneArray);
 
+//	if (!IsBuildble()) {		Destroy();	}
+
+	// if it is possible, bulid it
 	for (int i = 0; i < WaterArea.Num(); i++) 
 	{		
 		BTMangerREF->BuildConnector(ConnectorType::Bridge, WaterArea[i]);
@@ -939,80 +942,19 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 	AreaArray.Add(Area);
 }
 
-/*
-
-void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock){
-	TArray<FIntPoint> WaterPoints;
-	TArray<FIntPoint> HillPoints;
-
-	for (const FLanePoint& Point : LaneBlock)
+bool ALane::IsBuildble() 
+{
+	if (WaterArea.Num() > 99)//> GetBridge() )
 	{
-		FIntPoint Cord = Point.Coordination;
-		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Cord.X, Cord.Y);
-
-		switch (GridCellData.GridType) {
-		case GridType::Ground:
-			break;
-		case GridType::Water:
-			WaterPoints.Add(Cord);
-			break;
-		case GridType::Hill:
-			HillPoints.Add(Cord);
-			break;
-		}
+		return false;
 	}
-
-	int NumWater = WaterPoints.Num();
-
-	if (NumWater = 1)
+	if (HillArea.Num() > 99) // GetTunnel*(
 	{
-		WaterArea.Add(WaterPoints);
+		return false;
 	}
 
-	TArray<FIntPoint> Points;
-	for (int i = 0; i < NumWater - 1; i++)
-	{
-		FIntPoint CurrentCoord = WaterPoints[i];
-		FIntPoint NextCoord = WaterPoints[i + 1];
-
-		int XDiff = FMath::Abs(CurrentCoord.X - NextCoord.X);
-		int YDiff = FMath::Abs(CurrentCoord.Y - NextCoord.Y);
-
-		if (XDiff <= 1 && YDiff <= 1)
-		{
-			// Coordinates are within the range of (-1, -1) and (1, 1), indicating continuity
-			Points.Add(CurrentCoord);
-		}
-		else
-		{
-			// Coordinates are not continuous
-			Points.Add(CurrentCoord);
-			WaterArea.Add(Points);
-			Points.Empty();
-		}
-
-	}
-
-	if (FMath::Abs(WaterPoints[NumWater - 2].X - WaterPoints[NumWater - 1].X) > 1 ||
-			FMath::Abs(WaterPoints[NumWater - 2].Y - WaterPoints[NumWater - 1].Y) > 1)
-	{	// when last one is not continous with second last one
-		WaterArea.Add(Points);
-		Points.Empty();
-
-		Points.Add(WaterPoints[NumWater - 1]);
-		WaterArea.Add(Points);
-		Points.Empty();
-	}
-	else
-	{// when last one is not continous with second last one
-		WaterArea.Add(Points);
-		Points.Add(WaterPoints[NumWater - 1]);
-		Points.Empty();
-	}
-
-
+	return true;
 }
-*/
 
 bool ALane::HasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
 	FIntPoint Diff = NextStation - CurrentStation;

@@ -268,4 +268,6 @@ private:
 
 	TArray<TArray<FIntPoint>> WaterArea;
 	TArray<TArray<FIntPoint>> HillArea;
+
+	bool IsBuildble();
 };
