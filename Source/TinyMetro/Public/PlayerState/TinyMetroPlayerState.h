@@ -53,6 +53,12 @@ public:
 	UFUNCTION()
 	float GetDayTime();
 
+	UFUNCTION()
+	int32 GetValidBridgeCount();
+
+	UFUNCTION()
+	int32 GetValidTunnelCount();
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void AddMoney(int32 Amount);

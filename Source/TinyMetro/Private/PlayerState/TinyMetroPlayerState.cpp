@@ -138,6 +138,15 @@ float ATinyMetroPlayerState::GetDayTime() {
 	return CurrentHour;
 
 }
+
+int32 ATinyMetroPlayerState::GetValidBridgeCount() 
+{
+	return ValidBridge;
+}
+int32 ATinyMetroPlayerState::GetValidTunnelCount() 
+{
+	return ValidTunnel;
+}
 int32& ATinyMetroPlayerState::GetMoney() {
 	return Money;
 }

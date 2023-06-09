@@ -356,6 +356,7 @@ void ALane::FillLanePoint() {
 void ALane::LaneCreating_Implementation() {}
 
 void ALane::InitializeNewLane_Implementation() {}
+void ALane::RemoveLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
@@ -821,7 +822,12 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	// check if tunnel&bridge - and can be used
 	SetWaterHillArea(PreLaneArray);
 
-//	if (!IsBuildble()) {		Destroy();	}
+	if (!IsBuildble()) 
+	{		
+//		LaneManagerRef.RemoveDestroyedLane(LaneId);
+		Destroy();
+		return;
+	}
 
 	// if it is possible, bulid it
 	for (int i = 0; i < WaterArea.Num(); i++) 
@@ -944,11 +950,11 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 
 bool ALane::IsBuildble() 
 {
-	if (WaterArea.Num() > 99)//> GetBridge() )
+	if (WaterArea.Num() > TinyMetroPlayerState->GetValidBridgeCount() )//> GetBridge() )
 	{
 		return false;
 	}
-	if (HillArea.Num() > 99) // GetTunnel*(
+	if (HillArea.Num() > TinyMetroPlayerState->GetValidTunnelCount()) // GetTunnel*(
 	{
 		return false;
 	}

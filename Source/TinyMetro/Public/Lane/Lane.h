@@ -135,6 +135,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void InitializeNewLane();
 	virtual void InitializeNewLane_Implementation();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void RemoveLane();
+	virtual void RemoveLane_Implementation();
 
 public : // BlueprintNativeEvent
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
