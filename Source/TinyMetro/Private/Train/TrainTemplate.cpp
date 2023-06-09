@@ -268,6 +268,7 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 		TEXT("TrainTemplate::OnReleased")
 	);*/
 	if (TouchTime < LongClickInterval) {
+		IsSingleClick = true;
 		TrainInfoWidget->ShowWidget(this);
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 			TEXT("TrainTemplate::OnClick")
