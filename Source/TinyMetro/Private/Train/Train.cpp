@@ -243,21 +243,23 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
 
 	// Drag & Drop operation
-	if (IsValid(LaneRef) && !IsSingleClick) {
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
-		FVector StartLocation = GridManagerRef->Approximate(
-			this->GetActorLocation(), 
-			LaneRef->GetLaneShape(this->GetActorLocation())
-		);
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Train::Release after - %lf, %lf"), StartLocation.X, StartLocation.Y));*/
+	if (!IsSingleClick) {
+		if (IsValid(LaneRef)) {
+			/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+				FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
+			FVector StartLocation = GridManagerRef->Approximate(
+				this->GetActorLocation(),
+				LaneRef->GetLaneShape(this->GetActorLocation())
+			);
+			/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
+				FString::Printf(TEXT("Train::Release after - %lf, %lf"), StartLocation.X, StartLocation.Y));*/
 
-		SetActorLocation(StartLocation);
-		ServiceStart(StartLocation, LaneRef, Destination);
-	} else {
-		// TODO : if upgrade, return upgrade cost
-		DespawnTrain();
+			SetActorLocation(StartLocation);
+			ServiceStart(StartLocation, LaneRef, Destination);
+		} else {
+			// TODO : if upgrade, return upgrade cost
+			DespawnTrain();
+		}
 	}
 	
 	// Reset single click checker
@@ -419,7 +421,7 @@ void ATrain::DetachSubtrain(ASubtrain* T) {
 
 void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
-	Subtrains.Add(T);
+	Subtrains.AddUnique(T);
 	T->AttachToTrain(this);
 	UpdateSubtrainDistance();
 }

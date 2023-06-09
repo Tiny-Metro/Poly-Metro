@@ -134,16 +134,22 @@ bool ASubtrain::CanUpgrade() const {
 
 void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
-	if (IsValid(LaneRef)) {
-		FVector StartLocation = GridManagerRef->Approximate(GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
-		StartLocation.Z = 20.0f;
-		SetActorLocation(StartLocation);
-		TrainRef->AddSubtrain(this);
-		ServiceStart(GetActorLocation(), LaneRef, nullptr);
-	} else {
-		DespawnTrain();
+
+	// Drag & Drop operation
+	if (!IsSingleClick) {
+		if (IsValid(LaneRef)) {
+			FVector StartLocation = GridManagerRef->Approximate(GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
+			StartLocation.Z = 20.0f;
+			SetActorLocation(StartLocation);
+			TrainRef->AddSubtrain(this);
+			ServiceStart(GetActorLocation(), LaneRef, nullptr);
+		} else {
+			DespawnTrain();
+		}
 	}
-	
+
+	// Reset single click checker
+	IsSingleClick = false;
 }
 
 void ASubtrain::BeginPlay() {
