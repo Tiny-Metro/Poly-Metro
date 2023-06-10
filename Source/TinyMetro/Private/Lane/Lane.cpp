@@ -25,6 +25,8 @@ ALane::ALane()
 
 	TrainManagerRef = Cast<ATrainManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrainManager::StaticClass()));
 
+	BTMangerREF = Cast<ABridgeTunnelManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ABridgeTunnelManager::StaticClass()));;
+
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
@@ -354,6 +356,7 @@ void ALane::FillLanePoint() {
 void ALane::LaneCreating_Implementation() {}
 
 void ALane::InitializeNewLane_Implementation() {}
+void ALane::RemoveLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
@@ -733,104 +736,233 @@ FIntPoint ALane::GetWorldCoordinationByStationPointIndex(int32 Index)
 }
 
 //REFACTORING SET LANE ARRAY
-void ALane::RSetLaneArray(const TArray<class AStation*>& NewStationPoint) {
+void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
+	//check if station is valid
+	if (!IsStationsValid(NewStationPoint)) return;
 
-	StationPoint = NewStationPoint;
-	ClearLanePoint();
-
-	//int32 NumStations = NewStationArray.Num();
+	//check if lane points are valid
+	TArray<FLanePoint> PreLaneArray;
 	int32 NumStations = NewStationPoint.Num();
 
-	for (int32 i = 0; i < NumStations; i++) {
-		
-		FIntPoint CurrentStation = NewStationPoint[i]->GetCurrentGridCellData().WorldCoordination;
+	for (int32 i = 0; i < NumStations; i++) 
+	{
+		TArray<FLanePoint> LaneBlock;
+		LaneBlock.Empty();
 
+		if (i == NumStations - 1)
+		{
+			AStation* CurrentStationPtr = NewStationPoint[i];
+			FIntPoint CurrentStation = CurrentStationPtr->GetCurrentGridCellData().WorldCoordination;
+			FLanePoint CurrentLanePoint;
+			CurrentLanePoint.Coordination = CurrentStation;
+			CurrentLanePoint.IsStation = true;
+			CurrentLanePoint.IsBendingPoint = true;
+			CurrentLanePoint.IsThrough = false;
+			LaneBlock.Add(CurrentLanePoint);
+
+			PreLaneArray.Append(LaneBlock);
+			break;
+		}
+
+		AStation* CurrentStationPtr = NewStationPoint[i];
+		AStation* NextStationPtr = (i < NumStations - 1) ? NewStationPoint[i + 1] : nullptr;
+
+		FIntPoint CurrentStation = CurrentStationPtr->GetCurrentGridCellData().WorldCoordination;
+		FIntPoint NextStation = NextStationPtr->GetCurrentGridCellData().WorldCoordination;
+		FIntPoint Diff = NextStation - CurrentStation;
+
+		bool IsBending = HasBendingPoint(Diff);
+
+		// Add CurrentLanePoint ot PreLaneArray
 		FLanePoint CurrentLanePoint;
 		CurrentLanePoint.Coordination = CurrentStation;
 		CurrentLanePoint.IsStation = true;
 		CurrentLanePoint.IsBendingPoint = true;
 		CurrentLanePoint.IsThrough = false;
+		LaneBlock.Add(CurrentLanePoint);
 
-		RLaneArray.Add(CurrentLanePoint);
+		if (IsBending)
+		{
+			FIntPoint BendingCoord = FindBendingPoint(CurrentStation, NextStation);
 
-		if (i < NumStations - 1) {
-			FIntPoint NextStation = NewStationPoint[i+1]->GetCurrentGridCellData().WorldCoordination;
-			FIntPoint Diff = NextStation - CurrentStation;
+			// Generate paths
+			TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
+			TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
 
-			FIntPoint BendingCoord;
-			bool HasBendingPoint = hasBendingPoint(CurrentStation, NextStation);
-			
-			if (HasBendingPoint) {
-				BendingCoord = findBendingPoint(CurrentStation, NextStation);
-
-				TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
-				TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
-
-				for (const FIntPoint& Point : PathToBending) {
-					FLanePoint PathPoint;
-					PathPoint.Coordination = Point;
-					PathPoint.IsStation = false;
-					PathPoint.IsBendingPoint = false;
-					if(GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station) {
-						PathPoint.IsThrough = true;
-					}
-					else PathPoint.IsThrough = false;
-
-					RLaneArray.Add(PathPoint);
-				}
-
-				FLanePoint BendingPoint;
-				BendingPoint.Coordination = BendingCoord;
-				BendingPoint.IsStation = false;
-				BendingPoint.IsBendingPoint = true;
-				if (GridManagerRef->GetGridCellDataByPoint(BendingCoord.X, BendingCoord.Y).StationInfo == GridStationStructure::Station) {
-					BendingPoint.IsThrough = true;
-				}
-				else BendingPoint.IsThrough = false;
-
-				RLaneArray.Add(BendingPoint);
-				
-				for (const FIntPoint& Point : PathFromBending)
-				{
-					FLanePoint PathPoint;
-					PathPoint.Coordination = Point;
-					PathPoint.IsStation = false;
-					PathPoint.IsBendingPoint = false;
-					if (GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station) {
-						PathPoint.IsThrough = true;
-					}
-					else PathPoint.IsThrough = false;
-
-					RLaneArray.Add(PathPoint);
-				}
-
-			}
-			else {
-				TArray<FIntPoint> PathToNext = GeneratePath(CurrentStation, NextStation);
-
-				for (const FIntPoint& Point : PathToNext)
-				{
-					FLanePoint PathPoint;
-					PathPoint.Coordination = Point;
-					PathPoint.IsStation = false;
-					PathPoint.IsBendingPoint = false;
-					if (GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station) {
-						PathPoint.IsThrough = true;
-					}
-					else PathPoint.IsThrough = false;
-
-					RLaneArray.Add(PathPoint);
-				}
+			// Add PathToBending points to LaneArray
+			for (const FIntPoint& Point : PathToBending) 
+			{
+				AddLanePoint(Point, false, LaneBlock);
 			}
 
+			// Add BendingPoint to LaneArray
+			AddLanePoint(BendingCoord, true, LaneBlock);
 
+			// Add PathFromBending points to LaneArray
+			for (const FIntPoint& Point : PathFromBending) 
+			{
+				AddLanePoint(Point, false, LaneBlock);
+			}
+		}
+		else 
+		{
+			TArray<FIntPoint> PathToNext = GeneratePath(CurrentStation, NextStation);
+
+			// Add PathToNext points to LaneArray
+			for (const FIntPoint& Point : PathToNext) 
+			{
+				AddLanePoint(Point, false, LaneBlock);
+			}
 		}
 
-
+		PreLaneArray.Append(LaneBlock);
 	}
+
+
+	// check if tunnel&bridge - and can be used
+	SetWaterHillArea(PreLaneArray);
+
+	if (!IsBuildble()) 
+	{		
+//		LaneManagerRef.RemoveDestroyedLane(LaneId);
+		Destroy();
+		return;
+	}
+
+	// if it is possible, bulid it
+	for (int i = 0; i < WaterArea.Num(); i++) 
+	{		
+		BTMangerREF->BuildConnector(ConnectorType::Bridge, WaterArea[i]);
+	}
+	for (int i = 0; i < HillArea.Num(); i++)
+	{
+		BTMangerREF->BuildConnector(ConnectorType::Tunnel, HillArea[i]);
+	}
+
+	/*
+	*/
+
+	// Done
+	StationPoint = NewStationPoint;
+	ClearLanePoint();
+	LaneArray = PreLaneArray;
+
 }
 
-bool ALane::hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock)
+{
+	TArray<FIntPoint> WaterPoints;
+	TArray<FIntPoint> HillPoints;
+
+	TArray<int> WaterIndex;
+	TArray<int> HillIndex;
+
+	for (int i =0; i < LaneBlock.Num(); i++)
+	{
+		
+		FIntPoint Coord = LaneBlock[i].Coordination;
+
+		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Coord.X, Coord.Y);
+
+		switch (GridCellData.GridType)
+		{
+		case GridType::Ground:
+			break;
+		case GridType::Water:
+			if (WaterIndex.IsEmpty())
+			{
+				WaterPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			if (WaterIndex.Num() >= 1 && WaterIndex.Last() + 1 != i)
+			{
+				WaterPoints.Add(LaneBlock[WaterIndex.Last() + 1].Coordination);
+				WaterPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			WaterIndex.Add(i);
+			WaterPoints.Add(Coord);
+			break;
+		case GridType::Hill:
+			if (HillIndex.IsEmpty())
+			{
+				HillPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			if (HillIndex.Num() >= 1 && HillIndex.Last() + 1 != i)
+			{
+				HillPoints.Add(LaneBlock[HillIndex.Last() + 1].Coordination);
+				HillPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			HillIndex.Add(i);
+			HillPoints.Add(Coord);
+			break;
+		}
+
+	}
+
+	if (WaterIndex.Num() > 0)
+	{
+		WaterPoints.Add(LaneBlock[WaterIndex.Last() + 1].Coordination);
+	}
+	if (HillIndex.Num() > 0)
+	{
+		HillPoints.Add(LaneBlock[HillIndex.Last() + 1].Coordination);
+	}
+
+	SetArea(WaterPoints, WaterArea);
+	SetArea(HillPoints, HillArea);
+}
+
+void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray)
+{
+	int32 NumPoints = Points.Num();
+
+	if (NumPoints == 0)
+	{
+		return;
+	}
+
+	TArray<FIntPoint> Area;
+	Area.Add(Points[0]);
+
+	for (int32 i = 1; i < NumPoints; i++)
+	{
+		const FIntPoint& CurrentCoord = Points[i];
+		const FIntPoint& PrevCoord = Points[i - 1];
+
+		int32 XDiff = FMath::Abs(CurrentCoord.X - PrevCoord.X);
+		int32 YDiff = FMath::Abs(CurrentCoord.Y - PrevCoord.Y);
+
+		if (XDiff <= 1 && YDiff <= 1)
+		{
+			// Coordinates are within the range of (-1, -1) and (1, 1), indicating continuity
+			Area.Add(CurrentCoord);
+		}
+		else
+		{
+			// Coordinates are not continuous
+			AreaArray.Add(Area);
+			Area.Empty();
+			Area.Add(CurrentCoord);
+		}
+	}
+
+	AreaArray.Add(Area);
+}
+
+bool ALane::IsBuildble() 
+{
+	if (WaterArea.Num() > TinyMetroPlayerState->GetValidBridgeCount() )//> GetBridge() )
+	{
+		return false;
+	}
+	if (HillArea.Num() > TinyMetroPlayerState->GetValidTunnelCount()) // GetTunnel*(
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool ALane::HasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
 	FIntPoint Diff = NextStation - CurrentStation;
 
 	if (Diff.X == 0) return false;
@@ -838,8 +970,11 @@ bool ALane::hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
 	if (FMath::Abs(Diff.X) == FMath::Abs(Diff.Y)) return false;
 	return true;
 }
+bool ALane::HasBendingPoint(FIntPoint Diff) {
+	return Diff.X != 0 && Diff.Y != 0 && FMath::Abs(Diff.X) != FMath::Abs(Diff.Y);
+}
 
-FIntPoint ALane::findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
+FIntPoint ALane::FindBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation) {
 	FIntPoint BendingPoint;
 	
 	FIntPoint Diff = NextStation - CurrentStation;
@@ -872,20 +1007,31 @@ TArray<FIntPoint> ALane::GeneratePath(const FIntPoint& Start, const FIntPoint& E
 }
 
 //Refactoring SetLaneLocation
-void ALane::RSetLaneLocation() {
+void ALane::SetLaneLocation() {
 
 	if (!GridManagerRef){
 		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
 		return;
 	}
 
-	RLaneLocation.Empty();
-	for (const FLanePoint& Point : RLaneArray){
+	LaneLocation.Empty();
+	for (const FLanePoint& Point : LaneArray){
 		FVector VectorLocation = PointToLocation(Point.Coordination);
-		RLaneLocation.Add(VectorLocation);		
+		LaneLocation.Add(VectorLocation);		
 	}
 
 }
+
+void ALane::AddLanePoint(const FIntPoint& Point, bool IsBendingPoint, TArray<FLanePoint>& TargetArray) {
+	FLanePoint LanePoint;
+	LanePoint.Coordination = Point;
+	LanePoint.IsStation = false;
+	LanePoint.IsBendingPoint = IsBendingPoint;
+	LanePoint.IsThrough = GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station;
+
+	TargetArray.Add(LanePoint);
+}
+
 
 // REFACTORING SetLaneVector
 FVector ALane::PointToLocation(const FIntPoint& Point) {
@@ -895,32 +1041,32 @@ FVector ALane::PointToLocation(const FIntPoint& Point) {
 // Refactoring clearSplineMesh
 void ALane::ClearLanePoint() {
 	// Clear the existing lane array if any
-	for (int32 i = 0; i < RLaneArray.Num(); i++) {
+	for (int32 i = 0; i < LaneArray.Num(); i++) {
 		ClearSplineMeshAt(i);
 	}
-	RLaneArray.Empty();
+	LaneArray.Empty();
 }
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
-	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World,true);
+	Spline->SetSplinePoints(LaneLocation, ESplineCoordinateSpace::World,true);
 
-	for (int32 i = 0; i < RLaneLocation.Num(); i++) {
+	for (int32 i = 0; i < LaneLocation.Num(); i++) {
 		Spline->SetSplinePointType(i, ESplinePointType::Linear, true);
 	}
 }
 
-void ALane::HandleScaling(bool IsScaling, float SectionLength) {
-	if (IsScaling) { RSectionLength = GetActorScale3D().X * SectionLength; }
-	else RSectionLength = SectionLength;
+void ALane::HandleScaling(bool IsScaling, float Length) {
+	if (IsScaling) { SectionLength = GetActorScale3D().X * Length; }
+	else SectionLength = Length;
 	return;
 }
 
 void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
 	if (IsFullLength) {
-		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength))-1;
+		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / SectionLength))-1;
 	}
 	else {
-		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / RSectionLength));
+		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(Spline->GetSplineLength() / SectionLength));
 	}
 }
 
@@ -930,7 +1076,7 @@ void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
 }
 
-void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
+void ALane::SetSplineMeshes(USplineComponent* Spline) {
 
 	//Check the input parameter is valid
 	if (!Spline)
@@ -963,16 +1109,16 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 
 			StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			Length = StartTangent.Size();
-			ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+			ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 			StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 			EndTangent = StartTangent;
 
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+			SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 
 		//Set Last Point of Spline
@@ -986,10 +1132,10 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+			SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 
 		//Set Points between
@@ -1003,26 +1149,26 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if(RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-			else{SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);}
+			if(LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+			else{SetSplineMeshComponent(SplineMeshComponent, LaneMesh);}
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 			/* --- Middle Mesh (if there is any) --- */
-			if (RLaneArray[i].IsBendingPoint) {
+			if (LaneArray[i].IsBendingPoint) {
 				// Set Start/End Pos/Tangent
 				StartPos = EndPos;
 				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 
 				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-				else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+				if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+				else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 			
-				RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+				LaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
 			/* --- Front Mesh --- */
@@ -1030,10 +1176,10 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 			// Set Start/End Pos/Tangent
 			StartPos = EndPos;
 			StartTangent = EndTangent;
-			if (RLaneArray[i].IsBendingPoint) { 
+			if (LaneArray[i].IsBendingPoint) { 
 				StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local); 
 				Length = EndTangent.Size();
-				ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+				ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 				StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 			}
 			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
@@ -1041,12 +1187,12 @@ void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 		
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
 
@@ -1067,13 +1213,13 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 	SplineMeshComponent->RegisterComponent();
 }
 
-void ALane::SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh) {
-	RSplineMesh = Mesh;
-	RThroughMesh = ThroughMesh;
+void ALane::SetMesh(UStaticMesh* Mesh, UStaticMesh* Through) {
+	LaneMesh = Mesh;
+	ThroughMesh = Through;
 }
 
 void ALane::ClearSplineMeshAt(int32 Index){
-	for (USplineMeshComponent* SplineMeshComponent : RLaneArray[Index].MeshArray) {
+	for (USplineMeshComponent* SplineMeshComponent : LaneArray[Index].MeshArray) {
 		if (SplineMeshComponent) {
 			SplineMeshComponent->DestroyComponent();
 		}
@@ -1088,24 +1234,24 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 
 		//Lane Point
 		int count = 1;
-		for (int32 i = 1; i < RLaneArray.Num(); ++i)
+		for (int32 i = 1; i < LaneArray.Num(); ++i)
 		{
-			if (RLaneArray[i].IsStation) { break; }
+			if (LaneArray[i].IsStation) { break; }
 			else {
 				ClearSplineMeshAt(i);
-				RLaneArray.RemoveAt(i);
+				LaneArray.RemoveAt(i);
 				--i; // Decrement index to account for removed element
 				count++;
 			}
 		}
 
 		ClearSplineMeshAt(0);
-		RLaneArray.RemoveAt(0);
+		LaneArray.RemoveAt(0);
 
 		//Spline Point
 		for (int i = 0; i < count; i++) {
 			Spline->RemoveSplinePoint(0);
-			RLaneLocation.RemoveAt(0);
+			LaneLocation.RemoveAt(0);
 		}
 
 		tmpIndex++;
@@ -1120,16 +1266,16 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 	FVector StartTangent = Spline->GetTangentAtSplinePoint(0, ESplineCoordinateSpace::Local);
 	FVector EndTangent;
 	float Length = StartTangent.Size();
-	float ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	float ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 	EndTangent = StartTangent;
 
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-	SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+	SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
-	RLaneArray[0].MeshArray.Add(SplineMeshComponent);
+	LaneArray[0].MeshArray.Add(SplineMeshComponent);
 }
 
 void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline) {
@@ -1143,30 +1289,30 @@ void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent*
 
 		//Lane Point
 		int count = 1;
-		for (int32 i = RLaneArray.Num() - 2; i >= 0; --i)
+		for (int32 i = LaneArray.Num() - 2; i >= 0; --i)
 		{
-			if (RLaneArray[i].IsStation) { break; }
+			if (LaneArray[i].IsStation) { break; }
 			else {
 				ClearSplineMeshAt(i);
-				RLaneArray.RemoveAt(i);
+				LaneArray.RemoveAt(i);
 				count++;
 			}
 		}
 
-		ClearSplineMeshAt(RLaneArray.Num() - 1);
-		RLaneArray.RemoveAt(RLaneArray.Num() - 1);
+		ClearSplineMeshAt(LaneArray.Num() - 1);
+		LaneArray.RemoveAt(LaneArray.Num() - 1);
 
 		//Spline Point
 		for (int i = 0; i < count; i++) {
 			Spline->RemoveSplinePoint(Spline->GetNumberOfSplinePoints()-1);
-			RLaneLocation.RemoveAt(RLaneLocation.Num()-1);
+			LaneLocation.RemoveAt(LaneLocation.Num()-1);
 		}
 
 		tmpIndex--;
 	}
 
 	//Set EndPoint's Mesh Again
-	int32 lastIndex = RLaneArray.Num() - 1;
+	int32 lastIndex = LaneArray.Num() - 1;
 	ClearSplineMeshAt(lastIndex);
 
 	FVector EndPos = Spline->GetLocationAtSplinePoint(lastIndex, ESplineCoordinateSpace::Local);
@@ -1175,17 +1321,17 @@ void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent*
 	FVector StartTangent = Spline->GetTangentAtSplinePoint(lastIndex-1, ESplineCoordinateSpace::Local);
 	FVector EndTangent;
 	float Length = StartTangent.Size();
-	float ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+	float ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 	EndTangent = StartTangent;
 
 	//Add&Set Spline Mesh Component (mesh)
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-	SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+	SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
-	RLaneArray[lastIndex].MeshArray.Add(SplineMeshComponent);
+	LaneArray[lastIndex].MeshArray.Add(SplineMeshComponent);
 }
 
 void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
@@ -1213,10 +1359,10 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 	FIntPoint Diff = NextStation - NewPoint;
 
 	FIntPoint BendingCoord;
-	bool HasBendingPoint = hasBendingPoint(NewPoint, NextStation);
+	bool IsBending = HasBendingPoint(NewPoint, NextStation);
 
-	if (HasBendingPoint) {
-		BendingCoord = findBendingPoint(NewPoint, NextStation);
+	if (IsBending) {
+		BendingCoord = FindBendingPoint(NewPoint, NextStation);
 
 		TArray<FIntPoint> PathToBending = GeneratePath(NewPoint, BendingCoord);
 		TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
@@ -1278,7 +1424,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 		}
 	}
 
-	RLaneArray.Insert(AddLaneArray, 0);
+	LaneArray.Insert(AddLaneArray, 0);
 
 //Add LaneLoc
 	TArray<FVector> NewLaneLocation;
@@ -1291,10 +1437,10 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 		FVector VectorLocation = PointToLocation(Point.Coordination);
 		NewLaneLocation.Add(VectorLocation);
 	}
-	RLaneLocation.Insert(NewLaneLocation, 0);
+	LaneLocation.Insert(NewLaneLocation, 0);
 
 //Set Spline Again
-//	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World, true);
+//	Spline->SetSplinePoints(LaneLocation, ESplineCoordinateSpace::World, true);
 	SetLaneSpline(Spline);
 //Add Spline Mesh
 
@@ -1319,16 +1465,16 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 			StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			Length = StartTangent.Size();
-			ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+			ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 			StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 			EndTangent = StartTangent;
 
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+			SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 		//Set Points between
 		if (0 < i) {
@@ -1341,25 +1487,25 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 			/* --- Middle Mesh (if there is any) --- */
-			if (RLaneArray[i].IsBendingPoint) {
+			if (LaneArray[i].IsBendingPoint) {
 				// Set Start/End Pos/Tangent
 				StartPos = EndPos;
 				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 
 				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-				else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+				if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+				else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-				RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+				LaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
 			/* --- Front Mesh --- */
@@ -1367,10 +1513,10 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			// Set Start/End Pos/Tangent
 			StartPos = EndPos;
 			StartTangent = EndTangent;
-			if (RLaneArray[i].IsBendingPoint) {
+			if (LaneArray[i].IsBendingPoint) {
 				StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 				Length = EndTangent.Size();
-				ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+				ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 				StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 			}
 			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
@@ -1378,19 +1524,19 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
 }
 
 void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	//Destroy used-to-be last mesh
-	ClearSplineMeshAt(RLaneArray.Num() -1);
+	ClearSplineMeshAt(LaneArray.Num() -1);
 
 	//StationPoint.Add(NewStation);
 
@@ -1400,7 +1546,7 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	FIntPoint NewPoint = NewStation->GetCurrentGridCellData().WorldCoordination;
 
 	FLanePoint CurrentLanePoint;
-	CurrentLanePoint.Coordination = RLaneArray[RLaneArray.Num()-1].Coordination;
+	CurrentLanePoint.Coordination = LaneArray[LaneArray.Num()-1].Coordination;
 	CurrentLanePoint.IsStation = true;
 	CurrentLanePoint.IsBendingPoint = true;
 	CurrentLanePoint.IsThrough = false;
@@ -1411,10 +1557,10 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	FIntPoint Diff = NextStation - CurrentStation;
 
 	FIntPoint BendingCoord;
-	bool HasBendingPoint = hasBendingPoint(CurrentStation, NextStation);
+	bool IsBending = HasBendingPoint(CurrentStation, NextStation);
 
-	if (HasBendingPoint) {
-		BendingCoord = findBendingPoint(CurrentStation, NextStation);
+	if (IsBending) {
+		BendingCoord = FindBendingPoint(CurrentStation, NextStation);
 
 		TArray<FIntPoint> PathToBending = GeneratePath(CurrentStation, BendingCoord);
 		TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
@@ -1484,8 +1630,8 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 
 	AddLaneArray.Add(NewLanePoint);
 
-	int32 legacyNum = RLaneArray.Num() -1;
-	RLaneArray.Insert(AddLaneArray, RLaneArray.Num());
+	int32 legacyNum = LaneArray.Num() -1;
+	LaneArray.Insert(AddLaneArray, LaneArray.Num());
 
 	//Add LaneLoc
 	if (!GridManagerRef) {
@@ -1494,11 +1640,11 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	}
 	for (const FLanePoint& Point : AddLaneArray) {
 		FVector VectorLocation = PointToLocation(Point.Coordination);
-		RLaneLocation.Add(VectorLocation);
+		LaneLocation.Add(VectorLocation);
 	}
 
 	//Set Spline Again
-//	Spline->SetSplinePoints(RLaneLocation, ESplineCoordinateSpace::World, true);
+//	Spline->SetSplinePoints(LaneLocation, ESplineCoordinateSpace::World, true);
 	SetLaneSpline(Spline);
 
 	//[] Add Spline Mesh From End to New
@@ -1528,10 +1674,10 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, RSplineMesh);
+			SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 		else{
 			/* --- Back Mesh --- */
@@ -1543,25 +1689,25 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 
 			//Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 			/* --- Middle Mesh (if there is any) --- */
-			if (RLaneArray[i].IsBendingPoint) {
+			if (LaneArray[i].IsBendingPoint) {
 				// Set Start/End Pos/Tangent
 				StartPos = EndPos;
 				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 
 				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-				if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-				else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+				if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+				else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-				RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+				LaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
 			/* --- Front Mesh --- */
@@ -1569,10 +1715,10 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 			// Set Start/End Pos/Tangent
 			StartPos = EndPos;
 			StartTangent = EndTangent;
-			if (RLaneArray[i].IsBendingPoint) {
+			if (LaneArray[i].IsBendingPoint) {
 				StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 				Length = EndTangent.Size();
-				ClampedLength = FMath::Clamp(Length, 0.0f, RSectionLength);
+				ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
 				StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 			}
 			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
@@ -1580,12 +1726,33 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 
 			//Set Spline Mesh Component (mesh)
 			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (RLaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, RThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, RSplineMesh); }
+			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
 			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
-			RLaneArray[i].MeshArray.Add(SplineMeshComponent);
+			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
+}
+
+bool ALane::IsPointsValid() {
+// checking if it is out of the range
+// checking if there is bridge/Tunnel
+// checking if 
+	return true;
+}
+bool ALane::IsStationsValid(const TArray<class AStation*>& NewStationPoint) {
+	if (NewStationPoint.Num() < 2) {
+		UE_LOG(LogTemp, Warning, TEXT("Invalid NewStationPoint. The array should contain at least 2 elements."));
+		return false;
+	}
+	for (AStation* Station : NewStationPoint) {
+		if (Station == nullptr) {
+			UE_LOG(LogTemp, Warning, TEXT("Invalid NewStationPoint. The array contains an invalid Station."));
+			return false;
+		}
+	}
+
+	return true;
 }

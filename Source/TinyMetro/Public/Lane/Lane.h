@@ -9,6 +9,7 @@
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
+#include "BridgeTunnel/BridgeTunnelManager.h"
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "Lane.generated.h"
@@ -49,6 +50,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATinyMetroPlayerState* TinyMetroPlayerState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ABridgeTunnelManager* BTMangerREF;
+
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -130,6 +135,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void InitializeNewLane();
 	virtual void InitializeNewLane_Implementation();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void RemoveLane();
+	virtual void RemoveLane_Implementation();
 
 public : // BlueprintNativeEvent
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -165,58 +174,49 @@ public: // About Train
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
 
-//REFACTORING SETLANEARRAY
-
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Lane")
-	TArray<FLanePoint> RLaneArray;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FIntPoint> PointArray;
 
-
-
 	UFUNCTION(BlueprintCallable)
-	void RSetLaneArray(const TArray<class AStation*>& NewStationPoint);
+	void SetLaneArray(const TArray<class AStation*>& NewStationPoint);
 
 
 private:
-	bool hasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+	bool HasBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+	bool HasBendingPoint(FIntPoint Diff);
 
-	FIntPoint findBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
+	FIntPoint FindBendingPoint(FIntPoint CurrentStation, FIntPoint NextStation);
 
 	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
 
-// REFACTORING SetLaneVector
+	void AddLanePoint(const FIntPoint& Point, bool IsBendingPoint, TArray<FLanePoint>& TargetArray);
+	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FVector> RLaneLocation;
+	TArray<FVector> LaneLocation;
 
 	UFUNCTION(BlueprintCallable)
-	void RSetLaneLocation();
+	void SetLaneLocation();
 
 private:
 	FVector PointToLocation(const FIntPoint& Point);
 
-// Refactoring clearSplineMesh
 public:
 	UFUNCTION(BlueprintCallable)
 	void ClearLanePoint();
 
-//Refactoring SetSpline
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaneSpline(USplineComponent* Spline);
 
-//Refactoring HandleScaling
 public:
 	UFUNCTION(BlueprintCallable)
-	void HandleScaling(bool IsScaling, float SectionLength);
+	void HandleScaling(bool IsScaling, float Length);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	double RSectionLength;
+	double SectionLength;
 
-//Refactoring HandleFullLength
 public:
 	UFUNCTION(BlueprintCallable)
 	void HandleFullLength(bool IsFullLength, USplineComponent* Spline);
@@ -224,7 +224,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 EndLoop;
 
-// Refactoring AddSplineMeshComponent
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UMaterialInterface* MeshMaterial;
@@ -232,31 +231,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<USplineMeshComponent*> RKeepedSplineMesh;
-
-//Refactoring AddingSplineMesh in other way - 
 	UFUNCTION(BlueprintCallable)
-	void R2SplineMeshComponent(USplineComponent* Spline);
+	void SetSplineMeshes(USplineComponent* Spline);
 
 private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
 
-//1v1 corresponding sys
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FMeshComponentArray> R2KeepedSplineMesh;
-
 	public:
-//ReFactoring Setting Mesh & Remove
 		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
-		UStaticMesh* RSplineMesh;
+		UStaticMesh* LaneMesh;
 
 		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
-		UStaticMesh* RThroughMesh;
+		UStaticMesh* ThroughMesh;
 
 		UFUNCTION(BlueprintCallable)
-		void SetMesh(UStaticMesh* Mesh, UStaticMesh* ThroughMesh);
+		void SetMesh(UStaticMesh* Mesh, UStaticMesh* Through);
 
 		UFUNCTION(BlueprintCallable)
 		void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
@@ -272,4 +261,17 @@ public:
 
 		UFUNCTION(BlueprintCallable)
 		void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
+
+private:
+	bool IsPointsValid();
+	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
+
+private:
+	void SetWaterHillArea(TArray<FLanePoint>& LaneBlock);
+	void SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray);
+
+	TArray<TArray<FIntPoint>> WaterArea;
+	TArray<TArray<FIntPoint>> HillArea;
+
+	bool IsBuildble();
 };
