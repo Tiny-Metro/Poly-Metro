@@ -389,14 +389,17 @@ bool ALane::CheckTrainsByDestination(const TArray <class AStation*>& Stations)
 
 	for (AStation* Station : Stations)
 	{
-		int32 tmp = TrainManagerRef->GetStationsByDestination(Station->GetStationInfo(), this).Num();
+		int32 tmp = TrainManagerRef->GetStationCountByDestination(Station->GetStationInfo(), this);
 
+		tmp += TrainManagerRef->GetStationCountByOrigin(Station->GetStationInfo(), this);
 
 		if (tmp != 0)
 		{
 			res = true;
 			break;
 		}
+
+		
 	}
 
 	return res;
@@ -650,7 +653,7 @@ void ALane::SpawnTrain()
 					}),
 				1.0f,
 				false,
-				0.4f
+				0.45f
 			);
 		}
 		else {
