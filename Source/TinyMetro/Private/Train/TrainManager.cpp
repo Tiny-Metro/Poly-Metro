@@ -157,8 +157,8 @@ int32 ATrainManager::GetStationCountByOrigin(FStationInfo Origin, ALane* Lane) {
 	TArray<ATrainTemplate*> arr;
 	for (auto& i : Trains) {
 		if (IsValid(i)) {
-			if (i->GetCurrentStation() == Origin &&
-				i->GetServiceLaneId() == Lane->GetLaneId()) {
+			if ((i->GetCurrentStation() == Origin &&
+				i->GetServiceLaneId() == Lane->GetLaneId()) || i->GetCurrentStation().Id == -1) {
 				arr.Add(i);
 			}
 		}

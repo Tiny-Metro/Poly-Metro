@@ -653,7 +653,7 @@ void ALane::SpawnTrain()
 					}),
 				1.0f,
 				false,
-				0.5f
+				0.6f
 			);
 		}
 		else {
