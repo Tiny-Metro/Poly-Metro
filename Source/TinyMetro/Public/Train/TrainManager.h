@@ -58,7 +58,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<ATrainTemplate*> GetStationsByDestination(struct FStationInfo Station, class ALane* Lane);
 	UFUNCTION(BlueprintCallable)
-	int32 GetStationCountByDestination(struct FStationInfo Station, class ALane* Lane);
+	int32 GetStationCountByOrigin(struct FStationInfo Origin, class ALane* Lane);
+	UFUNCTION(BlueprintCallable)
+	int32 GetStationCountByDestination(struct FStationInfo Destination, class ALane* Lane);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")

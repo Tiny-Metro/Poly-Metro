@@ -153,11 +153,24 @@ TArray<ATrainTemplate*> ATrainManager::GetStationsByDestination(FStationInfo Sta
 	return arr;
 }
 
-int32 ATrainManager::GetStationCountByDestination(FStationInfo Station, ALane* Lane) {
+int32 ATrainManager::GetStationCountByOrigin(FStationInfo Origin, ALane* Lane) {
 	TArray<ATrainTemplate*> arr;
 	for (auto& i : Trains) {
 		if (IsValid(i)) {
-			if (i->GetNextStation() == Station &&
+			if (i->GetCurrentStation() == Origin &&
+				i->GetServiceLaneId() == Lane->GetLaneId()) {
+				arr.Add(i);
+			}
+		}
+	}
+	return arr.Num();
+}
+
+int32 ATrainManager::GetStationCountByDestination(FStationInfo Destination, ALane* Lane) {
+	TArray<ATrainTemplate*> arr;
+	for (auto& i : Trains) {
+		if (IsValid(i)) {
+			if (i->GetNextStation() == Destination &&
 				i->GetServiceLaneId() == Lane->GetLaneId()) {
 				arr.Add(i);
 			}
