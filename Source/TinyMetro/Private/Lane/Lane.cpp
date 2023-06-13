@@ -441,6 +441,21 @@ TArray<class AStation *> ALane::CollectEveryStations()
 	return EveryStations;
 }
 
+void ALane::MarkLaneToRemoveFromStart(int32 Index, UMaterial* Material)
+{
+
+}
+
+void ALane::MarkLaneToRemoveFromEnd(int32 Index, int32 ExStationNum, UMaterial* Material)
+{
+
+}
+
+void ALane::MarkLaneToClear(UMaterial* Material)
+{
+
+}
+
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {
 	int32 Index = -1;
