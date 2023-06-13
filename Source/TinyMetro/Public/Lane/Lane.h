@@ -274,6 +274,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();
+	UFUNCTION(BlueprintCallable)
+	void SetMaterialByIndex(int32 Index, UMaterial* Material);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<USplineMeshComponent*> RKeepedSplineMesh;

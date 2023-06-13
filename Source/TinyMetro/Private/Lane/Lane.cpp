@@ -1013,6 +1013,13 @@ void ALane::SetMeshMaterial() {
 	RemoveMeshMaterial = LaneMaterial[5];
 }
 
+void ALane::SetMaterialByIndex(int32 Index, UMaterial* Material)
+{
+	for (USplineMeshComponent* mesh : LaneArray[Index].MeshArray) {
+		mesh->SetMaterial(0, Material);
+	}
+}
+
 void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
 
 	//Check the input parameter is valid
