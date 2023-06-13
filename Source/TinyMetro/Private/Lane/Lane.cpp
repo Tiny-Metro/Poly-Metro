@@ -28,6 +28,10 @@ ALane::ALane()
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
+
+	for (auto& i : RemoveLanePath) {
+		RemoveLaneMaterial.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -1008,15 +1012,13 @@ void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
 
 void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
-
-// !!! NEED FIX !!!
-	RemoveMeshMaterial = LaneMaterial[5];
+	RemoveMeshMaterial = RemoveLaneMaterial[LaneId -1];
 }
 
-void ALane::SetMaterialByIndex(int32 Index, UMaterial* Material)
+void ALane::ChangeRemoveMaterialAtIndex(int32 Index)
 {
 	for (USplineMeshComponent* mesh : LaneArray[Index].MeshArray) {
-		mesh->SetMaterial(0, Material);
+		mesh->SetMaterial(0, RemoveMeshMaterial);
 	}
 }
 

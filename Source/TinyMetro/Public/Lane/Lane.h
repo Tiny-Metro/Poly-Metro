@@ -58,6 +58,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> RemoveLaneMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FString> RemoveLanePath = {
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_1.M_LaneTransparent_1'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_2.M_LaneTransparent_2'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_3.M_LaneTransparent_3'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_4.M_LaneTransparent_4'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_5.M_LaneTransparent_5'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_6.M_LaneTransparent_6'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_7.M_LaneTransparent_7'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_8.M_LaneTransparent_8'")
+	};
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool IsCircularLine = false;
 
@@ -275,7 +289,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();
 	UFUNCTION(BlueprintCallable)
-	void SetMaterialByIndex(int32 Index, UMaterial* Material);
+	void ChangeRemoveMaterialAtIndex(int32 Index);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<USplineMeshComponent*> RKeepedSplineMesh;
