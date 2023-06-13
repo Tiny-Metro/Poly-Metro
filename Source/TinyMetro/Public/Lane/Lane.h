@@ -269,6 +269,8 @@ public:
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UMaterialInterface* MeshMaterial;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* RemoveMeshMaterial;
 
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();

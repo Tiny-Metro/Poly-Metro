@@ -1008,6 +1008,9 @@ void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
 
 void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
+
+// !!! NEED FIX !!!
+	RemoveMeshMaterial = LaneMaterial[5];
 }
 
 void ALane::R2SplineMeshComponent(USplineComponent* Spline) {
