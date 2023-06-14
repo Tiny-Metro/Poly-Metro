@@ -198,13 +198,13 @@ public: //Delay Removing
 	TArray<class AStation*> CollectEveryStations();
 
 	UFUNCTION(BlueprintCallable)
-	void MarkLaneToRemoveFromStart(int32 Index, UMaterial* Material);
+	void MarkLaneToRemoveFromStart(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
-	void MarkLaneToRemoveFromEnd(int32 Index,int32 ExStationNum , UMaterial* Material);
+	void MarkLaneToRemoveFromEnd(int32 Index,int32 ExStationNum);
 
 	UFUNCTION(BlueprintCallable) //Mark All
-	void MarkLaneToClear(UMaterial* Material);
+	void MarkLaneToClear();
 
 
 

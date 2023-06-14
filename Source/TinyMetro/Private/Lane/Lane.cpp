@@ -445,19 +445,47 @@ TArray<class AStation *> ALane::CollectEveryStations()
 	return EveryStations;
 }
 
-void ALane::MarkLaneToRemoveFromStart(int32 Index, UMaterial* Material)
+void ALane::MarkLaneToRemoveFromStart(int32 Index)
 {
+	int32 tmpIndex = 0;
+	while (tmpIndex <= Index) {
 
+		//Lane Point
+		for (int32 i = 0; i < RLaneArray.Num(); i++)
+		{
+			if (i != 0 && RLaneArray[i].IsStation) { break; }
+
+			ChangeRemoveMaterialAtIndex(i);
+			
+		}
+
+		tmpIndex++;
+	}
 }
 
-void ALane::MarkLaneToRemoveFromEnd(int32 Index, int32 ExStationNum, UMaterial* Material)
+void ALane::MarkLaneToRemoveFromEnd(int32 Index, int32 ExStationNum)
 {
+	int32 tmpIndex = ExStationNum - 1;
 
+	while (tmpIndex >= Index) {
+		for (int32 i = RLaneArray.Num() - 1; i >= 0; --i)
+		{
+			if (i != RLaneArray.Num() - 1 && RLaneArray[i].IsStation) { break; }
+
+			ChangeRemoveMaterialAtIndex(i);
+
+			
+		}
+
+		tmpIndex--;
+	}
 }
 
-void ALane::MarkLaneToClear(UMaterial* Material)
+void ALane::MarkLaneToClear()
 {
-
+	for (int32 i = 0; i < RLaneArray.Num(); i++) {
+		ChangeRemoveMaterialAtIndex(i);
+	}
 }
 
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
@@ -1032,7 +1060,9 @@ void ALane::SetMeshMaterial() {
 
 void ALane::ChangeRemoveMaterialAtIndex(int32 Index)
 {
-	for (USplineMeshComponent* mesh : LaneArray[Index].MeshArray) {
+	for (USplineMeshComponent* mesh : RLaneArray[Index].MeshArray) {
+
+		UE_LOG(LogTemp, Warning, TEXT("MeshArray"));
 		mesh->SetMaterial(0, RemoveMeshMaterial);
 	}
 }
@@ -1197,7 +1227,7 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 		int count = 1;
 		for (int32 i = 1; i < RLaneArray.Num(); ++i)
 		{
-			if (RLaneArray[i].IsStation) { break; }
+			if (RLaneArray[i].IsStation) { break; }	
 			else {
 				ClearSplineMeshAt(i);
 				RLaneArray.RemoveAt(i);
