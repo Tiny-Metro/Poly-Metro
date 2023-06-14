@@ -88,4 +88,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF);
+
+public:
+	bool IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points);
 };

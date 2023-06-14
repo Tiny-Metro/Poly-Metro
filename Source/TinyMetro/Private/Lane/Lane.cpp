@@ -823,8 +823,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	SetWaterHillArea(PreLaneArray);
 
 	if (!IsBuildble()) 
-	{		
-//		LaneManagerRef.RemoveDestroyedLane(LaneId);
+	{	
 		Destroy();
 		return;
 	}
@@ -838,9 +837,6 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	{
 		BTMangerREF->BuildConnector(ConnectorType::Tunnel, HillArea[i]);
 	}
-
-	/*
-	*/
 
 	// Done
 	StationPoint = NewStationPoint;
@@ -939,7 +935,7 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 		else
 		{
 			// Coordinates are not continuous
-			AreaArray.Add(Area);
+			AreaArray.AddUnique(Area);
 			Area.Empty();
 			Area.Add(CurrentCoord);
 		}
@@ -950,11 +946,31 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 
 bool ALane::IsBuildble() 
 {
-	if (WaterArea.Num() > TinyMetroPlayerState->GetValidBridgeCount() )//> GetBridge() )
+	int RequiredBridge = 0;
+	int RequiredTunnel = 0;
+
+	for (int i = 0; i < HillArea.Num(); i++)
+	{
+		bool IsExist = BTMangerREF->IsConnectorExist(ConnectorType::Tunnel, HillArea[i]);
+		if (!IsExist) 
+		{
+			RequiredTunnel++;
+		}
+	}
+	for (int i = 0; i < WaterArea.Num(); i++)
+	{
+		bool IsExist = BTMangerREF->IsConnectorExist(ConnectorType::Bridge, WaterArea[i]);
+		if (!IsExist)
+		{
+			RequiredBridge++;
+		}
+	}
+
+	if (RequiredBridge> TinyMetroPlayerState->GetValidBridgeCount() )
 	{
 		return false;
 	}
-	if (HillArea.Num() > TinyMetroPlayerState->GetValidTunnelCount()) // GetTunnel*(
+	if (RequiredTunnel > TinyMetroPlayerState->GetValidTunnelCount()) 
 	{
 		return false;
 	}
