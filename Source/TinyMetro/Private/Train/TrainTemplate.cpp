@@ -375,6 +375,10 @@ void ATrainTemplate::InitPassengerMaterial() {
 	PassengerMaterial.Append(tmp);
 }
 
+void ATrainTemplate::SetTrainSpeed(float Speed) {
+	TrainMovement->MaxWalkSpeed = Speed;
+}
+
 void ATrainTemplate::SetTrainId(int32 Id) {
 	TrainId = Id;
 }
@@ -402,7 +406,7 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 void ATrainTemplate::Upgrade() {
 	IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
-	TrainMovement->MaxWalkSpeed = TRAIN_UPGRADE_SPEED;
+	SetTrainSpeed(TRAIN_UPGRADE_SPEED);
 	UpdateTrainMesh();
 }
 

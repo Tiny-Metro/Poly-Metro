@@ -8,8 +8,19 @@
 #include "../Station/StationInfo.h"
 #include "TrainTemplate.generated.h"
 
+// Train speed
 #define TRAIN_DEFAULT_SPEED 300.0f
 #define TRAIN_UPGRADE_SPEED 400.0f
+
+// Distance between Train and Subtrain
+#define DIST_TRAIN_SUBTRAIN 480.0f
+#define DIST_TRAIN_UP_SUBTRAIN 550.0f
+#define DIST_UP_TRAIN_SUBTRAIN 550.0f
+#define DIST_UP_TRAIN_UP_SUBTRAIN 630.0f
+#define DIST_SUBTRAIN_SUBTRAIN 410.0f
+#define DIST_SUBTRAIN_UP_SUBTRAIN 450.0f
+#define DIST_UP_SUBTRAIN_SUBTRAIN 460.0f
+#define DIST_UP_SUBTRAIN_UP_SUBTRAIN 550.0f
 
 UCLASS(Config = Game)
 class TINYMETRO_API ATrainTemplate : public ACharacter
@@ -44,6 +55,9 @@ public:
 	void TrainMeshDeferred();*/
 	UFUNCTION()
 	void InitPassengerMaterial();
+
+	UFUNCTION()
+	void SetTrainSpeed(float Speed);
 	
 	UFUNCTION(BlueprintCallable)
 	void SetTrainId(int32 Id);
@@ -222,6 +236,7 @@ protected:
 	TArray<UMaterial*> PassengerMaterial;
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {
+		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerNone.SM_PassengerNone'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerCircle.SM_PassengerCircle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerTriangle.SM_PassengerTriangle'"),
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerRectangle.SM_PassengerRectangle'"),

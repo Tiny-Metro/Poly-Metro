@@ -53,6 +53,8 @@ public:
 	void UpdateSubtrainDistance();
 	UFUNCTION()
 	void DetachSubtrain(ASubtrain* T);
+	UFUNCTION()
+	void UpdateSubtrainSpeed();
 
 protected:
 
