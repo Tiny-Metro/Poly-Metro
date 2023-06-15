@@ -453,10 +453,9 @@ void ALane::MarkLaneToRemoveFromStart(int32 Index)
 		//Lane Point
 		for (int32 i = 0; i < RLaneArray.Num(); i++)
 		{
-			if (i != 0 && RLaneArray[i].IsStation) { break; }
-
 			ChangeRemoveMaterialAtIndex(i);
-			
+
+			if (i != 0 && RLaneArray[i].IsStation) { break; }
 		}
 
 		tmpIndex++;
@@ -470,11 +469,9 @@ void ALane::MarkLaneToRemoveFromEnd(int32 Index, int32 ExStationNum)
 	while (tmpIndex >= Index) {
 		for (int32 i = RLaneArray.Num() - 1; i >= 0; --i)
 		{
-			if (i != RLaneArray.Num() - 1 && RLaneArray[i].IsStation) { break; }
-
 			ChangeRemoveMaterialAtIndex(i);
 
-			
+			if (i != RLaneArray.Num() - 1 && RLaneArray[i].IsStation) { break; }
 		}
 
 		tmpIndex--;
