@@ -57,6 +57,10 @@ public:
 	void TrainDeferredDespawn(struct FStationInfo Station, class ALane* Lane);
 	UFUNCTION(BlueprintCallable)
 	TArray<ATrainTemplate*> GetStationsByDestination(struct FStationInfo Station, class ALane* Lane);
+	UFUNCTION(BlueprintCallable)
+	int32 GetStationCountByOrigin(struct FStationInfo Origin, class ALane* Lane);
+	UFUNCTION(BlueprintCallable)
+	int32 GetStationCountByDestination(struct FStationInfo Destination, class ALane* Lane);
 
 	UFUNCTION()
 	int32 GetTrainCount(int32 LaneId = -1) const;
