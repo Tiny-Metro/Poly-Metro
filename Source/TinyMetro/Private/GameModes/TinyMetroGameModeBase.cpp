@@ -10,6 +10,7 @@
 #include "Policy/Policy.h"
 #include "Shop/Shop.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Lane/BridgeTunnel/BridgeTunnelManager.h"
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
@@ -68,6 +69,33 @@ void ATinyMetroGameModeBase::StartPlay() {
     Bank = GetWorld()->SpawnActor<ABank>();
     Timer = GetWorld()->SpawnActor<ATimer>();
     Shop = GetWorld()->SpawnActor<AShop>();
+
+    // Spawn BP_BridgeTunnelManager
+    // Load BP Class
+    UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BridgeTunnel/BP_BridgeTunnelManger.BP_BridgeTunnelManger'")));
+    
+    // Cast to BP
+    UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+    // Check object validation
+    if (!SpawnActor) {
+        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
+        return;
+    }
+
+    // Check null
+    UClass* SpawnClass = SpawnActor->StaticClass();
+    if (SpawnClass == nullptr) {
+        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+        return;
+    }
+
+    // Spawn actor
+    FActorSpawnParameters SpawnParams;
+    FTransform SpawnTransform;
+    SpawnParams.Owner = this;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    BridgeTunnelManager = Cast<ABridgeTunnelManager>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+
     PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     UE_LOG(LogTemp, Log, TEXT("GameMode::StartPlay : Spawn finish"));
     Super::StartPlay();
@@ -112,4 +140,8 @@ ATimer* ATinyMetroGameModeBase::GetTimer() const {
 
 AShop* ATinyMetroGameModeBase::GetShop() const {
     return Shop;
+}
+
+ABridgeTunnelManager* ATinyMetroGameModeBase::GetBridgeTunnelManager() const {
+    return BridgeTunnelManager;
 }

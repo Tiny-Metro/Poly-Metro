@@ -46,6 +46,8 @@ public:
 	class ATimer* GetTimer() const;
 	UFUNCTION(BlueprintCallable)
 	class AShop* GetShop() const;
+	UFUNCTION(BlueprintCallable)
+	class ABridgeTunnelManager* GetBridgeTunnelManager() const;
 
 protected:
 	UPROPERTY(Config)
@@ -74,6 +76,8 @@ protected:
 	class ATimer* Timer;
 	UPROPERTY()
 	class AShop* Shop;
+	UPROPERTY()
+	class ABridgeTunnelManager* BridgeTunnelManager;
 	UPROPERTY()
 	APlayerController* PlayerController;
 
