@@ -333,6 +333,11 @@ void ATrain::Upgrade() {
 	// TODO : Money function division
 	PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeTrain());
 	TrainManagerRef->ReportTrainUpgrade();
+	UpdateSubtrainSpeed();
+	UpdateSubtrainDistance();
+	for (auto& i : Subtrains) {
+		i->UpdateTrainMesh();
+	}
 }
 
 bool ATrain::CanUpgrade() const {
@@ -409,8 +414,62 @@ void ATrain::GetOffPassenger(AStation* Station, bool* Success) {
 
 void ATrain::UpdateSubtrainDistance() {
 	int count = 1;
-	for (auto& i : Subtrains) {
-		i->SetDistanceFromTrain(480 * count++);
+	// Distance between Train and 1st Subtrain
+	float defaultDistance = 0.0f;
+	// Is before Subtrain is upgrade
+	bool isUpgradeBeforeSubtrain = false;
+	// Total distance from Train to last Subtrain
+	float totalDistance = 0.0f;
+	if (Subtrains.IsValidIndex(0)) {
+		if (IsUpgrade) {
+			if (Subtrains[0]->GetIsUpgrade()) {
+				// Upgrade Train and Upgrade Subtrain
+				defaultDistance = DIST_UP_TRAIN_UP_SUBTRAIN;
+				isUpgradeBeforeSubtrain = true;
+			} else {
+				// Upgrade Train and Non upgrade Subtrain
+				defaultDistance = DIST_UP_TRAIN_SUBTRAIN;
+				isUpgradeBeforeSubtrain = false;
+			}
+		} else {
+			if (Subtrains[0]->GetIsUpgrade()) {
+				// Non upgrade Train and Upgrade Subtrain
+				defaultDistance = DIST_TRAIN_UP_SUBTRAIN;
+				isUpgradeBeforeSubtrain = true;
+			} else {
+				// Non upgrade Train and Non upgrade Subtrain
+				defaultDistance = DIST_TRAIN_SUBTRAIN;
+				isUpgradeBeforeSubtrain = false;
+			}
+		}
+		Subtrains[0]->SetDistanceFromTrain(defaultDistance);
+		totalDistance += defaultDistance;
+	}
+
+	if (Subtrains.Num() >= 2) {
+		for (int i = 1; i < Subtrains.Num(); i++) {
+			if (Subtrains[i]->GetIsUpgrade()) {
+				if (isUpgradeBeforeSubtrain) {
+					// Upgrade Subtrain and Upgrade Subtrain
+					Subtrains[i]->SetDistanceFromTrain(totalDistance + DIST_UP_SUBTRAIN_UP_SUBTRAIN);
+					totalDistance += DIST_UP_SUBTRAIN_UP_SUBTRAIN;
+				} else {
+					// Non upgrade Subtrain and Upgrade Subtrain
+					Subtrains[i]->SetDistanceFromTrain(totalDistance + DIST_SUBTRAIN_UP_SUBTRAIN);
+					totalDistance += DIST_SUBTRAIN_UP_SUBTRAIN;
+				}
+			} else {
+				if (isUpgradeBeforeSubtrain) {
+					// Upgrade Subtrain and Non upgrade Subtrain
+					Subtrains[i]->SetDistanceFromTrain(totalDistance + DIST_UP_SUBTRAIN_SUBTRAIN);
+					totalDistance += DIST_UP_SUBTRAIN_SUBTRAIN;
+				} else {
+					// Non upgrade Subtrain and Non upgrade Subtrain
+					Subtrains[i]->SetDistanceFromTrain(totalDistance + DIST_SUBTRAIN_SUBTRAIN);
+					totalDistance += DIST_SUBTRAIN_SUBTRAIN;
+				}
+			}
+		}
 	}
 }
 
@@ -419,10 +478,18 @@ void ATrain::DetachSubtrain(ASubtrain* T) {
 	UpdateSubtrainDistance();
 }
 
+void ATrain::UpdateSubtrainSpeed() {
+	for (auto& i : Subtrains) {
+		i->SetTrainSpeed(IsUpgrade ? TRAIN_UPGRADE_SPEED : TRAIN_DEFAULT_SPEED);
+	}
+}
+
 void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.AddUnique(T);
 	T->AttachToTrain(this);
+	T->SetActorLocation(this->GetActorLocation());
 	UpdateSubtrainDistance();
+	UpdateSubtrainSpeed();
 }
 
