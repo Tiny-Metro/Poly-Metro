@@ -30,6 +30,10 @@ ALane::ALane()
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
+
+	for (auto& i : RemoveLanePath) {
+		RemoveLaneMaterial.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -45,6 +49,24 @@ void ALane::BeginPlay()
 void ALane::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
+	//Delay Removing
+	if (DoesLaneToBeRemoved)
+	{
+		FinishClearingLane();
+	}
+
+	if (DoesStationsToBeRemovedAtStart)
+	{
+		FinishRemovingLaneAtStart();
+	}
+
+	if (DoesStationsToBeRemovedAtEnd)
+	{ 
+		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("Stations Have To Be Removed At End"));
+		FinishRemovingLaneAtEnd();
+	}
 
 }
 
@@ -360,9 +382,111 @@ void ALane::RemoveLane_Implementation() {}
 
 void ALane::ExtendLane_Implementation() {}
 
-void ALane::FinishRemovingLaneAtStart_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+void ALane::FinishRemovingLaneAtStart_Implementation() {}
 
-void ALane::FinishRemovingLaneAtEnd_Implementation(const TArray <class AStation*>& Stations, const int32 Index) {}
+void ALane::FinishRemovingLaneAtEnd_Implementation() {}
+
+void ALane::FinishClearingLane_Implementation() {}
+
+
+
+bool ALane::CheckTrainsByDestination(const TArray <class AStation*>& Stations)
+{
+	bool res = false;
+
+	for (AStation* Station : Stations)
+	{
+		int32 tmp = TrainManagerRef->GetStationCountByDestination(Station->GetStationInfo(), this);
+
+		tmp += TrainManagerRef->GetStationCountByOrigin(Station->GetStationInfo(), this);
+
+		if (tmp != 0)
+		{
+			res = true;
+			break;
+		}
+
+		
+	}
+
+	return res;
+}
+
+void ALane::NotifyTrainsOfRemoving(const TArray<class AStation*>& Stations)
+{
+	for (AStation* Station : Stations)
+	{
+		TrainManagerRef->TrainDeferredDespawn(Station->GetStationInfo(), this);
+		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, FString::Printf(TEXT("DEBUG")));
+	}
+}
+
+void ALane::ModifyStationInfoWhenRemoving(const TArray <class AStation*>& Stations)
+{
+	for (AStation* Station : Stations)
+	{
+		
+		Station->SetActivate(false);
+		Station->RemoveLane(LaneId);
+	}
+}
+
+TArray<class AStation *> ALane::CollectEveryStations()
+{
+	TArray<AStation* > EveryStations;
+
+	for(auto Station : StationPointBeforeRemovedStart)
+	{
+		EveryStations.Add(Station);
+	}
+
+	for(auto Station : StationPointBeforeRemovedEnd)
+	{
+		EveryStations.AddUnique(Station);
+	}
+
+	return EveryStations;
+}
+
+void ALane::MarkLaneToRemoveFromStart(int32 Index)
+{
+	int32 tmpIndex = 0;
+	while (tmpIndex <= Index) {
+
+		//Lane Point
+		for (int32 i = 0; i < LaneArray.Num(); i++)
+		{
+			ChangeRemoveMaterialAtIndex(i);
+
+			if (i != 0 && LaneArray[i].IsStation) { break; }
+		}
+
+		tmpIndex++;
+	}
+}
+
+void ALane::MarkLaneToRemoveFromEnd(int32 Index, int32 ExStationNum)
+{
+	int32 tmpIndex = ExStationNum - 1;
+
+	while (tmpIndex >= Index) {
+		for (int32 i = LaneArray.Num() - 1; i >= 0; --i)
+		{
+			ChangeRemoveMaterialAtIndex(i);
+
+			if (i != LaneArray.Num() - 1 && LaneArray[i].IsStation) { break; }
+		}
+
+		tmpIndex--;
+	}
+}
+
+void ALane::MarkLaneToClear()
+{
+	for (int32 i = 0; i < LaneArray.Num(); i++) {
+		ChangeRemoveMaterialAtIndex(i);
+	}
+}
 
 FIntPoint ALane::GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction)
 {
@@ -576,7 +700,7 @@ void ALane::SpawnTrain()
 					}),
 				1.0f,
 				false,
-				1.0f
+				0.6f
 			);
 		}
 		else {
@@ -1074,6 +1198,16 @@ void ALane::HandleFullLength(bool IsFullLength, USplineComponent* Spline) {
 
 void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
+	RemoveMeshMaterial = RemoveLaneMaterial[LaneId -1];
+}
+
+void ALane::ChangeRemoveMaterialAtIndex(int32 Index)
+{
+	for (USplineMeshComponent* mesh : LaneArray[Index].MeshArray) {
+
+		UE_LOG(LogTemp, Warning, TEXT("MeshArray"));
+		mesh->SetMaterial(0, RemoveMeshMaterial);
+	}
 }
 
 void ALane::SetSplineMeshes(USplineComponent* Spline) {
@@ -1237,6 +1371,7 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 		for (int32 i = 1; i < LaneArray.Num(); ++i)
 		{
 			if (LaneArray[i].IsStation) { break; }
+
 			else {
 				ClearSplineMeshAt(i);
 				LaneArray.RemoveAt(i);

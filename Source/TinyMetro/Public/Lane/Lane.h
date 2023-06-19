@@ -63,6 +63,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<UMaterial*> RemoveLaneMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FString> RemoveLanePath = {
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_1.M_LaneTransparent_1'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_2.M_LaneTransparent_2'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_3.M_LaneTransparent_3'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_4.M_LaneTransparent_4'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_5.M_LaneTransparent_5'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_6.M_LaneTransparent_6'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_7.M_LaneTransparent_7'"),
+		TEXT("Material'/Game/Resource/Material/Lane/Transparent/M_LaneTransparent_8.M_LaneTransparent_8'")
+	};
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool IsCircularLine = false;
 
@@ -146,13 +160,64 @@ public : // BlueprintNativeEvent
 	virtual void ExtendLane_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void FinishRemovingLaneAtStart(const TArray <class AStation*>& Stations, const int32 Index);
+	void FinishRemovingLaneAtStart();
+	virtual void FinishRemovingLaneAtStart_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void FinishRemovingLaneAtEnd(const TArray <class AStation*>& Stations, const int32 Index);
-	
-public: // About Train
+	void FinishRemovingLaneAtEnd();
+	virtual void FinishRemovingLaneAtEnd_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FinishClearingLane();
+	virtual void FinishClearingLane_Implementation();
+
+public: //Delay Removing
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationsToBeRemovedAtEnd;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationsToBeRemovedAtStart;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationPointBeforeRemovedEnd;
+	
+	UPROPERTY(BlueprintReadWrite)
+	TArray <AStation*> StationPointBeforeRemovedStart;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool DoesStationsToBeRemovedAtStart= false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool DoesStationsToBeRemovedAtEnd = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool DoesLaneToBeRemoved = false;
+
+	UFUNCTION(BlueprintCallable)
+	bool CheckTrainsByDestination(const TArray <class AStation*>& Stations);
+
+	UFUNCTION(BlueprintCallable)
+	void NotifyTrainsOfRemoving(const TArray <class AStation*>& Stations);
+
+	UFUNCTION(BlueprintCallable)
+	void ModifyStationInfoWhenRemoving(const TArray <class AStation*>& Stations);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<class AStation*> CollectEveryStations();
+
+	UFUNCTION(BlueprintCallable)
+	void MarkLaneToRemoveFromStart(int32 Index);
+
+	UFUNCTION(BlueprintCallable)
+	void MarkLaneToRemoveFromEnd(int32 Index,int32 ExStationNum);
+
+	UFUNCTION(BlueprintCallable) //Mark All
+	void MarkLaneToClear();
+
+
+
+public: // About Train
 	UFUNCTION(BlueprintCallable)
 	FIntPoint GetNextLocation(class ATrainTemplate* Train, FIntPoint CurLocation, TrainDirection Direction);
 
@@ -175,6 +240,7 @@ public: // About Train
 	FIntPoint GetWorldCoordinationByStationPointIndex(int32 Index);
 
 public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FIntPoint> PointArray;
 
@@ -227,9 +293,13 @@ public:
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UMaterialInterface* MeshMaterial;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* RemoveMeshMaterial;
 
 	UFUNCTION(BlueprintCallable)
 	void SetMeshMaterial();
+	UFUNCTION(BlueprintCallable)
+	void ChangeRemoveMaterialAtIndex(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	void SetSplineMeshes(USplineComponent* Spline);
