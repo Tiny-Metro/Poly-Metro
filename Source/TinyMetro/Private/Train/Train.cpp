@@ -485,7 +485,7 @@ void ATrain::UpdateSubtrainSpeed() {
 	}
 }
 
-void ATrain::AddSubtrain(ASubtrain* T) {
+void ATrain::AddSubtrain_Implementation(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.AddUnique(T);
 	T->AttachToTrain(this);

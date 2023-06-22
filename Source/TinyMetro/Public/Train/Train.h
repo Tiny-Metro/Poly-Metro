@@ -41,8 +41,9 @@ public:
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void AddSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
+	virtual void AddSubtrain_Implementation(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
 	UFUNCTION()
 	void ActiveMoveTest(); 
 	UFUNCTION()

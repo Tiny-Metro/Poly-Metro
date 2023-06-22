@@ -150,6 +150,8 @@ protected:
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TMap<int32, class UPassenger*> Passenger;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float CurrentSpeed = 0.0f;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> LineTraceIgnoreActors;
