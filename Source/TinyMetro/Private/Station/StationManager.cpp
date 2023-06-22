@@ -51,7 +51,6 @@ void AStationManager::BeginPlay()
 	}
 
 
-	StationSpawnRoutine();
 
 
 
@@ -242,46 +241,25 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 			FString::Printf(TEXT("Stations : %d"), Station.Num()));*/
 }
 
-void AStationManager::StationSpawnRoutine() {
-	/*GetWorld()->GetTimerManager().SetTimer(
-		TimerSpawnStation,
-		this, 
-		&AStationManager::IncreaseSpawnParameter, 
-		1.0f, 
-		true, 
-		1.0f);*/
+void AStationManager::StationSpawnRoutine(float DeltaTime) {
+	// Spawn routine
+	// Add time
+	StationSpawnCurrent += DeltaTime;
+	// If time over the require
+	if (StationSpawnCurrent >= StationSpawnRequire) {
+		// Spawn random station
+		SpawnStation(GridManager->GetGridCellDataRandom(), GetRandomStationType());
 
-	// Spawn loop
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerSpawnStation,
-		FTimerDelegate::CreateLambda([&]() {
-			StationSpawnCurrent += StationSpawnPerSec;
-			if (StationSpawnCurrent >= StationSpawnRequire) {
-				SpawnStation(GridManager->GetGridCellDataRandom(), GetRandomStationType());
-
-				/*if (GEngine)
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						15.0f,
-						FColor::Yellow,
-						FString::Printf(TEXT("Spawn!")));*/
-				StationSpawnCurrent = 0.0f;
-			}
-
-			//Log
-			//if (GEngine)
-			//	GEngine->AddOnScreenDebugMessage(
-			//		-1,
-			//		15.0f,
-			//		FColor::Yellow,
-			//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
-		}),
-		1.0f,
-		true,
-		1.0f
-	);
-
-	
+		/*if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.0f,
+				FColor::Yellow,
+				FString::Printf(TEXT("Spawn!")));*/
+		
+		// Initialize time
+		StationSpawnCurrent -= StationSpawnRequire;
+	}
 }
 
 void AStationManager::PolicyMaintenanceRoutine() {
@@ -961,6 +939,8 @@ FString AStationManager::StationTypeToString(StationType Type, bool& Success) {
 void AStationManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	StationSpawnRoutine(DeltaTime);
 
 	//if (Policy == nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(":("));
 	/*if (GEngine)
