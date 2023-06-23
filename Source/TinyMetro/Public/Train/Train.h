@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Train/TrainTemplate.h"
 #include "Subtrain.h"
+#include "TrainStatus.h"
 #include "TrainAiController.h"
 #include "Train.generated.h"
 
@@ -48,7 +49,7 @@ public:
 	UFUNCTION()
 	void GetOnPassenger(class AStation* Station);
 
-	virtual void GetOffPassenger(class AStation* Station, bool* Success) override;
+	virtual void GetOffPassenger(class AStation* Station, bool& Success) override;
 	UFUNCTION()
 	void UpdateSubtrainDistance();
 	UFUNCTION()
@@ -75,6 +76,12 @@ protected:
 	FVector LocationAtPreTick;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	ATrainAiController* AiControllerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	TrainStatus Status = TrainStatus::Run;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float PassengerTransitionDelay = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float PassengerTransitionCount = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* CubeComponent;

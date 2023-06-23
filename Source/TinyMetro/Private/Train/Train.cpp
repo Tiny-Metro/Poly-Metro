@@ -22,6 +22,22 @@ void ATrain::Tick(float DeltaTime) {
 		TEXT("Train::Tick")
 	);*/
 
+	// Passenger Off, On
+	if (Status == TrainStatus::GetOff) {
+		PassengerTransitionCount += DeltaTime;
+		if (PassengerTransitionCount >= PassengerTransitionDelay) {
+			bool tmp;
+			GetOffPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation), tmp);
+			PassengerTransitionCount -= PassengerTransitionDelay;
+		}
+	} else if (Status == TrainStatus::GetOn) {
+		PassengerTransitionCount += DeltaTime;
+		if (PassengerTransitionCount >= PassengerTransitionDelay) {
+			GetOnPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation));
+			PassengerTransitionCount -= PassengerTransitionDelay;
+		}
+	}
+
 	// Drag & Drop
 	if (IsActorDragged) {
 		//DropPassenger();
@@ -160,29 +176,32 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			// Initialize check index
 			PassengerIndex = 0;
 
-			bool tmp = false;
-			// Set up delegate (Passenger get on, off)
-			GetOffDelegate.BindUObject(
-				this,
-				&ATrain::GetOffPassenger,
-				Cast<AStation>(OtherActor),
-				&tmp
-			);
+			// Change status : Run -> GetOff
+			Status = TrainStatus::GetOff;
 
-			GetOnDelegate.BindUObject(
-				this,
-				&ATrain::GetOnPassenger,
-				Cast<AStation>(OtherActor)
-			);
+			//bool tmp = false;
+			//// Set up delegate (Passenger get on, off)
+			//GetOffDelegate.BindUObject(
+			//	this,
+			//	&ATrain::GetOffPassenger,
+			//	Cast<AStation>(OtherActor),
+			//	&tmp
+			//);
 
-			// Start get off passenger
-			GetWorld()->GetTimerManager().SetTimer(
-				GetOffHandle,
-				GetOffDelegate,
-				1.0f,
-				true,
-				0.0f
-			);
+			//GetOnDelegate.BindUObject(
+			//	this,
+			//	&ATrain::GetOnPassenger,
+			//	Cast<AStation>(OtherActor)
+			//);
+
+			//// Start get off passenger
+			//GetWorld()->GetTimerManager().SetTimer(
+			//	GetOffHandle,
+			//	GetOffDelegate,
+			//	1.0f,
+			//	true,
+			//	0.0f
+			//);
 
 			AiControllerRef->SetTrainDestination(
 				GetNextTrainDestination(AiControllerRef->GetTrainDestination())
@@ -372,45 +391,48 @@ void ATrain::GetOnPassenger(AStation* Station) {
 				}
 			} 
 		} else {
-			GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
+			//GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
+			Status = TrainStatus::Run;
 			TrainMovement->SetActive(true);
 
 			AiControllerRef->Patrol();
 		}
 	} else {
-		GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
+		//GetWorld()->GetTimerManager().ClearTimer(GetOnHandle);
+		Status = TrainStatus::Run;
 		TrainMovement->SetActive(true);
 
 		AiControllerRef->Patrol();
 	}
 }
 
-void ATrain::GetOffPassenger(AStation* Station, bool* Success) {
+void ATrain::GetOffPassenger(AStation* Station, bool& Success) {
 	// Log
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
 	
 	Super::GetOffPassenger(Station, Success);
-	if ((*Success)) {
+	if (Success) {
 		return;
 	}
 
 	for (auto& i : Subtrains) {
 		i->GetOffPassenger(Station, Success);
-		if ((*Success)) {
+		if (Success) {
 			return;
 		}
 	}
 	
 	// Call when any passenger get off
 	// Stop get off, Start get on
-	GetWorld()->GetTimerManager().ClearTimer(GetOffHandle);
+	/*GetWorld()->GetTimerManager().ClearTimer(GetOffHandle);
 	GetWorld()->GetTimerManager().SetTimer(
 		GetOnHandle,
 		GetOnDelegate,
 		1.0f,
 		true,
 		0.0f
-	);
+	);*/
+	Status = TrainStatus::GetOn;
 }
 
 void ATrain::UpdateSubtrainDistance() {
