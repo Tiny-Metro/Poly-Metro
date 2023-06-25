@@ -155,6 +155,23 @@ FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TA
 	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 	return nullptr;
 }
+bool ABridgeTunnelManager::AreArraysEqual(const TArray<FIntPoint>& Array1, const TArray<FIntPoint>& Array2)
+{
+	if (Array1.Num() != Array2.Num())
+	{
+		return false;
+	}
+
+	for (int32 Index = 0; Index < Array1.Num(); Index++)
+	{
+		if (Array1[Index] != Array2[Index])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 void ABridgeTunnelManager::DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
 	FConnectorData* ConnectorToDelete = FindConnector(type, points);
@@ -180,6 +197,10 @@ void ABridgeTunnelManager::DisconnectConnector(FConnectorData connectorData) {
 
 void ABridgeTunnelManager::DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
 	FConnectorData* ConnectorToDelete = FindConnector(type, points);
+	if (ConnectorToDelete == nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!The givien pointsArray is invalid!!!!!!!!"));
+		return;
+	}
 	DisconnectConnector(*ConnectorToDelete);
 }
 void ABridgeTunnelManager::DisconnectByActorRef(ABridgeTunnel* ConnectorREF) {
