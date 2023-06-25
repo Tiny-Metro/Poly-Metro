@@ -907,6 +907,132 @@ void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock)
 	SetArea(HillPoints, HillArea);
 }
 
+TArray<TArray<FIntPoint>> ALane::GetArea(const TArray<FLanePoint>& LaneBlock, GridType Type) {
+	TArray<FIntPoint> targetPoints;
+
+	TArray<int> targetIndex;
+
+	for (int i = 0; i < LaneBlock.Num(); i++)
+	{
+
+		FIntPoint Coord = LaneBlock[i].Coordination;
+
+		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Coord.X, Coord.Y);
+
+		if (GridCellData.GridType == Type) {
+			if (targetIndex.IsEmpty())
+			{
+				targetPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			if (targetIndex.Num() >= 1 && targetIndex.Last() + 1 != i)
+			{
+				targetPoints.Add(LaneBlock[targetIndex.Last() + 1].Coordination);
+				targetPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			targetIndex.Add(i);
+			targetPoints.Add(Coord);
+		}
+
+
+	}
+
+	if (targetIndex.Num() > 0)// && targetIndex.Last() + 1 < LaneBlock.Num())
+	{
+		targetPoints.Add(LaneBlock[targetIndex.Last() + 1].Coordination);
+	}
+
+
+	/////////
+
+	TArray<TArray<FIntPoint>> target;
+	int32 NumPoints = targetPoints.Num();
+
+	if (NumPoints == 0)
+	{
+		target.Empty();
+		return target;
+	}
+
+	TArray<FIntPoint> Area;
+	Area.Add(targetPoints[0]);
+
+	for (int32 i = 1; i < NumPoints; i++)
+	{
+		const FIntPoint& CurrentCoord = targetPoints[i];
+		const FIntPoint& PrevCoord = targetPoints[i - 1];
+
+		int32 XDiff = FMath::Abs(CurrentCoord.X - PrevCoord.X);
+		int32 YDiff = FMath::Abs(CurrentCoord.Y - PrevCoord.Y);
+
+		if (XDiff <= 1 && YDiff <= 1)
+		{
+			// Coordinates are within the range of (-1, -1) and (1, 1), indicating continuity
+			Area.Add(CurrentCoord);
+		}
+		else
+		{
+			// Coordinates are not continuous
+			target.AddUnique(Area);
+			Area.Empty();
+			Area.Add(CurrentCoord);
+		}
+	}
+
+	target.Add(Area);
+
+
+	return target;
+}
+void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
+
+	ConnectorType targetType;
+
+	switch (Type)
+	{
+	case GridType::Ground:
+		return;
+		break;
+	case GridType::Water:
+		targetType = ConnectorType::Bridge;
+		break;
+	case GridType::Hill:
+		targetType = ConnectorType::Tunnel;
+		break;
+	default:
+		return;
+		break;
+	}
+
+	for (int i = 0; i < Area.Num(); i++)
+	{
+		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+	}
+}
+void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
+
+	ConnectorType targetType;
+
+	switch (Type)
+	{
+	case GridType::Ground:
+		break;
+	case GridType::Water:
+		targetType = ConnectorType::Bridge;
+		break;
+	case GridType::Hill:
+		targetType = ConnectorType::Tunnel;
+		break;
+	default:
+		break;
+	}
+
+	for (int i = 0; i < Area.Num(); i++)
+	{
+//		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+		BTMangerREF->BuildConnector(targetType, Area[i]);
+	}
+}
+
 void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray)
 {
 	int32 NumPoints = Points.Num();

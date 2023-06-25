@@ -267,6 +267,11 @@ private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
 
 private:
+	void DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type);
+	void ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type);
+
+	TArray<TArray<FIntPoint>> GetArea(const TArray<FLanePoint>& LaneBlock, GridType Type);
+
 	void SetWaterHillArea(TArray<FLanePoint>& LaneBlock);
 	void SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray);
 
