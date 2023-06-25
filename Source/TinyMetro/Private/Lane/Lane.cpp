@@ -1370,7 +1370,28 @@ void ALane::ClearSplineMeshAt(int32 Index){
 
 void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 
+	// get preseverPOints for the BnT
+	TArray<FLanePoint> PreserveLane;
 	int32 tmpIndex = 0;
+	int32 ind = 0;
+	while (tmpIndex < Index +1)
+	{
+		PreserveLane.Add(LaneArray[ind]);
+		UE_LOG(LogTemp, Warning, TEXT("!!elements : %d     %d"), LaneArray[ind].Coordination.X, LaneArray[ind].Coordination.Y);
+		ind++;
+
+		if (LaneArray[ind].IsStation) { tmpIndex++; }
+
+	}
+	PreserveLane.Add(LaneArray[ind]);
+
+	//get area for the preserved points
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(PreserveLane, GridType::Water);
+	DisconnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(PreserveLane, GridType::Hill);
+	DisconnectBT(DeletedTunnel, GridType::Hill);
+	tmpIndex = 0;
 	while (tmpIndex <= Index) {
 		//StationPoint.RemoveAt(0);
 
@@ -1423,7 +1444,31 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline) {
 
 //	int32 tmpIndex = StationPoint.Num() -1;
+	TArray<FLanePoint> PreserveLane;
 	int32 tmpIndex = ExStationNum - 1;
+	int32 ind = LaneArray.Num()-1;
+	while (tmpIndex >= Index )
+	{
+		PreserveLane.Add(LaneArray[ind]);
+		UE_LOG(LogTemp, Warning, TEXT("!!elements : %d     %d"), LaneArray[ind].Coordination.X, LaneArray[ind].Coordination.Y);
+		ind--;
+
+		if (LaneArray[ind].IsStation) { tmpIndex--; }
+
+	}
+	PreserveLane.Add(LaneArray[ind]);
+
+	//get area for the preserved points
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(PreserveLane, GridType::Water);
+	DisconnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(PreserveLane, GridType::Hill);
+	DisconnectBT(DeletedTunnel, GridType::Hill);
+
+
+
+	//	int32 tmpIndex = StationPoint.Num() -1;
+	tmpIndex = ExStationNum - 1;
 
 	while (tmpIndex >= Index) {
 		//int32 lastIndexStation= StationPoint.Num() - 1;
@@ -1674,6 +1719,12 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
+
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
 }
 
 void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
@@ -1876,6 +1927,11 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
 }
 
 bool ALane::IsPointsValid() {
