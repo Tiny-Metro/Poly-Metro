@@ -144,6 +144,8 @@ public:
 	void SetPassengerSpawnEnable(bool Flag);
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
+	UFUNCTION()
+	void PassengerSpawnRoutine(float DeltaTime);
 	
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -167,7 +169,6 @@ public:
 	void SetStationInfo(int32 Id, StationType Type);
 
 protected:
-	void PassengerSpawnRoutine(float DeltaTime);
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
 	void ComplainRoutine();
