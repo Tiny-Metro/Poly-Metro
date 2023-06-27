@@ -754,11 +754,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			AStation* CurrentStationPtr = NewStationPoint[i];
 			FIntPoint CurrentStation = CurrentStationPtr->GetCurrentGridCellData().WorldCoordination;
 			FLanePoint CurrentLanePoint;
-			CurrentLanePoint.Coordination = CurrentStation;
-			CurrentLanePoint.IsStation = true;
-			CurrentLanePoint.IsBendingPoint = true;
-			CurrentLanePoint.IsThrough = false;
-			LaneBlock.Add(CurrentLanePoint);
+			AddLanePoint(CurrentStation, true, true, LaneBlock);
 
 			PreLaneArray.Append(LaneBlock);
 			break;
@@ -774,12 +770,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 		bool IsBending = HasBendingPoint(Diff);
 
 		// Add CurrentLanePoint ot PreLaneArray
-		FLanePoint CurrentLanePoint;
-		CurrentLanePoint.Coordination = CurrentStation;
-		CurrentLanePoint.IsStation = true;
-		CurrentLanePoint.IsBendingPoint = true;
-		CurrentLanePoint.IsThrough = false;
-		LaneBlock.Add(CurrentLanePoint);
+		AddLanePoint(CurrentStation, true, true, LaneBlock);
 
 		if (IsBending)
 		{
@@ -792,16 +783,16 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			// Add PathToBending points to LaneArray
 			for (const FIntPoint& Point : PathToBending) 
 			{
-				AddLanePoint(Point, false, LaneBlock);
+				AddLanePoint(Point, false, false, LaneBlock);
 			}
 
 			// Add BendingPoint to LaneArray
-			AddLanePoint(BendingCoord, true, LaneBlock);
+			AddLanePoint(BendingCoord, false, true, LaneBlock);
 
 			// Add PathFromBending points to LaneArray
 			for (const FIntPoint& Point : PathFromBending) 
 			{
-				AddLanePoint(Point, false, LaneBlock);
+				AddLanePoint(Point, false, false, LaneBlock);
 			}
 		}
 		else 
@@ -811,7 +802,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			// Add PathToNext points to LaneArray
 			for (const FIntPoint& Point : PathToNext) 
 			{
-				AddLanePoint(Point, false, LaneBlock);
+				AddLanePoint(Point, false, false, LaneBlock);
 			}
 		}
 
@@ -1164,12 +1155,18 @@ void ALane::SetLaneLocation() {
 
 }
 
-void ALane::AddLanePoint(const FIntPoint& Point, bool IsBendingPoint, TArray<FLanePoint>& TargetArray) {
+void ALane::AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingPoint, TArray<FLanePoint>& TargetArray) {
 	FLanePoint LanePoint;
 	LanePoint.Coordination = Point;
-	LanePoint.IsStation = false;
+	LanePoint.IsStation = IsStation;
 	LanePoint.IsBendingPoint = IsBendingPoint;
-	LanePoint.IsThrough = GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station;
+
+	if (IsStation) {
+		LanePoint.IsThrough = false;
+	}
+	else {
+		LanePoint.IsThrough = GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station;
+	}
 
 	TargetArray.Add(LanePoint);
 }
@@ -1534,13 +1531,9 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 	FIntPoint NewPoint = NewStation->GetCurrentGridCellData().WorldCoordination;
 
-	FLanePoint CurrentLanePoint;
-	CurrentLanePoint.Coordination = NewPoint;
-	CurrentLanePoint.IsStation = true;
-	CurrentLanePoint.IsBendingPoint = true;
-	CurrentLanePoint.IsThrough = false;
+	AddLanePoint(NewPoint, true, true, AddLaneArray);
 
-	AddLaneArray.Add(CurrentLanePoint);
+//	AddLaneArray.Add(CurrentLanePoint);
 
 	FIntPoint NextStation = StationPoint[1]->GetCurrentGridCellData().WorldCoordination;
 	FIntPoint Diff = NextStation - NewPoint;
@@ -1577,9 +1570,15 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 		else BendingPoint.IsThrough = false;
 
 		AddLaneArray.Add(BendingPoint);
+		*/
+		
+		AddLanePoint(BendingCoord, false, true, AddLaneArray);
+
 
 		for (const FIntPoint& Point : PathFromBending)
 		{
+			AddLanePoint(Point, false, false, AddLaneArray);
+/*
 			FLanePoint PathPoint;
 			PathPoint.Coordination = Point;
 			PathPoint.IsStation = false;
@@ -1608,6 +1607,10 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			else PathPoint.IsThrough = false;
 
 			AddLaneArray.Add(PathPoint);
+
+			*/
+			AddLanePoint(Point, false, false, AddLaneArray);
+
 		}
 	}
 
