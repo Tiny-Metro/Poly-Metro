@@ -190,7 +190,7 @@ private:
 
 	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
 
-	void AddLanePoint(const FIntPoint& Point, bool IsBendingPoint, TArray<FLanePoint>& TargetArray);
+	void AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingPoint, TArray<FLanePoint>& TargetArray);
 	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

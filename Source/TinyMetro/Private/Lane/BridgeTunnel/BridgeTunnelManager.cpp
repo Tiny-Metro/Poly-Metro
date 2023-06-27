@@ -143,11 +143,20 @@ FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TA
 	TArray<FIntPoint> reversedPoints = processedPoints;
 	Algo::Reverse(reversedPoints);
 
+	UE_LOG(LogTemp, Warning, TEXT("????????"));
+	UE_LOG(LogTemp, Warning, TEXT("Number of elements in processedPoints: %d"), processedPoints.Num());
+	for (int i = 0; i < processedPoints.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("elements : %d     %d"), processedPoints[i].X, processedPoints[i].Y);
+
+	}
+
+
 	for (FConnectorData& connector : Connectors) {
-		if (type == connector.Type && connector.PointArr == processedPoints) {
+		if (type == connector.Type && AreArraysEqual(processedPoints, connector.PointArr) ){ //connector.PointArr == processedPoints) {
 			return &connector;
 		}
-		if (type == connector.Type && connector.PointArr == reversedPoints) {
+		if (type == connector.Type && AreArraysEqual(reversedPoints, connector.PointArr)){//connector.PointArr == reversedPoints) {
 			return &connector;
 		}
 	}

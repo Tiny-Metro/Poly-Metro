@@ -1187,6 +1187,9 @@ void ALane::ClearLanePoint() {
 }
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
+
+	//TArray<FVector>
+	SetLaneLocation();
 	Spline->SetSplinePoints(LaneLocation, ESplineCoordinateSpace::World,true);
 
 	for (int32 i = 0; i < LaneLocation.Num(); i++) {
@@ -1388,6 +1391,7 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 
 	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(PreserveLane, GridType::Hill);
 	DisconnectBT(DeletedTunnel, GridType::Hill);
+
 	tmpIndex = 0;
 	while (tmpIndex <= Index) {
 		//StationPoint.RemoveAt(0);
@@ -1436,11 +1440,12 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
 	LaneArray[0].MeshArray.Add(SplineMeshComponent);
+
+
 }
 
 void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline) {
 
-//	int32 tmpIndex = StationPoint.Num() -1;
 	TArray<FLanePoint> PreserveLane;
 	int32 tmpIndex = ExStationNum - 1;
 	int32 ind = LaneArray.Num()-1;
@@ -1468,8 +1473,7 @@ void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent*
 	tmpIndex = ExStationNum - 1;
 
 	while (tmpIndex >= Index) {
-		//int32 lastIndexStation= StationPoint.Num() - 1;
-		//StationPoint.RemoveAt(lastIndexStation);
+
 
 		//Lane Point
 		int count = 1;
@@ -1548,6 +1552,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 		TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
 
 		for (const FIntPoint& Point : PathToBending) {
+			/*
 			FLanePoint PathPoint;
 			PathPoint.Coordination = Point;
 			PathPoint.IsStation = false;
@@ -1558,8 +1563,12 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			else PathPoint.IsThrough = false;
 
 			AddLaneArray.Add(PathPoint);
+			*/
+
+			AddLanePoint(Point, false, false, AddLaneArray);
 		}
 
+		/*
 		FLanePoint BendingPoint;
 		BendingPoint.Coordination = BendingCoord;
 		BendingPoint.IsStation = false;
@@ -1589,6 +1598,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			else PathPoint.IsThrough = false;
 
 			AddLaneArray.Add(PathPoint);
+*/
 		}
 
 	}
@@ -1597,6 +1607,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 		for (const FIntPoint& Point : PathToNext)
 		{
+			/*
 			FLanePoint PathPoint;
 			PathPoint.Coordination = Point;
 			PathPoint.IsStation = false;
@@ -1613,9 +1624,10 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 		}
 	}
-
+	FLanePoint Start = LaneArray[0];
 	LaneArray.Insert(AddLaneArray, 0);
 
+	AddLaneArray.Add(Start);
 //Add LaneLoc
 	TArray<FVector> NewLaneLocation;
 
@@ -1827,7 +1839,10 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	AddLaneArray.Add(NewLanePoint);
 
 	int32 legacyNum = LaneArray.Num() -1;
+
+	FLanePoint last = LaneArray.Last();
 	LaneArray.Insert(AddLaneArray, LaneArray.Num());
+	AddLaneArray.Insert(last, 0);
 
 	//Add LaneLoc
 	if (!GridManagerRef) {
@@ -1936,6 +1951,7 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
 	ConnectBT(DeletedTunnel, GridType::Hill);
 }
+
 
 bool ALane::IsPointsValid() {
 // checking if it is out of the range
