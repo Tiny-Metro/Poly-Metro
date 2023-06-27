@@ -451,34 +451,41 @@ TArray<class AStation *> ALane::CollectEveryStations()
 void ALane::MarkLaneToRemoveFromStart(int32 Index)
 {
 	int32 tmpIndex = 0;
+	int32 lastIndex;
 	while (tmpIndex <= Index) {
 
 		//Lane Point
 		for (int32 i = 0; i < LaneArray.Num(); i++)
 		{
 			ChangeRemoveMaterialAtIndex(i);
-
+			lastIndex = i;
 			if (i != 0 && LaneArray[i].IsStation) { break; }
 		}
 
 		tmpIndex++;
 	}
+
+	LaneArray[lastIndex].MeshArray.Last()->SetMaterial(0, MeshMaterial);
 }
 
 void ALane::MarkLaneToRemoveFromEnd(int32 Index, int32 ExStationNum)
 {
 	int32 tmpIndex = ExStationNum - 1;
+	int32 lastIndex;
 
 	while (tmpIndex >= Index) {
 		for (int32 i = LaneArray.Num() - 1; i >= 0; --i)
 		{
 			ChangeRemoveMaterialAtIndex(i);
+			lastIndex = i;
 
 			if (i != LaneArray.Num() - 1 && LaneArray[i].IsStation) { break; }
 		}
 
 		tmpIndex--;
 	}
+	LaneArray[lastIndex].MeshArray[0]->SetMaterial(0, MeshMaterial);
+
 }
 
 void ALane::MarkLaneToClear()
