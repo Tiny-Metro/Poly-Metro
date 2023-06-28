@@ -88,4 +88,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF);
+
+public:
+	bool IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points);
+	bool AreArraysEqual(const TArray<FIntPoint>& Array1, const TArray<FIntPoint>& Array2);
 };

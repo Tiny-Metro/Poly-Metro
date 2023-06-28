@@ -885,11 +885,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			AStation* CurrentStationPtr = NewStationPoint[i];
 			FIntPoint CurrentStation = CurrentStationPtr->GetCurrentGridCellData().WorldCoordination;
 			FLanePoint CurrentLanePoint;
-			CurrentLanePoint.Coordination = CurrentStation;
-			CurrentLanePoint.IsStation = true;
-			CurrentLanePoint.IsBendingPoint = true;
-			CurrentLanePoint.IsThrough = false;
-			LaneBlock.Add(CurrentLanePoint);
+			AddLanePoint(CurrentStation, true, true, LaneBlock);
 
 			PreLaneArray.Append(LaneBlock);
 			break;
@@ -905,12 +901,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 		bool IsBending = HasBendingPoint(Diff);
 
 		// Add CurrentLanePoint ot PreLaneArray
-		FLanePoint CurrentLanePoint;
-		CurrentLanePoint.Coordination = CurrentStation;
-		CurrentLanePoint.IsStation = true;
-		CurrentLanePoint.IsBendingPoint = true;
-		CurrentLanePoint.IsThrough = false;
-		LaneBlock.Add(CurrentLanePoint);
+		AddLanePoint(CurrentStation, true, true, LaneBlock);
 
 		if (IsBending)
 		{
@@ -923,16 +914,16 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			// Add PathToBending points to LaneArray
 			for (const FIntPoint& Point : PathToBending) 
 			{
-				AddLanePoint(Point, false, LaneBlock);
+				AddLanePoint(Point, false, false, LaneBlock);
 			}
 
 			// Add BendingPoint to LaneArray
-			AddLanePoint(BendingCoord, true, LaneBlock);
+			AddLanePoint(BendingCoord, false, true, LaneBlock);
 
 			// Add PathFromBending points to LaneArray
 			for (const FIntPoint& Point : PathFromBending) 
 			{
-				AddLanePoint(Point, false, LaneBlock);
+				AddLanePoint(Point, false, false, LaneBlock);
 			}
 		}
 		else 
@@ -942,7 +933,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 			// Add PathToNext points to LaneArray
 			for (const FIntPoint& Point : PathToNext) 
 			{
-				AddLanePoint(Point, false, LaneBlock);
+				AddLanePoint(Point, false, false, LaneBlock);
 			}
 		}
 
@@ -954,8 +945,7 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	SetWaterHillArea(PreLaneArray);
 
 	if (!IsBuildble()) 
-	{		
-//		LaneManagerRef.RemoveDestroyedLane(LaneId);
+	{	
 		Destroy();
 		return;
 	}
@@ -969,9 +959,6 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	{
 		BTMangerREF->BuildConnector(ConnectorType::Tunnel, HillArea[i]);
 	}
-
-	/*
-	*/
 
 	// Done
 	StationPoint = NewStationPoint;
@@ -1042,6 +1029,132 @@ void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock)
 	SetArea(HillPoints, HillArea);
 }
 
+TArray<TArray<FIntPoint>> ALane::GetArea(const TArray<FLanePoint>& LaneBlock, GridType Type) {
+	TArray<FIntPoint> targetPoints;
+
+	TArray<int> targetIndex;
+
+	for (int i = 0; i < LaneBlock.Num(); i++)
+	{
+
+		FIntPoint Coord = LaneBlock[i].Coordination;
+
+		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Coord.X, Coord.Y);
+
+		if (GridCellData.GridType == Type) {
+			if (targetIndex.IsEmpty())
+			{
+				targetPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			if (targetIndex.Num() >= 1 && targetIndex.Last() + 1 != i)
+			{
+				targetPoints.Add(LaneBlock[targetIndex.Last() + 1].Coordination);
+				targetPoints.Add(LaneBlock[i - 1].Coordination);
+			}
+			targetIndex.Add(i);
+			targetPoints.Add(Coord);
+		}
+
+
+	}
+
+	if (targetIndex.Num() > 0)// && targetIndex.Last() + 1 < LaneBlock.Num())
+	{
+		targetPoints.Add(LaneBlock[targetIndex.Last() + 1].Coordination);
+	}
+
+
+	/////////
+
+	TArray<TArray<FIntPoint>> target;
+	int32 NumPoints = targetPoints.Num();
+
+	if (NumPoints == 0)
+	{
+		target.Empty();
+		return target;
+	}
+
+	TArray<FIntPoint> Area;
+	Area.Add(targetPoints[0]);
+
+	for (int32 i = 1; i < NumPoints; i++)
+	{
+		const FIntPoint& CurrentCoord = targetPoints[i];
+		const FIntPoint& PrevCoord = targetPoints[i - 1];
+
+		int32 XDiff = FMath::Abs(CurrentCoord.X - PrevCoord.X);
+		int32 YDiff = FMath::Abs(CurrentCoord.Y - PrevCoord.Y);
+
+		if (XDiff <= 1 && YDiff <= 1)
+		{
+			// Coordinates are within the range of (-1, -1) and (1, 1), indicating continuity
+			Area.Add(CurrentCoord);
+		}
+		else
+		{
+			// Coordinates are not continuous
+			target.AddUnique(Area);
+			Area.Empty();
+			Area.Add(CurrentCoord);
+		}
+	}
+
+	target.Add(Area);
+
+
+	return target;
+}
+void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
+
+	ConnectorType targetType;
+
+	switch (Type)
+	{
+	case GridType::Ground:
+		return;
+		break;
+	case GridType::Water:
+		targetType = ConnectorType::Bridge;
+		break;
+	case GridType::Hill:
+		targetType = ConnectorType::Tunnel;
+		break;
+	default:
+		return;
+		break;
+	}
+
+	for (int i = 0; i < Area.Num(); i++)
+	{
+		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+	}
+}
+void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
+
+	ConnectorType targetType;
+
+	switch (Type)
+	{
+	case GridType::Ground:
+		break;
+	case GridType::Water:
+		targetType = ConnectorType::Bridge;
+		break;
+	case GridType::Hill:
+		targetType = ConnectorType::Tunnel;
+		break;
+	default:
+		break;
+	}
+
+	for (int i = 0; i < Area.Num(); i++)
+	{
+//		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+		BTMangerREF->BuildConnector(targetType, Area[i]);
+	}
+}
+
 void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray)
 {
 	int32 NumPoints = Points.Num();
@@ -1070,7 +1183,7 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 		else
 		{
 			// Coordinates are not continuous
-			AreaArray.Add(Area);
+			AreaArray.AddUnique(Area);
 			Area.Empty();
 			Area.Add(CurrentCoord);
 		}
@@ -1081,11 +1194,31 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 
 bool ALane::IsBuildble() 
 {
-	if (WaterArea.Num() > TinyMetroPlayerState->GetValidBridgeCount() )//> GetBridge() )
+	int RequiredBridge = 0;
+	int RequiredTunnel = 0;
+
+	for (int i = 0; i < HillArea.Num(); i++)
+	{
+		bool IsExist = BTMangerREF->IsConnectorExist(ConnectorType::Tunnel, HillArea[i]);
+		if (!IsExist) 
+		{
+			RequiredTunnel++;
+		}
+	}
+	for (int i = 0; i < WaterArea.Num(); i++)
+	{
+		bool IsExist = BTMangerREF->IsConnectorExist(ConnectorType::Bridge, WaterArea[i]);
+		if (!IsExist)
+		{
+			RequiredBridge++;
+		}
+	}
+
+	if (RequiredBridge> TinyMetroPlayerState->GetValidBridgeCount() )
 	{
 		return false;
 	}
-	if (HillArea.Num() > TinyMetroPlayerState->GetValidTunnelCount()) // GetTunnel*(
+	if (RequiredTunnel > TinyMetroPlayerState->GetValidTunnelCount()) 
 	{
 		return false;
 	}
@@ -1153,12 +1286,18 @@ void ALane::SetLaneLocation() {
 
 }
 
-void ALane::AddLanePoint(const FIntPoint& Point, bool IsBendingPoint, TArray<FLanePoint>& TargetArray) {
+void ALane::AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingPoint, TArray<FLanePoint>& TargetArray) {
 	FLanePoint LanePoint;
 	LanePoint.Coordination = Point;
-	LanePoint.IsStation = false;
+	LanePoint.IsStation = IsStation;
 	LanePoint.IsBendingPoint = IsBendingPoint;
-	LanePoint.IsThrough = GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station;
+
+	if (IsStation) {
+		LanePoint.IsThrough = false;
+	}
+	else {
+		LanePoint.IsThrough = GridManagerRef->GetGridCellDataByPoint(Point.X, Point.Y).StationInfo == GridStationStructure::Station;
+	}
 
 	TargetArray.Add(LanePoint);
 }
@@ -1179,6 +1318,9 @@ void ALane::ClearLanePoint() {
 }
 
 void ALane::SetLaneSpline(USplineComponent* Spline) {
+
+	//TArray<FVector>
+	SetLaneLocation();
 	Spline->SetSplinePoints(LaneLocation, ESplineCoordinateSpace::World,true);
 
 	for (int32 i = 0; i < LaneLocation.Num(); i++) {
@@ -1369,7 +1511,29 @@ void ALane::ClearSplineMeshAt(int32 Index){
 
 void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 
+	// get preseverPOints for the BnT
+	TArray<FLanePoint> PreserveLane;
 	int32 tmpIndex = 0;
+	int32 ind = 0;
+	while (tmpIndex < Index +1)
+	{
+		PreserveLane.Add(LaneArray[ind]);
+		UE_LOG(LogTemp, Warning, TEXT("!!elements : %d     %d"), LaneArray[ind].Coordination.X, LaneArray[ind].Coordination.Y);
+		ind++;
+
+		if (LaneArray[ind].IsStation) { tmpIndex++; }
+
+	}
+	PreserveLane.Add(LaneArray[ind]);
+
+	//get area for the preserved points
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(PreserveLane, GridType::Water);
+	DisconnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(PreserveLane, GridType::Hill);
+	DisconnectBT(DeletedTunnel, GridType::Hill);
+
+	tmpIndex = 0;
 	while (tmpIndex <= Index) {
 		//StationPoint.RemoveAt(0);
 
@@ -1418,16 +1582,40 @@ void ALane::RemoveLaneFromStart(int32 Index, USplineComponent* Spline) {
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 
 	LaneArray[0].MeshArray.Add(SplineMeshComponent);
+
+
 }
 
 void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline) {
 
-//	int32 tmpIndex = StationPoint.Num() -1;
+	TArray<FLanePoint> PreserveLane;
 	int32 tmpIndex = ExStationNum - 1;
+	int32 ind = LaneArray.Num()-1;
+	while (tmpIndex >= Index )
+	{
+		PreserveLane.Add(LaneArray[ind]);
+		UE_LOG(LogTemp, Warning, TEXT("!!elements : %d     %d"), LaneArray[ind].Coordination.X, LaneArray[ind].Coordination.Y);
+		ind--;
+
+		if (LaneArray[ind].IsStation) { tmpIndex--; }
+
+	}
+	PreserveLane.Add(LaneArray[ind]);
+
+	//get area for the preserved points
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(PreserveLane, GridType::Water);
+	DisconnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(PreserveLane, GridType::Hill);
+	DisconnectBT(DeletedTunnel, GridType::Hill);
+
+
+
+	//	int32 tmpIndex = StationPoint.Num() -1;
+	tmpIndex = ExStationNum - 1;
 
 	while (tmpIndex >= Index) {
-		//int32 lastIndexStation= StationPoint.Num() - 1;
-		//StationPoint.RemoveAt(lastIndexStation);
+
 
 		//Lane Point
 		int count = 1;
@@ -1489,13 +1677,9 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 	FIntPoint NewPoint = NewStation->GetCurrentGridCellData().WorldCoordination;
 
-	FLanePoint CurrentLanePoint;
-	CurrentLanePoint.Coordination = NewPoint;
-	CurrentLanePoint.IsStation = true;
-	CurrentLanePoint.IsBendingPoint = true;
-	CurrentLanePoint.IsThrough = false;
+	AddLanePoint(NewPoint, true, true, AddLaneArray);
 
-	AddLaneArray.Add(CurrentLanePoint);
+//	AddLaneArray.Add(CurrentLanePoint);
 
 	FIntPoint NextStation = StationPoint[1]->GetCurrentGridCellData().WorldCoordination;
 	FIntPoint Diff = NextStation - NewPoint;
@@ -1510,6 +1694,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 		TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStation);
 
 		for (const FIntPoint& Point : PathToBending) {
+			/*
 			FLanePoint PathPoint;
 			PathPoint.Coordination = Point;
 			PathPoint.IsStation = false;
@@ -1520,8 +1705,12 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			else PathPoint.IsThrough = false;
 
 			AddLaneArray.Add(PathPoint);
+			*/
+
+			AddLanePoint(Point, false, false, AddLaneArray);
 		}
 
+		/*
 		FLanePoint BendingPoint;
 		BendingPoint.Coordination = BendingCoord;
 		BendingPoint.IsStation = false;
@@ -1532,9 +1721,15 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 		else BendingPoint.IsThrough = false;
 
 		AddLaneArray.Add(BendingPoint);
+		*/
+		
+		AddLanePoint(BendingCoord, false, true, AddLaneArray);
+
 
 		for (const FIntPoint& Point : PathFromBending)
 		{
+			AddLanePoint(Point, false, false, AddLaneArray);
+/*
 			FLanePoint PathPoint;
 			PathPoint.Coordination = Point;
 			PathPoint.IsStation = false;
@@ -1545,6 +1740,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			else PathPoint.IsThrough = false;
 
 			AddLaneArray.Add(PathPoint);
+*/
 		}
 
 	}
@@ -1553,6 +1749,7 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 
 		for (const FIntPoint& Point : PathToNext)
 		{
+			/*
 			FLanePoint PathPoint;
 			PathPoint.Coordination = Point;
 			PathPoint.IsStation = false;
@@ -1563,11 +1760,16 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			else PathPoint.IsThrough = false;
 
 			AddLaneArray.Add(PathPoint);
+
+			*/
+			AddLanePoint(Point, false, false, AddLaneArray);
+
 		}
 	}
-
+	FLanePoint Start = LaneArray[0];
 	LaneArray.Insert(AddLaneArray, 0);
 
+	AddLaneArray.Add(Start);
 //Add LaneLoc
 	TArray<FVector> NewLaneLocation;
 
@@ -1674,6 +1876,12 @@ void ALane::ExtendStart(AStation* NewStation, USplineComponent* Spline) {
 			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
+
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
 }
 
 void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
@@ -1773,7 +1981,10 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 	AddLaneArray.Add(NewLanePoint);
 
 	int32 legacyNum = LaneArray.Num() -1;
+
+	FLanePoint last = LaneArray.Last();
 	LaneArray.Insert(AddLaneArray, LaneArray.Num());
+	AddLaneArray.Insert(last, 0);
 
 	//Add LaneLoc
 	if (!GridManagerRef) {
@@ -1876,7 +2087,13 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 		}
 	}
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
 }
+
 
 bool ALane::IsPointsValid() {
 // checking if it is out of the range
