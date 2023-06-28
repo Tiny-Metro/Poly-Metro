@@ -26,15 +26,11 @@ void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Init default data
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	//PlayerState = GetWorld()->GetControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
-	//PlayerState = Cast<ATinyMetroPlayerState>(GetWorld()->GetPawnIterator()->Get()->GetPlayerState());
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-
-	//Policy = Cast<APolicy>(UGameplayStatics::GetActorOfClass(GetWorld(), APolicy::StaticClass()));
 	PolicyRef = GameMode->GetPolicy();
 
-	//MaxStationCount = GridManager->GetGridSize()
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
 
@@ -50,63 +46,25 @@ void AStationManager::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("Policy Invalid"));
 	}
 
-
-	StationSpawnRoutine();
-
-
-
-	/*FIntPoint test(3,3);
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		15.0f,
-		FColor::Yellow,
-		FString::Printf(TEXT("TEST : %d"), test.Size()));*/
-
-	
-
-	// Test
-	/*FTimerHandle TestHandle;
-	GetWorld()->GetTimerManager().SetTimer(
-		TestHandle,
-		FTimerDelegate::CreateLambda([&]() {
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					15.0f,
-					FColor::Yellow,
-					FString::Printf(TEXT("Time : %f"), GetWorld()->GetTimeSeconds()));
-		}),
-		1.0f,
-		true,
-		1.0f
-	);*/
-	
-	// Spawn default 3 stationsstat
-	// Get GameMode, Get coord and station type
-	//GameMode = (ATinyMetroGameModeBase*)GetWorld()->GetAuthGameMode();
-
+	// Load initializa station data
+	// Need to modify by SaveManager
 	InitData = GameMode->GetInitData();
 
 	for (auto& i : InitData) {
 		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value, true);
 	}
 
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.0f,
-			FColor::Yellow,
-			FString::Printf(TEXT("Data : %d"), InitData.Num()));*/
 
+	// Init Floyd-Warshall
 	// Init adj matrix
 	FAdjArray adjTmp;
 	adjTmp.Init(TNumericLimits<float>::Max(), 301);
 	adj.Init(adjTmp, 301);
 
+	// Init path array
 	FPath pathTmp;
 	pathTmp.Init(-1, 301);
 	AdjPath.Init(pathTmp, 301);
-
 	AdjDist.Init(adjTmp, 301);
 
 	// Test Spawn actors
@@ -114,6 +72,7 @@ void AStationManager::BeginPlay()
 		GetWorld()->SpawnActor<AStation>();
 	}*/
 
+	// Register Timer tasks
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
 	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
@@ -150,7 +109,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 	double Distance = FVector::Dist(CurrentLocation, Station[0]->GetCurrentGridCellData().WorldLocation);
 	int StationIndex = 0;
 	bool LaneValid = IsValid(LaneRef);
-	//UE_LOG(LogTemp, Log, TEXT("Lane valid : %d"), LaneValid);
+
 	for (int i = 1; i < Station.Num(); i++) {
 		if (LaneValid && !Station[i]->GetLanes().FindByKey<int32>(LaneRef->GetLaneId())) continue;
 		double tmp = FVector::Dist(CurrentLocation, Station[i]->GetCurrentGridCellData().WorldLocation);
@@ -159,14 +118,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 			StationIndex = i;
 		}
 	}
-	/*FVector Result = Station[0]->GetCurrentGridCellData().WorldLocation;
-	for (auto& i : Station) {
-		double tmp = FVector::Dist(CurrentLocation, i->GetCurrentGridCellData().WorldLocation);
-		if (Distance > tmp) {
-			Distance = tmp;
-			Result = i->GetCurrentGridCellData().WorldLocation;
-		}
-	}*/
+
 	return Station[StationIndex];
 }
 
@@ -224,92 +176,26 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	AdjList->Add(tmp->GetStationInfo(), NewObject<UAdjArrayItem>());
 
-	/*
-	AdjList.Add(tmp->GetItem(), NewObject<UAdjArrayItem>());
-	AdjList[tmp->GetItem()].Add(tmp2->GetItem(), Length);
-	AdjList[tmp->GetItem()][tmp2->GetItem()] == Length;
-	*/
-
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
-
-	//Log
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.0f,
-			FColor::Magenta,
-			FString::Printf(TEXT("Stations : %d"), Station.Num()));*/
 }
 
-void AStationManager::StationSpawnRoutine() {
-	/*GetWorld()->GetTimerManager().SetTimer(
-		TimerSpawnStation,
-		this, 
-		&AStationManager::IncreaseSpawnParameter, 
-		1.0f, 
-		true, 
-		1.0f);*/
-
-	// Spawn loop
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerSpawnStation,
-		FTimerDelegate::CreateLambda([&]() {
-			StationSpawnCurrent += StationSpawnPerSec;
-			if (StationSpawnCurrent >= StationSpawnRequire) {
-				SpawnStation(GridManager->GetGridCellDataRandom(), GetRandomStationType());
-
-				/*if (GEngine)
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						15.0f,
-						FColor::Yellow,
-						FString::Printf(TEXT("Spawn!")));*/
-				StationSpawnCurrent = 0.0f;
-			}
-
-			//Log
-			//if (GEngine)
-			//	GEngine->AddOnScreenDebugMessage(
-			//		-1,
-			//		15.0f,
-			//		FColor::Yellow,
-			//		FString::Printf(TEXT("%d"), StationSpawnCurrent));
-		}),
-		1.0f,
-		true,
-		1.0f
-	);
-
-	
+void AStationManager::StationSpawnRoutine(float DeltaTime) {
+	// Spawn routine
+	// Add time
+	StationSpawnCurrent += DeltaTime;
+	// If time over the require
+	if (StationSpawnCurrent >= StationSpawnRequire) {
+		// Spawn random station
+		SpawnStation(GridManager->GetGridCellDataRandom(), GetRandomStationType());
+		
+		// Initialize time
+		StationSpawnCurrent -= StationSpawnRequire;
+	}
 }
 
 void AStationManager::PolicyMaintenanceRoutine() {
-	/*GetWorld()->GetTimerManager().SetTimer(
-		PolicyTimerStation,
-		FTimerDelegate::CreateLambda([&]() {
-			PolicyCostCurrent += PolicyCostPerSec;
-			if (PolicyCostCurrent >= PolicyCostRequire) {
-				
-				int32 MaintenanceCost = PolicyRef->GetTotalCost();
 
-				PlayerState->AddMoney(-(MaintenanceCost));
-
-				if (GEngine) {
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						15.0f,
-						FColor::Blue,
-						FString::Printf(TEXT("MaintenanceCost : %d"), MaintenanceCost));
-						
-				}
-				PolicyCostCurrent = 0.0f;
-			}
-		}),
-		1.0f,
-		true,
-		1.0f
-	);*/
 }
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
@@ -326,13 +212,8 @@ void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Lengt
 
 	FloydWarshall();
 
-	//AdjDist[Start->GetStationInfo().Id][End->GetStationInfo().Id] = Length;
-	//AdjDist[Start->GetStationInfo().Id][End->GetStationInfo().Id] = Start->GetStationInfo().Id;
-
 	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), Start->GetStationId(), End->GetStationId(), (*AdjList)[End->GetStationInfo()][Start->GetStationInfo()]);
 	UE_LOG(LogTemp, Warning, TEXT("AddList: StartId : %d / EndId : %d / Length : %f"), End->GetStationId(), Start->GetStationId(), (*AdjList)[Start->GetStationInfo()][End->GetStationInfo()]);
-
-	
 }
 
 void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
@@ -861,14 +742,6 @@ void AStationManager::FloydWarshall() {
 				StaticCast<StationType>(j),
 				PathFinding(i, StaticCast<StationType>(j))
 			);
-			/*if (ShortestRoute.Find(i) == nullptr) {
-				ShortestRoute.Add(i);
-			}
-			ShortestRoute[i].Emplace(
-				StaticCast<StationType>(j),
-				PathFinding(i, StaticCast<StationType>(j))
-			);*/
-			//ShortestRoute[i][StaticCast<StationType>(j)] = PathFinding(i, StaticCast<StationType>(j));
 		}
 	}
 	
@@ -961,6 +834,8 @@ FString AStationManager::StationTypeToString(StationType Type, bool& Success) {
 void AStationManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	StationSpawnRoutine(DeltaTime);
 
 	//if (Policy == nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(":("));
 	/*if (GEngine)

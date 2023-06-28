@@ -72,7 +72,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void StationSpawnRoutine();
+	void StationSpawnRoutine(float DeltaTime);
 	void TestFunction();
 
 public:	
@@ -215,18 +215,14 @@ private:
 
 protected:
 
-	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	int32 MaxStationCount;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	int32 StationSpawnRequire = 15000;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	int32 StationSpawnPerSec = 1000;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	int32 StationSpawnCurrent = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")
+	float StationSpawnRequire = 15.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")
+	float StationSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Station")
 	TArray<class AStation*> Station;
-	UPROPERTY(BlueprintReadOnly, Category = "Station")
-	FTimerHandle TimerSpawnStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AGridManager* GridManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")

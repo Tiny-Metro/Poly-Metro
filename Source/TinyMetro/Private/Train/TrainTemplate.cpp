@@ -203,8 +203,8 @@ void ATrainTemplate::DropPassenger() {
 	}
 }
 
-void ATrainTemplate::GetOffPassenger(AStation* Station, bool* Success) {
-	(*Success) = false;
+void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
+	Success = false;
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger[i]) {
 			// Update passenger route
@@ -227,14 +227,14 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool* Success) {
 					Station->GetOffPassenger(Passenger[i]);
 					Passenger.Add(i, nullptr);
 					UpdatePassengerMesh();
-					(*Success) = true;
+					Success = true;
 					return;
 				}
 			} else {
 				Station->GetOffPassenger(Passenger[i]);
 				Passenger.Add(i, nullptr);
 				UpdatePassengerMesh();
-				(*Success) = true;
+				Success = true;
 				return;
 			}
 		}

@@ -5,6 +5,7 @@
 #include "Station/StationManager.h"
 #include "Station/PathQueue.h"
 #include "Train/TrainTemplate.h"
+#include "Timer/Timer.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -95,8 +96,7 @@ void AStation::BeginPlay()
 	ATinyMetroGameModeBase* GameMode = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
 	StationManager = GameMode->GetStationManager();
 	Daytime = GameMode->GetDaytime();
-
-	ComplainRoutine();
+	TimerRef = GameMode->GetTimer();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationTypeValue]);
@@ -104,6 +104,9 @@ void AStation::BeginPlay()
 	UpdateStationMesh();
 	UpdatePassengerMesh();
 
+
+	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
+	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
 }
 
 // Called every frame
@@ -156,6 +159,16 @@ void AStation::LoadStationValue(FStationValuesStruct StationValues) {
 		UPassenger* tmp = UPassenger::ConstructPassenger(passengerValue.Destination);
 		Passenger.Add(tmp);
 	}
+}
+
+void AStation::WeeklyTask() {
+}
+
+void AStation::DailyTask() {
+	// Add spawn day
+	SpawnDay++;
+	// Update complain
+	ComplainRoutine();
 }
 
 UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
@@ -379,7 +392,7 @@ void AStation::SetComplainGauge(float Per) {
 
 void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
 	ComplainIncreaseRate += Rate;
-	if (Period != -1) {
+	/*if (Period != -1) {
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerComplain,
 			FTimerDelegate::CreateLambda([&]() {
@@ -389,7 +402,7 @@ void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
 			false,
 			0.0f
 		);
-	}
+	}*/
 }
 
 void AStation::SetComplainIncreaseEnable(bool Flag) {
@@ -476,52 +489,34 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 }
 
 void AStation::ComplainRoutine() {
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerComplain,
-		FTimerDelegate::CreateLambda([&]() {
-			SpawnDay++;
-			
-			if (IsComplainIncreaseEnable) {
-				// Passenger complain
-				if (Passenger.Num() > ComplainPassengerNum) {
-					ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
-				}
+	// Check station can increase complain
+	if (IsComplainIncreaseEnable) {
+		// Complain from Passenger
+		if (Passenger.Num() > ComplainPassengerNum) {
+			ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
+		}
 
-				// Not activate
-				if (!IsActive && SpawnDay > ComplainSpawnDay) {
-					ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
-				}
-			}
-			
-			/*
-			if (GEngine) {
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					15.0f,
-					FColor::Yellow,
-					FString::Printf(TEXT("AddPolicyComplain : %f"), AddPolicyComplain));
-
-			}*/
-			SetComplainGauge(ComplainCurrent / ComplainMax);
+		// Complain from not activate
+		if (!IsActive && SpawnDay > ComplainSpawnDay) {
+			ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
+		}
+	}
+	// Update Complain gauge Mesh
+	SetComplainGauge(ComplainCurrent / ComplainMax);
 
 
-			// Complain excess : Game over
-			if (ComplainMax <= ComplainCurrent) {
-				// Game over code
-				
-				//Log
-				if (GEngine)
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						15.0f,
-						FColor::Red,
-						FString::Printf(TEXT("Game Over")));
-			}
-		}),
-		Daytime,
-		true,
-		Daytime
-		);
+	// Complain excess : Game over
+	if (ComplainMax <= ComplainCurrent) {
+		// Game over code
+
+		//Log
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.0f,
+				FColor::Red,
+				FString::Printf(TEXT("Game Over")));
+	}
 }
 
 void AStation::UpdatePassengerMesh() {

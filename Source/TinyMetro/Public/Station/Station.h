@@ -90,6 +90,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadStationValue(FStationValuesStruct StationValues);
 
+	// Daily, Weekly tasks
+	UFUNCTION()
+	void WeeklyTask();
+	UFUNCTION()
+	void DailyTask();
+
 	// Lane
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
@@ -138,6 +144,8 @@ public:
 	void SetPassengerSpawnEnable(bool Flag);
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
+	UFUNCTION()
+	void PassengerSpawnRoutine(float DeltaTime);
 	
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -161,7 +169,6 @@ public:
 	void SetStationInfo(int32 Id, StationType Type);
 
 protected:
-	void PassengerSpawnRoutine(float DeltaTime);
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
 	void ComplainRoutine();
@@ -216,10 +223,10 @@ protected:
 	FGridCellData CurrentGridCellData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	APolicy* Policy;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATimer* TimerRef;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
-	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
-	FTimerHandle TimerComplain;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TArray<UPassenger*> Passenger;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")

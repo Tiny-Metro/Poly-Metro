@@ -106,7 +106,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DropPassenger();
 	
-	virtual void GetOffPassenger(class AStation* Station, bool* Success);
+	virtual void GetOffPassenger(class AStation* Station, bool& Success);
 
 	UFUNCTION()
 	FStationInfo GetCurrentStation() const;
