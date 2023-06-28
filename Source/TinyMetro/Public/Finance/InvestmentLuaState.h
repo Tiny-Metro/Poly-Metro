@@ -22,6 +22,26 @@ public:
 	// PlayerState effect
 	UFUNCTION()
 	void AddMoney(FLuaValue Money);
+	UFUNCTION()
+	void AddLane(FLuaValue Num);
+	UFUNCTION()
+	void AddTrain(FLuaValue Num);
+	UFUNCTION()
+	void AddSubtrain(FLuaValue Num);
+	UFUNCTION()
+	void AddBridge(FLuaValue Num);
+	UFUNCTION()
+	void AddTunnel(FLuaValue Num);
+	/*
+	- GetBuiltBirdgeCount
+	- GetBuiltTunnelCount
+	- GetBuiltLaneCount
+	- GetReduceLaneCount
+	- GetRemoveLaneCount
+	- GetArrivePassengerCount
+	- GetBuyItemCount
+	*/
+	
 
 	// Policy effect
 	UFUNCTION()
@@ -76,6 +96,10 @@ public:
 	void AddComplainFixedValue(FLuaValue StationId, FLuaValue Complain);
 	UFUNCTION()
 	void AddComplainByRate(FLuaValue StationId, FLuaValue Rate);
+	// GetStationCountByLane
+	// GetMaxComplain
+	// GetUpgradeStationCount
+	// GetMaxTransferCount
 
 	// Passenger effect
 	UFUNCTION()
@@ -116,6 +140,7 @@ public:
 	FLuaValue GetLaneCount() const;
 	UFUNCTION()
 	FLuaValue GetRandomLaneId() const;
+	// GetCircularLaneCount
 
 	// Train effect
 	UFUNCTION()
@@ -142,6 +167,10 @@ public:
 	FLuaValue GetSubTrainCountByLane(FLuaValue Id) const;
 	UFUNCTION()
 	FLuaValue GetUpgradeSubTrainCountByLane(FLuaValue Id) const;
+	// GetMaxSubtrainCount
+	
+	// Bank
+	// GetLoanAmount
 
 protected:
 	UPROPERTY()

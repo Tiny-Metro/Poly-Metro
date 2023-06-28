@@ -108,6 +108,41 @@ void UInvestmentLuaState::AddMoney(FLuaValue Money) {
     PlayerStateRef->AddMoney(Money.ToInteger());
 }
 
+void UInvestmentLuaState::AddLane(FLuaValue Num) {
+    if (!IsValid(PlayerStateRef)) {
+        PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    }
+    PlayerStateRef->AddItem(ItemType::Lane, Num.ToInteger());
+}
+
+void UInvestmentLuaState::AddTrain(FLuaValue Num) {
+    if (!IsValid(PlayerStateRef)) {
+        PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    }
+    PlayerStateRef->AddItem(ItemType::Train, Num.ToInteger());
+}
+
+void UInvestmentLuaState::AddSubtrain(FLuaValue Num) {
+    if (!IsValid(PlayerStateRef)) {
+        PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    }
+    PlayerStateRef->AddItem(ItemType::Subtrain, Num.ToInteger());
+}
+
+void UInvestmentLuaState::AddBridge(FLuaValue Num) {
+    if (!IsValid(PlayerStateRef)) {
+        PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    }
+    PlayerStateRef->AddItem(ItemType::Bridge, Num.ToInteger());
+}
+
+void UInvestmentLuaState::AddTunnel(FLuaValue Num) {
+    if (!IsValid(PlayerStateRef)) {
+        PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    }
+    PlayerStateRef->AddItem(ItemType::Tunnel, Num.ToInteger());
+}
+
 FLuaValue UInvestmentLuaState::GetServiceLevel() const {
     if (!IsValid(PolicyRef)) {
         if (!IsValid(GameModeRef)) {
