@@ -13,7 +13,7 @@ UENUM(BlueprintType)
 enum class InvestmentState : uint8
 {
 	Ready = 0 UMETA(DisplayName = "Ready"),
-	Processing = 1 UMETA(DisplayName = "Processing"),
+	Process = 1 UMETA(DisplayName = "Process"),
 	Success = 2 UMETA(DisplayName = "Success"),
 	Fail = 3 UMETA(DisplayName = "Fail")
 	
