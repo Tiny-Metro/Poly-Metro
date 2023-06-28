@@ -168,6 +168,20 @@ public:
 	FStationInfo GetStationInfo();
 	void SetStationInfo(int32 Id, StationType Type);
 
+	// Init widget
+	UFUNCTION()
+	void SetInfoWidget(class UStationInfoWidget* Widget);
+
+	// Click & Release
+	UFUNCTION()
+	virtual void StationOnPressed(AActor* Target, FKey ButtonPressed);
+	UFUNCTION()
+	virtual void StationOnReleased(AActor* Target, FKey ButtonPressed);
+
+	// Info widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStationInfoWidget* StationInfoWidget;
+
 protected:
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
@@ -234,8 +248,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FStationInfo StationInfo;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
-	bool TransferStation = false;;
+	bool TransferStation = false;
 
+	// Touch
+	UPROPERTY(BlueprintReadWrite)
+	float TouchTime = 0.0f;
+	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	float LongClickInterval = 0.5f;
 
 	// Passenger mesh
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
