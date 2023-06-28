@@ -168,6 +168,10 @@ public:
 	FStationInfo GetStationInfo();
 	void SetStationInfo(int32 Id, StationType Type);
 
+	// Upgrade
+	UFUNCTION(BlueprintCallable)
+	void Upgrade();
+
 	// Init widget
 	UFUNCTION()
 	void SetInfoWidget(class UStationInfoWidget* Widget);
@@ -265,6 +269,12 @@ protected:
 	float PassengerX_Distance = 90;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	float PassengerY_Distance = 45;
+
+	// Upgrade
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	int32 UpgradePermissionComplainPassenger = 3;
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	bool IsUpgrade = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> SpawnPaidPassenger = {

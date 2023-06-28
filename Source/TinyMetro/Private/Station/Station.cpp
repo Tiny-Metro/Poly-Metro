@@ -497,6 +497,26 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 	StationInfo.Type = Type;
 }
 
+void AStation::Upgrade() {
+	IsUpgrade = true;
+	ComplainPassengerNum += UpgradePermissionComplainPassenger;
+
+	auto meshScale = StationMeshComponent->GetComponentScale();
+	meshScale.X *= 1.5f;
+	meshScale.Y *= 1.5f;
+	StationMeshComponent->SetWorldScale3D(meshScale);
+
+	auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
+	gaugeScale.X *= 1.5f;
+	gaugeScale.Y *= 1.5f;
+	StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
+
+	for (auto& i : PassengerMeshComponent) {
+		i->AddRelativeLocation(FVector(70.0f, 0, 0));
+	}
+
+}
+
 void AStation::SetInfoWidget(UStationInfoWidget* Widget) {
 	StationInfoWidget = Widget;
 }
