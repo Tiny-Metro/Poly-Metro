@@ -8,6 +8,7 @@
 #include "Station/StationManager.h"
 #include "Lane/LaneManager.h"
 #include "Train/TrainManager.h"
+#include "Finance/InvestmentState.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -82,6 +83,12 @@ UInvestmentLuaState::UInvestmentLuaState() {
     Table.Add(TEXT("GetUpgradeMainTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetUpgradeMainTrainCountByLane, FLuaValue)));
     Table.Add(TEXT("GetSubTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetSubTrainCountByLane, FLuaValue)));
     Table.Add(TEXT("GetUpgradeSubTrainCountByLane"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetUpgradeSubTrainCountByLane, FLuaValue)));
+
+    // InvestmentState
+    Table.Add(TEXT("Ready"), FLuaValue(0));
+    Table.Add(TEXT("Process"), FLuaValue(1));
+    Table.Add(TEXT("Success"), FLuaValue(2));
+    Table.Add(TEXT("Fail"), FLuaValue(3));
 
     // Test Table
     Table.Add(TEXT(""), FLuaValue(0));
