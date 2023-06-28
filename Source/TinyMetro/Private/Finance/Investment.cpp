@@ -22,34 +22,35 @@ UInvestment* UInvestment::CreateInvestment(FString ScriptFileName, UInvestmentLu
 	return Obj;
 }
 
-void UInvestment::SetDaytime(int32 T) {
-	Daytime = T;
-}
-
-void UInvestment::SetInvestmentData(FInvestmentData Data) {
-	InvestmentData = Data;
-}
-
-void UInvestment::SetAcceptAction(TFunction<void(void)> Action) {
-	StartAction = Action;
-}
-
-void UInvestment::SetSuccessAction(TFunction<void(void)> Action) {
-	SuccessAction = Action;
-}
-
-void UInvestment::SetFailAction(TFunction<void(void)> Action) {
-	FailAction = Action;
-}
-
-void UInvestment::SetStateCheckFunction(TFunction<InvestmentState(void)> Check) {
-	ConditionCheckFunction = Check;
-}
-
 void UInvestment::InvestmentStart() {
 	auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetClass(),
-		TEXT("InvestmentStart"), TArray<FLuaValue>());
-	State = InvestmentState::Processing;
+		TEXT("Start"), TArray<FLuaValue>());
+	State = InvestmentState::Process;
+}
+
+InvestmentState UInvestment::InvestmentProcess() {
+	auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetClass(),
+		TEXT("Process"), TArray<FLuaValue>());
+	
+	// LuaValue to int
+	luaFunction.ToInteger();
+
+	return InvestmentState::Process;
+}
+
+InvestmentState UInvestment::InvestmentFinish() {
+	auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetClass(),
+		TEXT("Finish"), TArray<FLuaValue>());
+	return InvestmentState::Success;
+}
+
+void UInvestment::InvestmentSuccess() {
+	auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetClass(),
+		TEXT("OnSuccess"), TArray<FLuaValue>());
+}
+
+bool UInvestment::GetAppearable() const {
+	return true;
 }
 
 void UInvestment::InitInvestment() {
@@ -58,55 +59,22 @@ void UInvestment::InitInvestment() {
 
 	InvestmentData = FInvestmentData(
 		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("title"))),
-		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("content"))),
-		readLua.GetField(TEXT("time_require")).ToInteger(),
-		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("require_message"))),
-		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("accept_message"))),
-		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("award_message"))),
-		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("reward_message")))
+		readLua.GetField(TEXT("time_limit")).ToInteger(),
+		ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("award_message")))
 	);
 
 	ResetInvestment();
-
-	/*auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetSelfLuaState(),
-		TEXT("Test"), TArray<FLuaValue>());*/
-	
-	/*if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
-			FString::Printf(TEXT("%s : %s, Title : %s"), *ScriptFileName, *luaFunction.ToString(), *ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("title")))));
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("title"))));
-	}*/
 }
 
 void UInvestment::ResetInvestment() {
 	State = InvestmentState::Ready;
-	RemainTime = InvestmentData.TimeRequire;
+	RemainTime = InvestmentData.TimeLimit;
 }
 
-InvestmentState UInvestment::CheckInvestmentProcess(float DeltaTime) {
-	if (State == InvestmentState::Processing) {
-		switch (ConditionCheckFunction()) {
-		case InvestmentState::Fail:
-			FailAction();
-			return InvestmentState::Fail;
-		case InvestmentState::Success:
-			if (ElapseTime >= Daytime * InvestmentData.TimeRequire) { // Time over : Success
-				SuccessAction();
-				return InvestmentState::Success;
-			} else { // Process investment
-				return InvestmentState::Processing;
-			}
-		default:
-			return InvestmentState::Processing;
-		}
-	}
-
-	return InvestmentState::Ready;
-}
 
 void UInvestment::NotifyDailyTask() {
-	if (State == InvestmentState::Processing) {
-		ElapseTime += Daytime;
+	if (State == InvestmentState::Process) {
+		RemainTime--;
 	}
 }
 

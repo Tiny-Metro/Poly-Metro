@@ -20,33 +20,34 @@ class TINYMETRO_API UInvestment : public UObject
 public:
 	UInvestment();
 	static UInvestment* CreateInvestment(FString ScriptFileName, class UInvestmentLuaState* LuaState, UWorld* WorldContextObject);
-	void SetDaytime(int32 T);
-	void SetInvestmentData(FInvestmentData Data);
-	void SetAcceptAction(TFunction<void(void)> Action);
-	void SetSuccessAction(TFunction<void(void)> Action);
-	void SetFailAction(TFunction<void(void)> Action);
-	void SetStateCheckFunction(TFunction<InvestmentState(void)> Check);
 	UFUNCTION()
 	void InitInvestment();
 	UFUNCTION()
 	void ResetInvestment();
 
+	// Investment processing
 	UFUNCTION(BlueprintCallable)
 	void InvestmentStart();
+	UFUNCTION(BlueprintCallable)
+	InvestmentState InvestmentProcess();
+	UFUNCTION(BlueprintCallable)
+	InvestmentState InvestmentFinish();
+	UFUNCTION(BlueprintCallable)
+	void InvestmentSuccess();
 	
+	// Investment appearance
+	UFUNCTION(BlueprintCallable)
+	bool GetAppearable() const;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	FInvestmentData GetInvestmentData() const;
 	UFUNCTION(BlueprintCallable)
 	InvestmentState GetState() const;
-	UFUNCTION(BlueprintCallable)
-	InvestmentState CheckInvestmentProcess(float DeltaTime);
+
+	// Call by Bank::DailyTask
 	UFUNCTION(BlueprintCallable)
 	void NotifyDailyTask();
-
-	//UFUNCTION(BlueprintCallable)
-	//void DisableInvestment();
-
 
 protected:
 	UPROPERTY()
@@ -60,16 +61,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FInvestmentData InvestmentData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	int32 Daytime = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 RemainTime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	float ElapseTime = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	InvestmentState State = InvestmentState::Ready;
-
-	TFunction<void(void)> StartAction;
-	TFunction<void(void)> SuccessAction;
-	TFunction<void(void)> FailAction;
-	TFunction<InvestmentState(void)> ConditionCheckFunction;
 };

@@ -14,34 +14,18 @@ struct TINYMETRO_API FInvestmentData
 {
 	GENERATED_BODY()
 	FInvestmentData() = default;
-	FInvestmentData(FString Title, FString Content, int32 TimeRequire, FString RequireText, FString AcceptMessage, FString AwardMessage, FString RewardMessage) :
+	FInvestmentData(FString Title, int32 TimeLimit, FString AwardMessage) :
 		Title(Title),
-		Content(Content),
-		TimeRequire(TimeRequire),
-		RequireText(RequireText),
-		AcceptMessage(AcceptMessage),
-		AwardMessage(AwardMessage),
-		RewardMessage(RewardMessage){ }
+		TimeLimit(TimeLimit),
+		AwardMessage(AwardMessage){ }
 
 	// Investmet title
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString Title;
-	// Flavor text
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FString Content;
 	// Require day
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int32 TimeRequire;
-	// Require condition
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FString RequireText;
-	// Deposit of investment
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FString AcceptMessage;
+	int32 TimeLimit;
 	// Investment success
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString AwardMessage;
-	// Investment fail
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FString RewardMessage;
 };

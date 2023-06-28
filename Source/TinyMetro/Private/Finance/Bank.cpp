@@ -445,7 +445,7 @@ void ABank::ChangeInvestment(int Index = -1) {
 
 	// Select remove index
 	for (auto& i : AvailInvestment) {
-		if (Investment[i]->GetState() != InvestmentState::Processing) {
+		if (Investment[i]->GetState() != InvestmentState::Process) {
 			removeIndex = i;
 			break;
 		}
@@ -484,7 +484,7 @@ void ABank::ChangeAllInvestment() {
 	do {
 		AvailIndex = FMath::RandRange(0, Investment.Num() - 1);
 		int Idx = AvailInvestment[Flag];
-		if (Investment[Idx]->GetState() == InvestmentState::Processing) {
+		if (Investment[Idx]->GetState() == InvestmentState::Process) {
 			Temp.Emplace(Idx);
 			Flag++;
 		} else {
