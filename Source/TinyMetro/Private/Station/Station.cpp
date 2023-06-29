@@ -5,6 +5,7 @@
 #include "Station/StationManager.h"
 #include "Station/PathQueue.h"
 #include "Station/StationInfoWidget.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
 #include "GameModes/TinyMetroGameModeBase.h"
@@ -101,6 +102,7 @@ void AStation::BeginPlay()
 	StationManager = GameMode->GetStationManager();
 	Daytime = GameMode->GetDaytime();
 	TimerRef = GameMode->GetTimer();
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationTypeValue]);
@@ -498,23 +500,30 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 }
 
 void AStation::Upgrade() {
-	IsUpgrade = true;
-	ComplainPassengerNum += UpgradePermissionComplainPassenger;
+	if (CanUpgrade()) {
+		PlayerStateRef->AddMoney(-UpgradeCost);
+		IsUpgrade = true;
+		ComplainPassengerNum += UpgradePermissionComplainPassenger;
 
-	auto meshScale = StationMeshComponent->GetComponentScale();
-	meshScale.X *= 1.5f;
-	meshScale.Y *= 1.5f;
-	StationMeshComponent->SetWorldScale3D(meshScale);
+		auto meshScale = StationMeshComponent->GetComponentScale();
+		meshScale.X *= 1.5f;
+		meshScale.Y *= 1.5f;
+		StationMeshComponent->SetWorldScale3D(meshScale);
 
-	auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
-	gaugeScale.X *= 1.5f;
-	gaugeScale.Y *= 1.5f;
-	StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
+		auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
+		gaugeScale.X *= 1.5f;
+		gaugeScale.Y *= 1.5f;
+		StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
 
-	for (auto& i : PassengerMeshComponent) {
-		i->AddRelativeLocation(FVector(70.0f, 0, 0));
+		for (auto& i : PassengerMeshComponent) {
+			i->AddRelativeLocation(FVector(70.0f, 0, 0));
+		}
 	}
+}
 
+bool AStation::CanUpgrade() const {
+	if (!IsUpgrade && PlayerStateRef->GetMoney() >= UpgradeCost) return true;
+	else return false;
 }
 
 void AStation::SetInfoWidget(UStationInfoWidget* Widget) {

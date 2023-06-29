@@ -171,6 +171,8 @@ public:
 	// Upgrade
 	UFUNCTION(BlueprintCallable)
 	void Upgrade();
+	UFUNCTION(BlueprintCallable)
+	bool CanUpgrade() const;
 
 	// Init widget
 	UFUNCTION()
@@ -243,6 +245,8 @@ protected:
 	APolicy* Policy;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
@@ -275,6 +279,8 @@ protected:
 	int32 UpgradePermissionComplainPassenger = 3;
 	UPROPERTY(BlueprintReadOnly, Category = "Config")
 	bool IsUpgrade = false;
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	float UpgradeCost = 300.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> SpawnPaidPassenger = {
