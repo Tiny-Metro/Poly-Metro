@@ -168,6 +168,26 @@ public:
 	FStationInfo GetStationInfo();
 	void SetStationInfo(int32 Id, StationType Type);
 
+	// Upgrade
+	UFUNCTION(BlueprintCallable)
+	void Upgrade();
+	UFUNCTION(BlueprintCallable)
+	bool CanUpgrade() const;
+
+	// Init widget
+	UFUNCTION()
+	void SetInfoWidget(class UStationInfoWidget* Widget);
+
+	// Click & Release
+	UFUNCTION()
+	virtual void StationOnPressed(AActor* Target, FKey ButtonPressed);
+	UFUNCTION()
+	virtual void StationOnReleased(AActor* Target, FKey ButtonPressed);
+
+	// Info widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStationInfoWidget* StationInfoWidget;
+
 protected:
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
@@ -225,6 +245,8 @@ protected:
 	APolicy* Policy;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
@@ -234,8 +256,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FStationInfo StationInfo;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
-	bool TransferStation = false;;
+	bool TransferStation = false;
 
+	// Touch
+	UPROPERTY(BlueprintReadWrite)
+	float TouchTime = 0.0f;
+	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	float LongClickInterval = 0.5f;
 
 	// Passenger mesh
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
@@ -246,6 +273,14 @@ protected:
 	float PassengerX_Distance = 90;
 	UPROPERTY(BlueprintReadWrite, Category = "Passenger mesh")
 	float PassengerY_Distance = 45;
+
+	// Upgrade
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	int32 UpgradePermissionComplainPassenger = 3;
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	bool IsUpgrade = false;
+	UPROPERTY(BlueprintReadOnly, Category = "Config")
+	float UpgradeCost = 300.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> SpawnPaidPassenger = {

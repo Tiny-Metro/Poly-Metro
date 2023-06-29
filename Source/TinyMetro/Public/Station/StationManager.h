@@ -57,6 +57,9 @@ public:
 	friend class ATMSaveManager;
 	friend class APolicy;
 
+	UFUNCTION()
+	void InitStationInfoWidget();
+
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
 	UFUNCTION(BlueprintCallable)
@@ -204,6 +207,10 @@ public:
 	FStationInfo GetRandomDestroyedStationInfo() const;
 	UFUNCTION()
 	FStationInfo GetRandomTypeStationInfo(StationType Type) const;
+
+	// Widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStationInfoWidget* StationInfoWidget;
 
 private:
 	AStation* GetNearestStationByType(int32 Start, StationType Type);

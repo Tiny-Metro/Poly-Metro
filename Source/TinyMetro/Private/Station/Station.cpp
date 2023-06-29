@@ -4,6 +4,8 @@
 #include "Station/Station.h"
 #include "Station/StationManager.h"
 #include "Station/PathQueue.h"
+#include "Station/StationInfoWidget.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
 #include "GameModes/TinyMetroGameModeBase.h"
@@ -84,6 +86,9 @@ AStation::AStation()
 	OverlapVolume->InitBoxExtent(FVector(10, 10, 100));
 	OverlapVolume->SetupAttachment(RootComponent);
 
+	// Bind click, release event
+	OnClicked.AddDynamic(this, &AStation::StationOnPressed);
+	OnReleased.AddDynamic(this, &AStation::StationOnReleased);
 }
 
 // Called when the game starts or when spawned
@@ -97,6 +102,7 @@ void AStation::BeginPlay()
 	StationManager = GameMode->GetStationManager();
 	Daytime = GameMode->GetDaytime();
 	TimerRef = GameMode->GetTimer();
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationTypeValue]);
@@ -115,6 +121,11 @@ void AStation::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	PassengerSpawnRoutine(DeltaTime);
+
+	// Add TouchTime
+	// If condition don't needed
+	// (When OnClick, TouchTime init by 0.0)
+	TouchTime += DeltaTime;
 }
 
 void AStation::SetStationId(int32 Id) {
@@ -486,6 +497,47 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 {
 	StationInfo.Id = Id;
 	StationInfo.Type = Type;
+}
+
+void AStation::Upgrade() {
+	if (CanUpgrade()) {
+		PlayerStateRef->AddMoney(-UpgradeCost);
+		IsUpgrade = true;
+		ComplainPassengerNum += UpgradePermissionComplainPassenger;
+
+		auto meshScale = StationMeshComponent->GetComponentScale();
+		meshScale.X *= 1.5f;
+		meshScale.Y *= 1.5f;
+		StationMeshComponent->SetWorldScale3D(meshScale);
+
+		auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
+		gaugeScale.X *= 1.5f;
+		gaugeScale.Y *= 1.5f;
+		StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
+
+		for (auto& i : PassengerMeshComponent) {
+			i->AddRelativeLocation(FVector(70.0f, 0, 0));
+		}
+	}
+}
+
+bool AStation::CanUpgrade() const {
+	if (!IsUpgrade && PlayerStateRef->GetMoney() >= UpgradeCost) return true;
+	else return false;
+}
+
+void AStation::SetInfoWidget(UStationInfoWidget* Widget) {
+	StationInfoWidget = Widget;
+}
+
+void AStation::StationOnPressed(AActor* Target, FKey ButtonPressed) {
+	TouchTime = 0.0f;
+}
+
+void AStation::StationOnReleased(AActor* Target, FKey ButtonPressed) {
+	if (TouchTime > LongClickInterval) {
+		StationInfoWidget->ShowWidget(this);
+	}
 }
 
 void AStation::ComplainRoutine() {

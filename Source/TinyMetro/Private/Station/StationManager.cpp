@@ -6,8 +6,11 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationInfo.h"
 #include "Timer/Timer.h"
+#include "Station/StationInfoWidget.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
+#include <Blueprint/UserWidget.h>
+#include <Engine/AssetManager.h>
 
 // Sets default values
 AStationManager::AStationManager()
@@ -46,6 +49,15 @@ void AStationManager::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("Policy Invalid"));
 	}
 
+	// Init info widget
+	InitStationInfoWidget();
+	/*FSoftClassPath MyWidgetClassRef(TEXT("Blueprint'/Game/Stage/UI/HUD/WBP_StationInfoWidget.WBP_StationInfoWidget'"));
+	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
+		StationInfoWidget = CreateWidget<UStationInfoWidget>(GetWorld(), MyWidgetClass);
+		StationInfoWidget->AddToViewport();
+		StationInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	}*/
+
 	// Load initializa station data
 	// Need to modify by SaveManager
 	InitData = GameMode->GetInitData();
@@ -76,6 +88,12 @@ void AStationManager::BeginPlay()
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
 	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
+	if (IsValid(StationInfoWidget)) {
+		UE_LOG(LogTemp, Warning, TEXT("StationInfoWidget Valid"));
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("StationInfoWidget Invalid"));
+	}
+
 }
 
 void AStationManager::TestFunction() {
@@ -103,6 +121,15 @@ float AStationManager::GetComplainAverage() {
 		ComplainSum += i->GetComplain();
 	}
 	return ((float)ComplainSum)/Station.Num();
+}
+
+void AStationManager::InitStationInfoWidget() {
+	FSoftClassPath MyWidgetClassRef(TEXT("Blueprint'/Game/Stage/UI/HUD/WBP_StationInfoWidget.WBP_StationInfoWidget_C'"));
+	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
+		StationInfoWidget = CreateWidget<UStationInfoWidget>(GetWorld(), MyWidgetClass);
+		StationInfoWidget->AddToViewport();
+		StationInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALane* LaneRef) {
@@ -156,6 +183,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	tmp->SetStationInfo(NextStationId++, Type);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
+	tmp->SetInfoWidget(StationInfoWidget);
 
 	if (ActivateFlag) {
 		tmp->SetActivate(true);
