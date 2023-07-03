@@ -34,6 +34,13 @@ AStation::AStation()
 	StationComplainMeshComponent->SetupAttachment(RootComponent);
 	StationComplainMeshComponent->SetGenerateOverlapEvents(false);
 	StationComplainMeshComponent->SetWorldScale3D(FVector(1.20f));
+	
+	// Set station pulse effect mesh
+	PulseComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pulse plane"));
+	PulseComponent->SetupAttachment(RootComponent);
+	PulseComponent->SetGenerateOverlapEvents(false);
+	PulseComponent->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")).Object);
+	PulseComponent->SetWorldScale3D(FVector(20.0f, 20.0f, 1.0f));
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
@@ -148,8 +155,6 @@ void AStation::SetPolicy(APolicy* _Policy) {
 	Policy = _Policy;
 }
 
-
-
 FGridCellData AStation::GetCurrentGridCellData() const {
 	return CurrentGridCellData;
 }
@@ -180,6 +185,8 @@ void AStation::DailyTask() {
 	SpawnDay++;
 	// Update complain
 	ComplainRoutine();
+	// Off new station alarm
+	OffSpawnAlarm();
 }
 
 UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
@@ -592,6 +599,12 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 		}
 		PassengerSpawnCurrent -= PassengerSpawnRequire;
 	}
+}
+
+void AStation::OffSpawnAlarm() {
+	SpawnAlarm = false;
+	PulseComponent->SetMaterial(0, nullptr);
+	PulseComponent->SetWorldScale3D(FVector(0));
 }
 
 // Not used

@@ -188,6 +188,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStationInfoWidget* StationInfoWidget;
 
+	// New Station
+	UFUNCTION()
+	void OffSpawnAlarm();
+
 protected:
 	void SpawnPassenger();
 	double GetPassengerSpawnProbability();
@@ -282,6 +286,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Config")
 	float UpgradeCost = 300.0f;
 
+	// New station
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
+	UStaticMeshComponent* PulseComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
+	bool SpawnAlarm = true;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
 	TMap<StationType, int32> SpawnPaidPassenger = {
 		TPair<StationType, int32>(StationType::Circle, 0),
@@ -364,6 +374,7 @@ protected:
 	TArray<UStaticMesh*> StationMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> StationComplainMesh;
+
 
 	// Passenger meshes
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
