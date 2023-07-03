@@ -117,6 +117,8 @@ void AStation::BeginPlay()
 	UpdateStationMesh();
 	UpdatePassengerMesh();
 
+	FTimerHandle alarmHandle;
+	GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
@@ -185,8 +187,6 @@ void AStation::DailyTask() {
 	SpawnDay++;
 	// Update complain
 	ComplainRoutine();
-	// Off new station alarm
-	OffSpawnAlarm();
 }
 
 UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
