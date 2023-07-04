@@ -117,6 +117,7 @@ void AStation::BeginPlay()
 	UpdateStationMesh();
 	UpdatePassengerMesh();
 
+	// Set off alarm pulse
 	FTimerHandle alarmHandle;
 	GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
 

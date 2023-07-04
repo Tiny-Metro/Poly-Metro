@@ -7,6 +7,7 @@
 #include "Station/StationInfo.h"
 #include "Timer/Timer.h"
 #include "Station/StationInfoWidget.h"
+#include "Station/StationSpawnBorderWidget.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 #include <Blueprint/UserWidget.h>
@@ -51,12 +52,9 @@ void AStationManager::BeginPlay()
 
 	// Init info widget
 	InitStationInfoWidget();
-	/*FSoftClassPath MyWidgetClassRef(TEXT("Blueprint'/Game/Stage/UI/HUD/WBP_StationInfoWidget.WBP_StationInfoWidget'"));
-	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
-		StationInfoWidget = CreateWidget<UStationInfoWidget>(GetWorld(), MyWidgetClass);
-		StationInfoWidget->AddToViewport();
-		StationInfoWidget->SetVisibility(ESlateVisibility::Hidden);
-	}*/
+
+	// Init spawn alarm widget
+	InitStationSpawnWidget();
 
 	// Load initializa station data
 	// Need to modify by SaveManager
@@ -129,6 +127,15 @@ void AStationManager::InitStationInfoWidget() {
 		StationInfoWidget = CreateWidget<UStationInfoWidget>(GetWorld(), MyWidgetClass);
 		StationInfoWidget->AddToViewport();
 		StationInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void AStationManager::InitStationSpawnWidget() {
+	FSoftClassPath MyWidgetClassRef(TEXT("WidgetBlueprint'/Game/Stage/UI/HUD/WBP_SpawnBorderAlarm.WBP_SpawnBorderAlarm_C'"));
+	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
+		StationSpawnWidget = CreateWidget<UStationSpawnBorderWidget>(GetWorld(), MyWidgetClass);
+		StationSpawnWidget->AddToViewport();
+		//StationSpawnWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -206,6 +213,38 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
+
+	// For test : camera location
+	auto tmpPawnLocation = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation();
+	auto tmpStationLocation = SpawnTransform.GetLocation();
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn::PawnLocation : %f, %f, %f"), tmpPawnLocation.X, tmpPawnLocation.Y, tmpPawnLocation.Z);
+
+	// Decide spawn direction
+	auto spawnDirection = tmpPawnLocation - tmpStationLocation;
+	if (abs(spawnDirection.X) >= abs(spawnDirection.Y)) {
+		// Spawn X direction (Left or Right)
+		if (spawnDirection.X > 0) {
+			// Spawn Right
+			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Left"));
+			StationSpawnWidget->AlarmLeft();
+		} else {
+			// Spawn Left
+			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Right"));
+			StationSpawnWidget->AlarmRight();
+		}
+	} else {
+		// Spawn Y direction (Top or Bottom)
+		if (spawnDirection.Y > 0) {
+			// Spawn Bottom
+			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Top"));
+			StationSpawnWidget->AlarmTop();
+		} else {
+			// Spawn Top
+			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Bottom"));
+			StationSpawnWidget->AlarmBottom();
+		}
+	}
+
 }
 
 void AStationManager::StationSpawnRoutine(float DeltaTime) {
