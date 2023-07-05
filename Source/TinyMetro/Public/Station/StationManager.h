@@ -59,6 +59,8 @@ public:
 
 	UFUNCTION()
 	void InitStationInfoWidget();
+	UFUNCTION()
+	void InitStationSpawnWidget();
 
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
@@ -208,10 +210,6 @@ public:
 	UFUNCTION()
 	FStationInfo GetRandomTypeStationInfo(StationType Type) const;
 
-	// Widget
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStationInfoWidget* StationInfoWidget;
-
 private:
 	AStation* GetNearestStationByType(int32 Start, StationType Type);
 	void FloydWarshall();
@@ -267,6 +265,14 @@ protected:
 	int32 StationSpawnRange = 7;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 NextStationId = 0;
+
+	// Info Widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStationInfoWidget* StationInfoWidget;
+
+	// New station alarm widget
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStationSpawnBorderWidget* StationSpawnWidget;
 
 	// Passenger statistics
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger Statistics")
