@@ -220,30 +220,30 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn::PawnLocation : %f, %f, %f"), tmpPawnLocation.X, tmpPawnLocation.Y, tmpPawnLocation.Z);
 
 	// Decide spawn direction
-	auto spawnDirection = tmpPawnLocation - tmpStationLocation;
-	if (abs(spawnDirection.X) >= abs(spawnDirection.Y)) {
-		// Spawn X direction (Left or Right)
-		if (spawnDirection.X > 0) {
-			// Spawn Right
-			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Left"));
-			StationSpawnWidget->AlarmLeft();
-		} else {
-			// Spawn Left
-			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Right"));
-			StationSpawnWidget->AlarmRight();
-		}
-	} else {
-		// Spawn Y direction (Top or Bottom)
-		if (spawnDirection.Y > 0) {
-			// Spawn Bottom
-			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Top"));
-			StationSpawnWidget->AlarmTop();
-		} else {
-			// Spawn Top
-			UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Bottom"));
-			StationSpawnWidget->AlarmBottom();
-		}
-	}
+	//auto spawnDirection = tmpPawnLocation - tmpStationLocation;
+	//if (abs(spawnDirection.X) >= abs(spawnDirection.Y)) {
+	//	// Spawn X direction (Left or Right)
+	//	if (spawnDirection.X > 0) {
+	//		// Spawn Right
+	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Left"));
+	//		StationSpawnWidget->AlarmLeft();
+	//	} else {
+	//		// Spawn Left
+	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Right"));
+	//		StationSpawnWidget->AlarmRight();
+	//	}
+	//} else {
+	//	// Spawn Y direction (Top or Bottom)
+	//	if (spawnDirection.Y > 0) {
+	//		// Spawn Bottom
+	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Top"));
+	//		StationSpawnWidget->AlarmTop();
+	//	} else {
+	//		// Spawn Top
+	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Bottom"));
+	//		StationSpawnWidget->AlarmBottom();
+	//	}
+	//}
 
 }
 
