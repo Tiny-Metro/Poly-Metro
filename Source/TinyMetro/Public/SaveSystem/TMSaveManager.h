@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "SaveSystem/SaveActorType.h"
+
 #include "StationSaveGame.h"
 #include "WorldSaveGame.h"
 
@@ -16,6 +18,8 @@ class AStationManager;
 class AStation;
 class ATinyMetroPlayerState;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSaveTask);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadTask);
 
 UCLASS()
 class TINYMETRO_API ATMSaveManager : public AActor
@@ -38,10 +42,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public :
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
+
+	UPROPERTY(BlueprintAssignable)
+	FSaveTask SaveTask;
+
+	UPROPERTY(BlueprintAssignable)
+	FLoadTask LoadTask;
+
+	void SaveAllActor();
+	void LoadAllActor();
+
+	bool Save(class USaveGame* SaveGame, SaveActorType& SaveActor, int32 id = -1);
+	class USaveGame* Load(SaveActorType& SaveActor, int32 id = -1);
+
 	AStationManager* stationmanager;
 	ATinyMetroPlayerState* TinyMetroPlayerState; 
 
@@ -66,5 +82,8 @@ public:
 
 	void SaveWorldInfo();
 	void LoadWorldInfo();
+
+private:
+	FString MakeFileName(SaveActorType& ActorType, int32 id = -1);
 
 };
