@@ -19,7 +19,6 @@ class AStation;
 class ATinyMetroPlayerState;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSaveTask);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadTask);
 
 UCLASS()
 class TINYMETRO_API ATMSaveManager : public AActor
@@ -49,15 +48,15 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FSaveTask SaveTask;
 
-	UPROPERTY(BlueprintAssignable)
-	FLoadTask LoadTask;
-
 	void SaveAllActor();
-	void LoadAllActor();
 
 	bool Save(class USaveGame* SaveGame, SaveActorType& SaveActor, int32 id = -1);
 	class USaveGame* Load(SaveActorType& SaveActor, int32 id = -1);
 
+	bool CheckSaveGameExist(SaveActorType& SaveActor, int32 id = -1);
+	FString MakeFileName(SaveActorType& ActorType, int32 id = -1);
+
+	/*
 	AStationManager* stationmanager;
 	ATinyMetroPlayerState* TinyMetroPlayerState; 
 
@@ -82,8 +81,8 @@ public:
 
 	void SaveWorldInfo();
 	void LoadWorldInfo();
+	*/
 
-private:
-	FString MakeFileName(SaveActorType& ActorType, int32 id = -1);
+	
 
 };
