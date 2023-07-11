@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SaveSystem/TMSaveManager.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 ATMSaveManager::ATMSaveManager()
@@ -15,6 +17,10 @@ ATMSaveManager::ATMSaveManager()
 void ATMSaveManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Add AutoSave
+	GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameModeRef->GetTimer()->WeeklyTask.AddDynamic(this, &ATMSaveManager::SaveAllActor);
 }
 
 // Called every frame
@@ -48,19 +54,22 @@ bool ATMSaveManager::Save(USaveGame* SaveGame, SaveActorType& SaveActor, int32 i
 
 USaveGame* ATMSaveManager::Load(SaveActorType& SaveActor, int32 id)
 {
-	USaveGame* SaveData = Cast<USaveGame>(UGameplayStatics::LoadGameFromSlot(MakeFileName(SaveActor, id), 0));
+	USaveGame* SaveData = UGameplayStatics::LoadGameFromSlot(MakeFileName(SaveActor, id), 0);
 
 	return SaveData;
 }
 
 FString ATMSaveManager::MakeFileName(SaveActorType& ActorType, int32 id)
 {
+	//Enum to String
 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("SaveActorType"), true);
 
 	if (!EnumPtr) return FString("Invalid");
 
 	FString fileName = EnumPtr->GetNameStringByIndex((int32)ActorType);
 
+
+	//Check id
 	if (id == -1)
 	{
 		return fileName;
@@ -71,6 +80,3 @@ FString ATMSaveManager::MakeFileName(SaveActorType& ActorType, int32 id)
 
 	}
 }
-
-
-

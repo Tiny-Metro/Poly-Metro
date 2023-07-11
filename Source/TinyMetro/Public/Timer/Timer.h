@@ -42,8 +42,6 @@ protected:
 	class AStationManager* StationManagerRef;
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
-	UPROPERTY()
-	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	int32 Daytime;
 	UPROPERTY(VisibleAnywhere, Category = "Info")

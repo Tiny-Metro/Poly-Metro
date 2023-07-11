@@ -162,24 +162,6 @@ FGridCellData AStation::GetCurrentGridCellData() const {
 	return CurrentGridCellData;
 }
 
-void AStation::LoadStationValue(FStationValuesStruct StationValues) {
-	ComplainCurrent = StationValues.ComplainCurrent;
-	StationId = StationValues.StationId;
-	if (StationValues.IsActive) {
-		SetActivate(true);
-	};
-	SetStationType(StationValues.StationTypeValue);
-	SetGridCellData(StationValues.GridCellData);
-
-	for (int i = 0; i < StationValues.passengers.Num(); i++) {
-		FPassengerValues passengerValue = StationValues.passengers[i];
-
-		//TODO 승객 로드 추가하기
-		UPassenger* tmp = UPassenger::ConstructPassenger(passengerValue.Destination);
-		Passenger.Add(tmp);
-	}
-}
-
 void AStation::WeeklyTask() {
 }
 

@@ -2,15 +2,11 @@
 
 #pragma once
 
-#include "SaveSystem/SaveActorType.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "SaveSystem/SaveActorType.h"
 #include "TMSaveManager.generated.h"
-
-class AStationManager;
-class AStation;
-class ATinyMetroPlayerState;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSaveTask);
 
@@ -38,12 +34,15 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FSaveTask SaveTask;
 
+	UPROPERTY()
+	class ATinyMetroGameModeBase* GameModeRef;
+
 	void SaveAllActor();
 
+	//Save, Load Function
 	bool Save(class USaveGame* SaveGame, SaveActorType& SaveActor, int32 id = -1);
 	class USaveGame* Load(SaveActorType& SaveActor, int32 id = -1);
 
 	FString MakeFileName(SaveActorType& ActorType, int32 id = -1);
 
-	
 };

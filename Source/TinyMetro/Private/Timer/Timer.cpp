@@ -5,7 +5,6 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "SaveSystem/TMSaveManager.h"
 
 // Sets default values
 ATimer::ATimer()
@@ -25,8 +24,6 @@ void ATimer::BeginPlay()
 	//StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	Daytime = GameModeRef->GetDaytime();
 
-	//Get SaveManagerRef
-	SaveManagerRef = GameModeRef->GetSaveManager();
 }
 
 // Called every frame
@@ -47,10 +44,6 @@ void ATimer::Tick(float DeltaTime)
 	// Weekly check
 	if (WeekCounter >= (Daytime * 7)) {
 		WeeklyTask.Broadcast();
-
-		//AutoSave
-		SaveManagerRef->SaveAllActor();
-
 		WeekCounter -= (Daytime * 7);
 	}
 
