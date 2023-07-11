@@ -11,6 +11,7 @@
 #include "Shop/Shop.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Lane/BridgeTunnel/BridgeTunnelManager.h"
+#include "Event/TinyMetroEventManager.h"
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
@@ -69,6 +70,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     Bank = GetWorld()->SpawnActor<ABank>();
     Timer = GetWorld()->SpawnActor<ATimer>();
     Shop = GetWorld()->SpawnActor<AShop>();
+    EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
 
     // Spawn BP_BridgeTunnelManager
     // Load BP Class
@@ -144,4 +146,8 @@ AShop* ATinyMetroGameModeBase::GetShop() const {
 
 ABridgeTunnelManager* ATinyMetroGameModeBase::GetBridgeTunnelManager() const {
     return BridgeTunnelManager;
+}
+
+ATinyMetroEventManager* ATinyMetroGameModeBase::GetEventManager() const {
+    return EventManager;
 }
