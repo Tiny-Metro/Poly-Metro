@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LanePoint.h"
 #include "MeshComponentArray.h"
+//#include "LaneManager.h"
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
@@ -13,6 +14,7 @@
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "Lane.generated.h"
+class ALaneManager;
 
 UCLASS(Blueprintable)
 class TINYMETRO_API ALane : public AActor
@@ -43,7 +45,8 @@ public:
 	AStationManager* StationManagerRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
-	class ALaneManager* LaneManagerRef;
+	ALaneManager* LaneManagerRef;
+	//class ALaneManager* LaneManagerRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATrainManager* TrainManagerRef;
@@ -257,7 +260,8 @@ private:
 	TArray<FIntPoint> GeneratePath(const FIntPoint& Start, const FIntPoint& End);
 
 	void AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingPoint, TArray<FLanePoint>& TargetArray);
-	
+	void AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingPoint, TArray<FLanePoint>& TargetArray, int32 LanePosition);
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FVector> LaneLocation;
@@ -349,4 +353,10 @@ private:
 	TArray<TArray<FIntPoint>> HillArea;
 
 	bool IsBuildble();
+
+//REFACTORING
+private: 
+	// Sets coord, bend, through,, lane position etc
+	TArray<FLanePoint> GetLanePath(AStation* StartStation, AStation* EndStation);
+	void SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* Spline);
 };
