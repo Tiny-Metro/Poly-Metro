@@ -7,7 +7,6 @@
 #include "StationType.h"
 #include "StationState.h"
 #include "Passenger.h"
-#include "../SaveSystem/TMSaveManager.h"
 #include "../GridGenerator/GridCellData.h"
 #include "../Policy/Policy.h"
 #include "StationInfo.h"
@@ -23,9 +22,6 @@ class TINYMETRO_API AStation : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStation();
-
-	friend class ATMSaveManager;
-
 
 protected:
 	// Called when the game starts or when spawned
@@ -87,8 +83,6 @@ public:
 	void SetPolicy(APolicy* Policy);
 	UFUNCTION(BlueprintCallable)
 	void UpdateStationMesh();
-	UFUNCTION(BlueprintCallable)
-	void LoadStationValue(FStationValuesStruct StationValues);
 
 	// Daily, Weekly tasks
 	UFUNCTION()

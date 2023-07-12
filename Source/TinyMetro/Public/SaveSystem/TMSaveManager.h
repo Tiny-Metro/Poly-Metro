@@ -2,20 +2,13 @@
 
 #pragma once
 
-#include "StationSaveGame.h"
-#include "WorldSaveGame.h"
-
-#include "GridGenerator/GridCellData.h"
-#include "GridGenerator/GridManager.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "SaveSystem/SaveActorType.h"
 #include "TMSaveManager.generated.h"
 
-class AStationManager;
-class AStation;
-class ATinyMetroPlayerState;
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSaveTask);
 
 UCLASS()
 class TINYMETRO_API ATMSaveManager : public AActor
@@ -26,10 +19,6 @@ public:
 	// Sets default values for this actor's properties
 	ATMSaveManager();
 
-	friend class Station;
-	friend class StationManager;
-	friend class TinyMetroPlayerState;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,33 +27,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public :
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	AStationManager* stationmanager;
-	ATinyMetroPlayerState* TinyMetroPlayerState; 
 
-	FTimerHandle TimerAutoSave;
+	UPROPERTY(BlueprintAssignable)
+	FSaveTask SaveTask;
 
-	int32 AutoSaveCount = 1000;
-	int32 AutoSaveCurrent = 0;
-	int32 AutoSavePeriod = 7;
-	int32 AutoSaveRequire = 84000; // 12 * 7 * 1000
+	UPROPERTY()
+	class ATinyMetroGameModeBase* GameModeRef;
 
+	void SaveAllActor();
 
-	bool testing = false;
-	void SaveStationManager();
-	void LoadStationManager();
+	//Save, Load Function
+	bool Save(class USaveGame* SaveGame, SaveActorType& SaveActor, int32 id = -1);
+	class USaveGame* Load(SaveActorType& SaveActor, int32 id = -1);
 
-	void SpawnStations(FStationValuesStruct StationValues);
-
-	UFUNCTION(BlueprintCallable)
-	void DeleteSaveFiles();
-
-	void AutoSave();
-
-	void SaveWorldInfo();
-	void LoadWorldInfo();
+	FString MakeFileName(SaveActorType& ActorType, int32 id = -1);
 
 };

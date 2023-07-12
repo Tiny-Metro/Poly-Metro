@@ -23,6 +23,7 @@ void ATimer::BeginPlay()
 	GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
 	//StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	Daytime = GameModeRef->GetDaytime();
+
 }
 
 // Called every frame

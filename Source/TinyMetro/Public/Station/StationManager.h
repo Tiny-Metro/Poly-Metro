@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "../GridGenerator/GridManager.h"
 #include "../GameModes/TinyMetroGameModeBase.h"
-#include "../SaveSystem/TMSaveManager.h"
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
@@ -54,7 +53,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	friend class ATMSaveManager;
 	friend class APolicy;
 
 	UFUNCTION()
