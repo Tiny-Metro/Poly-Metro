@@ -23,6 +23,7 @@ void ATimer::BeginPlay()
 	GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
 	//StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	Daytime = GameModeRef->GetDaytime();
+
 }
 
 // Called every frame
@@ -37,12 +38,17 @@ void ATimer::Tick(float DeltaTime)
 	// Daily check
 	if (DayCounter >= Daytime) {
 		DailyTask.Broadcast();
+
+		Timestamp.DayoftheWeek = static_cast<Day>(Timestamp.Date % 7);
+		Timestamp.Date++;
+
 		DayCounter -= Daytime;
 	}
 
 	// Weekly check
 	if (WeekCounter >= (Daytime * 7)) {
 		WeeklyTask.Broadcast();
+		Timestamp.Week++;
 		WeekCounter -= (Daytime * 7);
 	}
 
@@ -56,5 +62,9 @@ void ATimer::SkipTime(int32 Skipday) {
 	SkiptimeTarget = ((int32)(ElapseTimeSec / Daytime) + Skipday) * Daytime; // Next day time
 	SkiptimeFlag = true;
 	GameModeRef->SetGameSpeed(1000.0f);
+}
+
+FTimestamp ATimer::GetTimestamp() {
+	return Timestamp;
 }
 
