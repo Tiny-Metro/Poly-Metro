@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Timestamp.h"
 #include "Timer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDailyTask);
@@ -28,10 +29,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SkipTime(int32 Skipday = 1);
+	UFUNCTION(BlueprintCallable)
+	FTimestamp GetTimestamp();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 	float ElapseTimeSec;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
+	FTimestamp Timestamp;
 	UPROPERTY(BlueprintAssignable)
 	FDailyTask DailyTask;
 	UPROPERTY(BlueprintAssignable)
