@@ -35,7 +35,9 @@ void ATinyMetroEventManager::DailyTask() {
 
 void ATinyMetroEventManager::SimulateProbability() {
 	// Occur Event
-	if (EventOccurProbability[Day] > FMath::RandRange(0.0, 1.0)) {
+	float EventProbability = (Day > (uint32)EventOccurProbability.Num()) ? 1.0 : EventOccurProbability[Day];
+	//float EventProbability = 1.0f;
+	if (EventProbability > FMath::RandRange(0.0, 1.0)) {
 		UpdateEventWeight();
 		OccurEvent();
 		Day = 0;
@@ -44,6 +46,7 @@ void ATinyMetroEventManager::SimulateProbability() {
 
 void ATinyMetroEventManager::OccurEvent() {
 	UE_LOG(LogTemp, Log, TEXT("EventManager::OccurEvent"));
+	EventOccurTask.Broadcast();
 }
 
 void ATinyMetroEventManager::UpdateEventWeight() {

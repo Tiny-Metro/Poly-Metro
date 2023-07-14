@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "TinyMetroEventManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEventOccurTask);
+
 UCLASS()
 class TINYMETRO_API ATinyMetroEventManager : public AActor
 {
@@ -32,11 +34,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(BlueprintAssignable)
+	FEventOccurTask EventOccurTask;
 
 protected:
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
-	UPROPERTY(Category = "Info")
+	UPROPERTY()
 	TArray<float> EventOccurProbability = {
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		0.3333, // Day 15
@@ -61,8 +65,8 @@ protected:
 		0.9667,
 		0 // Day 35
 	};
-	UPROPERTY(Category = "Info")
+	UPROPERTY(VisibleAnywhere, Category = "Info")
 	uint32 Day = 0;
-	UPROPERTY(Category = "Info")
+	UPROPERTY(VisibleAnywhere, Category = "Info")
 	int32 EventPeriod = 0;
 };
