@@ -111,15 +111,17 @@ void AStation::BeginPlay()
 	TimerRef = GameMode->GetTimer();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
-	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationTypeValue]);
-	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationTypeValue]);
+	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
+	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationInfo.Type]);
 	InitComplainGauge();
 	UpdateStationMesh();
 	UpdatePassengerMesh();
 
 	// Set off alarm pulse
-	FTimerHandle alarmHandle;
-	GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
+	if (SpawnAlarm) {
+		FTimerHandle alarmHandle;
+		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
+	}
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
@@ -143,11 +145,11 @@ void AStation::SetStationId(int32 Id) {
 }
 
 int32 AStation::GetStationId() const {
-	return StationId;
+	return StationInfo.Id;
 }
 
 void AStation::SetStationType(StationType Type) {
-	StationTypeValue = Type;
+	StationInfo.Type = Type;
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -204,7 +206,7 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 }
 
 void AStation::GetOffPassenger(UPassenger* P) {
-	if (P->GetDestination() == this->StationTypeValue) {
+	if (P->GetDestination() == this->StationInfo.Type) {
 		// Passenger arrive destination
 		if (P->GetFree()) {
 			ArriveFreePassenger++;
@@ -316,7 +318,7 @@ void AStation::SpawnPassenger(StationType Destination) {
 	);
 	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
 	//UPassenger* tmp = NewObject<UPassenger>();
-	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationTypeValue));
+	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationInfo.Type));
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
 		tmp->SetFree();
 	}
@@ -449,7 +451,7 @@ void AStation::SetStationState(StationState S) {
 }
 
 StationType AStation::GetStationType() const {
-	return StationTypeValue;
+	return StationInfo.Type;
 }
 
 void AStation::AddComplain(double ReduceRate) {
@@ -577,7 +579,7 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 	if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 		if (IsPassengerSpawnEnable) {
 			if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
-				SpawnPassenger(StationManager->CalculatePassengerDest(StationTypeValue));
+				SpawnPassenger(StationManager->CalculatePassengerDest(StationInfo.Type));
 			}
 		}
 		PassengerSpawnCurrent -= PassengerSpawnRequire;
@@ -593,7 +595,7 @@ void AStation::OffSpawnAlarm() {
 // Not used
 // Replcaed by SpawnPassenger(StationType)
 void AStation::SpawnPassenger() {
-	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationTypeValue);
+	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationInfo.Type);
 	UPassenger* tmp = UPassenger::ConstructPassenger(
 		NewPassengerDestination
 	);
