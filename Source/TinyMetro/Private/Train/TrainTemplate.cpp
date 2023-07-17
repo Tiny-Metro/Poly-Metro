@@ -222,7 +222,7 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 				// False : Get off (Ride other train)
 				if (PassengerRoute.Peek() == NextStation.Id) {
 					PassengerRoute.Dequeue();
-					Passenger[i]->SetPassengerPath(PassengerRoute);
+					//Passenger[i]->SetPassengerPath(PassengerRoute);
 				} else {
 					Station->GetOffPassenger(Passenger[i]);
 					Passenger.Add(i, nullptr);

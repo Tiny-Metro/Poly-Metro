@@ -90,6 +90,12 @@ public:
 	UFUNCTION()
 	void DailyTask();
 
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
 	// Lane
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
@@ -368,7 +374,6 @@ protected:
 	TArray<UStaticMesh*> StationMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> StationComplainMesh;
-
 
 	// Passenger meshes
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")

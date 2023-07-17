@@ -35,7 +35,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<bool> RandomFree = {true, false, false, false, false};
 	
-	PathQueue ShortestPath;
+	//PathQueue ShortestPath;
 
 public:
 	UFUNCTION()
@@ -43,7 +43,7 @@ public:
 	UFUNCTION()
 	bool GetFree() const;
 
-	void SetPassengerPath(PathQueue Path);
-	PathQueue GetPassengerPath();
+	//void SetPassengerPath(PathQueue Path);
+	//PathQueue GetPassengerPath();
 	
 };

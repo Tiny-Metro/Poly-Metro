@@ -28,10 +28,10 @@ bool UPassenger::GetFree() const {
 	return IsFree;
 }
 
-void UPassenger::SetPassengerPath(PathQueue Path) {
-	ShortestPath = Path;
-}
-
-PathQueue UPassenger::GetPassengerPath() {
-	return ShortestPath;
-}
+//void UPassenger::SetPassengerPath(PathQueue Path) {
+//	ShortestPath = Path;
+//}
+//
+//PathQueue UPassenger::GetPassengerPath() {
+//	return ShortestPath;
+//}

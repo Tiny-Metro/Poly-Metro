@@ -124,9 +124,10 @@ void AStation::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
 	}
 
-
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
+
+	GameMode->GetSaveManager()->SaveTask.AddDynamic(this, &AStation::Save);
 }
 
 // Called every frame
@@ -176,6 +177,12 @@ void AStation::DailyTask() {
 	ComplainRoutine();
 }
 
+void AStation::Save() {
+}
+
+void AStation::Load() {
+}
+
 UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 	// TPair.key : Passenger pointer
 	// TPair.value : Index validation (true : Need to next passenger check, false : Last index)
@@ -201,7 +208,7 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 			}
 		}
 
-		Passenger[i]->SetPassengerPath(PassengerRoute);
+		//Passenger[i]->SetPassengerPath(PassengerRoute);
 	}
 
 	return nullptr;
