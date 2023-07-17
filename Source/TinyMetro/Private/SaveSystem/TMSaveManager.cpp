@@ -41,7 +41,7 @@ void ATMSaveManager::SaveAllActor()
 	SaveTask.Broadcast();
 }
 
-bool ATMSaveManager::Save(USaveGame* SaveGame, SaveActorType& SaveActor, int32 id)
+bool ATMSaveManager::Save(USaveGame* SaveGame, SaveActorType SaveActor, int32 id)
 {
 	if (UGameplayStatics::SaveGameToSlot(SaveGame, MakeFileName(SaveActor, id), 0))
 	{
@@ -52,14 +52,14 @@ bool ATMSaveManager::Save(USaveGame* SaveGame, SaveActorType& SaveActor, int32 i
 	}
 }
 
-USaveGame* ATMSaveManager::Load(SaveActorType& SaveActor, int32 id)
+USaveGame* ATMSaveManager::Load(SaveActorType SaveActor, int32 id)
 {
 	USaveGame* SaveData = UGameplayStatics::LoadGameFromSlot(MakeFileName(SaveActor, id), 0);
 
 	return SaveData;
 }
 
-FString ATMSaveManager::MakeFileName(SaveActorType& ActorType, int32 id)
+FString ATMSaveManager::MakeFileName(SaveActorType ActorType, int32 id)
 {
 	//Enum to String
 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("SaveActorType"), true);

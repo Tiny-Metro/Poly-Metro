@@ -10,6 +10,7 @@
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
 #include "StationInfo.h"
+#include "StationSpawnData.h"
 #include "AdjList.h"
 #include "StationManager.generated.h"
 
@@ -63,7 +64,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag);
+	void SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id = -1);
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType(); 
 	UFUNCTION(BlueprintCallable)
@@ -71,6 +72,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static FString StationTypeToString(StationType Type, bool& Success);
 	
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	bool Load();
 
 protected:
 	// Called when the game starts or when spawned
@@ -232,6 +238,8 @@ protected:
 	ATinyMetroGameModeBase* GameMode;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	APolicy* PolicyRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -568,6 +576,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FServiceData ServiceData;
+
+	// Save data
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStationSpawnData> StationSpawnLog;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UAdjList* AdjList;

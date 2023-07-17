@@ -37,12 +37,15 @@ public:
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
 
-	void SaveAllActor();
 
 	//Save, Load Function
-	bool Save(class USaveGame* SaveGame, SaveActorType& SaveActor, int32 id = -1);
-	class USaveGame* Load(SaveActorType& SaveActor, int32 id = -1);
+	UFUNCTION()
+	void SaveAllActor();
+	UFUNCTION()
+	bool Save(class USaveGame* SaveGame, SaveActorType SaveActor, int32 id = -1);
+	UFUNCTION()
+	class USaveGame* Load(SaveActorType SaveActor, int32 id = -1);
 
-	FString MakeFileName(SaveActorType& ActorType, int32 id = -1);
+	FString MakeFileName(SaveActorType ActorType, int32 id = -1);
 
 };

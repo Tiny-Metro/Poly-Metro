@@ -8,6 +8,8 @@
 #include "Timer/Timer.h"
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSpawnBorderWidget.h"
+#include "Station/StationManagerSaveGame.h"
+#include "SaveSystem/TMSaveManager.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 #include <Blueprint/UserWidget.h>
@@ -34,6 +36,7 @@ void AStationManager::BeginPlay()
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	PolicyRef = GameMode->GetPolicy();
+	SaveManagerRef = GameMode->GetSaveManager();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -58,12 +61,17 @@ void AStationManager::BeginPlay()
 
 	// Load initializa station data
 	// Need to modify by SaveManager
-	InitData = GameMode->GetInitData();
 
-	for (auto& i : InitData) {
-		SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value, true);
+	if (!Load()) {
+		UE_LOG(LogTemp, Log, TEXT("StationManager::BeginPlay::No save data"));
+		InitData = GameMode->GetInitData();
+
+		for (auto& i : InitData) {
+			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
+		}
+	} else {
+		UE_LOG(LogTemp, Log, TEXT("StationManager::BeginPlay::Load data"));
 	}
-
 
 	// Init Floyd-Warshall
 	// Init adj matrix
@@ -77,20 +85,11 @@ void AStationManager::BeginPlay()
 	AdjPath.Init(pathTmp, 301);
 	AdjDist.Init(adjTmp, 301);
 
-	// Test Spawn actors
-	/*for (int i = 0; i < 300; i++) {
-		GetWorld()->SpawnActor<AStation>();
-	}*/
-
 	// Register Timer tasks
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
 	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
-	if (IsValid(StationInfoWidget)) {
-		UE_LOG(LogTemp, Warning, TEXT("StationInfoWidget Valid"));
-	} else {
-		UE_LOG(LogTemp, Warning, TEXT("StationInfoWidget Invalid"));
-	}
+	SaveManagerRef->SaveTask.AddDynamic(this, &AStationManager::Save);
 
 }
 
@@ -156,8 +155,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 	return Station[StationIndex];
 }
 
-void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, bool ActivateFlag = false) {
-	
+void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id) {
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 
@@ -169,34 +167,25 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		return;
 	}
 
-	// Check null
-	UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == nullptr) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return;
-	}
-
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(GridCellData.WorldLocation);
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, GridCellData.WorldLocation, GetActorRotation(), SpawnParams));
-	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
-	tmp->SetStationType(Type);
-	tmp->SetGridCellData(GridCellData);
-	tmp->SetStationId(NextStationId);
 
-	tmp->SetStationInfo(NextStationId++, Type);
+	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+	int32 StatoinId = NextStationId++;
+	if (Id != -1) {
+		StatoinId = Id;
+		tmp->OffSpawnAlarm();
+	}
+	tmp->SetStationInfo(NextStationId, Type);
+	tmp->SetGridCellData(GridCellData);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
 	tmp->SetInfoWidget(StationInfoWidget);
 
-	if (ActivateFlag) {
-		tmp->SetActivate(true);
-	}
 	tmp->FinishSpawning(SpawnTransform);
-
 
 	Station.Add(tmp);
 	GridManager->SetGridStructure(
@@ -208,7 +197,12 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		GridCellData.WorldCoordination.Y,
 		GridStationStructure::Station);
 
-
+	FStationSpawnData spawnLog;
+	spawnLog.GridCellData = GridCellData;
+	spawnLog.Type = Type;
+	spawnLog.StationId = tmp->GetStationId();
+	StationSpawnLog.Add(std::move(spawnLog));
+	
 	AdjList->Add(tmp->GetStationInfo(), NewObject<UAdjArrayItem>());
 
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
@@ -895,6 +889,29 @@ FString AStationManager::StationTypeToString(StationType Type, bool& Success) {
 		Success = false;
 	}
 	return result;
+}
+
+void AStationManager::Save() {
+	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UStationManagerSaveGame::StaticClass()));
+	tmp->NextStationId = NextStationId;
+	tmp->IsPassengerSpawnEnable = IsPassengerSpawnEnable;
+	tmp->StationSpawnDataArr = StationSpawnLog;
+	
+	SaveManagerRef->Save(tmp, SaveActorType::StationManager);
+}
+
+bool AStationManager::Load() {
+	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
+	
+	if (!IsValid(tmp)) return false;
+	UE_LOG(LogTemp, Log, TEXT("StatioManager::Load tmp->NextStationId = %d"), tmp->NextStationId);
+	NextStationId = tmp->NextStationId;
+	IsPassengerSpawnEnable = tmp->IsPassengerSpawnEnable;
+	for (auto& i : tmp->StationSpawnDataArr) {
+		SpawnStation(i.GridCellData, i.Type, i.StationId);
+	}
+
+	return true;
 }
 
 // Called every frame
