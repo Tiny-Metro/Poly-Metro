@@ -59,6 +59,8 @@ public:
 	UFUNCTION()
 	void InitStationInfoWidget();
 	UFUNCTION()
+	UStationInfoWidget* GetStationInfoWidget() const;
+	UFUNCTION()
 	void InitStationSpawnWidget();
 
 	UFUNCTION(BlueprintCallable)

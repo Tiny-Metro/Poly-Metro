@@ -62,10 +62,11 @@ TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetPassengerMaterialPath() const
 }
 
 void ATinyMetroGameModeBase::StartPlay() {
-    StationManager = GetWorld()->SpawnActor<AStationManager>();
     SaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
-    TrainManager = GetWorld()->SpawnActor<ATrainManager>();
+    StationManager = GetWorld()->SpawnActor<AStationManager>();
+    StationManager->Load();
     LaneManager = GetWorld()->SpawnActor<ALaneManager>();
+    TrainManager = GetWorld()->SpawnActor<ATrainManager>();
     Policy = GetWorld()->SpawnActor<APolicy>();
     Bank = GetWorld()->SpawnActor<ABank>();
     Timer = GetWorld()->SpawnActor<ATimer>();

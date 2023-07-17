@@ -116,12 +116,14 @@ void AStation::BeginPlay()
 	InitComplainGauge();
 	UpdateStationMesh();
 	UpdatePassengerMesh();
+	SetInfoWidget(StationManager->GetStationInfoWidget());
 
 	// Set off alarm pulse
 	if (SpawnAlarm) {
 		FTimerHandle alarmHandle;
 		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
 	}
+
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);

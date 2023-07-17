@@ -41,7 +41,6 @@ void AStationManager::BeginPlay()
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
 
-
 	if (IsValid(PlayerState)) {
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Valid"));
 	} else {
@@ -62,7 +61,7 @@ void AStationManager::BeginPlay()
 	// Load initializa station data
 	// Need to modify by SaveManager
 
-	if (!Load()) {
+	/*if (!Load()) {
 		UE_LOG(LogTemp, Log, TEXT("StationManager::BeginPlay::No save data"));
 		InitData = GameMode->GetInitData();
 
@@ -71,7 +70,7 @@ void AStationManager::BeginPlay()
 		}
 	} else {
 		UE_LOG(LogTemp, Log, TEXT("StationManager::BeginPlay::Load data"));
-	}
+	}*/
 
 	// Init Floyd-Warshall
 	// Init adj matrix
@@ -129,6 +128,10 @@ void AStationManager::InitStationInfoWidget() {
 	}
 }
 
+UStationInfoWidget* AStationManager::GetStationInfoWidget() const {
+	return StationInfoWidget;
+}
+
 void AStationManager::InitStationSpawnWidget() {
 	FSoftClassPath MyWidgetClassRef(TEXT("WidgetBlueprint'/Game/Stage/UI/HUD/WBP_SpawnBorderAlarm.WBP_SpawnBorderAlarm_C'"));
 	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
@@ -180,10 +183,9 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 		StatoinId = Id;
 		tmp->OffSpawnAlarm();
 	}
-	tmp->SetStationInfo(NextStationId, Type);
+	tmp->SetStationInfo(StatoinId, Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
-	tmp->SetInfoWidget(StationInfoWidget);
 
 	tmp->FinishSpawning(SpawnTransform);
 
@@ -901,10 +903,19 @@ void AStationManager::Save() {
 }
 
 bool AStationManager::Load() {
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	SaveManagerRef = GameMode->GetSaveManager();
 	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
 	
-	if (!IsValid(tmp)) return false;
-	UE_LOG(LogTemp, Log, TEXT("StatioManager::Load tmp->NextStationId = %d"), tmp->NextStationId);
+	if (!IsValid(tmp)) {
+		InitData = GameMode->GetInitData();
+
+		for (auto& i : InitData) {
+			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
+		}
+		return false;
+	}
+
 	NextStationId = tmp->NextStationId;
 	IsPassengerSpawnEnable = tmp->IsPassengerSpawnEnable;
 	for (auto& i : tmp->StationSpawnDataArr) {
