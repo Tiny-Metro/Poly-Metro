@@ -797,7 +797,7 @@ void AStationManager::FloydWarshall() {
 
 	// Calculate route
 	for (int i = 0; i < StationNum; i++) {
-		for (int j = 0; j < 10; j++) {
+		for (int j = 0; j < StationNum; j++) {
 			if (ShortestPath.Find(i) == nullptr) {
 				ShortestPath.Add(i);
 			}

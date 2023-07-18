@@ -5,43 +5,38 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "StationType.h"
-#include "PathQueue.h"
-#include "../SaveSystem/TMSaveManager.h"
 #include "Passenger.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class TINYMETRO_API UPassenger : public UObject
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FPassenger
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
-	UFUNCTION()
+	/*UFUNCTION()
 	void SetDestination(StationType Dest);
 	UFUNCTION()
 	StationType GetDestination() const;
-	static UPassenger* ConstructPassenger(StationType Dest);
+	static FPassenger* ConstructPassenger(StationType Dest);*/
 
-
-	friend class ATMSaveManager;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	StationType Destination;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool IsFree;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<bool> RandomFree = {true, false, false, false, false};
 	
 	//PathQueue ShortestPath;
 
 public:
-	UFUNCTION()
+	/*UFUNCTION()
 	void SetFree();
 	UFUNCTION()
-	bool GetFree() const;
+	bool GetFree() const;*/
 
 	//void SetPassengerPath(PathQueue Path);
 	//PathQueue GetPassengerPath();

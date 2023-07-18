@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "TrainDirection.h"
 #include "../Station/StationInfo.h"
+#include "../Station/Passenger.h"
 #include "TrainTemplate.generated.h"
 
 // Train speed
@@ -88,7 +89,7 @@ public:
 	UFUNCTION()
 	virtual int32 GetValidSeatCount() const;
 	UFUNCTION()
-	virtual bool AddPassenger(class UPassenger* P);
+	virtual bool AddPassenger(FPassenger P);
 	UFUNCTION()
 	virtual void UpdatePassengerSlot();
 	UFUNCTION()
@@ -149,7 +150,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	TMap<int32, class UPassenger*> Passenger;
+	TMap<int32, FPassenger> Passenger;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> LineTraceIgnoreActors;

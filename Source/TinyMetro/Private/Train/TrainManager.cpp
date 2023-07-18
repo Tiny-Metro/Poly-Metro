@@ -34,6 +34,9 @@ void ATrainManager::BeginPlay()
 	}
 }
 
+void ATrainManager::Load() {
+}
+
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
 	RefreshTrainArray();
 	if (Trains.Find(Train) == INDEX_NONE) {

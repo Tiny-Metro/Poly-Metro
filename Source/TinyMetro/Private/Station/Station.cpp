@@ -8,6 +8,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -145,6 +146,7 @@ void AStation::Tick(float DeltaTime)
 
 void AStation::SetStationId(int32 Id) {
 	StationId = Id;
+	StationInfo.Id = Id;
 }
 
 int32 AStation::GetStationId() const {
@@ -153,6 +155,7 @@ int32 AStation::GetStationId() const {
 
 void AStation::SetStationType(StationType Type) {
 	StationInfo.Type = Type;
+	StationTypeValue = Type;
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -183,7 +186,8 @@ void AStation::Save() {
 void AStation::Load() {
 }
 
-UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
+// Station -> Train
+FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 	// TPair.key : Passenger pointer
 	// TPair.value : Index validation (true : Need to next passenger check, false : Last index)
 	//TPair<UPassenger*, bool> RidePassenger(nullptr, false);
@@ -191,7 +195,7 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 		// Update passenger route
 		auto PassengerRoute = StationManager->GetShortestPath(
 			StationInfo.Id,
-			Passenger[i]->GetDestination()
+			Passenger[i].Destination
 		);
 
 		// Check route is empty
@@ -200,7 +204,7 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 			// True : Passenger get on
 			if (PassengerRoute.Peek() == Train->GetNextStation().Id) {
 				PassengerRoute.Dequeue();
-				UPassenger* tmp = Passenger[i];
+				FPassenger tmp = Passenger[i];
 				Passenger.RemoveAt(i);
 				UpdatePassengerMesh();
 				
@@ -211,18 +215,21 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 		//Passenger[i]->SetPassengerPath(PassengerRoute);
 	}
 
-	return nullptr;
+	FPassenger tmp;
+	tmp.Destination = StationType::None;
+	return tmp;
 }
 
-void AStation::GetOffPassenger(UPassenger* P) {
-	if (P->GetDestination() == this->StationInfo.Type) {
+// Train -> Station
+void AStation::GetOffPassenger(FPassenger P) {
+	if (P.Destination == this->StationInfo.Type) {
 		// Passenger arrive destination
-		if (P->GetFree()) {
+		if (P.IsFree) {
 			ArriveFreePassenger++;
 		} else {
 			ArrivePaidPassenger++;
 		}
-		P = nullptr;
+		P.Destination = StationType::None;
 	} else {
 		Passenger.Add(P);
 	}
@@ -281,7 +288,7 @@ int32 AStation::GetWaitTotalPassengerCount() const {
 int32 AStation::GetWaitPaidPassengerCount() const {
 	int32 result = 0;
 	for (auto& i : Passenger) {
-		if (!i->GetFree()) {
+		if (!i.IsFree) {
 			result++;
 		}
 	}
@@ -291,7 +298,7 @@ int32 AStation::GetWaitPaidPassengerCount() const {
 int32 AStation::GetWaitFreePassengerCount() const {
 	int32 result = 0;
 	for (auto& i : Passenger) {
-		if (i->GetFree()) {
+		if (i.IsFree) {
 			result++;
 		}
 	}
@@ -322,24 +329,23 @@ int32 AStation::GetWaitPassenger() const {
 }
 
 void AStation::SpawnPassenger(StationType Destination) {
-	UPassenger* tmp = UPassenger::ConstructPassenger(
-		Destination
-	);
+	FPassenger tmp;
+	tmp.Destination = Destination;
 	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationInfo.Type));
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
-		tmp->SetFree();
+		tmp.IsFree = true;
 	}
 
-	if (tmp->GetFree()) {
-		SpawnFreePassenger[tmp->GetDestination()]++;
-		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
+	if (tmp.IsFree) {
+		SpawnFreePassenger[tmp.Destination]++;
+		StationManager->NotifySpawnPassenger(tmp.Destination, true);
 	} else {
-		SpawnPaidPassenger[tmp->GetDestination()]++;
-		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
+		SpawnPaidPassenger[tmp.Destination]++;
+		StationManager->NotifySpawnPassenger(tmp.Destination, false);
 	}
-	TotalSpawnPassenger[tmp->GetDestination()]++;
+	TotalSpawnPassenger[tmp.Destination]++;
 
 
 	Passenger.Add(MoveTemp(tmp));
@@ -347,9 +353,9 @@ void AStation::SpawnPassenger(StationType Destination) {
 }
 
 void AStation::DespawnPassenger(StationType Destination) {
-	for (auto& i : Passenger) {
-		if (i->GetDestination() == Destination) {
-			Passenger.Remove(i);
+	for (int i = 0; i < Passenger.Num(); i++) {
+		if (Passenger[i].Destination == Destination) {
+			Passenger.RemoveAt(i);
 			break;
 		}
 	}
@@ -576,7 +582,7 @@ void AStation::UpdatePassengerMesh() {
 	// Read passenger array, clear and reorganize meshes
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
 		if (Passenger.IsValidIndex(i)) {
-			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i].Destination]);
 		} else {
 			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
 		}
@@ -604,7 +610,7 @@ void AStation::OffSpawnAlarm() {
 // Not used
 // Replcaed by SpawnPassenger(StationType)
 void AStation::SpawnPassenger() {
-	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationInfo.Type);
+	/*auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationInfo.Type);
 	UPassenger* tmp = UPassenger::ConstructPassenger(
 		NewPassengerDestination
 	);
@@ -623,7 +629,7 @@ void AStation::SpawnPassenger() {
 	TotalSpawnPassenger[tmp->GetDestination()]++;
 
 	
-	Passenger.Add(MoveTemp(tmp));
+	Passenger.Add(MoveTemp(tmp));*/
 
 	//Log
 	/*if (GEngine)

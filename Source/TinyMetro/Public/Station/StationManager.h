@@ -11,6 +11,7 @@
 #include "../PlayerState/TinyMetroPlayerState.h"
 #include "StationInfo.h"
 #include "StationSpawnData.h"
+#include "PathQueue.h"
 #include "AdjList.h"
 #include "StationManager.generated.h"
 

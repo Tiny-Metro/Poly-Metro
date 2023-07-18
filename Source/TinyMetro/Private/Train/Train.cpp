@@ -379,7 +379,7 @@ void ATrain::GetOnPassenger(AStation* Station) {
 
 		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
 
-		if (RidePassenger != nullptr) {
+		if (RidePassenger.Destination != StationType::None) {
 			PassengerIndex--;
 			// Add Passenger
 			if (!AddPassenger(RidePassenger)) { // Train is full
