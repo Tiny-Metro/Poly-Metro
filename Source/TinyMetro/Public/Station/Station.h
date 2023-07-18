@@ -199,6 +199,8 @@ protected:
 	void UpdatePassengerMesh();
 
 protected:
+	UPROPERTY()
+	class ATinyMetroGameModeBase* GameModeRef = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AStationManager* StationManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")

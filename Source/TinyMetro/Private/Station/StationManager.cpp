@@ -194,6 +194,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationInfo(StatoinId, Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
+	tmp->Load();
 
 	tmp->FinishSpawning(SpawnTransform);
 
@@ -880,7 +881,9 @@ void AStationManager::Save() {
 }
 
 bool AStationManager::Load() {
-	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
 	SaveManagerRef = GameMode->GetSaveManager();
 	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
 	

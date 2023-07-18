@@ -9,6 +9,7 @@
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Station/StationSaveGame.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -105,11 +106,15 @@ void AStation::BeginPlay()
 
 	Super::BeginPlay();
 	
+	UE_LOG(LogTemp, Log, TEXT("Station::BeginPlay"));
+
 	// Get GameMode, set daytime
-	ATinyMetroGameModeBase* GameMode = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
-	StationManager = GameMode->GetStationManager();
-	Daytime = GameMode->GetDaytime();
-	TimerRef = GameMode->GetTimer();
+	if (!GameModeRef) {
+		GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	}
+	StationManager = GameModeRef->GetStationManager();
+	Daytime = GameModeRef->GetDaytime();
+	TimerRef = GameModeRef->GetTimer();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
@@ -125,10 +130,14 @@ void AStation::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
 	}
 
+	if (IsUpgrade) {
+		Upgrade();
+	}
+
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
 
-	GameMode->GetSaveManager()->SaveTask.AddDynamic(this, &AStation::Save);
+	GameModeRef->GetSaveManager()->SaveTask.AddDynamic(this, &AStation::Save);
 }
 
 // Called every frame
@@ -181,9 +190,31 @@ void AStation::DailyTask() {
 }
 
 void AStation::Save() {
+	UStationSaveGame* tmp = Cast<UStationSaveGame>(UGameplayStatics::CreateSaveGameObject(UStationSaveGame::StaticClass()));
+	tmp->Passenger = Passenger;
+	tmp->ComplainCurrent = ComplainCurrent;
+	tmp->PassengerSpawnCurrent = PassengerSpawnCurrent;
+	tmp->SpawnDay = SpawnDay;
+	tmp->IsUpgrade = IsUpgrade;
+
+	GameModeRef->GetSaveManager()->Save(tmp, SaveActorType::Station, StationInfo.Id);
 }
 
 void AStation::Load() {
+	if (!GameModeRef) {
+		GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	}
+	UStationSaveGame* tmp = Cast<UStationSaveGame>(
+		GameModeRef->GetSaveManager()->Load(SaveActorType::Station, StationInfo.Id));
+
+	// Load success
+	if (IsValid(tmp)) {
+		Passenger = tmp->Passenger;
+		ComplainCurrent = tmp->ComplainCurrent;
+		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
+		SpawnDay = tmp->SpawnDay;
+		IsUpgrade = tmp->IsUpgrade;
+	}
 }
 
 // Station -> Train
@@ -507,24 +538,21 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 }
 
 void AStation::Upgrade() {
-	if (CanUpgrade()) {
-		PlayerStateRef->AddMoney(-UpgradeCost);
-		IsUpgrade = true;
-		ComplainPassengerNum += UpgradePermissionComplainPassenger;
+	IsUpgrade = true;
+	ComplainPassengerNum += UpgradePermissionComplainPassenger;
 
-		auto meshScale = StationMeshComponent->GetComponentScale();
-		meshScale.X *= 1.5f;
-		meshScale.Y *= 1.5f;
-		StationMeshComponent->SetWorldScale3D(meshScale);
+	auto meshScale = StationMeshComponent->GetComponentScale();
+	meshScale.X *= 1.5f;
+	meshScale.Y *= 1.5f;
+	StationMeshComponent->SetWorldScale3D(meshScale);
 
-		auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
-		gaugeScale.X *= 1.5f;
-		gaugeScale.Y *= 1.5f;
-		StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
+	auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
+	gaugeScale.X *= 1.5f;
+	gaugeScale.Y *= 1.5f;
+	StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
 
-		for (auto& i : PassengerMeshComponent) {
-			i->AddRelativeLocation(FVector(70.0f, 0, 0));
-		}
+	for (auto& i : PassengerMeshComponent) {
+		i->AddRelativeLocation(FVector(70.0f, 0, 0));
 	}
 }
 
