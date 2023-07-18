@@ -178,10 +178,12 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
-	int32 StatoinId = NextStationId++;
+	int32 StatoinId;
 	if (Id != -1) {
 		StatoinId = Id;
 		tmp->OffSpawnAlarm();
+	} else {
+		StatoinId = NextStationId++;
 	}
 	tmp->SetStationInfo(StatoinId, Type);
 	tmp->SetGridCellData(GridCellData);
