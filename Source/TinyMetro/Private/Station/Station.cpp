@@ -103,11 +103,8 @@ AStation::AStation()
 // Called when the game starts or when spawned
 void AStation::BeginPlay()
 {
-
 	Super::BeginPlay();
 	
-	UE_LOG(LogTemp, Log, TEXT("Station::BeginPlay"));
-
 	// Get GameMode, set daytime
 	if (!GameModeRef) {
 		GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
