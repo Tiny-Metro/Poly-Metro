@@ -8,6 +8,8 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
+#include "SaveSystem/TMSaveManager.h"
+#include "Station/StationSaveGame.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -101,14 +103,15 @@ AStation::AStation()
 // Called when the game starts or when spawned
 void AStation::BeginPlay()
 {
-
 	Super::BeginPlay();
 	
 	// Get GameMode, set daytime
-	ATinyMetroGameModeBase* GameMode = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
-	StationManager = GameMode->GetStationManager();
-	Daytime = GameMode->GetDaytime();
-	TimerRef = GameMode->GetTimer();
+	if (!GameModeRef) {
+		GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	}
+	StationManager = GameModeRef->GetStationManager();
+	Daytime = GameModeRef->GetDaytime();
+	TimerRef = GameModeRef->GetTimer();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
@@ -124,9 +127,14 @@ void AStation::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
 	}
 
+	if (IsUpgrade) {
+		Upgrade();
+	}
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
+
+	GameModeRef->GetSaveManager()->SaveTask.AddDynamic(this, &AStation::Save);
 }
 
 // Called every frame
@@ -144,6 +152,7 @@ void AStation::Tick(float DeltaTime)
 
 void AStation::SetStationId(int32 Id) {
 	StationId = Id;
+	StationInfo.Id = Id;
 }
 
 int32 AStation::GetStationId() const {
@@ -152,6 +161,7 @@ int32 AStation::GetStationId() const {
 
 void AStation::SetStationType(StationType Type) {
 	StationInfo.Type = Type;
+	StationTypeValue = Type;
 }
 
 void AStation::SetGridCellData(FGridCellData _GridCellData) {
@@ -176,7 +186,36 @@ void AStation::DailyTask() {
 	ComplainRoutine();
 }
 
-UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
+void AStation::Save() {
+	UStationSaveGame* tmp = Cast<UStationSaveGame>(UGameplayStatics::CreateSaveGameObject(UStationSaveGame::StaticClass()));
+	tmp->Passenger = Passenger;
+	tmp->ComplainCurrent = ComplainCurrent;
+	tmp->PassengerSpawnCurrent = PassengerSpawnCurrent;
+	tmp->SpawnDay = SpawnDay;
+	tmp->IsUpgrade = IsUpgrade;
+
+	GameModeRef->GetSaveManager()->Save(tmp, SaveActorType::Station, StationInfo.Id);
+}
+
+void AStation::Load() {
+	if (!GameModeRef) {
+		GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	}
+	UStationSaveGame* tmp = Cast<UStationSaveGame>(
+		GameModeRef->GetSaveManager()->Load(SaveActorType::Station, StationInfo.Id));
+
+	// Load success
+	if (IsValid(tmp)) {
+		Passenger = tmp->Passenger;
+		ComplainCurrent = tmp->ComplainCurrent;
+		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
+		SpawnDay = tmp->SpawnDay;
+		IsUpgrade = tmp->IsUpgrade;
+	}
+}
+
+// Station -> Train
+FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 	// TPair.key : Passenger pointer
 	// TPair.value : Index validation (true : Need to next passenger check, false : Last index)
 	//TPair<UPassenger*, bool> RidePassenger(nullptr, false);
@@ -184,7 +223,7 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 		// Update passenger route
 		auto PassengerRoute = StationManager->GetShortestPath(
 			StationInfo.Id,
-			Passenger[i]->GetDestination()
+			Passenger[i].Destination
 		);
 
 		// Check route is empty
@@ -193,7 +232,7 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 			// True : Passenger get on
 			if (PassengerRoute.Peek() == Train->GetNextStation().Id) {
 				PassengerRoute.Dequeue();
-				UPassenger* tmp = Passenger[i];
+				FPassenger tmp = Passenger[i];
 				Passenger.RemoveAt(i);
 				UpdatePassengerMesh();
 				
@@ -201,21 +240,24 @@ UPassenger* AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 			}
 		}
 
-		Passenger[i]->SetPassengerPath(PassengerRoute);
+		//Passenger[i]->SetPassengerPath(PassengerRoute);
 	}
 
-	return nullptr;
+	FPassenger tmp;
+	tmp.Destination = StationType::None;
+	return tmp;
 }
 
-void AStation::GetOffPassenger(UPassenger* P) {
-	if (P->GetDestination() == this->StationInfo.Type) {
+// Train -> Station
+void AStation::GetOffPassenger(FPassenger P) {
+	if (P.Destination == this->StationInfo.Type) {
 		// Passenger arrive destination
-		if (P->GetFree()) {
+		if (P.IsFree) {
 			ArriveFreePassenger++;
 		} else {
 			ArrivePaidPassenger++;
 		}
-		P = nullptr;
+		P.Destination = StationType::None;
 	} else {
 		Passenger.Add(P);
 	}
@@ -274,7 +316,7 @@ int32 AStation::GetWaitTotalPassengerCount() const {
 int32 AStation::GetWaitPaidPassengerCount() const {
 	int32 result = 0;
 	for (auto& i : Passenger) {
-		if (!i->GetFree()) {
+		if (!i.IsFree) {
 			result++;
 		}
 	}
@@ -284,7 +326,7 @@ int32 AStation::GetWaitPaidPassengerCount() const {
 int32 AStation::GetWaitFreePassengerCount() const {
 	int32 result = 0;
 	for (auto& i : Passenger) {
-		if (i->GetFree()) {
+		if (i.IsFree) {
 			result++;
 		}
 	}
@@ -315,24 +357,23 @@ int32 AStation::GetWaitPassenger() const {
 }
 
 void AStation::SpawnPassenger(StationType Destination) {
-	UPassenger* tmp = UPassenger::ConstructPassenger(
-		Destination
-	);
+	FPassenger tmp;
+	tmp.Destination = Destination;
 	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
 	//UPassenger* tmp = NewObject<UPassenger>();
 	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationInfo.Type));
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
-		tmp->SetFree();
+		tmp.IsFree = true;
 	}
 
-	if (tmp->GetFree()) {
-		SpawnFreePassenger[tmp->GetDestination()]++;
-		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
+	if (tmp.IsFree) {
+		SpawnFreePassenger[tmp.Destination]++;
+		StationManager->NotifySpawnPassenger(tmp.Destination, true);
 	} else {
-		SpawnPaidPassenger[tmp->GetDestination()]++;
-		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
+		SpawnPaidPassenger[tmp.Destination]++;
+		StationManager->NotifySpawnPassenger(tmp.Destination, false);
 	}
-	TotalSpawnPassenger[tmp->GetDestination()]++;
+	TotalSpawnPassenger[tmp.Destination]++;
 
 
 	Passenger.Add(MoveTemp(tmp));
@@ -340,9 +381,9 @@ void AStation::SpawnPassenger(StationType Destination) {
 }
 
 void AStation::DespawnPassenger(StationType Destination) {
-	for (auto& i : Passenger) {
-		if (i->GetDestination() == Destination) {
-			Passenger.Remove(i);
+	for (int i = 0; i < Passenger.Num(); i++) {
+		if (Passenger[i].Destination == Destination) {
+			Passenger.RemoveAt(i);
 			break;
 		}
 	}
@@ -494,24 +535,21 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 }
 
 void AStation::Upgrade() {
-	if (CanUpgrade()) {
-		PlayerStateRef->AddMoney(-UpgradeCost);
-		IsUpgrade = true;
-		ComplainPassengerNum += UpgradePermissionComplainPassenger;
+	IsUpgrade = true;
+	ComplainPassengerNum += UpgradePermissionComplainPassenger;
 
-		auto meshScale = StationMeshComponent->GetComponentScale();
-		meshScale.X *= 1.5f;
-		meshScale.Y *= 1.5f;
-		StationMeshComponent->SetWorldScale3D(meshScale);
+	auto meshScale = StationMeshComponent->GetComponentScale();
+	meshScale.X *= 1.5f;
+	meshScale.Y *= 1.5f;
+	StationMeshComponent->SetWorldScale3D(meshScale);
 
-		auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
-		gaugeScale.X *= 1.5f;
-		gaugeScale.Y *= 1.5f;
-		StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
+	auto gaugeScale = StationComplainMeshComponent->GetComponentScale();
+	gaugeScale.X *= 1.5f;
+	gaugeScale.Y *= 1.5f;
+	StationComplainMeshComponent->SetWorldScale3D(gaugeScale);
 
-		for (auto& i : PassengerMeshComponent) {
-			i->AddRelativeLocation(FVector(70.0f, 0, 0));
-		}
+	for (auto& i : PassengerMeshComponent) {
+		i->AddRelativeLocation(FVector(70.0f, 0, 0));
 	}
 }
 
@@ -569,7 +607,7 @@ void AStation::UpdatePassengerMesh() {
 	// Read passenger array, clear and reorganize meshes
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
 		if (Passenger.IsValidIndex(i)) {
-			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i].Destination]);
 		} else {
 			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
 		}
@@ -597,7 +635,7 @@ void AStation::OffSpawnAlarm() {
 // Not used
 // Replcaed by SpawnPassenger(StationType)
 void AStation::SpawnPassenger() {
-	auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationInfo.Type);
+	/*auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationInfo.Type);
 	UPassenger* tmp = UPassenger::ConstructPassenger(
 		NewPassengerDestination
 	);
@@ -616,7 +654,7 @@ void AStation::SpawnPassenger() {
 	TotalSpawnPassenger[tmp->GetDestination()]++;
 
 	
-	Passenger.Add(MoveTemp(tmp));
+	Passenger.Add(MoveTemp(tmp));*/
 
 	//Log
 	/*if (GEngine)

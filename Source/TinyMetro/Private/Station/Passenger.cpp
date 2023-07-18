@@ -3,35 +3,35 @@
 
 #include "Station/Passenger.h"
 
-void UPassenger::SetDestination(StationType Dest) {
-	Destination = Dest;
-}
+//void UPassenger::SetDestination(StationType Dest) {
+//	Destination = Dest;
+//}
+//
+//StationType UPassenger::GetDestination() const {
+//	return Destination;
+//}
+//
+//UPassenger* UPassenger::ConstructPassenger(StationType Dest) {
+//	auto Obj = NewObject<UPassenger>();
+//	Obj->SetDestination(Dest);
+//	//Obj->SetFree();  TODO : if Policy->GetHasBicycle == true
+//	return MoveTemp(Obj);
+//}
+//
+//void UPassenger::SetFree() {
+//	int result = FMath::RandRange(0,4);
+//
+//	IsFree = RandomFree[result];
+//}
+//
+//bool UPassenger::GetFree() const {
+//	return IsFree;
+//}
 
-StationType UPassenger::GetDestination() const {
-	return Destination;
-}
-
-UPassenger* UPassenger::ConstructPassenger(StationType Dest) {
-	auto Obj = NewObject<UPassenger>();
-	Obj->SetDestination(Dest);
-	//Obj->SetFree();  TODO : if Policy->GetHasBicycle == true
-	return MoveTemp(Obj);
-}
-
-void UPassenger::SetFree() {
-	int result = FMath::RandRange(0,4);
-
-	IsFree = RandomFree[result];
-}
-
-bool UPassenger::GetFree() const {
-	return IsFree;
-}
-
-void UPassenger::SetPassengerPath(PathQueue Path) {
-	ShortestPath = Path;
-}
-
-PathQueue UPassenger::GetPassengerPath() {
-	return ShortestPath;
-}
+//void UPassenger::SetPassengerPath(PathQueue Path) {
+//	ShortestPath = Path;
+//}
+//
+//PathQueue UPassenger::GetPassengerPath() {
+//	return ShortestPath;
+//}

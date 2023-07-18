@@ -8,6 +8,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Lane/LaneManager.h"
 #include "Lane/Lane.h"
+#include "Station/PathQueue.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -58,9 +59,9 @@ ATrainTemplate::ATrainTemplate()
 		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
 	}
 
-	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
+	/*for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		Passenger.Add(i, nullptr);
-	}
+	}*/
 
 	// Bind click, release event
 	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnPressed);
@@ -88,8 +89,8 @@ void ATrainTemplate::BeginPlay()
 void ATrainTemplate::UpdatePassengerMesh() {
 	// Read passenger array, clear and reorganize meshes
 	for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
-		if (Passenger[i]) {
-			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i]->GetDestination()]);
+		if (Passenger.Contains(i)) {
+			PassengerMeshComponent[i]->SetStaticMesh(PassengerMesh[(int)Passenger[i].Destination]);
 		} else {
 			PassengerMeshComponent[i]->SetStaticMesh(nullptr);
 		}
@@ -129,18 +130,18 @@ bool ATrainTemplate::IsPassengerSlotFull() {
 }
 
 int32 ATrainTemplate::GetValidSeatCount() const {
-	int32 ValidSeat = 0;
+	/*int32 ValidSeat = 0;
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (!Passenger[i]) {
 			ValidSeat++;
 		}
-	}
-	return ValidSeat;
+	}*/
+	return CurrentPassengerSlot - Passenger.Num();
 }
 
-bool ATrainTemplate::AddPassenger(UPassenger* P) {
+bool ATrainTemplate::AddPassenger(FPassenger P) {
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
-		if (Passenger[i] == nullptr) {
+		if (!Passenger.Contains(i)) {
 			Passenger.Add(i, P);
 
 			TotalPassenger++;
@@ -192,25 +193,21 @@ void ATrainTemplate::DropPassenger() {
 
 	if (IsValid(CurrentStationPointer)) {
 		for (auto& i : Passenger) {
-			if (i.Value != nullptr) {
-				CurrentStationPointer->GetOffPassenger(i.Value);
-				i.Value = nullptr;
-				UpdatePassengerMesh();
-			}
+			CurrentStationPointer->GetOffPassenger(i.Value);
+			Passenger.Remove(i.Key);
+			UpdatePassengerMesh();
 		}
-	} else {
-
 	}
 }
 
 void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 	Success = false;
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
-		if (Passenger[i]) {
+		if (Passenger.Contains(i)) {
 			// Update passenger route
 			auto PassengerRoute = StationManagerRef->GetShortestPath(
 				CurrentStation.Id,
-				Passenger[i]->GetDestination()
+				Passenger[i].Destination
 			);
 
 			//auto PassengerRoute = Passenger[i]->GetPassengerPath();
@@ -222,17 +219,20 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 				// False : Get off (Ride other train)
 				if (PassengerRoute.Peek() == NextStation.Id) {
 					PassengerRoute.Dequeue();
-					Passenger[i]->SetPassengerPath(PassengerRoute);
+					//Passenger[i]->SetPassengerPath(PassengerRoute);
 				} else {
 					Station->GetOffPassenger(Passenger[i]);
-					Passenger.Add(i, nullptr);
+					//Passenger.Add(i, nullptr);
+					Passenger.Remove(i);
+					//Passenger.Remove(i);
 					UpdatePassengerMesh();
 					Success = true;
 					return;
 				}
 			} else {
 				Station->GetOffPassenger(Passenger[i]);
-				Passenger.Add(i, nullptr);
+				//Passenger.Add(i, nullptr);
+				Passenger.Remove(i);
 				UpdatePassengerMesh();
 				Success = true;
 				return;

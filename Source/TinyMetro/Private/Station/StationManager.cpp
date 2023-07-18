@@ -160,15 +160,21 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 
 void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id) {
 	// Load BP Class
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
+	//UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
+	if (!StationBlueprintClass) {
+		StationBlueprintClass = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
+	}
 
 	// Cast to BP
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	//UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	if (!GeneratedStationBlueprint) {
+		GeneratedStationBlueprint = Cast<UBlueprint>(StationBlueprintClass);
+	}
 	// Check object validation
-	if (!SpawnActor) {
+	/*if (!SpawnActor) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
 		return;
-	}
+	}*/
 
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
@@ -177,15 +183,18 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
-	int32 StatoinId = NextStationId++;
+	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedStationBlueprint->GeneratedClass, SpawnTransform));
+	int32 StatoinId;
 	if (Id != -1) {
 		StatoinId = Id;
 		tmp->OffSpawnAlarm();
+	} else {
+		StatoinId = NextStationId++;
 	}
 	tmp->SetStationInfo(StatoinId, Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
+	tmp->Load();
 
 	tmp->FinishSpawning(SpawnTransform);
 
@@ -203,43 +212,12 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	spawnLog.GridCellData = GridCellData;
 	spawnLog.Type = Type;
 	spawnLog.StationId = tmp->GetStationId();
-	StationSpawnLog.Add(std::move(spawnLog));
+	StationSpawnLog.Add(spawnLog);
 	
 	AdjList->Add(tmp->GetStationInfo(), NewObject<UAdjArrayItem>());
 
-	UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
-	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));
-
-	// For test : camera location
-	auto tmpPawnLocation = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn()->GetActorLocation();
-	auto tmpStationLocation = SpawnTransform.GetLocation();
-	UE_LOG(LogTemp, Warning, TEXT("StationSpawn::PawnLocation : %f, %f, %f"), tmpPawnLocation.X, tmpPawnLocation.Y, tmpPawnLocation.Z);
-
-	// Decide spawn direction
-	//auto spawnDirection = tmpPawnLocation - tmpStationLocation;
-	//if (abs(spawnDirection.X) >= abs(spawnDirection.Y)) {
-	//	// Spawn X direction (Left or Right)
-	//	if (spawnDirection.X > 0) {
-	//		// Spawn Right
-	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Left"));
-	//		StationSpawnWidget->AlarmLeft();
-	//	} else {
-	//		// Spawn Left
-	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Right"));
-	//		StationSpawnWidget->AlarmRight();
-	//	}
-	//} else {
-	//	// Spawn Y direction (Top or Bottom)
-	//	if (spawnDirection.Y > 0) {
-	//		// Spawn Bottom
-	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Top"));
-	//		StationSpawnWidget->AlarmTop();
-	//	} else {
-	//		// Spawn Top
-	//		UE_LOG(LogTemp, Warning, TEXT("StationSpawn::Spawn Bottom"));
-	//		StationSpawnWidget->AlarmBottom();
-	//	}
-	//}
+	/*UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
+	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));*/
 
 }
 
@@ -797,7 +775,7 @@ void AStationManager::FloydWarshall() {
 
 	// Calculate route
 	for (int i = 0; i < StationNum; i++) {
-		for (int j = 0; j < 10; j++) {
+		for (int j = 0; j < StationNum; j++) {
 			if (ShortestPath.Find(i) == nullptr) {
 				ShortestPath.Add(i);
 			}
@@ -903,7 +881,9 @@ void AStationManager::Save() {
 }
 
 bool AStationManager::Load() {
-	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
 	SaveManagerRef = GameMode->GetSaveManager();
 	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
 	

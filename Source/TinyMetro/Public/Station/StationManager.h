@@ -11,6 +11,7 @@
 #include "../PlayerState/TinyMetroPlayerState.h"
 #include "StationInfo.h"
 #include "StationSpawnData.h"
+#include "PathQueue.h"
 #include "AdjList.h"
 #include "StationManager.generated.h"
 
@@ -225,7 +226,10 @@ private:
 
 
 protected:
-
+	UPROPERTY()
+	UObject* StationBlueprintClass = nullptr;
+	UPROPERTY()
+	UBlueprint* GeneratedStationBlueprint = nullptr;
 	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	int32 MaxStationCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")

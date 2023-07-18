@@ -90,6 +90,12 @@ public:
 	UFUNCTION()
 	void DailyTask();
 
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
 	// Lane
 	UFUNCTION(BlueprintCallable)
 	bool IsValidLane(int32 LId) const;
@@ -145,8 +151,8 @@ public:
 	Key is passenger's pointer, set nullptr when passenger don't want ride
 	Value is bool of Index's validation. return true when index is valid
 	*/
-	UPassenger* GetOnPassenger(int32 Index, class ATrainTemplate* Train);
-	void GetOffPassenger(class UPassenger* P);
+	FPassenger GetOnPassenger(int32 Index, class ATrainTemplate* Train);
+	void GetOffPassenger(FPassenger P);
     
 
 	void AddComplain(double ReduceRate);
@@ -193,6 +199,8 @@ protected:
 	void UpdatePassengerMesh();
 
 protected:
+	UPROPERTY()
+	class ATinyMetroGameModeBase* GameModeRef = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AStationManager* StationManager;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
@@ -248,7 +256,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TArray<UPassenger*> Passenger;
+	TArray<FPassenger> Passenger;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	TArray<int32> Lanes;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
@@ -368,7 +376,6 @@ protected:
 	TArray<UStaticMesh*> StationMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UStaticMesh*> StationComplainMesh;
-
 
 	// Passenger meshes
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")

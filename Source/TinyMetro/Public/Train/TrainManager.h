@@ -25,6 +25,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	// Test
+	UFUNCTION()
+		void Load();
+
 	UFUNCTION(BlueprintCallable)
 	void AddTrain(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
