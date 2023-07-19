@@ -37,6 +37,7 @@ void AStationManager::BeginPlay()
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	PolicyRef = GameMode->GetPolicy();
 	SaveManagerRef = GameMode->GetSaveManager();
+	TimerRef = GameMode->GetTimer();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -158,7 +159,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 	return Station[StationIndex];
 }
 
-void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id) {
+void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id, FTimestamp Timestamp) {
 	// Load BP Class
 	//UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 	if (!StationBlueprintClass) {
@@ -185,10 +186,13 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedStationBlueprint->GeneratedClass, SpawnTransform));
 	int32 StatoinId;
+
 	if (Id != -1) {
+		// Load station
 		StatoinId = Id;
 		tmp->OffSpawnAlarm();
-	} else {
+	} else { 
+		// New station
 		StatoinId = NextStationId++;
 	}
 	tmp->SetStationInfo(StatoinId, Type);
@@ -212,9 +216,18 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	spawnLog.GridCellData = GridCellData;
 	spawnLog.Type = Type;
 	spawnLog.StationId = tmp->GetStationId();
+	if (Id != -1) {
+		// Load station
+		spawnLog.Timestamp = Timestamp;
+	} else {
+		// New station
+		spawnLog.Timestamp = TimerRef->GetTimestamp();
+	}
 	StationSpawnLog.Add(spawnLog);
 	
 	AdjList->Add(tmp->GetStationInfo(), NewObject<UAdjArrayItem>());
+
+	StationSpawnTask.Broadcast();
 
 	/*UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));*/
@@ -900,6 +913,7 @@ bool AStationManager::Load() {
 	IsPassengerSpawnEnable = tmp->IsPassengerSpawnEnable;
 	for (auto& i : tmp->StationSpawnDataArr) {
 		SpawnStation(i.GridCellData, i.Type, i.StationId);
+		
 	}
 
 	return true;

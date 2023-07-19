@@ -15,6 +15,7 @@ struct TINYMETRO_API FTimestamp
 {
 	GENERATED_USTRUCT_BODY()
 
+	FTimestamp() : Date(1), Week(1), DayoftheWeek(Day::Monday) {}
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Date = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
