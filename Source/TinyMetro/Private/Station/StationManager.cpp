@@ -73,6 +73,15 @@ void AStationManager::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("StationManager::BeginPlay::Load data"));
 	}*/
 
+	// New game
+	if (Station.Num() == 0) {
+		InitData = GameMode->GetInitData();
+
+		for (auto& i : InitData) {
+			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
+		}
+	}
+
 	// Init Floyd-Warshall
 	// Init adj matrix
 	FAdjArray adjTmp;
@@ -897,15 +906,15 @@ bool AStationManager::Load() {
 	if (!GameMode) {
 		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	}
-	SaveManagerRef = GameMode->GetSaveManager();
+	if (!SaveManagerRef) {
+		SaveManagerRef = GameMode->GetSaveManager();
+	}
+	if (!TimerRef) {
+		TimerRef = GameMode->GetTimer();
+	}
 	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
 	
 	if (!IsValid(tmp)) {
-		InitData = GameMode->GetInitData();
-
-		for (auto& i : InitData) {
-			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
-		}
 		return false;
 	}
 
