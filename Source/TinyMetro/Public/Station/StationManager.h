@@ -9,11 +9,14 @@
 #include "Station.h"
 #include "../Policy/Policy.h"
 #include "../PlayerState/TinyMetroPlayerState.h"
+#include "../Timer/Timestamp.h"
 #include "StationInfo.h"
 #include "StationSpawnData.h"
 #include "PathQueue.h"
 #include "AdjList.h"
 #include "StationManager.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStationSpawnTask);
 
 USTRUCT(BlueprintType)
 struct TINYMETRO_API FAdjArray {
@@ -67,7 +70,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id = -1);
+	void SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id = -1, FTimestamp Timestamp = FTimestamp());
 	UFUNCTION(BlueprintCallable)
 	StationType GetRandomStationType(); 
 	UFUNCTION(BlueprintCallable)
@@ -245,6 +248,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	APolicy* PolicyRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
@@ -282,9 +287,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStationInfoWidget* StationInfoWidget;
 
-	// New station alarm widget
+	// New station alarm
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStationSpawnBorderWidget* StationSpawnWidget;
+	UPROPERTY(BlueprintAssignable)
+	FStationSpawnTask StationSpawnTask;
 
 	// Passenger statistics
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger Statistics")

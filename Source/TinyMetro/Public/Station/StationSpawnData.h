@@ -24,4 +24,6 @@ public:
 	StationType Type;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 StationId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FTimestamp Timestamp;
 };
