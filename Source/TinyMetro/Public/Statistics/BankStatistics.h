@@ -9,9 +9,17 @@
 /**
  * 
  */
-UCLASS()
-class TINYMETRO_API UBankStatistics : public UObject
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FBankStatistics
 {
-	GENERATED_BODY()
-	
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalUsingLoanCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalRepayMoney = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalLoanMoney = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalRepayInterestMoney = 0;
 };

@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DefaultStatistics.h"
+#include "LaneStatistics.h"
+#include "ShopStatistics.h"
+#include "BankStatistics.h"
 #include "StatisticsManager.generated.h"
 
 UCLASS()
@@ -23,4 +27,34 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Daily, Weekly task
+	UFUNCTION()
+	void DailyTask();
+	UFUNCTION()
+	void WeeklyTask();
+
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
+protected:
+	// Other actors reference
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
+	class ATimer* TimerRef = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
+	class ATinyMetroGameModeBase* GameModeRef = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
+	class ATMSaveManager* SaveManagerRef = nullptr;
+
+	// Statistics structs
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
+	FDefaultStatistics DefaultStatistics;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
+	FLaneStatistics LaneStatistics;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
+	FShopStatistics ShopStatistics;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
+	FBankStatistics BankStatistics;
 };

@@ -4,14 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "LaneSeveralStatistics.h"
 #include "LaneStatistics.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class TINYMETRO_API ULaneStatistics : public UObject
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FLaneStatistics
 {
-	GENERATED_BODY()
-	
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalLaneCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalModifyAndDeleteCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<int, FLaneSeveralStatistics> Lanes;
 };
