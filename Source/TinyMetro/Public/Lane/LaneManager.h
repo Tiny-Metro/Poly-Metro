@@ -103,4 +103,11 @@ public:
 	void LaneMaterialDeferred();
 	UFUNCTION()
 	TArray<UMaterial*> GetLaneMaterial() const;
+
+
+	UFUNCTION()
+	void Save();
+
+	UFUNCTION()
+	void Load();
 };

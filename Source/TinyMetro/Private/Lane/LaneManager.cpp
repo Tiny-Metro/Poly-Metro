@@ -200,3 +200,11 @@ void ALaneManager::LaneMaterialDeferred() {
 TArray<UMaterial*> ALaneManager::GetLaneMaterial() const {
 	return LaneMaterial;
 }
+
+void ALaneManager::Save()
+{
+}
+
+void ALaneManager::Load()
+{
+}
