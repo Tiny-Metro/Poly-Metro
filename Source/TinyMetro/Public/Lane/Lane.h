@@ -360,4 +360,5 @@ private:
 	TArray<FLanePoint> GetLanePath(AStation* StartStation, AStation* EndStation);
 	void SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* Spline);
 	void SetSplineMeshComponent(USplineComponent* Spline, FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
+	FVector LineIntersection(FVector A, FVector B, FVector C, FVector D);
 };
