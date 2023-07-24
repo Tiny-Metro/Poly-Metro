@@ -50,6 +50,8 @@ public:
 	class ABridgeTunnelManager* GetBridgeTunnelManager() const;
 	UFUNCTION(BlueprintCallable)
 	class ATinyMetroEventManager* GetEventManager() const;
+	UFUNCTION(BlueprintCallable)
+	class AStatisticsManager* GetStatisticsManager() const;
 
 protected:
 	UPROPERTY(Config)
@@ -84,5 +86,7 @@ protected:
 	APlayerController* PlayerController;
 	UPROPERTY()
 	class ATinyMetroEventManager* EventManager;
+	UPROPERTY()
+	class AStatisticsManager* StatisticsManager;
 
 };

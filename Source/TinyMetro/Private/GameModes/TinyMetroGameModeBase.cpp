@@ -9,6 +9,7 @@
 #include "Lane/LaneManager.h"
 #include "Policy/Policy.h"
 #include "Shop/Shop.h"
+#include "Statistics/StatisticsManager.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Lane/BridgeTunnel/BridgeTunnelManager.h"
 #include "Event/TinyMetroEventManager.h"
@@ -63,6 +64,7 @@ TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetPassengerMaterialPath() const
 
 void ATinyMetroGameModeBase::StartPlay() {
     SaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
+    StatisticsManager = GetWorld()->SpawnActor<AStatisticsManager>();
     StationManager = GetWorld()->SpawnActor<AStationManager>();
     StationManager->Load();
     LaneManager = GetWorld()->SpawnActor<ALaneManager>();
@@ -151,4 +153,8 @@ ABridgeTunnelManager* ATinyMetroGameModeBase::GetBridgeTunnelManager() const {
 
 ATinyMetroEventManager* ATinyMetroGameModeBase::GetEventManager() const {
     return EventManager;
+}
+
+AStatisticsManager* ATinyMetroGameModeBase::GetStatisticsManager() const {
+    return StatisticsManager;
 }
