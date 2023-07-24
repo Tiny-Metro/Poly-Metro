@@ -1836,12 +1836,32 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 				StartTangent = EndTangent;
 				if (LaneArray[i - 1].LanePosition != 0) {
 					FVector LineDirection = (EndPos - StartPos).GetSafeNormal();
+					FVector LineDirection0 = (Spline->GetLocationAtSplinePoint(i+1, ESplineCoordinateSpace::Local) - EndPos).GetSafeNormal();
+					LineDirection0 += LineDirection;
+					LineDirection0 = LineDirection0.GetSafeNormal();
+					
 
 					// Calculate the perpendicular vector to the line segment
 					FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+					FVector PerpendicularVector0 = FVector::CrossProduct(LineDirection0, FVector::UpVector);
 
 					// Normalize the perpendicular vector and move the mesh positions along it
 					PerpendicularVector.Normalize();
+					PerpendicularVector0.Normalize();
+					if (PerpendicularVector != PerpendicularVector0) {
+						float AngleCosine = FVector::DotProduct(PerpendicularVector, PerpendicularVector0);
+
+						// Check if the angle is close to zero (i.e., the vectors are almost parallel)
+						const float AngleThreshold = 0.001f;
+						if (FMath::Abs(AngleCosine) > AngleThreshold)
+						{
+							// Calculate the scaling factor using (1 / cos(angle))
+							float ScalingFactor = 1.0f / AngleCosine;
+
+							// Apply the scaling to PerpendicularVector0
+							PerpendicularVector0 *= ScalingFactor;
+						}
+					}
 
 					float off;
 					if (LaneArray[i - 1].LanePosition % 2 == 0) {
@@ -1852,7 +1872,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 					}
 					off *= 100;
 					StartPos += PerpendicularVector * off;// FVector(100, 0, 0);
-					EndPos += PerpendicularVector * off; //FVector(100, 0, 0);
+					EndPos += PerpendicularVector0 * off; //FVector(100, 0, 0);
 				}
 
 				//Set Spline Mesh Component (mesh)
@@ -1889,12 +1909,31 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 				StartTangent = EndTangent;
 				if (LaneArray[i].LanePosition != 0) {
 					FVector LineDirection = (EndPos - StartPos).GetSafeNormal();
+					FVector LineDirection0 = (StartPos - Spline->GetLocationAtSplinePoint(i - 1, ESplineCoordinateSpace::Local)).GetSafeNormal();
+					LineDirection0 += LineDirection;
+					LineDirection0 = LineDirection0.GetSafeNormal();
 
 					// Calculate the perpendicular vector to the line segment
 					FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+					FVector PerpendicularVector0 = FVector::CrossProduct(LineDirection0, FVector::UpVector);
 
 					// Normalize the perpendicular vector and move the mesh positions along it
 					PerpendicularVector.Normalize();
+					PerpendicularVector0.Normalize();
+					if (PerpendicularVector != PerpendicularVector0) {
+						float AngleCosine = FVector::DotProduct(PerpendicularVector, PerpendicularVector0);
+
+						// Check if the angle is close to zero (i.e., the vectors are almost parallel)
+						const float AngleThreshold = 0.001f;
+						if (FMath::Abs(AngleCosine) > AngleThreshold)
+						{
+							// Calculate the scaling factor using (1 / cos(angle))
+							float ScalingFactor = 1.0f / AngleCosine;
+
+							// Apply the scaling to PerpendicularVector0
+							PerpendicularVector0 *= ScalingFactor;
+						}
+					}
 					float off;
 					if (LaneArray[i ].LanePosition % 2 == 0) {
 						off = LaneArray[i].LanePosition / 2 ;
@@ -1904,7 +1943,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 
 					}
 					off *= 100;
-					StartPos += PerpendicularVector * off;// FVector(100, 0, 0);
+					StartPos += PerpendicularVector0 * off;// FVector(100, 0, 0);
 					EndPos += PerpendicularVector * off; //FVector(100, 0, 0);
 				}
 				if (LaneArray[i].IsBendingPoint) {
