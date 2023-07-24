@@ -1621,9 +1621,6 @@ void ALane::ExtendEnd(AStation* NewStation, USplineComponent* Spline) {
 
 	int32 NumSplinePoints = Spline->GetNumberOfSplinePoints();
 
-//	EndPos, EndTangent
-	/*
-	*/
 
 	SetMeshByIndex(legacyNum, NumSplinePoints -1, Spline);
 
@@ -1723,7 +1720,6 @@ TArray<FLanePoint> ALane::GetLanePath(AStation* StartStation, AStation* EndStati
 }
 
 void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* Spline) {
-	
 	if (!Spline)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
@@ -1744,17 +1740,13 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 	float ClampedLength;
 
 	for (int32 i = StartIndex; i <= LastIndex; i++) {
-		if (i == StartIndex) {
+		if (i == 0) {
 			/* --- Front Mesh Only --- */
 
 			// Set Start/End Pos/Tangent
 			StartPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
 
-			if (LaneArray[i].LanePosition != 0) {
-				StartPos += FVector(100, 0, 0);
-				EndPos += FVector(100, 0, 0);
-			}
 
 			StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			Length = StartTangent.Size();
@@ -1762,6 +1754,27 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 			StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 			EndTangent = StartTangent;
 
+			if (LaneArray[i].LanePosition != 0) {
+				FVector LineDirection = (EndPos - StartPos).GetSafeNormal();
+
+				// Calculate the perpendicular vector to the line segment
+				FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+
+				// Normalize the perpendicular vector and move the mesh positions along it
+				PerpendicularVector.Normalize();
+				float off;
+				if (LaneArray[i].LanePosition % 2 == 0) {
+					off = LaneArray[i ].LanePosition / 2;
+				}
+				else {
+					off = ((LaneArray[i ].LanePosition+1) / 2) * -1;
+
+				}
+				off *= 100;
+				StartPos += PerpendicularVector * off;// FVector(100, 0, 0);
+				EndPos += PerpendicularVector * off; //FVector(100, 0, 0);
+			}
+
 			//Add&Set Spline Mesh Component (mesh)
 			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 			SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
@@ -1770,51 +1783,136 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 			LaneArray[i].MeshArray.Add(SplineMeshComponent);
 
 		}
-		else if(i==LastIndex)
+		else if (i == LastIndex)
 		{
 			/* --- Back Mesh Only --- */
 
-// Set Start/End Pos/Tangent
-			StartPos = EndPos;
-			StartTangent = EndTangent;
-			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-			if (LaneArray[i].LanePosition != 0) {
-				EndPos += FVector(100, 0, 0);
-			}
-
-			//Add&Set Spline Mesh Component (mesh)
-			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
-			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			LaneArray[i].MeshArray.Add(SplineMeshComponent);
-		}
-		else 
-		{
-			/* --- Back Mesh --- */
-
 			// Set Start/End Pos/Tangent
-			StartPos = EndPos;
+			StartPos = (Spline->GetLocationAtSplinePoint(i - 1, ESplineCoordinateSpace::Local) + Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local)) / 2.0f;
 			EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+
 			StartTangent = EndTangent;
-			if (LaneArray[i].LanePosition != 0) {
-				EndPos += FVector(100, 0, 0);
+			if (LaneArray[i - 1].LanePosition != 0) {
+				FVector LineDirection = (EndPos - StartPos).GetSafeNormal();
+
+				// Calculate the perpendicular vector to the line segment
+				FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+
+				// Normalize the perpendicular vector and move the mesh positions along it
+				PerpendicularVector.Normalize();
+				float off;
+				if (LaneArray[i - 1].LanePosition % 2 == 0) {
+					off = LaneArray[i - 1].LanePosition / 2 ;
+				}
+				else {
+					off = ((LaneArray[i - 1].LanePosition+1) / 2 ) * -1;
+
+				}
+				off *= 100;
+				StartPos += PerpendicularVector * off;// FVector(100, 0, 0);
+				EndPos += PerpendicularVector * off; //FVector(100, 0, 0);			}
 			}
+				//Add&Set Spline Mesh Component (mesh)
+				USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+				SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+				LaneArray[i].MeshArray.Add(SplineMeshComponent);
+			}
+		else
+			{
+				/* --- Back Mesh --- */
 
-
-			//Set Spline Mesh Component (mesh)
-			USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
-			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-			LaneArray[i].MeshArray.Add(SplineMeshComponent);
-
-			/* --- Middle Mesh (if there is any) --- */
-			if (LaneArray[i].IsBendingPoint) {
 				// Set Start/End Pos/Tangent
-				StartPos = EndPos;
-				EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+				StartPos = (Spline->GetLocationAtSplinePoint(i - 1, ESplineCoordinateSpace::Local) + Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local)) / 2.0f;
+				EndPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+
+				StartTangent = Spline->GetTangentAtSplinePoint(i-1, ESplineCoordinateSpace::Local);
+				Length = StartTangent.Size();
+				ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
+				StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+				EndTangent = StartTangent;
+
+				StartTangent = EndTangent;
+				if (LaneArray[i - 1].LanePosition != 0) {
+					FVector LineDirection = (EndPos - StartPos).GetSafeNormal();
+
+					// Calculate the perpendicular vector to the line segment
+					FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+
+					// Normalize the perpendicular vector and move the mesh positions along it
+					PerpendicularVector.Normalize();
+
+					float off;
+					if (LaneArray[i - 1].LanePosition % 2 == 0) {
+						off = LaneArray[i - 1].LanePosition / 2;
+					}
+					else {
+						off = ( (LaneArray[i - 1].LanePosition +1) / 2) * -1;
+					}
+					off *= 100;
+					StartPos += PerpendicularVector * off;// FVector(100, 0, 0);
+					EndPos += PerpendicularVector * off; //FVector(100, 0, 0);
+				}
+
+				//Set Spline Mesh Component (mesh)
+				USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+				if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+				else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
+				SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+				SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+				LaneArray[i].MeshArray.Add(SplineMeshComponent);
+
+				/* --- Middle Mesh (if there is any) --- */
+				if (LaneArray[i].IsBendingPoint) {
+					// Set Start/End Pos/Tangent
+					StartPos = EndPos;
+					EndTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+
+					//Set Spline Mesh Component (mesh)
+					SplineMeshComponent = NewObject<USplineMeshComponent>(this);
+					if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+					else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
+					SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+					SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
+
+					LaneArray[i].MeshArray.Add(SplineMeshComponent);
+				}
+
+				/* --- Front Mesh --- */
+
+				// Set Start/End Pos/Tangent
+				StartPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
+				EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
+
+
+				StartTangent = EndTangent;
+				if (LaneArray[i].LanePosition != 0) {
+					FVector LineDirection = (EndPos - StartPos).GetSafeNormal();
+
+					// Calculate the perpendicular vector to the line segment
+					FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+
+					// Normalize the perpendicular vector and move the mesh positions along it
+					PerpendicularVector.Normalize();
+					float off;
+					if (LaneArray[i ].LanePosition % 2 == 0) {
+						off = LaneArray[i].LanePosition / 2 ;
+					}
+					else {
+						off = ((LaneArray[i].LanePosition +1) / 2) * -1;
+
+					}
+					off *= 100;
+					StartPos += PerpendicularVector * off;// FVector(100, 0, 0);
+					EndPos += PerpendicularVector * off; //FVector(100, 0, 0);
+				}
+				if (LaneArray[i].IsBendingPoint) {
+					StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
+					Length = EndTangent.Size();
+					ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
+					StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
+				}
 
 				//Set Spline Mesh Component (mesh)
 				SplineMeshComponent = NewObject<USplineMeshComponent>(this);
@@ -1826,33 +1924,6 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 				LaneArray[i].MeshArray.Add(SplineMeshComponent);
 			}
 
-			/* --- Front Mesh --- */
-
-			// Set Start/End Pos/Tangent
-			StartPos = EndPos;
-			StartTangent = EndTangent;
-			if (LaneArray[i].IsBendingPoint) {
-				StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
-				Length = EndTangent.Size();
-				ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
-				StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
-			}
-			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
-			EndTangent = StartTangent;
-			if (LaneArray[i].LanePosition != 0) {
-				EndPos += FVector(100, 0, 0);
-			}
-
-			//Set Spline Mesh Component (mesh)
-			SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-			if (LaneArray[i].IsThrough) SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
-			else { SetSplineMeshComponent(SplineMeshComponent, LaneMesh); }
-			SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
-			SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
-
-			LaneArray[i].MeshArray.Add(SplineMeshComponent);
-		}
-
-	}
+}
 
 }
