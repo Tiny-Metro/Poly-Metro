@@ -21,6 +21,8 @@ public:
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
+	UFUNCTION(BlueprintCallable)
+	virtual TMap<int32, FColor> GetLaneColor() const;
 	virtual TArray<FSoftObjectPath> GetTrainMaterialPath() const;
 	virtual TArray<FSoftObjectPath> GetLaneMaterialPath() const;
 	virtual TArray<FSoftObjectPath> GetPassengerMaterialPath() const;

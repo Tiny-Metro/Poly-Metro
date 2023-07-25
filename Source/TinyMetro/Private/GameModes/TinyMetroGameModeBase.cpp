@@ -50,6 +50,10 @@ int32 ATinyMetroGameModeBase::GetDaytime() const {
     return Daytime;
 }
 
+TMap<int32, FColor> ATinyMetroGameModeBase::GetLaneColor() const {
+    return TMap<int32, FColor>();
+}
+
 TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetTrainMaterialPath() const {
     return TrainMaterialPath;
 }
