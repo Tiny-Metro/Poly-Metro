@@ -1244,134 +1244,68 @@ void ALane::SetLaneLocation() {
 	LaneLocation.Empty(); 
 	float Offset = 100;
 
-	for (int i = 0; i < LaneArray.Num(); i++) 
+	for (int i = 0; i < LaneArray.Num(); i++)
 	{
-		FLanePoint Point = LaneArray[i];
+	FLanePoint CurrentPoint = LaneArray[i];
 
-		FVector LineDirection;
-//		FVector PerpendicularVector;
+	FVector PointVector = PointToLocation(CurrentPoint.Coordination);
+	FVector LineDirection;
 
-		if(i==0)
+	float off = CalculateOffset(CurrentPoint.LanePosition);
+	FVector VectorLocation = PointVector;
+
+		if (i == 0)
 		{
-			float off;
-			if (Point.LanePosition % 2 == 0)
-			{
-				off = Point.LanePosition / 2;
-			}
-			else
-			{
-				off = ((Point.LanePosition + 1) / 2) * -1;
-			}
-
-			FLanePoint FrontPoint = LaneArray[i+1];
+			FLanePoint FrontPoint = LaneArray[i + 1];
 			FVector FrontVector = PointToLocation(FrontPoint.Coordination);
-			FVector PointVector = PointToLocation(Point.Coordination);
-			LineDirection = (FrontVector - PointVector).GetSafeNormal();
-			FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
-			PerpendicularVector.Normalize();
-
-			FVector VectorLocation = PointVector;
-			VectorLocation += PerpendicularVector * Offset * off;
-
-			LaneLocation.Add(VectorLocation);
-
+			LineDirection = CalculateLineDirection(FrontVector, PointVector);
+			VectorLocation += CalculatePerpendicular(LineDirection, Offset, off);
 		}
-		else if (i == LaneArray.Num() -1)
+		else if (i == LaneArray.Num() - 1)
 		{
-			FLanePoint BackPoint = LaneArray[i-1];
-			float off;
-			if (BackPoint.LanePosition % 2 == 0)
-			{
-				off = BackPoint.LanePosition / 2;
-			}
-			else
-			{
-				off = ((BackPoint.LanePosition + 1) / 2) * -1;
-			}
-
+			FLanePoint BackPoint = LaneArray[i - 1];
 			FVector BackVector = PointToLocation(BackPoint.Coordination);
-			FVector PointVector = PointToLocation(Point.Coordination);
-			LineDirection = (PointVector - BackVector).GetSafeNormal();
-			FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
-			PerpendicularVector.Normalize();
-
-			FVector VectorLocation = PointVector;
-			VectorLocation += PerpendicularVector * Offset * off;
-
-			LaneLocation.Add(VectorLocation);
+			LineDirection = CalculateLineDirection(PointVector, BackVector);
+			off = CalculateOffset(BackPoint.LanePosition);
+			VectorLocation += CalculatePerpendicular(LineDirection, Offset, off);
 		}
 		else
 		{
-			if(Point.IsBendingPoint)
+			if (CurrentPoint.IsBendingPoint)
 			{
 				FLanePoint BackPoint = LaneArray[i - 1];
 				FLanePoint FrontPoint = LaneArray[i + 1];
 
 				FVector BackVector = PointToLocation(BackPoint.Coordination);
-				FVector PointVector = PointToLocation(Point.Coordination);
 				FVector FrontVector = PointToLocation(FrontPoint.Coordination);
 
-				FVector BackDirection = (PointVector - BackVector).GetSafeNormal();
-				FVector FrontDirection = (FrontVector - PointVector).GetSafeNormal();
+				FVector BackDirection = CalculateLineDirection(PointVector, BackVector);
+				FVector FrontDirection = CalculateLineDirection(FrontVector, PointVector);
 
 				FVector BackPerpendicularVector = FVector::CrossProduct(BackDirection, FVector::UpVector);
 				BackPerpendicularVector.Normalize();
 				FVector FrontPerpendicularVector = FVector::CrossProduct(FrontDirection, FVector::UpVector);
 				FrontPerpendicularVector.Normalize();
+				
+				int32 BackOff = CalculateOffset(BackPoint.LanePosition);
+				int32 FrontOff = CalculateOffset(CurrentPoint.LanePosition);
 
-				int32 BackOff;
-				if (BackPoint.LanePosition % 2 == 0)
-				{
-					BackOff = BackPoint.LanePosition / 2;
-				}
-				else
-				{
-					BackOff = ((BackPoint.LanePosition + 1) / 2) * -1;
-				}
+				FVector BackVectorLocation = PointVector + BackPerpendicularVector * Offset * BackOff;
+				FVector FrontVectorLocation = PointVector + FrontPerpendicularVector * Offset * FrontOff;
 
-				int32 FrontOff;
-				if (Point.LanePosition % 2 == 0)
-				{
-					FrontOff = Point.LanePosition / 2;
-				}
-				else
-				{
-					FrontOff = ((Point.LanePosition + 1) / 2) * -1;
-				}
-
-				FVector BackVectorLocation = PointVector;
-				BackVectorLocation += BackPerpendicularVector * Offset * BackOff;
-				FVector FrontVectorLocation = PointVector;
-				FrontVectorLocation += FrontPerpendicularVector * Offset * FrontOff;
-
-				LaneLocation.Add(LineIntersection( BackVector+ BackPerpendicularVector * Offset * BackOff, BackVectorLocation, FrontVectorLocation, FrontVector + FrontPerpendicularVector * Offset * FrontOff));
+				VectorLocation = (LineIntersection(BackVector + BackPerpendicularVector * Offset * BackOff, BackVectorLocation, FrontVectorLocation, FrontVector + FrontPerpendicularVector * Offset * FrontOff));
 			}
 			else
 			{
-				float off;
-				if (Point.LanePosition % 2 == 0)
-				{
-					off = Point.LanePosition / 2;
-				}
-				else
-				{
-					off = ((Point.LanePosition + 1) / 2) * -1;
-				}
-
 				FLanePoint FrontPoint = LaneArray[i + 1];
 				FVector FrontVector = PointToLocation(FrontPoint.Coordination);
-				FVector PointVector = PointToLocation(Point.Coordination);
-				LineDirection = (FrontVector - PointVector).GetSafeNormal();
-				FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
-				PerpendicularVector.Normalize();
-
-				FVector VectorLocation = PointVector;
-				VectorLocation += PerpendicularVector * Offset * off;
-
-				LaneLocation.Add(VectorLocation);
+				LineDirection = CalculateLineDirection(FrontVector, PointVector);
+				VectorLocation += CalculatePerpendicular(LineDirection, Offset, off);
 			}
 		}
+		LaneLocation.Add(VectorLocation);
 	}
+
 }
 
 FVector ALane::LineIntersection(FVector A, FVector B, FVector C, FVector D)
@@ -1397,6 +1331,24 @@ FVector ALane::LineIntersection(FVector A, FVector B, FVector C, FVector D)
 		float y = (a1 * c2 - a2 * c1) / determinant;
 		return FVector(x, y, B.Z); // z-coordinate is zero as this is in 2D
 	}
+}
+
+
+float ALane::CalculateOffset(int32 LanePosition)
+{
+	return (LanePosition % 2 == 0) ? LanePosition / 2 : ((LanePosition + 1) / 2) * -1;
+}
+
+FVector ALane::CalculateLineDirection(FVector Vector1, FVector Vector2)
+{
+	return (Vector1 - Vector2).GetSafeNormal();
+}
+
+FVector ALane::CalculatePerpendicular(FVector LineDirection, float Offset, float off)
+{
+	FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
+	PerpendicularVector.Normalize();
+	return PerpendicularVector * Offset * off;
 }
 
 
@@ -1876,6 +1828,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
 		return;
 	}
+
 	// Destroy Exisiting One
 	for (int32 i = StartIndex; i <= LastIndex; i++)
 	{
@@ -1897,7 +1850,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 			// Set Start/End Pos/Tangent
 			StartPos = Spline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			EndPos = ((StartPos + Spline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
-
+			 
 
 			StartTangent = Spline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 			Length = StartTangent.Size();
@@ -1968,7 +1921,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* 
 				SetSplineMeshComponent(Spline, StartPos, StartTangent, EndPos, EndTangent, i);
 			}
 
-}
+	}
 
 }
 
