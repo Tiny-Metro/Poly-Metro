@@ -17,8 +17,7 @@ class TINYMETRO_API ULaneManagerSaveGame : public USaveGame
 	
 public:
 	UPROPERTY()
-	TArray<FLanePoint> Lanes;
-
+	TArray<int32> Lanes;
 
 	UPROPERTY()
 	bool CanAssignBridge;

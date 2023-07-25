@@ -37,6 +37,9 @@ public:
 	TArray<FLanePoint> LaneArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -53,6 +56,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ABridgeTunnelManager* BTMangerREF;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
 
 
 protected:
@@ -349,4 +355,12 @@ private:
 	TArray<TArray<FIntPoint>> HillArea;
 
 	bool IsBuildble();
+
+
+public: //Save
+	UFUNCTION()
+	void Save();
+
+	UFUNCTION()
+	bool Load();
 };

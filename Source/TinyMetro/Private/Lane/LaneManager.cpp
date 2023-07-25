@@ -5,6 +5,8 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include <Engine/AssetManager.h>
 #include <Kismet/GameplayStatics.h>
+#include "Lane/LaneManagerSaveGame.h"
+#include "SaveSystem/TMSaveManager.h"
 
 
 // Sets default values
@@ -20,8 +22,13 @@ void ALaneManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	SaveManagerRef = GameMode->GetSaveManager();
+	
 	InitLaneMaterial();
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ALaneManager::Save);
 }
 
 // Called every frame
@@ -77,14 +84,8 @@ void ALaneManager::RemoveDestroyedLane(int LaneNum)
 	Lanes.Remove(LaneNum);
 }
 
-void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
-
-	if (NextLaneNums.IsEmpty()) {
-
-		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
-		return;
-	}
-
+ALane* ALaneManager::SpawnLane()
+{
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
 
@@ -108,9 +109,21 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	FTransform SpawnTransform;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
-
 	
+	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
+	
+	return tmpLane;
+}
+
+void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
+
+	if (NextLaneNums.IsEmpty()) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
+		return;
+	}
+
+	ALane* tmpLane = SpawnLane();
 
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
 	tmpLane->SetLaneId(NextLaneNums[0]);
@@ -203,8 +216,58 @@ TArray<UMaterial*> ALaneManager::GetLaneMaterial() const {
 
 void ALaneManager::Save()
 {
+	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(ULaneManagerSaveGame::StaticClass()));
+
+	tmp->CanAssignBridge = CanAssignBridge;
+	tmp->CanAssignTunnel = CanAssignTunnel;
+	tmp->NextLaneNums = NextLaneNums;
+
+	for (auto& i : Lanes)
+	{
+		tmp->Lanes.Add(i.Key);
+	}
+
+	SaveManagerRef->Save(tmp, SaveActorType::LaneManager);
 }
 
-void ALaneManager::Load()
+bool ALaneManager::Load()
 {
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
+	if (!SaveManagerRef) {
+		SaveManagerRef = GameMode->GetSaveManager();
+	}
+
+	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
+
+	if (!IsValid(tmp)) {
+		return false;
+	}
+
+	CanAssignBridge = tmp->CanAssignBridge;
+	CanAssignTunnel = tmp->CanAssignTunnel;
+	NextLaneNums = tmp->NextLaneNums;
+
+	for (auto& i : tmp->Lanes)
+	{
+		ALane* tmp = LoadLane(i);
+
+		Lanes.Add(i, tmp);
+	}
+
+	return true;
+
+}
+
+ALane* ALaneManager::LoadLane(int32 LaneId)
+{
+
+	ALane* tmpLane = SpawnLane();
+
+	tmpLane->SetLaneId(LaneId);
+
+
+
+	return tmpLane;
 }

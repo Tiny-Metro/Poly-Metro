@@ -41,6 +41,10 @@ void ALane::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	SaveManagerRef = GameMode->GetSaveManager();
+
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	
 }
@@ -1222,6 +1226,29 @@ bool ALane::IsBuildble()
 	{
 		return false;
 	}
+
+	return true;
+}
+
+void ALane::Save()
+{
+
+
+}
+
+bool ALane::Load()
+{
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
+	if (!SaveManagerRef) {
+		SaveManagerRef = GameMode->GetSaveManager();
+	}
+
+	//Load Lane Data
+
+	//Spawn Mesh
+
 
 	return true;
 }
