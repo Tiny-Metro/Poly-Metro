@@ -39,15 +39,6 @@ public:
 	UFUNCTION()
 	void Load();
 
-protected:
-	// Other actors reference
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
-	class ATimer* TimerRef = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
-	class ATinyMetroGameModeBase* GameModeRef = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
-	class ATMSaveManager* SaveManagerRef = nullptr;
-
 	// Statistics structs
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
 	FDefaultStatistics DefaultStatistics;
@@ -57,4 +48,14 @@ protected:
 	FShopStatistics ShopStatistics;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
 	FBankStatistics BankStatistics;
+
+protected:
+	// Other actors reference
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
+	class ATimer* TimerRef = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
+	class ATinyMetroGameModeBase* GameModeRef = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
+	class ATMSaveManager* SaveManagerRef = nullptr;
+
 };
