@@ -337,7 +337,6 @@ private:
 		void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
 
 private:
-	bool IsPointsValid();
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
 
 private:
@@ -365,4 +364,7 @@ private:
 	float CalculateOffset(int32 LanePosition);
 	FVector CalculateLineDirection(FVector Vector1, FVector Vector2);
 	FVector CalculatePerpendicular(FVector LineDirection, float Offset, float off);
+
+	void UpdateLocationAndSpline(USplineComponent* Spline);
+	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
 };
