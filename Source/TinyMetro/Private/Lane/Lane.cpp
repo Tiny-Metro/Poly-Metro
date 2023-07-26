@@ -1438,6 +1438,25 @@ void ALane::SetMeshMaterial() {
 	RemoveMeshMaterial = RemoveLaneMaterial[LaneId -1];
 }
 
+void ALane::SetHandleMaterial()
+{
+	StartHandle->SetMaterial(0, MeshMaterial);
+	EndHandle->SetMaterial(0, MeshMaterial);
+}
+
+void ALane::SetHandleTransform() 
+{
+	FVector StartLocation = PointToLocation(LaneArray[0].Coordination);
+	FRotator StartRotator = (StartLocation - PointToLocation(LaneArray[1].Coordination)).Rotation();
+	StartHandle->SetWorldLocation(StartLocation);
+	StartHandle->SetWorldRotation(StartRotator);
+
+	FVector EndLocation = PointToLocation(LaneArray.Last(0).Coordination);
+	FRotator EndRotator = (EndLocation - PointToLocation(LaneArray.Last(1).Coordination)).Rotation();
+	EndHandle->SetWorldLocation(EndLocation);
+	EndHandle->SetWorldRotation(EndRotator);
+}
+
 void ALane::ChangeRemoveMaterialAtIndex(int32 Index)
 {
 	for (USplineMeshComponent* mesh : LaneArray[Index].MeshArray) {

@@ -311,30 +311,43 @@ public:
 private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
 
-	public:
-		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
-		UStaticMesh* LaneMesh;
+public:
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	UStaticMesh* LaneMesh;
 
-		UPROPERTY(BluePrintReadWrite, EditAnyWhere)
-		UStaticMesh* ThroughMesh;
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	UStaticMesh* ThroughMesh;
 
-		UFUNCTION(BlueprintCallable)
-		void SetMesh(UStaticMesh* Mesh, UStaticMesh* Through);
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	UStaticMeshComponent* StartHandle;
 
-		UFUNCTION(BlueprintCallable)
-		void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	UStaticMeshComponent* EndHandle;
 
-		UFUNCTION(BlueprintCallable)
-		void ClearSplineMeshAt(int32 Index);
+	UFUNCTION(BlueprintCallable)
+	void SetHandleMaterial();
+	
+	UFUNCTION(BlueprintCallable)
+	void SetHandleTransform();
 
-		UFUNCTION(BlueprintCallable)
-		void RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline);
 
-		UFUNCTION(BlueprintCallable)
-		void ExtendStart(AStation* NewStation, USplineComponent* Spline);
+	UFUNCTION(BlueprintCallable)
+	void SetMesh(UStaticMesh* Mesh, UStaticMesh* Through);
 
-		UFUNCTION(BlueprintCallable)
-		void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
+	UFUNCTION(BlueprintCallable)
+	void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
+
+	UFUNCTION(BlueprintCallable)
+	void ClearSplineMeshAt(int32 Index);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline);
+
+	UFUNCTION(BlueprintCallable)
+	void ExtendStart(AStation* NewStation, USplineComponent* Spline);
+
+	UFUNCTION(BlueprintCallable)
+	void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
 
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
