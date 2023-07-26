@@ -5,6 +5,7 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Timer/Timer.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Statistics/StatisticsManagerSaveGame.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -45,15 +46,42 @@ void AStatisticsManager::DailyTask() {
 }
 
 void AStatisticsManager::WeeklyTask() {
+	// Reset weekly values (Default statistics)
+	DefaultStatistics.WeeklyArrivePassenger = 0;
+	DefaultStatistics.WeeklyIncome = 0;
+	DefaultStatistics.WeeklySpending = 0;
+
+	// Reset weekly values (Lane statistics)
+	for (auto& i : LaneStatistics.Lanes) {
+		i.Value.WeeklyArrivePassenger = 0;
+		i.Value.WeeklyProfit = 0;
+	}
+
 }
 
 void AStatisticsManager::Save() {
+	UStatisticsManagerSaveGame* tmp = Cast<UStatisticsManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UStatisticsManagerSaveGame::StaticClass()));
+	tmp->DefaultStatistics = DefaultStatistics;
+	tmp->LaneStatistics = LaneStatistics;
+	tmp->ShopStatistics = ShopStatistics;
+	tmp->BankStatistics = BankStatistics;
+
+	SaveManagerRef->Save(tmp, SaveActorType::StatisticsManager);
 }
 
 void AStatisticsManager::Load() {
 	// Get outer actors references
 	if (GameModeRef == nullptr) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (SaveManagerRef == nullptr) SaveManagerRef = GameModeRef->GetSaveManager();
+
+	UStatisticsManagerSaveGame* tmp = Cast<UStatisticsManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StatisticsManager));
+
+	if (!IsValid(tmp)) return;
+
+	DefaultStatistics = tmp->DefaultStatistics;
+	LaneStatistics = tmp->LaneStatistics;
+	ShopStatistics = tmp->ShopStatistics;
+	BankStatistics = tmp->BankStatistics;
 
 }
 
