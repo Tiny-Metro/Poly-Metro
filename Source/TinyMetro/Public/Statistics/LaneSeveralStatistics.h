@@ -19,6 +19,10 @@ struct TINYMETRO_API FLaneSeveralStatistics
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 WeeklyArrivePassenger = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalProfit = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 WeeklyProfit = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 UsingBridgeCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 UsingTunnelCount = 0;
@@ -29,7 +33,7 @@ struct TINYMETRO_API FLaneSeveralStatistics
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalModifyAndReduceCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 AverageComplain = 0;
+	float AverageComplain = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 ServiceTrainAndSubtrainCount = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
