@@ -13,11 +13,13 @@
 #include "BridgeTunnel/BridgeTunnelManager.h"
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
+#include "LaneInterface.h"
 #include "Lane.generated.h"
 class ALaneManager;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPopHandleCalled, bool, IsUp);
 
 UCLASS(Blueprintable)
-class TINYMETRO_API ALane : public AActor
+class TINYMETRO_API ALane : public AActor, public ILaneInterface
 {
 	GENERATED_BODY()
 	
@@ -33,6 +35,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	static FOnPopHandleCalled OnPopHandleCalled;
+	UFUNCTION(BlueprintCallable)
+	virtual void PopHandle(bool isUp) override;
+	void OnOtherLanePopHandleCalled(bool isUp);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -329,7 +336,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SetHandleTransform();
-
 
 	UFUNCTION(BlueprintCallable)
 	void SetMesh(UStaticMesh* Mesh, UStaticMesh* Through);

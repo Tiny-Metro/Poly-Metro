@@ -37,7 +37,10 @@ ALane::ALane()
 	for (auto& i : RemoveLanePath) {
 		RemoveLaneMaterial.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
+
+	OnPopHandleCalled.AddDynamic(this, &ALane::OnOtherLanePopHandleCalled);
 }
+
 
 // Called when the game starts or when spawned
 void ALane::BeginPlay()
@@ -72,6 +75,38 @@ void ALane::Tick(float DeltaTime)
 	}
 
 }
+
+FOnPopHandleCalled ALane::OnPopHandleCalled;
+
+void ALane::OnOtherLanePopHandleCalled(bool IsUp)
+{
+	if (IsUp)
+	{
+		PopHandle(false);
+	}
+}
+
+void ALane::PopHandle(bool IsUp)
+{
+	FVector ChangedStartLoc = StartHandle->GetComponentLocation();
+	FVector ChangedEndLoc = EndHandle->GetComponentLocation();
+
+	float TargetZ = PointToLocation(LaneArray[0].Coordination).Z;
+
+	if (IsUp)
+	{
+		TargetZ += 1;
+	}
+	ChangedStartLoc = FVector(ChangedStartLoc.X, ChangedStartLoc.Y, TargetZ);
+	ChangedEndLoc = FVector(ChangedEndLoc.X, ChangedEndLoc.Y, TargetZ);
+
+	StartHandle->SetWorldLocation(ChangedStartLoc);
+	EndHandle->SetWorldLocation(ChangedEndLoc);
+
+	OnPopHandleCalled.Broadcast(IsUp);
+
+}
+
 
 void ALane::SetLaneId(int _LaneId)
 {
