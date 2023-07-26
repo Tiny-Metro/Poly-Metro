@@ -39,6 +39,7 @@ ALane::ALane()
 	}
 
 	OnPopHandleCalled.AddDynamic(this, &ALane::OnOtherLanePopHandleCalled);
+	CurrentlyPoppingLane = false;
 }
 
 
@@ -76,35 +77,59 @@ void ALane::Tick(float DeltaTime)
 
 }
 
+
 FOnPopHandleCalled ALane::OnPopHandleCalled;
 
 void ALane::OnOtherLanePopHandleCalled(bool IsUp)
 {
+		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled    Lane ID = %d"), LaneId);
+	if (CurrentlyPoppingLane) {
+		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled: IGNORED Lane ID = %d"), LaneId);
+		return;  // Ignore if this lane is the one that's currently popping the handle
+	}
+
 	if (IsUp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled: GO down Lane ID = %d"), LaneId);
 		PopHandle(false);
 	}
 }
 
 void ALane::PopHandle(bool IsUp)
 {
+	if (!IsValid(StartHandle) || !IsValid(EndHandle))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PopHandle : NO Valid Handle - Lane ID = %d"), LaneId);
+		return;
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PopHandle : YES Valid Handle - Lane ID = %d"), LaneId);
+	}
+
 	FVector ChangedStartLoc = StartHandle->GetComponentLocation();
 	FVector ChangedEndLoc = EndHandle->GetComponentLocation();
-
-	float TargetZ = PointToLocation(LaneArray[0].Coordination).Z;
-
+	float TargetZ = 1;
 	if (IsUp)
 	{
-		TargetZ += 1;
+		TargetZ = 2;
+		CurrentlyPoppingLane = true;
+		UE_LOG(LogTemp, Warning, TEXT("PopHandle: GO down Lane ID = %d"), LaneId);
+	}
+	else 
+	{
+		CurrentlyPoppingLane = false;
 	}
 	ChangedStartLoc = FVector(ChangedStartLoc.X, ChangedStartLoc.Y, TargetZ);
 	ChangedEndLoc = FVector(ChangedEndLoc.X, ChangedEndLoc.Y, TargetZ);
-
 	StartHandle->SetWorldLocation(ChangedStartLoc);
 	EndHandle->SetWorldLocation(ChangedEndLoc);
 
-	OnPopHandleCalled.Broadcast(IsUp);
-
+	if (IsUp) 
+	{
+		OnPopHandleCalled.Broadcast(IsUp);
+		CurrentlyPoppingLane = false;
+	}
 }
 
 

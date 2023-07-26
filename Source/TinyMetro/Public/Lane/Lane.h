@@ -39,7 +39,10 @@ public:
 	static FOnPopHandleCalled OnPopHandleCalled;
 	UFUNCTION(BlueprintCallable)
 	virtual void PopHandle(bool isUp) override;
+	UFUNCTION()
 	void OnOtherLanePopHandleCalled(bool isUp);
+
+	bool CurrentlyPoppingLane;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
