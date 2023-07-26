@@ -12,5 +12,6 @@
 UENUM(BlueprintType)
 enum class ConnectorType : uint8 {
 	Bridge = 0 UMETA(DisplayName = "Bridge"),
-	Tunnel = 1 UMETA(DisplayName = "Tunnel")
+	Tunnel = 1 UMETA(DisplayName = "Tunnel"),
+	None = 2 UMETA(DisplayName = "None")
 };

@@ -938,23 +938,28 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	TArray<FLanePoint> PreLaneArray;
 	GetLaneArray(NewStationPoint, PreLaneArray);
 
-	// check if tunnel&bridge - and can be used
-	SetWaterHillArea(PreLaneArray);
 
-	if (!IsBuildble()) 
+	// check if tunnel&bridge - and can be used
+//	SetWaterHillArea(PreLaneArray);
+
+	if (!IsBuildble(PreLaneArray))
 	{	
 		Destroy();
 		return;
 	}
 
+	// Get Area that requires Connectors
+	TArray<TArray<FIntPoint>> TunnelArea = GetConnectorArea(PreLaneArray, GridType::Hill);
+	TArray<TArray<FIntPoint>> BridgeArea = GetConnectorArea(PreLaneArray, GridType::Water);
+
 	// if it is possible, bulid it
-	for (int i = 0; i < WaterArea.Num(); i++) 
+	for (int i = 0; i < BridgeArea.Num(); i++) 
 	{		
-		BTMangerREF->BuildConnector(ConnectorType::Bridge, WaterArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i]);
 	}
-	for (int i = 0; i < HillArea.Num(); i++)
+	for (int i = 0; i < TunnelArea.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(ConnectorType::Tunnel, HillArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i]);
 	}
 
 	// Done
@@ -998,66 +1003,92 @@ void ALane::GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<
 
 }
 
-void ALane::SetWaterHillArea(TArray<FLanePoint>& LaneBlock)
+TArray<TArray<FIntPoint>> ALane::GetConnectorArea(TArray<FLanePoint>& LaneBlock, GridType type)
 {
-	TArray<FIntPoint> WaterPoints;
-	TArray<FIntPoint> HillPoints;
+	TArray<TArray<FIntPoint>> TargetArea;
+	TargetArea.Empty();
 
-	TArray<int> WaterIndex;
-	TArray<int> HillIndex;
-
-	for (int i =0; i < LaneBlock.Num(); i++)
+	ConnectorType TargetConnector = GetConnectorType(type);
+	if (TargetConnector == ConnectorType::None)
 	{
-		
+		return TargetArea;
+	}
+
+	TArray<FIntPoint> TargetPoints;
+	TArray<int> TargetIndex;
+
+	for (int i = 0; i < LaneBlock.Num(); i++)
+	{
 		FIntPoint Coord = LaneBlock[i].Coordination;
 
 		FGridCellData GridCellData = GridManagerRef->GetGridCellDataByPoint(Coord.X, Coord.Y);
-
-		switch (GridCellData.GridType)
+		GridType GridCellType = GridCellData.GridType;
+		if (GridCellType == type)
 		{
-		case GridType::Ground:
-			break;
-		case GridType::Water:
-			if (WaterIndex.IsEmpty())
+			if (TargetIndex.IsEmpty())
 			{
-				WaterPoints.Add(LaneBlock[i - 1].Coordination);
+				TargetPoints.Add(LaneBlock[i - 1].Coordination);
 			}
-			if (WaterIndex.Num() >= 1 && WaterIndex.Last() + 1 != i)
+			if (TargetIndex.Num() >= 1 && TargetIndex.Last() + 1 != i)
 			{
-				WaterPoints.Add(LaneBlock[WaterIndex.Last() + 1].Coordination);
-				WaterPoints.Add(LaneBlock[i - 1].Coordination);
+				TargetPoints.Add(LaneBlock[TargetIndex.Last() + 1].Coordination);
+				TargetPoints.Add(LaneBlock[i - 1].Coordination);
 			}
-			WaterIndex.Add(i);
-			WaterPoints.Add(Coord);
-			break;
-		case GridType::Hill:
-			if (HillIndex.IsEmpty())
-			{
-				HillPoints.Add(LaneBlock[i - 1].Coordination);
-			}
-			if (HillIndex.Num() >= 1 && HillIndex.Last() + 1 != i)
-			{
-				HillPoints.Add(LaneBlock[HillIndex.Last() + 1].Coordination);
-				HillPoints.Add(LaneBlock[i - 1].Coordination);
-			}
-			HillIndex.Add(i);
-			HillPoints.Add(Coord);
-			break;
+			TargetIndex.Add(i);
+			TargetPoints.Add(Coord);
 		}
-
 	}
 
-	if (WaterIndex.Num() > 0)
+	if (TargetIndex.Num() > 0)
 	{
-		WaterPoints.Add(LaneBlock[WaterIndex.Last() + 1].Coordination);
-	}
-	if (HillIndex.Num() > 0)
-	{
-		HillPoints.Add(LaneBlock[HillIndex.Last() + 1].Coordination);
+		TargetPoints.Add(LaneBlock[TargetIndex.Last() + 1].Coordination);
 	}
 
-	SetArea(WaterPoints, WaterArea);
-	SetArea(HillPoints, HillArea);
+
+	SetArea(TargetPoints, TargetArea);
+
+	return TargetArea;
+}
+
+int32 ALane::GetRequiredConnector(TArray<TArray<FIntPoint>>& AreaArray, GridType type)
+{
+
+	ConnectorType TargetConnector = GetConnectorType(type);
+	if (TargetConnector == ConnectorType::None)
+	{
+		return 0;
+	}
+
+	int32 RequiredNum = 0;
+
+
+	for(int i = 0; i < AreaArray.Num(); i++)
+	{
+		bool IsExist = BTMangerREF->IsConnectorExist(TargetConnector, AreaArray[i]);
+		if (!IsExist)
+		{
+			RequiredNum++;
+		}
+	}
+	return RequiredNum;
+}
+
+ConnectorType ALane::GetConnectorType(GridType Type)
+{
+	ConnectorType TargetConnector;
+	switch (Type)
+	{
+	case GridType::Water:
+		TargetConnector = ConnectorType::Bridge;
+		break;
+	case GridType::Hill:
+		TargetConnector = ConnectorType::Tunnel;
+		break;
+	default:
+		TargetConnector = ConnectorType::None;
+		break;
+	}
+	return TargetConnector;
 }
 
 TArray<TArray<FIntPoint>> ALane::GetArea(const TArray<FLanePoint>& LaneBlock, GridType Type) {
@@ -1163,20 +1194,10 @@ void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 }
 void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
-	ConnectorType targetType;
-
-	switch (Type)
+	ConnectorType targetType = GetConnectorType(Type);
+	if (targetType == ConnectorType::None) 
 	{
-	case GridType::Ground:
-		break;
-	case GridType::Water:
-		targetType = ConnectorType::Bridge;
-		break;
-	case GridType::Hill:
-		targetType = ConnectorType::Tunnel;
-		break;
-	default:
-		break;
+		return;
 	}
 
 	for (int i = 0; i < Area.Num(); i++)
@@ -1222,27 +1243,13 @@ void ALane::SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& 
 	AreaArray.Add(Area);
 }
 
-bool ALane::IsBuildble() 
+bool ALane::IsBuildble(TArray<FLanePoint>& LaneBlock)
 {
-	int RequiredBridge = 0;
-	int RequiredTunnel = 0;
+	TArray<TArray<FIntPoint>> TunnelArea = GetConnectorArea(LaneBlock, GridType::Hill);
+	TArray<TArray<FIntPoint>> BridgeArea = GetConnectorArea(LaneBlock, GridType::Water);
 
-	for (int i = 0; i < HillArea.Num(); i++)
-	{
-		bool IsExist = BTMangerREF->IsConnectorExist(ConnectorType::Tunnel, HillArea[i]);
-		if (!IsExist) 
-		{
-			RequiredTunnel++;
-		}
-	}
-	for (int i = 0; i < WaterArea.Num(); i++)
-	{
-		bool IsExist = BTMangerREF->IsConnectorExist(ConnectorType::Bridge, WaterArea[i]);
-		if (!IsExist)
-		{
-			RequiredBridge++;
-		}
-	}
+	int32 RequiredTunnel = GetRequiredConnector(TunnelArea, GridType::Hill);
+	int32 RequiredBridge = GetRequiredConnector(TunnelArea, GridType::Water);
 
 	if (RequiredBridge> TinyMetroPlayerState->GetValidBridgeCount() )
 	{

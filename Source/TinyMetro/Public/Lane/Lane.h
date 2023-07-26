@@ -367,14 +367,13 @@ private:
 
 	TArray<TArray<FIntPoint>> GetArea(const TArray<FLanePoint>& LaneBlock, GridType Type);
 
-	void SetWaterHillArea(TArray<FLanePoint>& LaneBlock);
 	void SetArea(const TArray<FIntPoint>& Points, TArray<TArray<FIntPoint>>& AreaArray);
 
-	TArray<TArray<FIntPoint>> WaterArea;
-	TArray<TArray<FIntPoint>> HillArea;
-
-	bool IsBuildble();
-
+	bool IsBuildble(TArray<FLanePoint>& LaneBlock);
+	TArray<TArray<FIntPoint>> GetConnectorArea(TArray<FLanePoint>& LaneBlock, GridType type);
+	int32 GetRequiredConnector(TArray<TArray<FIntPoint>>& AreaArray, GridType type);
+//Helper Functions
+	ConnectorType GetConnectorType(GridType Type);
 //REFACTORING
 private: 
 	// Sets coord, bend, through,, lane position etc
