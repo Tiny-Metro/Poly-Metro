@@ -1311,8 +1311,76 @@ bool ALane::Load()
 	}
 
 	//Load Lane Data
+	ULaneSaveGame* tmp = Cast<ULaneSaveGame>(SaveManagerRef->Load(SaveActorType::Lane));
 
-	//Spawn Mesh
+	if (!IsValid(tmp)) {
+		return false;
+	}
+	
+	IsCircularLine = tmp->IsCircularLane;
+
+	//StationPoint Save
+	for (const auto& i : tmp->StationPoint)
+	{
+		StationPoint.Add(StationManagerRef->GetStationById(i));
+	}
+
+	//PointArray Save
+	for (const auto& i : tmp->PointArray)
+	{
+		PointArray.Add(i);
+	}
+
+	for (const auto& i : tmp->LaneLocation)
+	{
+		LaneLocation.Add(i);
+	}
+
+	for (const auto& i : tmp->LaneArray)
+	{
+		FLanePoint LanePoint;
+
+		LanePoint.Coordination = i.Coordination;
+		LanePoint.IsStation = i.IsStation;
+		LanePoint.IsBendingPoint = i.IsBendingPoint;
+		LanePoint.IsThrough = i.IsThrough;
+		LanePoint.LanePosition = i.LanePosition;
+		LanePoint.LaneType = i.LaneType;
+		LanePoint.LaneDirection = i.LaneDirection;
+		LanePoint.WillBeRemoved = i.WillBeRemoved;
+
+		//TODO : Add Mesh
+
+
+		LaneArray.Add(LanePoint);
+	}
+
+	//Delay Removing
+	DoesStationsToBeRemovedAtStart = tmp->DoesStationsToBeRemovedAtStart;
+	DoesStationsToBeRemovedAtEnd = tmp->DoesStationsToBeRemovedAtEnd;
+	DoesLaneToBeRemoved = tmp->DoesLaneToBeRemoved;
+
+	for (const auto& i : tmp->StationsToBeRemovedAtStart)
+	{
+		StationsToBeRemovedAtStart.Add(StationManagerRef->GetStationById(i));
+	}
+
+	for (const auto& i : tmp->StationsToBeRemovedAtEnd)
+	{
+		StationsToBeRemovedAtEnd.Add(StationManagerRef->GetStationById(i));
+	}
+
+	for (const auto& i : tmp->StationPointBeforeRemovedStart)
+	{
+		StationPointBeforeRemovedStart.Add(StationManagerRef->GetStationById(i));
+	}
+
+	for (const auto& i : tmp->StationPointBeforeRemovedEnd)
+	{
+		StationPointBeforeRemovedEnd.Add(StationManagerRef->GetStationById(i));
+	}
+
+	//Spawn Start,End Point
 
 
 	return true;
