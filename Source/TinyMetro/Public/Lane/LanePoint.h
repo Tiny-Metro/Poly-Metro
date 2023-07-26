@@ -37,4 +37,7 @@ struct TINYMETRO_API FLanePoint {
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<USplineMeshComponent*> MeshArray;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool WillBeRemoved = false;
 };
