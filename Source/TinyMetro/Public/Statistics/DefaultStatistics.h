@@ -19,9 +19,9 @@ struct TINYMETRO_API FDefaultStatistics
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 WeeklyArrivePassenger = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TotalProfit = 0;
+	int32 TotalIncome = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 WeeklyProfit = 0;
+	int32 WeeklyIncome = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalSpending = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
