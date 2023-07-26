@@ -94,14 +94,14 @@ ALane* ALaneManager::SpawnLane()
 	// Check object validation
 	if (!SpawnActor) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / Lane")));
-		return;
+		return nullptr;
 	}
 
 	// Check null
 	UClass* SpawnClass = SpawnActor->StaticClass();
 	if (SpawnClass == nullptr) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return;
+		return nullptr;
 	}
 
 	// Spawn actor
@@ -239,7 +239,7 @@ bool ALaneManager::Load()
 		SaveManagerRef = GameMode->GetSaveManager();
 	}
 
-	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::StationManager));
+	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::LaneManager));
 
 	if (!IsValid(tmp)) {
 		return false;
@@ -251,9 +251,9 @@ bool ALaneManager::Load()
 
 	for (auto& i : tmp->Lanes)
 	{
-		ALane* tmp = LoadLane(i);
+		ALane* tmpLane = LoadLane(i);
 
-		Lanes.Add(i, tmp);
+		Lanes.Add(i, tmpLane);
 	}
 
 	return true;
@@ -267,7 +267,7 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 
 	tmpLane->SetLaneId(LaneId);
 
-
+	tmpLane->Load();
 
 	return tmpLane;
 }

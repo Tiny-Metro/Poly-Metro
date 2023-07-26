@@ -18,9 +18,6 @@ class TINYMETRO_API ULaneSaveGame : public USaveGame
 public:
 	UPROPERTY()
 	TArray<FLanePoint> LaneArray;
-	
-	UPROPERTY()
-	int32 LaneId;
 
 	UPROPERTY()
 	bool IsCircularLane;
@@ -36,6 +33,15 @@ public:
 
 	//Delay Removing
 	UPROPERTY()
+	bool DoesStationsToBeRemovedAtStart;
+
+	UPROPERTY()
+	bool DoesStationsToBeRemovedAtEnd;
+
+	UPROPERTY()
+	bool DoesLaneToBeRemoved;
+
+	UPROPERTY()
 	TArray<int32> StationsToBeRemovedAtStart;
 
 	UPROPERTY()
@@ -46,14 +52,4 @@ public:
 
 	UPROPERTY()
 	TArray<int32> StationPointBeforeRemovedEnd;
-
-	UPROPERTY()
-	bool DoesStationsToBeRemovedAtStart;
-
-	UPROPERTY()
-	bool DoesStationsToBeRemovedAtEnd;
-
-	UPROPERTY()
-	bool DoesLaneToBeRemoved;
-
 };

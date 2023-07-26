@@ -10,6 +10,8 @@
 #include "Components/SplineMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/Controller.h"
+#include "Lane/LaneSaveGame.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -46,6 +48,8 @@ void ALane::BeginPlay()
 	SaveManagerRef = GameMode->GetSaveManager();
 
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ALane::Save);
 	
 }
 
@@ -1232,8 +1236,69 @@ bool ALane::IsBuildble()
 
 void ALane::Save()
 {
+	ULaneSaveGame* tmp = Cast<ULaneSaveGame>(UGameplayStatics::CreateSaveGameObject(ULaneSaveGame::StaticClass()));
 
+	tmp->IsCircularLane = IsCircularLine;
 
+	//StationPoint Save
+	for (const auto& i : StationPoint)
+	{
+		tmp->StationPoint.Add(i->GetStationId());
+	}
+
+	//PointArray Save
+	for (const auto& i : PointArray)
+	{
+		tmp->PointArray.Add(i);
+	}
+
+	for (const auto& i : LaneLocation)
+	{
+		tmp->LaneLocation.Add(i);
+	}
+
+	for (const auto& i : LaneArray)
+	{
+		FLanePoint LanePoint;
+
+		LanePoint.Coordination = i.Coordination;
+		LanePoint.IsStation = i.IsStation;
+		LanePoint.IsBendingPoint = i.IsBendingPoint;
+		LanePoint.IsThrough = i.IsThrough;
+		LanePoint.LanePosition = i.LanePosition;
+		LanePoint.LaneType = i.LaneType;
+		LanePoint.LaneDirection = i.LaneDirection;
+		LanePoint.WillBeRemoved = i.WillBeRemoved;
+
+		tmp->LaneArray.Add(LanePoint);
+	}
+	
+	//Delay Removing
+	tmp->DoesStationsToBeRemovedAtStart = DoesStationsToBeRemovedAtStart;
+	tmp->DoesStationsToBeRemovedAtEnd = DoesStationsToBeRemovedAtEnd;
+	tmp->DoesLaneToBeRemoved = DoesLaneToBeRemoved;
+	
+	for (const auto& i : StationsToBeRemovedAtStart)
+	{
+		tmp->StationsToBeRemovedAtStart.Add(i->GetStationId());
+	}
+
+	for (const auto& i : StationsToBeRemovedAtEnd)
+	{
+		tmp->StationsToBeRemovedAtEnd.Add(i->GetStationId());
+	}
+
+	for (const auto& i : StationPointBeforeRemovedStart)
+	{
+		tmp->StationPointBeforeRemovedStart.Add(i->GetStationId());
+	}
+
+	for (const auto& i : StationPointBeforeRemovedEnd)
+	{
+		tmp->StationPointBeforeRemovedEnd.Add(i->GetStationId());
+	}
+
+	SaveManagerRef->Save(tmp, SaveActorType::Lane, LaneId);
 }
 
 bool ALane::Load()
