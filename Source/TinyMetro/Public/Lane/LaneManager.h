@@ -103,4 +103,7 @@ public:
 	void LaneMaterialDeferred();
 	UFUNCTION()
 	TArray<UMaterial*> GetLaneMaterial() const;
+
+public:
+	int32 GetPosition(FIntPoint Start, FIntPoint End);
 };
