@@ -159,7 +159,7 @@ void ALane::SetIsCircularLine(bool _Circular)
 {
 	IsCircularLine = _Circular;
 }
-
+  
 FLanePoint ALane::GetNearestLanePoint(FVector Location) {
 	double Distance = std::numeric_limits<double>::max();
 	FLanePoint tmp;
@@ -1640,7 +1640,7 @@ void ALane::AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingP
 	LanePoint.Coordination = Point;
 	LanePoint.IsStation = IsStation;
 	LanePoint.IsBendingPoint = IsBendingPoint;
-
+	LanePoint.WillBeRemoved = false;
 	if (IsStation) {
 		LanePoint.IsThrough = false;
 	}
@@ -1656,6 +1656,8 @@ void ALane::AddLanePoint(const FIntPoint& Point, bool IsStation, bool IsBendingP
 	LanePoint.IsStation = IsStation;
 	LanePoint.IsBendingPoint = IsBendingPoint;
 	LanePoint.LanePosition = Position;
+	LanePoint.WillBeRemoved = false;
+
 	if (IsStation) {
 		LanePoint.IsThrough = false;
 	}
@@ -1719,8 +1721,9 @@ void ALane::SetHandleTransform()
 	EndHandle->SetWorldRotation(EndRotator);
 }
 
-void ALane::ChangeRemoveMaterialAtIndex(int32 Index)
+void ALane::ChangeRemoveMaterialAtIndex(int32 Index) // also make WillBeRemoved = true;
 {
+	LaneArray[Index].WillBeRemoved = true;
 	for (USplineMeshComponent* mesh : LaneArray[Index].MeshArray) {
 
 		UE_LOG(LogTemp, Warning, TEXT("MeshArray"));
