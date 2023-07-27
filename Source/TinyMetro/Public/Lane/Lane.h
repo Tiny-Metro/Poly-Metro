@@ -49,6 +49,9 @@ public:
 	TArray<FLanePoint> LaneArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -66,6 +69,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ABridgeTunnelManager* BTMangerREF;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
 
 
 protected:
@@ -389,4 +395,13 @@ private:
 
 	void UpdateLocationAndSpline(USplineComponent* Spline);
 	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
+//	bool IsBuildble();
+
+
+public: //Save
+	UFUNCTION()
+	void Save();
+
+	UFUNCTION()
+	bool Load();
 };
