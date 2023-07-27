@@ -82,15 +82,15 @@ FOnPopHandleCalled ALane::OnPopHandleCalled;
 
 void ALane::OnOtherLanePopHandleCalled(bool IsUp)
 {
-		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled    Lane ID = %d"), LaneId);
+//		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled    Lane ID = %d"), LaneId);
 	if (CurrentlyPoppingLane) {
-		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled: IGNORED Lane ID = %d"), LaneId);
+//		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled: IGNORED Lane ID = %d"), LaneId);
 		return;  // Ignore if this lane is the one that's currently popping the handle
 	}
 
 	if (IsUp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled: GO down Lane ID = %d"), LaneId);
+//		UE_LOG(LogTemp, Warning, TEXT("OnOtherLanePopHandleCalled: GO down Lane ID = %d"), LaneId);
 		PopHandle(false);
 	}
 }
@@ -114,7 +114,7 @@ void ALane::PopHandle(bool IsUp)
 	{
 		TargetZ = 2;
 		CurrentlyPoppingLane = true;
-		UE_LOG(LogTemp, Warning, TEXT("PopHandle: GO down Lane ID = %d"), LaneId);
+	//	UE_LOG(LogTemp, Warning, TEXT("PopHandle: GO down Lane ID = %d"), LaneId);
 	}
 	else 
 	{
@@ -940,8 +940,6 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 
 
 	// check if tunnel&bridge - and can be used
-//	SetWaterHillArea(PreLaneArray);
-
 	if (!IsBuildble(PreLaneArray))
 	{	
 		Destroy();
@@ -1169,29 +1167,15 @@ TArray<TArray<FIntPoint>> ALane::GetArea(const TArray<FLanePoint>& LaneBlock, Gr
 }
 void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
-	ConnectorType targetType;
-
-	switch (Type)
-	{
-	case GridType::Ground:
-		return;
-		break;
-	case GridType::Water:
-		targetType = ConnectorType::Bridge;
-		break;
-	case GridType::Hill:
-		targetType = ConnectorType::Tunnel;
-		break;
-	default:
-		return;
-		break;
-	}
+	ConnectorType targetType = GetConnectorType(Type);
+	if (targetType == ConnectorType::None) { return; }
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
 		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
 	}
 }
+
 void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	ConnectorType targetType = GetConnectorType(Type);
