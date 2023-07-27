@@ -1349,9 +1349,10 @@ void ALane::SetLaneLocation() {
 				FVector FrontDirection = CalculateLineDirection(FrontVector, PointVector);
 
 				FVector BackPerpendicularVector = FVector::CrossProduct(BackDirection, FVector::UpVector);
-				BackPerpendicularVector.Normalize();
+				BackPerpendicularVector= ChangePerpendicularToStandard(BackPerpendicularVector);
+
 				FVector FrontPerpendicularVector = FVector::CrossProduct(FrontDirection, FVector::UpVector);
-				FrontPerpendicularVector.Normalize();
+				FrontPerpendicularVector = ChangePerpendicularToStandard(FrontPerpendicularVector);
 				
 				int32 BackOff = CalculateOffset(BackPoint.LanePosition);
 				int32 FrontOff = CalculateOffset(CurrentPoint.LanePosition);
@@ -1418,8 +1419,58 @@ FVector ALane::CalculateLineDirection(FVector Vector1, FVector Vector2)
 FVector ALane::CalculatePerpendicular(FVector LineDirection, float Offset, float off)
 {
 	FVector PerpendicularVector = FVector::CrossProduct(LineDirection, FVector::UpVector);
-	PerpendicularVector.Normalize();
+
+	PerpendicularVector = ChangePerpendicularToStandard(PerpendicularVector);
+
 	return PerpendicularVector * Offset * off;
+}
+
+FVector ALane::ChangePerpendicularToStandard(FVector Perpendicular) 
+{
+	Perpendicular.Normalize();
+
+	FVector y = FVector(0, 1, 0);
+	y.Normalize();
+
+	FVector x = FVector(1, 0, 0);
+	x.Normalize();
+
+	FVector xy = FVector(1, 1, 0);
+	xy.Normalize();
+
+	FVector xyMinous = FVector(-1, 1, 0);
+	xyMinous.Normalize();
+
+	constexpr float epsilon = 0.0001f;
+	FVector targetStandard = Perpendicular;
+	if ((Perpendicular - y).Size() < epsilon || (Perpendicular - (-y)).Size() < epsilon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CalculatePerPendicular: Y"));
+		targetStandard = y;
+	}
+
+	if ((Perpendicular - x).Size() < epsilon || (Perpendicular - (-x)).Size() < epsilon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CalculatePerPendicular: X"));
+		targetStandard = x;
+
+	}
+
+	if ((Perpendicular - xy).Size() < epsilon || (Perpendicular - (-xy)).Size() < epsilon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CalculatePerPendicular: XY"));
+		targetStandard = xy;
+
+	}
+
+	if ((Perpendicular - xyMinous).Size() < epsilon || (Perpendicular - (-xyMinous)).Size() < epsilon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CalculatePerPendicular: xyMinous"));
+		targetStandard = xyMinous;
+
+	}
+
+	return targetStandard;
 }
 
 //=================================================================================================//

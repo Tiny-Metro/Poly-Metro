@@ -385,6 +385,7 @@ private:
 	float CalculateOffset(int32 LanePosition);
 	FVector CalculateLineDirection(FVector Vector1, FVector Vector2);
 	FVector CalculatePerpendicular(FVector LineDirection, float Offset, float off);
+	FVector ChangePerpendicularToStandard(FVector Perpendicular);
 
 	void UpdateLocationAndSpline(USplineComponent* Spline);
 	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
