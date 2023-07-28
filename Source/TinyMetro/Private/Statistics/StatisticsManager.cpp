@@ -16,10 +16,6 @@ AStatisticsManager::AStatisticsManager()
 
 }
 
-AStatisticsManager::~AStatisticsManager() {
-	delete StatisticsKey;
-}
-
 // Called when the game starts or when spawned
 void AStatisticsManager::BeginPlay()
 {
@@ -89,19 +85,19 @@ void AStatisticsManager::Load() {
 
 }
 
-FCriticalSection* AStatisticsManager::GetDefaultStatisticsKey() const {
+TWeakPtr<FCriticalSection> AStatisticsManager::GetDefaultStatisticsKey() const {
 	return DefaultStatisticsKey;
 }
 
-FCriticalSection* AStatisticsManager::GetLaneStatisticsKey() const {
+TWeakPtr<FCriticalSection> AStatisticsManager::GetLaneStatisticsKey() const {
 	return LaneStatisticsKey;
 }
 
-FCriticalSection* AStatisticsManager::GetShopStatisticsKey() const {
+TWeakPtr<FCriticalSection> AStatisticsManager::GetShopStatisticsKey() const {
 	return ShopStatisticsKey;
 }
 
-FCriticalSection* AStatisticsManager::GetBankStatisticsKey() const {
+TWeakPtr<FCriticalSection> AStatisticsManager::GetBankStatisticsKey() const {
 	return BankStatisticsKey;
 }
 

@@ -152,7 +152,7 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 			// Get money
 			PlayerStateRef->AddMoney(Fare);
 			{
-				FScopeLock Lock(StatisticsManagerRef->GetDefaultStatisticsKey());
+				FScopeLock Lock(StatisticsManagerRef->GetDefaultStatisticsKey().Pin().Get());
 				StatisticsManagerRef->DefaultStatistics.TotalArrivePassenger++;
 				StatisticsManagerRef->DefaultStatistics.WeeklyArrivePassenger++;
 			}

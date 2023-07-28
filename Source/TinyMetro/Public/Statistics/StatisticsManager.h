@@ -18,7 +18,6 @@ class TINYMETRO_API AStatisticsManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStatisticsManager();
-	~AStatisticsManager();
 
 protected:
 	// Called when the game starts or when spawned
@@ -51,10 +50,10 @@ public:
 	FBankStatistics BankStatistics;
 
 	// Mutex
-	FCriticalSection* GetDefaultStatisticsKey() const;
-	FCriticalSection* GetLaneStatisticsKey() const;
-	FCriticalSection* GetShopStatisticsKey() const;
-	FCriticalSection* GetBankStatisticsKey() const;
+	TWeakPtr<FCriticalSection> GetDefaultStatisticsKey() const;
+	TWeakPtr<FCriticalSection> GetLaneStatisticsKey() const;
+	TWeakPtr<FCriticalSection> GetShopStatisticsKey() const;
+	TWeakPtr<FCriticalSection> GetBankStatisticsKey() const;
 
 protected:
 	// Other actors reference
@@ -66,9 +65,9 @@ protected:
 	class ATMSaveManager* SaveManagerRef = nullptr;
 
 	// Mutex
-	FCriticalSection* DefaultStatisticsKey = new FCriticalSection();
-	FCriticalSection* LaneStatisticsKey = new FCriticalSection();
-	FCriticalSection* ShopStatisticsKey = new FCriticalSection();
-	FCriticalSection* BankStatisticsKey = new FCriticalSection();
+	TSharedPtr<FCriticalSection> DefaultStatisticsKey = MakeShared<FCriticalSection>();
+	TSharedPtr<FCriticalSection> LaneStatisticsKey = MakeShared<FCriticalSection>();
+	TSharedPtr<FCriticalSection> ShopStatisticsKey = MakeShared<FCriticalSection>();
+	TSharedPtr<FCriticalSection> BankStatisticsKey = MakeShared<FCriticalSection>();
 
 };
