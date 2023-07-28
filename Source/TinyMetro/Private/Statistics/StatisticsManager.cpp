@@ -89,7 +89,20 @@ void AStatisticsManager::Load() {
 
 }
 
-FCriticalSection* AStatisticsManager::GetKey() const {
-	return StatisticsKey;
+FCriticalSection* AStatisticsManager::GetDefaultStatisticsKey() const {
+	return DefaultStatisticsKey;
 }
+
+FCriticalSection* AStatisticsManager::GetLaneStatisticsKey() const {
+	return LaneStatisticsKey;
+}
+
+FCriticalSection* AStatisticsManager::GetShopStatisticsKey() const {
+	return ShopStatisticsKey;
+}
+
+FCriticalSection* AStatisticsManager::GetBankStatisticsKey() const {
+	return BankStatisticsKey;
+}
+
 

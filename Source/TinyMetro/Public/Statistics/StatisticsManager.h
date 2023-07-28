@@ -51,7 +51,10 @@ public:
 	FBankStatistics BankStatistics;
 
 	// Mutex
-	FCriticalSection* GetKey() const;
+	FCriticalSection* GetDefaultStatisticsKey() const;
+	FCriticalSection* GetLaneStatisticsKey() const;
+	FCriticalSection* GetShopStatisticsKey() const;
+	FCriticalSection* GetBankStatisticsKey() const;
 
 protected:
 	// Other actors reference
@@ -63,6 +66,9 @@ protected:
 	class ATMSaveManager* SaveManagerRef = nullptr;
 
 	// Mutex
-	FCriticalSection* StatisticsKey = new FCriticalSection();
+	FCriticalSection* DefaultStatisticsKey = new FCriticalSection();
+	FCriticalSection* LaneStatisticsKey = new FCriticalSection();
+	FCriticalSection* ShopStatisticsKey = new FCriticalSection();
+	FCriticalSection* BankStatisticsKey = new FCriticalSection();
 
 };
