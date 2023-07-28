@@ -30,5 +30,7 @@ struct TINYMETRO_API FDefaultStatistics
 	float AverageComplain = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 ServiceStationCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 UpgradeStationCount = 0;
 
 };
