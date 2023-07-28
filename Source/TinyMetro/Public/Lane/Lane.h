@@ -404,4 +404,6 @@ public: //Save
 
 	UFUNCTION()
 	bool Load();
+
+	void SpawnLaneMesh(USplineComponent* Spline);
 };

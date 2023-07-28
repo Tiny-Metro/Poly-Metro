@@ -2208,8 +2208,26 @@ void ALane::SetSplineMeshComponent(USplineComponent* Spline, FVector StartPos, F
 	{
 		SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
 	}
-
+	//RemoveMeshMaterial
+	if(LaneArray[Index].WillBeRemoved)
+	{
+		SplineMeshComponent->SetMaterial(0, RemoveMeshMaterial);
+	}
+	else
+	{
+		SplineMeshComponent->SetMaterial(0, MeshMaterial);
+	}
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(Spline, FAttachmentTransformRules::KeepWorldTransform);
 	LaneArray[Index].MeshArray.Add(SplineMeshComponent);
+}
+
+void ALane::SpawnLaneMesh(USplineComponent* Spline)
+{
+	//Get LaneLocation ?? is this deletable?
+	//Set Spline 
+	UpdateLocationAndSpline(Spline);
+	
+	//Set Mesh
+	SetMeshByIndex(0, LaneArray.Num() -1 , Spline);
 }
