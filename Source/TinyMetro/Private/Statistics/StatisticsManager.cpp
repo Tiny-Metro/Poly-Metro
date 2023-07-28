@@ -16,6 +16,10 @@ AStatisticsManager::AStatisticsManager()
 
 }
 
+AStatisticsManager::~AStatisticsManager() {
+	delete StatisticsKey;
+}
+
 // Called when the game starts or when spawned
 void AStatisticsManager::BeginPlay()
 {
@@ -83,5 +87,9 @@ void AStatisticsManager::Load() {
 	ShopStatistics = tmp->ShopStatistics;
 	BankStatistics = tmp->BankStatistics;
 
+}
+
+FCriticalSection* AStatisticsManager::GetKey() const {
+	return StatisticsKey;
 }
 

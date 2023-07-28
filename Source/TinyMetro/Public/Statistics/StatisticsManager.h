@@ -18,6 +18,7 @@ class TINYMETRO_API AStatisticsManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AStatisticsManager();
+	~AStatisticsManager();
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,6 +50,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Statistics")
 	FBankStatistics BankStatistics;
 
+	// Mutex
+	FCriticalSection* GetKey() const;
+
 protected:
 	// Other actors reference
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
@@ -57,5 +61,8 @@ protected:
 	class ATinyMetroGameModeBase* GameModeRef = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reference")
 	class ATMSaveManager* SaveManagerRef = nullptr;
+
+	// Mutex
+	FCriticalSection* StatisticsKey = new FCriticalSection();
 
 };
