@@ -15,5 +15,6 @@ enum class SaveActorType : uint8
 	LaneManager = 2 UMETA(DisplayName = "LaneManager"),
 	Lane = 3 UMETA(DisplayName = "Lane"),
 	TrainManager = 4 UMETA(DisplayName = "TrainManager"),
-	Train = 5 UMETA(DisplayName = "Train")
+	Train = 5 UMETA(DisplayName = "Train"),
+	StatisticsManager = 6 UMETA(DisplayName = "StatisticsManager")
 };

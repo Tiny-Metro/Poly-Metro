@@ -20,6 +20,7 @@ public:
 	virtual FString GetFileName() const override;
 	virtual TMap<FIntPoint, StationType> GetInitData() const override;
 	virtual int32 GetDaytime() const override;
+	virtual TMap<int32, FColor> GetLaneColor() const;
 
 	virtual void BeginPlay() override;
 

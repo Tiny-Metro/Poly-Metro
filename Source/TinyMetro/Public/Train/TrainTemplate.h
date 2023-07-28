@@ -148,6 +148,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATrainManager* TrainManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class AStatisticsManager* StatisticsManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TMap<int32, FPassenger> Passenger;

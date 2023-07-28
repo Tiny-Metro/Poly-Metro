@@ -9,6 +9,7 @@
 #include "Lane/LaneManager.h"
 #include "Lane/Lane.h"
 #include "Station/PathQueue.h"
+#include "Statistics/StatisticsManager.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -79,6 +80,7 @@ void ATrainTemplate::BeginPlay()
 	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
+	StatisticsManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStatisticsManager();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
@@ -145,8 +147,15 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 			Passenger.Add(i, P);
 
 			TotalPassenger++;
+
+			// TODO : Transfer passenger
 			// Get money
 			PlayerStateRef->AddMoney(Fare);
+			{
+				FScopeLock Lock(StatisticsManagerRef->GetDefaultStatisticsKey().Pin().Get());
+				StatisticsManagerRef->DefaultStatistics.TotalArrivePassenger++;
+				StatisticsManagerRef->DefaultStatistics.WeeklyArrivePassenger++;
+			}
 			UpdatePassengerMesh();
 			return true;
 		}

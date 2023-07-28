@@ -21,6 +21,8 @@ public:
 	virtual FString GetFileName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
+	UFUNCTION(BlueprintCallable)
+	virtual TMap<int32, FColor> GetLaneColor() const;
 	virtual TArray<FSoftObjectPath> GetTrainMaterialPath() const;
 	virtual TArray<FSoftObjectPath> GetLaneMaterialPath() const;
 	virtual TArray<FSoftObjectPath> GetPassengerMaterialPath() const;
@@ -50,6 +52,8 @@ public:
 	class ABridgeTunnelManager* GetBridgeTunnelManager() const;
 	UFUNCTION(BlueprintCallable)
 	class ATinyMetroEventManager* GetEventManager() const;
+	UFUNCTION(BlueprintCallable)
+	class AStatisticsManager* GetStatisticsManager() const;
 
 protected:
 	UPROPERTY(Config)
@@ -84,5 +88,7 @@ protected:
 	APlayerController* PlayerController;
 	UPROPERTY()
 	class ATinyMetroEventManager* EventManager;
+	UPROPERTY()
+	class AStatisticsManager* StatisticsManager;
 
 };
