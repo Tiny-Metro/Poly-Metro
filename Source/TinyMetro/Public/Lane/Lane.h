@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "LanePoint.h"
 #include "MeshComponentArray.h"
-//#include "LaneManager.h"
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
@@ -73,6 +72,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATMSaveManager* SaveManagerRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spline")
+	USplineComponent* LaneSpline;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -399,6 +400,8 @@ private:
 public:
 	UFUNCTION(BlueprintCallable)
 	bool CheckExtendable(FIntPoint StartingStationCoordinate, FIntPoint AddedStationCoordinate);
+	void InitLaneSpline();
+
 //	bool IsBuildble();
 
 
@@ -410,4 +413,5 @@ public: //Save
 	bool Load();
 
 	void SpawnLaneMesh(USplineComponent* Spline);
+
 };
