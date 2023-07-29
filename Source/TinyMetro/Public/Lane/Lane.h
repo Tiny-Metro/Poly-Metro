@@ -395,6 +395,7 @@ private:
 
 	void UpdateLocationAndSpline(USplineComponent* Spline);
 	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
+	bool CheckExtendable(FIntPoint StartingStationCoordinate, FIntPoint AddedStationCoordinate);
 //	bool IsBuildble();
 
 
