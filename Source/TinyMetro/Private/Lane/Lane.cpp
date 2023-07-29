@@ -1009,6 +1009,13 @@ void ALane::GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<
 
 }
 
+bool ALane::CheckExtendable(FIntPoint StartingStationCoordinate, FIntPoint AddedStationCoordinate)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CheckExtendalbe"))
+
+	return true;
+}
+
 TArray<TArray<FIntPoint>> ALane::GetConnectorArea(TArray<FLanePoint>& LaneBlock, GridType type)
 {
 	TArray<TArray<FIntPoint>> TargetArea;
