@@ -295,7 +295,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetLaneSpline(USplineComponent* Spline);
+	void SetLaneSpline();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -306,7 +306,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void HandleFullLength(bool IsFullLength, USplineComponent* Spline);
+	void HandleFullLength(bool IsFullLength);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 EndLoop;
@@ -323,7 +323,7 @@ public:
 	void ChangeRemoveMaterialAtIndex(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
-	void SetSplineMeshes(USplineComponent* Spline);
+	void SetSplineMeshes();
 
 private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
@@ -351,19 +351,19 @@ public:
 	void SetMesh(UStaticMesh* Mesh, UStaticMesh* Through);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
+	void RemoveLaneFromStart(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	void ClearSplineMeshAt(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline);
+	void RemoveLaneFromEnd(int32 Index, int32 ExStationNum);
 
 	UFUNCTION(BlueprintCallable)
-	void ExtendStart(AStation* NewStation, USplineComponent* Spline);
+	void ExtendStart(AStation* NewStation);
 
 	UFUNCTION(BlueprintCallable)
-	void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
+	void ExtendEnd(AStation* NewStation);
 
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
@@ -385,8 +385,8 @@ private:
 private: 
 	// Sets coord, bend, through,, lane position etc
 	TArray<FLanePoint> GetLanePath(AStation* StartStation, AStation* EndStation);
-	void SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* Spline);
-	void SetSplineMeshComponent(USplineComponent* Spline, FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
+	void SetMeshByIndex(int32 StartIndex, int32 LastIndex);
+	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
 	FVector LineIntersection(FVector A, FVector B, FVector C, FVector D);
 
 	float CalculateOffset(int32 LanePosition);
@@ -394,7 +394,7 @@ private:
 	FVector CalculatePerpendicular(FVector LineDirection, float Offset, float off);
 	FVector ChangePerpendicularToStandard(FVector Perpendicular);
 
-	void UpdateLocationAndSpline(USplineComponent* Spline);
+	void UpdateLocationAndSpline();
 	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
 	
 public:
@@ -412,6 +412,6 @@ public: //Save
 	UFUNCTION()
 	bool Load();
 
-	void SpawnLaneMesh(USplineComponent* Spline);
+	void SpawnLaneMesh();
 
 };
