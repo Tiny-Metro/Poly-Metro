@@ -1001,19 +1001,93 @@ void ALane::GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<
 		AStation* NextStationPtr = (i < NumStations - 1) ? NewStationPoint[i + 1] : nullptr;
 
 		LaneBlock = GetLanePath(CurrentStationPtr, NextStationPtr);
-
 		int32 lastIndex = LaneBlock.Num() - 1;
 		LaneBlock.RemoveAt(lastIndex);
 		PreLaneArray.Append(LaneBlock);
 	}
 
 }
+void GetLaneArrays(FIntPoint StartStationCoord, FIntPoint AddedStationCoord, TArray<FLanePoint>& PreLaneArray) 
+{
+	//check if lane points are valid
+	PreLaneArray.Empty();
+
+	TArray<FLanePoint> LaneBlock;
+	LaneBlock.Empty();
+
+
+//	LaneBlock = GetLanePathByPoint(StartStationCoord, AddedStationCoord);
+
+	PreLaneArray.Append(LaneBlock);
+}
+
 
 bool ALane::CheckExtendable(FIntPoint StartingStationCoordinate, FIntPoint AddedStationCoordinate)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CheckExtendalbe"))
+	//Create Coord Array for path
+	TArray<FLanePoint> LaneBlock;
 
-	return true;
+	FIntPoint StartStationCoord = StartingStationCoordinate;
+	FIntPoint NextStationCoord = AddedStationCoordinate;
+
+	FIntPoint Diff = NextStationCoord - StartStationCoord;
+
+	bool IsBending = HasBendingPoint(Diff);
+
+
+	if (IsBending)
+	{
+		FIntPoint BendingCoord = FindBendingPoint(StartStationCoord, NextStationCoord);
+		int32 Position = LaneManagerRef->GetPosition(StartStationCoord, BendingCoord);
+
+		AddLanePoint(StartStationCoord, true, true, LaneBlock, Position);
+
+		// Generate paths
+		TArray<FIntPoint> PathToBending = GeneratePath(StartStationCoord, BendingCoord);
+		TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStationCoord);
+
+		// Add PathToBending points to LaneArray
+		for (const FIntPoint& Point : PathToBending)
+		{
+			AddLanePoint(Point, false, false, LaneBlock, Position);
+		}
+
+		// Add BendingPoint to LaneArray
+		Position = LaneManagerRef->GetPosition(BendingCoord, NextStationCoord);
+		AddLanePoint(BendingCoord, false, true, LaneBlock, Position);
+
+		// Add PathFromBending points to LaneArray
+		for (const FIntPoint& Point : PathFromBending)
+		{
+			AddLanePoint(Point, false, false, LaneBlock, Position);
+		}
+
+		AddLanePoint(NextStationCoord, true, true, LaneBlock);
+
+	}
+	else
+	{
+		int32 Position = LaneManagerRef->GetPosition(StartStationCoord, NextStationCoord);
+
+		AddLanePoint(StartStationCoord, true, true, LaneBlock, Position);
+
+		TArray<FIntPoint> PathToNext = GeneratePath(StartStationCoord, NextStationCoord);
+
+		// Add PathToNext points to LaneArray
+		for (const FIntPoint& Point : PathToNext)
+		{
+			AddLanePoint(Point, false, false, LaneBlock, Position);
+		}
+
+		AddLanePoint(NextStationCoord, true, true, LaneBlock);
+
+	}
+
+
+	//Check Required Items
+	return IsBuildble(LaneBlock);
+
 }
 
 TArray<TArray<FIntPoint>> ALane::GetConnectorArea(TArray<FLanePoint>& LaneBlock, GridType type)
@@ -2067,6 +2141,70 @@ TArray<FLanePoint> ALane::GetLanePath(AStation* StartStation, AStation* EndStati
 			AddLanePoint(Point, false, false, LaneBlock, Position);
 		}
 		
+		AddLanePoint(NextStationCoord, true, true, LaneBlock);
+
+	}
+	else
+	{
+		int32 Position = LaneManagerRef->GetPosition(StartStationCoord, NextStationCoord);
+
+		AddLanePoint(StartStationCoord, true, true, LaneBlock, Position);
+
+		TArray<FIntPoint> PathToNext = GeneratePath(StartStationCoord, NextStationCoord);
+
+		// Add PathToNext points to LaneArray
+		for (const FIntPoint& Point : PathToNext)
+		{
+			AddLanePoint(Point, false, false, LaneBlock, Position);
+		}
+
+		AddLanePoint(NextStationCoord, true, true, LaneBlock);
+
+	}
+
+
+	return LaneBlock;
+}
+
+TArray<FLanePoint> ALane::GetLanePathByPoint(FIntPoint StartStation, FIntPoint EndStation) {
+	//Get Path of Coord
+	TArray<FLanePoint> LaneBlock;
+
+	FIntPoint StartStationCoord = StartStation;
+	FIntPoint NextStationCoord = EndStation;
+
+	FIntPoint Diff = NextStationCoord - StartStationCoord;
+
+	bool IsBending = HasBendingPoint(Diff);
+
+
+	if (IsBending)
+	{
+		FIntPoint BendingCoord = FindBendingPoint(StartStationCoord, NextStationCoord);
+		int32 Position = LaneManagerRef->GetPosition(StartStationCoord, BendingCoord);
+
+		AddLanePoint(StartStationCoord, true, true, LaneBlock, Position);
+
+		// Generate paths
+		TArray<FIntPoint> PathToBending = GeneratePath(StartStationCoord, BendingCoord);
+		TArray<FIntPoint> PathFromBending = GeneratePath(BendingCoord, NextStationCoord);
+
+		// Add PathToBending points to LaneArray
+		for (const FIntPoint& Point : PathToBending)
+		{
+			AddLanePoint(Point, false, false, LaneBlock, Position);
+		}
+
+		// Add BendingPoint to LaneArray
+		Position = LaneManagerRef->GetPosition(BendingCoord, NextStationCoord);
+		AddLanePoint(BendingCoord, false, true, LaneBlock, Position);
+
+		// Add PathFromBending points to LaneArray
+		for (const FIntPoint& Point : PathFromBending)
+		{
+			AddLanePoint(Point, false, false, LaneBlock, Position);
+		}
+
 		AddLanePoint(NextStationCoord, true, true, LaneBlock);
 
 	}

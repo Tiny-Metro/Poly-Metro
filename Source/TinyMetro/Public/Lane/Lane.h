@@ -381,10 +381,11 @@ private:
 	int32 GetRequiredConnector(TArray<TArray<FIntPoint>>& AreaArray, GridType type);
 //Helper Functions
 	ConnectorType GetConnectorType(GridType Type);
-//REFACTORING
 private: 
 	// Sets coord, bend, through,, lane position etc
 	TArray<FLanePoint> GetLanePath(AStation* StartStation, AStation* EndStation);
+	TArray<FLanePoint> GetLanePathByPoint(FIntPoint StartStation, FIntPoint EndStation);
+	void GetLaneArrays(FIntPoint StartStationCoord, FIntPoint AddedStationCoord, TArray<FLanePoint>& PreLaneArray);
 	void SetMeshByIndex(int32 StartIndex, int32 LastIndex);
 	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
 	FVector LineIntersection(FVector A, FVector B, FVector C, FVector D);
@@ -396,7 +397,6 @@ private:
 
 	void UpdateLocationAndSpline();
 	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
-	
 public:
 	UFUNCTION(BlueprintCallable)
 	bool CheckExtendable(FIntPoint StartingStationCoordinate, FIntPoint AddedStationCoordinate);
