@@ -520,6 +520,7 @@ TArray<int32> AStation::GetLanes()
 void AStation::SetLanes(int32 AdditionalLaneId)
 {
 	Lanes.Add(AdditionalLaneId);
+	StationInfo.ServiceLaneCount = Lanes.Num();
 }
 
 void AStation::SetTransfer(bool Flag) {
