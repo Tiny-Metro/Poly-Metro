@@ -192,7 +192,6 @@ void AStation::DailyTask() {
 void AStation::Save() {
 	UStationSaveGame* tmp = Cast<UStationSaveGame>(UGameplayStatics::CreateSaveGameObject(UStationSaveGame::StaticClass()));
 	tmp->Passenger = Passenger;
-	tmp->ComplainCurrent = ComplainCurrent;
 	tmp->PassengerSpawnCurrent = PassengerSpawnCurrent;
 	tmp->SpawnDay = SpawnDay;
 	tmp->IsUpgrade = IsUpgrade;
@@ -211,7 +210,6 @@ void AStation::Load() {
 	// Load success
 	if (IsValid(tmp)) {
 		Passenger = tmp->Passenger;
-		ComplainCurrent = tmp->ComplainCurrent;
 		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
 		SpawnDay = tmp->SpawnDay;
 		IsUpgrade = tmp->IsUpgrade;
@@ -432,7 +430,7 @@ void AStation::InitComplainGauge() {
 
 	// Set the GaugePer value
 	//GaugePer = 0.0f; // Replace this with the value you want to set
-	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", ComplainCurrent / ComplainMax);
+	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", StationInfo.Complain / ComplainMax);
 
 	StationComplainMeshComponent->SetMaterial(0, ComplainDynamicMaterial);
 }
@@ -461,11 +459,11 @@ void AStation::SetComplainIncreaseEnable(bool Flag) {
 }
 
 void AStation::SetComplainByRate(float Rate) {
-	ComplainCurrent *= Rate;
+	StationInfo.Complain *= Rate;
 }
 
 void AStation::AddComplain(float Value, bool IsFixedValue) {
-	ComplainCurrent += (Value * (IsFixedValue ? 1.0f : ComplainIncreaseRate));
+	StationInfo.Complain += (Value * (IsFixedValue ? 1.0f : ComplainIncreaseRate));
 }
 
 void AStation::MaintenanceCost(int32 Cost) {
@@ -503,15 +501,15 @@ StationType AStation::GetStationType() const {
 }
 
 void AStation::AddComplain(double ReduceRate) {
-	ComplainCurrent *= ReduceRate;
+	StationInfo.Complain *= ReduceRate;
 }
 
 void AStation::AddComplain(int32 ReduceValue) {
-	ComplainCurrent += (ReduceValue * ComplainIncreaseRate);
+	StationInfo.Complain += (ReduceValue * ComplainIncreaseRate);
 }
 
 int32 AStation::GetComplain() const {
-	return ComplainCurrent;
+	return StationInfo.Complain;
 }
 
 TArray<int32> AStation::GetLanes()
@@ -582,20 +580,20 @@ void AStation::ComplainRoutine() {
 	if (IsComplainIncreaseEnable) {
 		// Complain from Passenger
 		if (Passenger.Num() > ComplainPassengerNum) {
-			ComplainCurrent += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
+			StationInfo.Complain += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
 		}
 
 		// Complain from not activate
 		if (!IsActive && SpawnDay > ComplainSpawnDay) {
-			ComplainCurrent += ComplainFromInactive * ComplainIncreaseRate;
+			StationInfo.Complain += ComplainFromInactive * ComplainIncreaseRate;
 		}
 	}
 	// Update Complain gauge Mesh
-	SetComplainGauge(ComplainCurrent / ComplainMax);
+	SetComplainGauge(StationInfo.Complain / ComplainMax);
 
 
 	// Complain excess : Game over
-	if (ComplainMax <= ComplainCurrent) {
+	if (ComplainMax <= StationInfo.Complain) {
 		// Game over code
 
 		//Log
