@@ -26,13 +26,23 @@ public:
 	UFUNCTION()
 	FLuaValue GetLaneStatistics();
 	UFUNCTION()
+	TArray<FLuaValue> GetLaneDetailStatistics();
+	UFUNCTION()
 	FLuaValue GetShopStatistics();
+	UFUNCTION()
+	FLuaValue GetTrainStatistics();
+	UFUNCTION()
+	FLuaValue GetSubtrainStatistics();
+	UFUNCTION()
+	FLuaValue GetBridgeStatistics();
+	UFUNCTION()
+	FLuaValue GetTunnelStatistics();
 	UFUNCTION()
 	FLuaValue GetBankStatistics();
 
 protected:
 	UPROPERTY()
-	mutable class ATinyMetroGameModeBase* GameModeRef;
+	class ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY()
-	mutable class AStatisticsManager* StatisticsManagerRef;
+	class AStatisticsManager* StatisticsManagerRef;
 };

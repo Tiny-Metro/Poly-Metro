@@ -12,7 +12,12 @@ UTinyMetroLuaState::UTinyMetroLuaState() {
 
     Table.Add(TEXT("GetDefaultStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetDefaultStatistics)));
     Table.Add(TEXT("GetLaneStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetLaneStatistics)));
+    Table.Add(TEXT("GetLaneDetailStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetLaneDetailStatistics)));
     Table.Add(TEXT("GetShopStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetShopStatistics)));
+    Table.Add(TEXT("GetTrainStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTrainStatistics)));
+    Table.Add(TEXT("GetSubtrainStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetSubtrainStatistics)));
+    Table.Add(TEXT("GetBridgeStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetBridgeStatistics)));
+    Table.Add(TEXT("GetTunnelStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTunnelStatistics)));
     Table.Add(TEXT("GetBankStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetBankStatistics)));
 }
 
@@ -57,63 +62,98 @@ FLuaValue UTinyMetroLuaState::GetLaneStatistics() {
 
     statisticsTable.SetField(TEXT("TotalLaneCount"), FLuaValue(laneStatistics.TotalLaneCount));
     statisticsTable.SetField(TEXT("TotalModifyAndDeleteCount"), FLuaValue(laneStatistics.TotalModifyAndDeleteCount));
-    for (int i = 1; i < 9; i++) {
-        FLuaValue tempTable = CreateLuaTable();
-        tempTable.SetField(TEXT("TotalArrivePassenger"), FLuaValue(laneStatistics.Lanes[i].TotalArrivePassenger));
-        tempTable.SetField(TEXT("WeeklyArrivePassenger"), FLuaValue(laneStatistics.Lanes[i].WeeklyArrivePassenger));
-        tempTable.SetField(TEXT("TotalProfit"), FLuaValue(laneStatistics.Lanes[i].TotalProfit));
-        tempTable.SetField(TEXT("WeeklyProfit"), FLuaValue(laneStatistics.Lanes[i].WeeklyProfit));
-        tempTable.SetField(TEXT("UsingBridgeCount"), FLuaValue(laneStatistics.Lanes[i].UsingBridgeCount));
-        tempTable.SetField(TEXT("UsingTunnelCount"), FLuaValue(laneStatistics.Lanes[i].UsingTunnelCount));
-        tempTable.SetField(TEXT("TransferStationCount"), FLuaValue(laneStatistics.Lanes[i].TransferStationCount));
-        tempTable.SetField(TEXT("ServiceStationCount"), FLuaValue(laneStatistics.Lanes[i].ServiceStationCount));
-        tempTable.SetField(TEXT("TotalModifyAndReduceCount"), FLuaValue(laneStatistics.Lanes[i].TotalModifyAndReduceCount));
-        tempTable.SetField(TEXT("AverageComplain"), FLuaValue(laneStatistics.Lanes[i].AverageComplain));
-        tempTable.SetField(TEXT("ServiceTrainAndSubtrainCount"), FLuaValue(laneStatistics.Lanes[i].ServiceTrainAndSubtrainCount));
-        tempTable.SetField(TEXT("IsCircularLane"), FLuaValue(laneStatistics.Lanes[i].IsCircularLane));
-
-        statisticsTable.SetField(FString::Printf(TEXT("Lane%d"), i), tempTable);
-    }
     
     return FLuaValue();
+}
+
+TArray<FLuaValue> UTinyMetroLuaState::GetLaneDetailStatistics() {
+    InitReferClasses();
+    TArray<FLuaValue> Result;
+    Result.Add(FLuaValue());
+    auto laneStatistics = StatisticsManagerRef->LaneStatistics;
+
+    // Add lane 1 ~ 8
+    for (int i = 1; i < 9; i++) {
+        FLuaValue tmp = CreateLuaTable();
+        tmp.SetField(TEXT("TotalArrivePassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].TotalArrivePassenger));
+        tmp.SetField(TEXT("WeeklyArrivePassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].WeeklyArrivePassenger));
+        tmp.SetField(TEXT("TotalProfit"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].TotalProfit));
+        tmp.SetField(TEXT("WeeklyProfit"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].WeeklyProfit));
+        tmp.SetField(TEXT("UsingBridgeCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].UsingBridgeCount));
+        tmp.SetField(TEXT("UsingTunnelCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].UsingTunnelCount));
+        tmp.SetField(TEXT("TransferStationCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].TransferStationCount));
+        tmp.SetField(TEXT("ServiceStationCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].ServiceStationCount));
+        tmp.SetField(TEXT("TotalModifyAndReduceCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].TotalModifyAndReduceCount));
+        tmp.SetField(TEXT("AverageComplain"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(laneStatistics.Lanes[i].AverageComplain));
+        tmp.SetField(TEXT("ServiceTrainAndSubtrainCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.Lanes[i].ServiceTrainAndSubtrainCount));
+        tmp.SetField(TEXT("IsCircularLane"), ULuaBlueprintFunctionLibrary::LuaCreateBool(laneStatistics.Lanes[i].IsCircularLane));
+
+        Result.Add(tmp);
+    }
+
+    return Result;
 }
 
 // Return StatisticsManager::ShopStatistics
 FLuaValue UTinyMetroLuaState::GetShopStatistics() {
     InitReferClasses();
     FLuaValue statisticsTable = CreateLuaTable();
-    FLuaValue trainTable = CreateLuaTable();
-    FLuaValue subtrainTable = CreateLuaTable();
-    FLuaValue bridgeTable = CreateLuaTable();
-    FLuaValue tunnelTable = CreateLuaTable();
     auto shopStatistics = StatisticsManagerRef->ShopStatistics;
-
-    trainTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TrainStatistics.TotalPurchaseCount));
-    trainTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.TrainStatistics.TotalPlacementCount));
-    trainTable.SetField(TEXT("TotalShiftCount"), FLuaValue(shopStatistics.TrainStatistics.TotalShiftCount));
-    trainTable.SetField(TEXT("TotalRetrievalCount"), FLuaValue(shopStatistics.TrainStatistics.TotalRetrievalCount));
-    trainTable.SetField(TEXT("TotalUpgradeCount"), FLuaValue(shopStatistics.TrainStatistics.TotalUpgradeCount));
-
-    subtrainTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalPurchaseCount));
-    subtrainTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalPlacementCount));
-    subtrainTable.SetField(TEXT("TotalShiftCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalShiftCount));
-    subtrainTable.SetField(TEXT("TotalRetrievalCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalRetrievalCount));
-    subtrainTable.SetField(TEXT("TotalUpgradeCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalUpgradeCount));
-
-    bridgeTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.BridgeStatistics.TotalPurchaseCount));
-    bridgeTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.BridgeStatistics.TotalPlacementCount));
-
-    tunnelTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TunnelStatistics.TotalPurchaseCount));
-    tunnelTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.TunnelStatistics.TotalPlacementCount));
 
     statisticsTable.SetField(TEXT("TotalUsingMoney"), FLuaValue(shopStatistics.TotalUsingMoney));
     statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TotalPurchaseCount));
-    statisticsTable.SetField(TEXT("TrainStatistics"), trainTable);
-    statisticsTable.SetField(TEXT("SubtrainStatistics"), subtrainTable);
-    statisticsTable.SetField(TEXT("BridgeStatistics"), bridgeTable);
-    statisticsTable.SetField(TEXT("TunnelStatistics"), tunnelTable);
 
     return statisticsTable;
+}
+
+FLuaValue UTinyMetroLuaState::GetTrainStatistics() {
+    InitReferClasses();
+    FLuaValue statisticsTable = CreateLuaTable();
+    auto shopStatistics = StatisticsManagerRef->ShopStatistics;
+
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TrainStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.TrainStatistics.TotalPlacementCount));
+    statisticsTable.SetField(TEXT("TotalShiftCount"), FLuaValue(shopStatistics.TrainStatistics.TotalShiftCount));
+    statisticsTable.SetField(TEXT("TotalRetrievalCount"), FLuaValue(shopStatistics.TrainStatistics.TotalRetrievalCount));
+    statisticsTable.SetField(TEXT("TotalUpgradeCount"), FLuaValue(shopStatistics.TrainStatistics.TotalUpgradeCount));
+
+    return statisticsTable;
+}
+
+FLuaValue UTinyMetroLuaState::GetSubtrainStatistics() {
+    InitReferClasses();
+    FLuaValue statisticsTable = CreateLuaTable();
+    auto shopStatistics = StatisticsManagerRef->ShopStatistics;
+
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalPlacementCount));
+    statisticsTable.SetField(TEXT("TotalShiftCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalShiftCount));
+    statisticsTable.SetField(TEXT("TotalRetrievalCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalRetrievalCount));
+    statisticsTable.SetField(TEXT("TotalUpgradeCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalUpgradeCount));
+
+    return FLuaValue();
+}
+
+FLuaValue UTinyMetroLuaState::GetBridgeStatistics() {
+    InitReferClasses();
+    FLuaValue statisticsTable = CreateLuaTable();
+    auto shopStatistics = StatisticsManagerRef->ShopStatistics;
+
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.BridgeStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.BridgeStatistics.TotalPlacementCount));
+
+    return FLuaValue();
+}
+
+FLuaValue UTinyMetroLuaState::GetTunnelStatistics() {
+    InitReferClasses();
+    FLuaValue statisticsTable = CreateLuaTable();
+    auto shopStatistics = StatisticsManagerRef->ShopStatistics;
+
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TunnelStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.TunnelStatistics.TotalPlacementCount));
+
+    return FLuaValue();
 }
 
 // Return StatisticsManager::BankStatistics
