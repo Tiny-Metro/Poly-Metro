@@ -148,6 +148,11 @@ void AStation::Tick(float DeltaTime)
 	// If condition don't needed
 	// (When OnClick, TouchTime init by 0.0)
 	TouchTime += DeltaTime;
+
+	// Update passenger wait time
+	for (auto& i : Passenger) {
+		i.WaitTime += DeltaTime;
+	}
 }
 
 void AStation::SetStationId(int32 Id) {
