@@ -238,6 +238,10 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 				FPassenger tmp = Passenger[i];
 				Passenger.RemoveAt(i);
 				UpdatePassengerMesh();
+
+				// Update Passenger using count
+				StationInfo.TotalUsingPassenger++;
+				StationInfo.WeeklyUsingPassenger++;
 				
 				return MoveTemp(tmp);
 			}
