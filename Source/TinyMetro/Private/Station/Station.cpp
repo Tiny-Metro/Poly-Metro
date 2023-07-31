@@ -177,6 +177,9 @@ FGridCellData AStation::GetCurrentGridCellData() const {
 }
 
 void AStation::WeeklyTask() {
+	StationInfo.WeeklyProfit = 0;
+	StationInfo.WeeklyTransferPassenger = 0;
+	StationInfo.WeeklyUsingPassenger = 0;
 }
 
 void AStation::DailyTask() {
@@ -193,6 +196,7 @@ void AStation::Save() {
 	tmp->PassengerSpawnCurrent = PassengerSpawnCurrent;
 	tmp->SpawnDay = SpawnDay;
 	tmp->IsUpgrade = IsUpgrade;
+	tmp->StationInfo = StationInfo;
 
 	GameModeRef->GetSaveManager()->Save(tmp, SaveActorType::Station, StationInfo.Id);
 }
@@ -211,6 +215,7 @@ void AStation::Load() {
 		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
 		SpawnDay = tmp->SpawnDay;
 		IsUpgrade = tmp->IsUpgrade;
+		StationInfo = tmp->StationInfo;
 	}
 }
 
