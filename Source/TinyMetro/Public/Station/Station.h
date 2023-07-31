@@ -158,7 +158,7 @@ public:
 	void AddComplain(double ReduceRate);
 	void AddComplain(int32 ReduceValue);
 
-	int32 GetComplain() const;
+	float GetComplain() const;
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
 
@@ -209,8 +209,6 @@ protected:
 	float ComplainFromInactive = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
 	float ComplainFromPassenger = 5;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
-	float ComplainCurrent = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	int32 ComplainPassengerNum = 5;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")

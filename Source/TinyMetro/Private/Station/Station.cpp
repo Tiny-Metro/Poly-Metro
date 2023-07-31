@@ -508,7 +508,7 @@ void AStation::AddComplain(int32 ReduceValue) {
 	StationInfo.Complain += (ReduceValue * ComplainIncreaseRate);
 }
 
-int32 AStation::GetComplain() const {
+float AStation::GetComplain() const {
 	return StationInfo.Complain;
 }
 
