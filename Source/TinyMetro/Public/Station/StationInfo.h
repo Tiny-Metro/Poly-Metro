@@ -22,23 +22,23 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	StationType Type;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 ServiceLaneCount;
+	int32 ServiceLaneCount = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 TotalUsingPassenger;
+	int32 TotalUsingPassenger = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 WeeklyUsingPassenger;
+	int32 WeeklyUsingPassenger = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 TotalProfit;
+	int32 TotalProfit = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 WeeklyProfit;
+	int32 WeeklyProfit = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	float Complain;
+	float Complain = 0.0f;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	float AverageWaitTime;
+	float AverageWaitTime = 0.0f;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 TotalTransferPassenger;
+	int32 TotalTransferPassenger = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-	int32 WeeklyTransferPassenger;
+	int32 WeeklyTransferPassenger = 0;
 
 
 	FStationInfo() { Id = 0; Type = StationType::Circle; }
