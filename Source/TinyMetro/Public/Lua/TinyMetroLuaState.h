@@ -45,4 +45,6 @@ protected:
 	class ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY()
 	class AStatisticsManager* StatisticsManagerRef;
+	UPROPERTY()
+	class AStationManager* StationManagerRef;
 };

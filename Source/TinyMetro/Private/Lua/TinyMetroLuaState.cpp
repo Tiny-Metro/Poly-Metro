@@ -4,6 +4,7 @@
 #include "Lua/TinyMetroLuaState.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Statistics/StatisticsManager.h"
+#include "Station/StationManager.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -31,6 +32,7 @@ UTinyMetroLuaState* UTinyMetroLuaState::CreateInstance(UWorld* WorldContextObjec
 void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+    if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
 }
 
 // Return StatisticsManager::DefaultStatistics
