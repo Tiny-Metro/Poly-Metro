@@ -244,10 +244,6 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 				Passenger.RemoveAt(i);
 				UpdatePassengerMesh();
 
-				// Update Passenger using count
-				StationInfo.TotalUsingPassenger++;
-				StationInfo.WeeklyUsingPassenger++;
-				
 				return MoveTemp(tmp);
 			}
 		}
@@ -272,6 +268,10 @@ void AStation::GetOffPassenger(FPassenger P) {
 		P.Destination = StationType::None;
 	} else {
 		Passenger.Add(P);
+
+		// Update Passenger using count
+		StationInfo.TotalUsingPassenger++;
+		StationInfo.WeeklyUsingPassenger++;
 	}
 	UpdatePassengerMesh();
 }
@@ -387,6 +387,9 @@ void AStation::SpawnPassenger(StationType Destination) {
 	}
 	TotalSpawnPassenger[tmp.Destination]++;
 
+	// Update Passenger using count
+	StationInfo.TotalUsingPassenger++;
+	StationInfo.WeeklyUsingPassenger++;
 
 	Passenger.Add(MoveTemp(tmp));
 	UpdatePassengerMesh();
