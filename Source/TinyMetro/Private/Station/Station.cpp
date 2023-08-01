@@ -244,6 +244,10 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 				Passenger.RemoveAt(i);
 				UpdatePassengerMesh();
 
+				// Get money
+				if (!tmp.IsAlreadyPaid && !tmp.IsFree) PlayerStateRef->AddMoney(Fare);
+				tmp.IsAlreadyPaid = true;
+
 				return MoveTemp(tmp);
 			}
 		}

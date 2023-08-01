@@ -181,9 +181,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class AStation* Destination;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 Fare = 2;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
 

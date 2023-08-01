@@ -261,6 +261,8 @@ protected:
 	FStationInfo StationInfo;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	bool TransferStation = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	int32 Fare = 2;
 
 	// Touch
 	UPROPERTY(BlueprintReadWrite)
