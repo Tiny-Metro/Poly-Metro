@@ -34,6 +34,10 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	float Complain = 0.0f;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	int32 GetOnPassengerCount = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	float TotalWaitTime = 0.0f;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	float AverageWaitTime = 0.0f;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	int32 TotalTransferPassenger = 0;

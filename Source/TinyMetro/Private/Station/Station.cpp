@@ -245,8 +245,17 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 				UpdatePassengerMesh();
 
 				// Get money
-				if (!tmp.IsAlreadyPaid && !tmp.IsFree) PlayerStateRef->AddMoney(Fare);
+				if (!tmp.IsAlreadyPaid && !tmp.IsFree) {
+					PlayerStateRef->AddMoney(Fare);
+					StationInfo.TotalProfit += Fare;
+					StationInfo.WeeklyProfit += Fare;
+				}
 				tmp.IsAlreadyPaid = true;
+
+				// Update wait time
+				StationInfo.GetOnPassengerCount++;
+				StationInfo.TotalWaitTime += tmp.WaitTime;
+				StationInfo.AverageWaitTime = StationInfo.TotalWaitTime / StationInfo.GetOnPassengerCount;
 
 				return MoveTemp(tmp);
 			}
