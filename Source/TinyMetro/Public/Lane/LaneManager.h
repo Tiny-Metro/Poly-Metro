@@ -35,7 +35,7 @@ public:
 	//UPROPERTY(BlueprintReadWrite)
 	//int32 NextLaneId = 1;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TMap<int32, ALane*> Lanes;
 
 	UPROPERTY(BlueprintReadWrite)

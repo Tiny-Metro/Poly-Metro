@@ -22,19 +22,9 @@ ALane::ALane()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	
-	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-
-	TrainManagerRef = Cast<ATrainManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrainManager::StaticClass()));
-
-	BTMangerREF = Cast<ABridgeTunnelManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ABridgeTunnelManager::StaticClass()));;
-
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
-
-	LaneManagerRef = Cast<ALaneManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ALaneManager::StaticClass()));
 
 	for (auto& i : RemoveLanePath) {
 		RemoveLaneMaterial.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
@@ -52,6 +42,16 @@ void ALane::BeginPlay()
 	Super::BeginPlay();
 
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+
+	StationManagerRef = GameMode->GetStationManager();
+
+	TrainManagerRef = GameMode->GetTrainManager();
+
+	BTMangerREF = GameMode->GetBridgeTunnelManager();
+
+	LaneManagerRef = GameMode->GetLaneManager();
 
 	SaveManagerRef = GameMode->GetSaveManager();
 
@@ -1411,13 +1411,25 @@ bool ALane::Load()
 	if (!SaveManagerRef) {
 		SaveManagerRef = GameMode->GetSaveManager();
 	}
+	if (!StationManagerRef)
+	{
+		StationManagerRef = GameMode->GetStationManager();
+	}
+	if (!GridManagerRef)
+	{
+		GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	}
 
 	//Load Lane Data
-	ULaneSaveGame* tmp = Cast<ULaneSaveGame>(SaveManagerRef->Load(SaveActorType::Lane));
+	ULaneSaveGame* tmp = Cast<ULaneSaveGame>(SaveManagerRef->Load(SaveActorType::Lane, LaneId));
 
 	if (!IsValid(tmp)) {
+		UE_LOG(LogTemp, Warning, TEXT("Lane %d SaveGame is not valid"), LaneId);
 		return false;
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Lane %d is loaded"), LaneId);
+
 	
 	IsCircularLine = tmp->IsCircularLane;
 
@@ -1451,9 +1463,6 @@ bool ALane::Load()
 		LanePoint.LaneDirection = i.LaneDirection;
 		LanePoint.WillBeRemoved = i.WillBeRemoved;
 
-		//TODO : Add Mesh
-
-
 		LaneArray.Add(LanePoint);
 	}
 
@@ -1481,9 +1490,6 @@ bool ALane::Load()
 	{
 		StationPointBeforeRemovedEnd.Add(StationManagerRef->GetStationById(i));
 	}
-
-	//Spawn Start,End Point
-
 
 	return true;
 }
@@ -1791,8 +1797,16 @@ void ALane::SetHandleMaterial()
 
 void ALane::SetHandleTransform()
 {
+	if (!GridManagerRef)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is Null"));
+		return;
+	}
 	FVector StartLocation = PointToLocation(LaneArray[0].Coordination);
 	FRotator StartRotator = (StartLocation - PointToLocation(LaneArray[1].Coordination)).Rotation();
+	
+	UE_LOG(LogTemp, Warning, TEXT("StartLocation X::%f , Y::%f, Z::%f"), StartLocation.X, StartLocation.Y, StartLocation.Z);
+
 	StartHandle->SetWorldLocation(StartLocation);
 	StartHandle->SetWorldRotation(StartRotator);
 

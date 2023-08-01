@@ -225,9 +225,20 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 	for (const auto& Pair : Lanes)
 	{
 		const ALane* TargetLane = Pair.Value;
+		if (!IsValid(TargetLane))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid Lane detected, skipping process"));
+			continue;
+		}
 		int32 LaneId = TargetLane->GetLaneId();
 		UE_LOG(LogTemp, Warning, TEXT("GetPosition: Checking Lane ID = %d"), LaneId);
 		TArray<FLanePoint> TargetLaneArray = TargetLane->LaneArray;
+		if (!TargetLaneArray.IsValidIndex(0))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid LaneArray detected, skipping process"));
+			continue;
+		}
+
 
 		FIntPoint TargetStart = TargetLaneArray[0].Coordination;
 		FIntPoint TargetEnd;
@@ -355,6 +366,13 @@ bool ALaneManager::Load()
 		Lanes.Add(i, tmpLane);
 	}
 
+	for (const auto& i : Lanes)
+	{
+		i.Value->SpawnLaneMesh();
+
+		i.Value->SetHandleTransform();
+	}
+
 	return true;
 
 }
@@ -370,4 +388,3 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 
 	return tmpLane;
 }
-//>>>>>>> develop-LaneSaveOriginal

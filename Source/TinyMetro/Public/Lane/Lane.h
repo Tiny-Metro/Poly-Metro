@@ -76,7 +76,7 @@ public:
 	USplineComponent* LaneSpline;
 
 protected:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnyWhere)
 	int32 LaneId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> LaneMaterial;
