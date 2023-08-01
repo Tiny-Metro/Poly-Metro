@@ -43,6 +43,10 @@ public:
 	int32 TotalTransferPassenger = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	int32 WeeklyTransferPassenger = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	bool IsActive = false;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	bool IsDestroyed = false;
 
 
 	FStationInfo() { Id = 0; Type = StationType::Circle; }

@@ -171,3 +171,29 @@ FLuaValue UTinyMetroLuaState::GetBankStatistics() {
 
     return statisticsTable;
 }
+
+TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
+    InitReferClasses();
+    TArray<FLuaValue> infoTable;
+    auto stationInfos = StationManagerRef->GetAllStationInfo();
+
+    for (auto& i : stationInfos) {
+        FLuaValue tmp = CreateLuaTable();
+        tmp.SetField(TEXT("Id"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.Id));
+        tmp.SetField(TEXT("ServiceLaneCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.ServiceLaneCount));
+        tmp.SetField(TEXT("TotalUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.TotalUsingPassenger));
+        tmp.SetField(TEXT("WeeklyUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyUsingPassenger));
+        tmp.SetField(TEXT("TotalProfit"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.TotalProfit));
+        tmp.SetField(TEXT("WeeklyProfit"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyProfit));
+        tmp.SetField(TEXT("Complain"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(i.Complain));
+        tmp.SetField(TEXT("GetOnPassengerCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.GetOnPassengerCount));
+        tmp.SetField(TEXT("TotalWaitTime"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(i.TotalWaitTime));
+        tmp.SetField(TEXT("AverageWaitTime"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(i.AverageWaitTime));
+        tmp.SetField(TEXT("TotalTransferPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.TotalTransferPassenger));
+        tmp.SetField(TEXT("WeeklyTransferPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyTransferPassenger));
+        tmp.SetField(TEXT("IsActive"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsActive));
+        tmp.SetField(TEXT("IsDestroyed"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsDestroyed));
+    }
+
+    return infoTable;
+}

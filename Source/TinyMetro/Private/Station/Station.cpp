@@ -441,7 +441,8 @@ void AStation::CalculateComplain() {
 void AStation::SetActivate(bool Flag) {
 	IsActive = Flag;
 	State = Flag ? StationState::Active : StationState::Inactive;
-	
+	StationInfo.IsActive = true;
+
 	UpdateStationMesh();
 
 	// TODO :  Visible logic
@@ -519,6 +520,22 @@ StationState AStation::GetStationState() const {
 
 void AStation::SetStationState(StationState S) {
 	State = S;
+	switch (S) {
+	case StationState::Inactive:
+		StationInfo.IsActive = false;
+		StationInfo.IsDestroyed = false;
+		break;
+	case StationState::Active:
+		StationInfo.IsActive = true;
+		StationInfo.IsDestroyed = false;
+		break;
+	case StationState::Destroyed:
+		StationInfo.IsActive = false;
+		StationInfo.IsDestroyed = true;
+		break;
+	default:
+		break;
+	}
 	UpdateStationMesh();
 }
 

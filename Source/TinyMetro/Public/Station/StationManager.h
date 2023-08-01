@@ -210,6 +210,8 @@ public:
 	UFUNCTION()
 	int32 GetTypeStationCount(StationType Type) const;
 	UFUNCTION()
+	TArray<FStationInfo> GetAllStationInfo() const;
+	UFUNCTION()
 	FStationInfo GetRandomStationInfo() const;
 	UFUNCTION()
 	FStationInfo GetRandomActiveStationInfo() const;

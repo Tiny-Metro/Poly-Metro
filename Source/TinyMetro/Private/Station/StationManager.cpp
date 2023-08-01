@@ -704,6 +704,14 @@ int32 AStationManager::GetTypeStationCount(StationType Type) const {
 	return result;
 }
 
+TArray<FStationInfo> AStationManager::GetAllStationInfo() const {
+	TArray<FStationInfo> tmp;
+	for (auto& i : Station) {
+		tmp.Add(i->GetStationInfo());
+	}
+	return tmp;
+}
+
 FStationInfo AStationManager::GetRandomStationInfo() const {
 	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
 	do {

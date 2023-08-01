@@ -39,6 +39,8 @@ public:
 	FLuaValue GetTunnelStatistics();
 	UFUNCTION()
 	FLuaValue GetBankStatistics();
+	UFUNCTION()
+	TArray<FLuaValue> GetStationInfos();
 
 protected:
 	UPROPERTY()
