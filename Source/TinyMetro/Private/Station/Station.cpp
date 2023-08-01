@@ -256,6 +256,7 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 				StationInfo.GetOnPassengerCount++;
 				StationInfo.TotalWaitTime += tmp.WaitTime;
 				StationInfo.AverageWaitTime = StationInfo.TotalWaitTime / StationInfo.GetOnPassengerCount;
+				tmp.WaitTime = 0.0f;
 
 				return MoveTemp(tmp);
 			}
