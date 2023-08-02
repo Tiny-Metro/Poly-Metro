@@ -33,6 +33,7 @@ ALane::ALane()
 	OnPopHandleCalled.AddDynamic(this, &ALane::OnOtherLanePopHandleCalled);
 	CurrentlyPoppingLane = false;
 	InitLaneSpline();
+	InitHandles();
 }
 
 
@@ -148,6 +149,20 @@ void ALane::SetLaneId(int _LaneId)
 
 void ALane::InitLaneMaterial(TArray<UMaterial*> Materials) {
 	LaneMaterial.Append(Materials);
+}
+void ALane::InitHandles()
+{
+	EndHandle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EndHandle"));
+	StartHandle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StartHandle"));
+
+	//set Staticmesh of it
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(*LanedHandleMeshPath);
+
+	if (MeshAsset.Succeeded() )
+	{
+		EndHandle->SetStaticMesh(MeshAsset.Object);
+		StartHandle->SetStaticMesh(MeshAsset.Object);
+	}
 }
 
 bool ALane::GetIsCircularLine() const

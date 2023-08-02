@@ -82,7 +82,8 @@ protected:
 	TArray<UMaterial*> LaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString LanedHandleMeshPath = TEXT("StaticMesh'/Game/Lane/UpdatedMeshMatrial/SM_LaneEdge.SM_LaneEdge'");
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> RemoveLaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -340,6 +341,9 @@ public:
 
 	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 	UStaticMeshComponent* EndHandle;
+
+	UFUNCTION(BlueprintCallable)
+	void InitHandles();
 
 	UFUNCTION(BlueprintCallable)
 	void SetHandleMaterial();
