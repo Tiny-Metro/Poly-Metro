@@ -195,11 +195,33 @@ ALane* ALaneManager::GetLaneById(int32 LaneId) {
 
 void ALaneManager::InitLaneMaterial() {
 	LaneMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetLaneMaterialPath();
+
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	/*
 	AssetLoader.RequestAsyncLoad(
 		LaneMaterialPath,
 		FStreamableDelegate::CreateUObject(this, &ALaneManager::LaneMaterialDeferred)
 	);
+	AssetLoader.RequestAsyncLoad(
+		LaneMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ALaneManager::LaneMaterialDeferred)
+	);
+	*/
+	for (auto& Path : LaneMaterialPath)
+	{
+		// Load Material Synchronously
+		UMaterial* MaterialAsset = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, *Path.ToString()));
+
+		if (MaterialAsset)
+		{
+			LaneMaterial.Add(MaterialAsset);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load material at path: %s"), *Path.ToString());
+		}
+	}
+
 }
 
 void ALaneManager::LaneMaterialDeferred() {
@@ -358,6 +380,7 @@ bool ALaneManager::Load()
 	}
 
 	InitLaneMaterial();
+	UE_LOG(LogTemp, Warning, TEXT("LaneManager: Load Lane Manager - Warning - Lane Material Num, = %d"), LaneMaterial.Num());
 
 	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::LaneManager));
 
@@ -394,9 +417,13 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 
 	tmpLane->SetLaneId(LaneId);
 
+	UE_LOG(LogTemp, Warning, TEXT("LaneManager: Warning - Lane Material Nu, = %d"), LaneMaterial.Num() );
+	if (LaneMaterial.IsValidIndex(8))
+	{
 	tmpLane->InitLaneMaterial(LaneMaterial);
 
 	tmpLane->Load();
+	}
 
 	return tmpLane;
 }
