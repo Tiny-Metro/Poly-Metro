@@ -252,8 +252,10 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 				//Check if same Direction
 				if ((Diff.X == 0 && TargetDiff.X == 0)) {
 					if (Start.X == TargetStart.X) {
-						if ((Start.Y >= FMath::Min(TargetStart.Y, TargetEnd.Y) && Start.Y <= FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
-							(End.Y >= FMath::Min(TargetStart.Y, TargetEnd.Y) && End.Y <= FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
+						UE_LOG(LogTemp, Warning, TEXT("GetPosition: X!!! %d = X %d position Taken %d Lane ID = %d"), Start.X, TargetStart.X, TargetLaneArray[k - 1].LanePosition, LaneId);
+
+						if ((Start.Y > FMath::Min(TargetStart.Y, TargetEnd.Y) && Start.Y < FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
+							(End.Y > FMath::Min(TargetStart.Y, TargetEnd.Y) && End.Y < FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
 							(FMath::Min(Start.Y, End.Y) <= FMath::Min(TargetStart.Y, TargetEnd.Y) && FMath::Max(Start.Y, End.Y) >= FMath::Max(TargetStart.Y, TargetEnd.Y)))
 						{
 							TakenPosition.Add(TargetLaneArray[k - 1].LanePosition);
@@ -261,12 +263,15 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 
 						}
 					}
+					continue;
 				}
 				
 				if (Diff.Y == 0 && TargetDiff.Y == 0) {
 					if (Start.Y == TargetStart.Y) {
-						if ((Start.X >= FMath::Min(TargetStart.X, TargetEnd.X) && Start.X <= FMath::Max(TargetStart.X, TargetEnd.X)) ||
-							(End.X >= FMath::Min(TargetStart.X, TargetEnd.X) && End.X <= FMath::Max(TargetStart.X, TargetEnd.X)) ||
+						UE_LOG(LogTemp, Warning, TEXT("GetPosition: Y!!! %d = Y %d position Taken %d Lane ID = %d"), Start.Y, TargetStart.Y, TargetLaneArray[k - 1].LanePosition, LaneId);
+
+						if ((Start.X > FMath::Min(TargetStart.X, TargetEnd.X) && Start.X < FMath::Max(TargetStart.X, TargetEnd.X)) ||
+							(End.X > FMath::Min(TargetStart.X, TargetEnd.X) && End.X < FMath::Max(TargetStart.X, TargetEnd.X)) ||
 							(FMath::Min(Start.X, End.X) <= FMath::Min(TargetStart.X, TargetEnd.X) && FMath::Max(Start.X, End.X) >= FMath::Max(TargetStart.X, TargetEnd.X)))
 						{
 							TakenPosition.Add(TargetLaneArray[k - 1].LanePosition);
@@ -274,6 +279,8 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 
 						}
 					}
+					continue;
+
 				}
 
 				if(Diff.X * TargetDiff.Y == Diff.Y * TargetDiff.X) {
@@ -286,8 +293,8 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 					{
 						UE_LOG(LogTemp, Warning, TEXT("GetPosition:  (Start.Y - Start.X) == TargetStart.Y - TargetStart.X)   Lane ID = %d"), LaneId);
 
-						if ( ( (Start.X >= FMath::Min(TargetStart.X, TargetEnd.X) ) && (Start.X <= FMath::Max(TargetStart.X, TargetEnd.X) ) ) ||
-							( (End.X >= FMath::Min(TargetStart.X, TargetEnd.X) ) && ( End.X <= FMath::Max(TargetStart.X, TargetEnd.X)) ) ||
+						if ( ( (Start.X > FMath::Min(TargetStart.X, TargetEnd.X) ) && (Start.X < FMath::Max(TargetStart.X, TargetEnd.X) ) ) ||
+							( (End.X > FMath::Min(TargetStart.X, TargetEnd.X) ) && ( End.X < FMath::Max(TargetStart.X, TargetEnd.X)) ) ||
 							( (FMath::Min(Start.X, End.X) <= FMath::Min(TargetStart.X, TargetEnd.X) ) && (FMath::Max(Start.X, End.X) >= FMath::Max(TargetStart.X, TargetEnd.X) ) ))
 						{
 							TakenPosition.Add(TargetLaneArray[k - 1].LanePosition);
@@ -295,6 +302,7 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 
 						}
 					}
+					continue;
 				}
 
 				TargetStart = TargetEnd;
