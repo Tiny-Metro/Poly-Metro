@@ -276,7 +276,7 @@ void ALane::CheckStationPoint() {
 		UE_LOG(LogTemp, Warning, TEXT("tmpLaneArray0[%d] : X = %d , Y = %d"), i, tmpLaneArray0[i].Coordination.X, tmpLaneArray0[i].Coordination.Y);
 
 	}
-
+	
 	UE_LOG(LogTemp, Error, TEXT("CheckStationPoint End!"));
 	*/
 }
@@ -1434,6 +1434,8 @@ bool ALane::Load()
 	{
 		GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	}
+
+	SetMeshMaterial();
 
 	//Load Lane Data
 	ULaneSaveGame* tmp = Cast<ULaneSaveGame>(SaveManagerRef->Load(SaveActorType::Lane, LaneId));

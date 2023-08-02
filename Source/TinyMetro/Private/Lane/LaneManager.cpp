@@ -357,6 +357,8 @@ bool ALaneManager::Load()
 		SaveManagerRef = GameMode->GetSaveManager();
 	}
 
+	InitLaneMaterial();
+
 	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::LaneManager));
 
 	if (!IsValid(tmp)) {
@@ -391,6 +393,8 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 	ALane* tmpLane = SpawnLane();
 
 	tmpLane->SetLaneId(LaneId);
+
+	tmpLane->InitLaneMaterial(LaneMaterial);
 
 	tmpLane->Load();
 
