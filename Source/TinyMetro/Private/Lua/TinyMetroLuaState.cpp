@@ -20,6 +20,7 @@ UTinyMetroLuaState::UTinyMetroLuaState() {
     Table.Add(TEXT("GetBridgeStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetBridgeStatistics)));
     Table.Add(TEXT("GetTunnelStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTunnelStatistics)));
     Table.Add(TEXT("GetBankStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetBankStatistics)));
+    Table.Add(TEXT("GetStationInfos"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetStationInfos)));
 }
 
 UTinyMetroLuaState* UTinyMetroLuaState::CreateInstance(UWorld* WorldContextObject) {
