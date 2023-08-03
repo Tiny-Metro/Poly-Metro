@@ -44,6 +44,10 @@ public:
 	void DetachFromTrain();
 	UFUNCTION(BlueprintCallable)
 	void AttachToTrain(class ATrain* Train);
+	UFUNCTION(BlueprintCallable)
+	void SetIndex(int32 Idx);
+	UFUNCTION(BlueprintCallable)
+	int32 GetIndex() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,6 +60,8 @@ protected:
 	class ATrain* TrainRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	class ATrain* OwnerTrain;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
+	int32 Index = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class ASubtrainAiController* AiControllerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

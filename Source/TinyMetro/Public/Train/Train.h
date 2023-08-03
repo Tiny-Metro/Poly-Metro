@@ -56,6 +56,8 @@ public:
 	void DetachSubtrain(ASubtrain* T);
 	UFUNCTION()
 	void UpdateSubtrainSpeed();
+	UFUNCTION()
+	void IndexingSubtrain();
 
 protected:
 

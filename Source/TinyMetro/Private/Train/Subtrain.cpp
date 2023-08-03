@@ -192,3 +192,11 @@ void ASubtrain::AttachToTrain(ATrain* Train) {
 	OwnerTrain = Train;
 	OwnerTrainId = Train->GetTrainId();
 }
+
+void ASubtrain::SetIndex(int32 Idx) {
+	Index = Idx;
+}
+
+int32 ASubtrain::GetIndex() const {
+	return Index;
+}

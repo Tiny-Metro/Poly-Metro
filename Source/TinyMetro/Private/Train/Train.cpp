@@ -499,11 +499,18 @@ void ATrain::UpdateSubtrainDistance() {
 void ATrain::DetachSubtrain(ASubtrain* T) {
 	Subtrains.Remove(T);
 	UpdateSubtrainDistance();
+	IndexingSubtrain();
 }
 
 void ATrain::UpdateSubtrainSpeed() {
 	for (auto& i : Subtrains) {
 		i->SetTrainSpeed(IsUpgrade ? TRAIN_UPGRADE_SPEED : TRAIN_DEFAULT_SPEED);
+	}
+}
+
+void ATrain::IndexingSubtrain() {
+	for (int i = 0; i < Subtrains.Num(); i++) {
+		Subtrains[i]->SetIndex(i);
 	}
 }
 
@@ -514,5 +521,6 @@ void ATrain::AddSubtrain(ASubtrain* T) {
 	T->SetActorLocation(this->GetActorLocation());
 	UpdateSubtrainDistance();
 	UpdateSubtrainSpeed();
+	IndexingSubtrain();
 }
 
