@@ -368,6 +368,10 @@ bool ATrain::CanUpgrade() const {
 	}
 }
 
+int32 ATrain::GetSubtrainCount() const {
+	return Subtrains.Num();
+}
+
 void ATrain::ActiveMoveTest() {
 	TrainMovement->SetActive(true);
 }
@@ -404,6 +408,26 @@ void ATrain::GetOnPassenger(AStation* Station) {
 
 		AiControllerRef->Patrol();
 	}
+}
+
+int32 ATrain::GetTotalPassenger() const {
+	int32 result = 0;
+	for (auto& i : Subtrains) {
+		result += i->GetTotalBoardPassenger();
+	}
+	result += GetTotalBoardPassenger();
+
+	return result;
+}
+
+int32 ATrain::GetWeeklyPassenger() const {
+	int32 result = 0;
+	for (auto& i : Subtrains) {
+		result += i->GetWeeklyBoardPassenger();
+	}
+	result += GetWeeklyBoardPassenger();
+
+	return result;
 }
 
 void ATrain::GetOffPassenger(AStation* Station, bool& Success) {

@@ -97,6 +97,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanUpgrade() const;
 
+	// Return class field { TotalBoardPassenger, WeeklyBoardPassenger }
+	UFUNCTION(BlueprintCallable)
+	int32 GetTotalBoardPassenger() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetWeeklyBoardPassenger() const;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, UPARAM(DisplayName = "Destination")class AStation* D);
@@ -123,6 +128,8 @@ public:
 	virtual void TrainOnPressed(AActor* Target, FKey ButtonPressed);
 	UFUNCTION()
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
+	UFUNCTION(BlueprintCallable)
+	int32 GetShiftCount() const;
 
 	UFUNCTION()
 	void SetDespawnNextStation();
@@ -130,7 +137,7 @@ public:
 	UFUNCTION()
 	void SetTrainInfoWidget(class UTrainInfoWidget* Widget);
 
-	// Daily, Weekly tasks
+	// Weekly tasks
 	UFUNCTION()
 	virtual void WeeklyTask();
 
@@ -175,8 +182,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float TotalTravel = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 TotalPassenger = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 MaxPassengerSlotUpgrade = 8;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 MaxPassengerSlot = 6;
@@ -188,6 +193,10 @@ protected:
 	FStationInfo NextStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class AStation* Destination;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 TotalBoardPassenger = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 WeeklyBoardPassenger = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
@@ -201,6 +210,8 @@ protected:
 	float TouchTime = 0.0f;
 	UPROPERTY(BlueprintReadWrite)
 	bool TouchInput = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	int32 ShiftCount = -1;
 	UPROPERTY(BlueprintReadWrite)
 	float TrainSafeDistance = 250.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")

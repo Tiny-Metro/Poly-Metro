@@ -44,10 +44,18 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
+	UFUNCTION(BlueprintCallable)
+	int32 GetSubtrainCount() const;
 	UFUNCTION()
 	void ActiveMoveTest(); 
 	UFUNCTION()
 	void GetOnPassenger(class AStation* Station);
+
+	// Return { TotalBoardPassenger, WeeklyBoardPassenger } on Train and own Subtrain
+	UFUNCTION(BlueprintCallable)
+	int32 GetTotalPassenger() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetWeeklyPassenger() const;
 
 	virtual void GetOffPassenger(class AStation* Station, bool& Success) override;
 	UFUNCTION()

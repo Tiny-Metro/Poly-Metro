@@ -149,7 +149,8 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 		if (!Passenger.Contains(i)) {
 			Passenger.Add(i, P);
 
-			TotalPassenger++;
+			TotalBoardPassenger++;
+			WeeklyBoardPassenger++;
 
 			// TODO : Transfer passenger
 			{
@@ -183,11 +184,20 @@ bool ATrainTemplate::CanUpgrade() const {
 	return false;
 }
 
+int32 ATrainTemplate::GetTotalBoardPassenger() const {
+	return TotalBoardPassenger;
+}
+
+int32 ATrainTemplate::GetWeeklyBoardPassenger() const {
+	return WeeklyBoardPassenger;
+}
+
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
 	ServiceLaneId = Lane->GetLaneId();
+	ShiftCount++;
 	UpdateTrainMesh();
 }
 
@@ -289,6 +299,10 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	TouchTime = 0.0f;
 }
 
+int32 ATrainTemplate::GetShiftCount() const {
+	return ShiftCount;
+}
+
 void ATrainTemplate::SetDespawnNextStation() {
 	DeferredDespawn = true;
 }
@@ -299,7 +313,8 @@ void ATrainTemplate::SetTrainInfoWidget(UTrainInfoWidget* Widget) {
 
 // Broadcast by TimerRef
 void ATrainTemplate::WeeklyTask() {
-	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::WeeklyTask"))
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::WeeklyTask"));
+	WeeklyBoardPassenger = 0;
 }
 
 // Called every frame
