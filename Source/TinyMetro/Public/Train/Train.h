@@ -59,6 +59,9 @@ public:
 	UFUNCTION()
 	void IndexingSubtrain();
 
+	// Weekly tasks
+	virtual void WeeklyTask() override;
+
 protected:
 
 	// Called when the game starts or when spawned

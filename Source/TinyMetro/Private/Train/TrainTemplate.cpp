@@ -75,17 +75,20 @@ void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	LaneManagerRef = GameModeRef->GetLaneManager();
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	StationManagerRef = GameModeRef->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-	TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
-	StatisticsManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStatisticsManager();
+	TrainManagerRef = GameModeRef->GetTrainManager();
+	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+	TimerRef = GameModeRef->GetTimer();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
 	//InitTrainMesh();
 
+	TimerRef->WeeklyTask.AddDynamic(this, &ATrainTemplate::WeeklyTask);
 }
 
 void ATrainTemplate::UpdatePassengerMesh() {
@@ -292,6 +295,11 @@ void ATrainTemplate::SetDespawnNextStation() {
 
 void ATrainTemplate::SetTrainInfoWidget(UTrainInfoWidget* Widget) {
 	TrainInfoWidget = Widget;
+}
+
+// Broadcast by TimerRef
+void ATrainTemplate::WeeklyTask() {
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::WeeklyTask"))
 }
 
 // Called every frame

@@ -514,6 +514,11 @@ void ATrain::IndexingSubtrain() {
 	}
 }
 
+void ATrain::WeeklyTask() {
+	Super::WeeklyTask();
+	UE_LOG(LogTemp, Log, TEXT("Train::WeeklyTask"));
+}
+
 void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.AddUnique(T);

@@ -130,12 +130,18 @@ public:
 	UFUNCTION()
 	void SetTrainInfoWidget(class UTrainInfoWidget* Widget);
 
+	// Daily, Weekly tasks
+	UFUNCTION()
+	virtual void WeeklyTask();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 TrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 ServiceLaneId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALane* LaneRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALaneManager* LaneManagerRef;
@@ -149,6 +155,8 @@ protected:
 	class ATrainManager* TrainManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class AStatisticsManager* StatisticsManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class ATimer* TimerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

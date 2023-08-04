@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetIndex() const;
 
+	// Weekly tasks
+	virtual void WeeklyTask() override;
+
 protected:
 	virtual void BeginPlay() override;
 

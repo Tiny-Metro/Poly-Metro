@@ -200,3 +200,7 @@ void ASubtrain::SetIndex(int32 Idx) {
 int32 ASubtrain::GetIndex() const {
 	return Index;
 }
+
+void ASubtrain::WeeklyTask() {
+	UE_LOG(LogTemp, Log, TEXT("Subtrain::WeeklyTask"));
+}
