@@ -294,6 +294,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClearLanePoint();
 
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaneSpline();
@@ -303,7 +304,7 @@ public:
 	void HandleScaling(bool IsScaling, float Length);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	double SectionLength;
+	double SectionLength = 100;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -418,4 +419,9 @@ public: //Save
 
 	void SpawnLaneMesh();
 
+private:
+	bool HasSaveFile = false;
+
+public:
+	void SetHasSaveFile(bool hasSave);
 };

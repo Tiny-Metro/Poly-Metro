@@ -29,6 +29,10 @@ ALane::ALane()
 	for (auto& i : RemoveLanePath) {
 		RemoveLaneMaterial.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
 	}
+	if (!GridManagerRef)
+	{
+		GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	}
 
 	OnPopHandleCalled.AddDynamic(this, &ALane::OnOtherLanePopHandleCalled);
 	CurrentlyPoppingLane = false;
@@ -59,6 +63,11 @@ void ALane::BeginPlay()
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	SaveManagerRef->SaveTask.AddDynamic(this, &ALane::Save);
+
+	if (HasSaveFile) 
+	{
+		SpawnLaneMesh();
+	}
 }
 
 // Called every frame
@@ -1436,7 +1445,7 @@ bool ALane::Load()
 	}
 
 	SetMeshMaterial();
-
+	SetHandleMaterial();
 	//Load Lane Data
 	ULaneSaveGame* tmp = Cast<ULaneSaveGame>(SaveManagerRef->Load(SaveActorType::Lane, LaneId));
 
@@ -1567,7 +1576,7 @@ void ALane::UpdateLocationAndSpline()
 void ALane::SetLaneLocation() {
 
 	if (!GridManagerRef){
-		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+		UE_LOG(LogTemp, Warning, TEXT("SetLaneLocation: GridManagerRef is not valid."));
 		return;
 	}
 
@@ -1645,6 +1654,7 @@ void ALane::SetLaneSpline(){
 	for (int32 i = 0; i < LaneLocation.Num(); i++) {
 		LaneSpline->SetSplinePointType(i, ESplinePointType::Linear, true);
 	}
+	UE_LOG(LogTemp, Warning, TEXT("SetLaneSpline: %d"), LaneSpline->GetNumberOfSplinePoints());
 }
 
 // Heloper Function for 'SetLaneLocation'
@@ -1819,11 +1829,11 @@ void ALane::SetHandleTransform()
 		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is Null"));
 		return;
 	}
+	if (LaneArray.IsValidIndex(0))
+	{
 	FVector StartLocation = PointToLocation(LaneArray[0].Coordination);
 	FRotator StartRotator = (StartLocation - PointToLocation(LaneArray[1].Coordination)).Rotation();
-	
 	UE_LOG(LogTemp, Warning, TEXT("StartLocation X::%f , Y::%f, Z::%f"), StartLocation.X, StartLocation.Y, StartLocation.Z);
-
 	StartHandle->SetWorldLocation(StartLocation);
 	StartHandle->SetWorldRotation(StartRotator);
 
@@ -1831,6 +1841,12 @@ void ALane::SetHandleTransform()
 	FRotator EndRotator = (EndLocation - PointToLocation(LaneArray.Last(1).Coordination)).Rotation();
 	EndHandle->SetWorldLocation(EndLocation);
 	EndHandle->SetWorldRotation(EndRotator);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SetHandleTransform : 0 index Invalid"));
+		return;
+	}
 }
 
 void ALane::ChangeRemoveMaterialAtIndex(int32 Index) // also make WillBeRemoved = true;
@@ -2359,6 +2375,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 			}
 
 	}
+	UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex."));
 
 }
 
@@ -2384,6 +2401,7 @@ void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVect
 	}
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
+	SplineMeshComponent->RegisterComponent();
 	LaneArray[Index].MeshArray.Add(SplineMeshComponent);
 }
 
@@ -2404,4 +2422,9 @@ void ALane::InitLaneSpline()
 	// Create the spline component and attach it to the RootComponent
 	LaneSpline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 	RootComponent = LaneSpline;
+}
+
+void ALane::SetHasSaveFile(bool hasSave)
+{
+	HasSaveFile = hasSave;
 }

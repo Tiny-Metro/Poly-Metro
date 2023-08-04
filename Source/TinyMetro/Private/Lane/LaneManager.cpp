@@ -401,7 +401,7 @@ bool ALaneManager::Load()
 
 	for (const auto& i : Lanes)
 	{
-		i.Value->SpawnLaneMesh();
+//		i.Value->SpawnLaneMesh();
 
 		i.Value->SetHandleTransform();
 	}
@@ -418,11 +418,14 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 	tmpLane->SetLaneId(LaneId);
 
 	UE_LOG(LogTemp, Warning, TEXT("LaneManager: Warning - Lane Material Nu, = %d"), LaneMaterial.Num() );
-	if (LaneMaterial.IsValidIndex(8))
+	if (LaneMaterial.IsValidIndex(7))
 	{
-	tmpLane->InitLaneMaterial(LaneMaterial);
 
-	tmpLane->Load();
+		tmpLane->InitLaneMaterial(LaneMaterial);
+
+		bool hasSave = tmpLane -> Load();
+
+		tmpLane->SetHasSaveFile(hasSave);
 	}
 
 	return tmpLane;
