@@ -35,7 +35,7 @@ public:
 	//UPROPERTY(BlueprintReadWrite)
 	//int32 NextLaneId = 1;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TMap<int32, ALane*> Lanes;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -57,8 +57,13 @@ protected:
 	TArray<int32> NextLaneNums = {1,2,3,4,5,6,7,8};
 
 	UPROPERTY(BlueprintReadOnly)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(BlueprintReadOnly)
 	AStationManager* StationManagerRef;
 
+	UPROPERTY(BlueprintReadOnly)
+	class ATMSaveManager* SaveManagerRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> LaneMaterial;
@@ -85,6 +90,9 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
+	class ALane* SpawnLane();
+
+	UFUNCTION(BlueprintCallable)
 	void CreatingNewLane(TArray <AStation*> SelectedStations);
 
 	UFUNCTION(BlueprintCallable)
@@ -106,4 +114,13 @@ public:
 
 public:
 	int32 GetPosition(FIntPoint Start, FIntPoint End);
+
+	UFUNCTION()
+	void Save();
+
+	UFUNCTION()
+	bool Load();
+
+	UFUNCTION()
+	class ALane* LoadLane(int32 LaneId);
 };

@@ -5,6 +5,8 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include <Engine/AssetManager.h>
 #include <Kismet/GameplayStatics.h>
+#include "Lane/LaneManagerSaveGame.h"
+#include "SaveSystem/TMSaveManager.h"
 
 
 // Sets default values
@@ -20,8 +22,13 @@ void ALaneManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
+	SaveManagerRef = GameMode->GetSaveManager();
+	
 	InitLaneMaterial();
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ALaneManager::Save);
 }
 
 // Called every frame
@@ -77,14 +84,8 @@ void ALaneManager::RemoveDestroyedLane(int LaneNum)
 	Lanes.Remove(LaneNum);
 }
 
-void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
-
-	if (NextLaneNums.IsEmpty()) {
-
-		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
-		return;
-	}
-
+ALane* ALaneManager::SpawnLane()
+{
 	// Load BP Class
 	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
 
@@ -93,14 +94,14 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	// Check object validation
 	if (!SpawnActor) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / Lane")));
-		return;
+		return nullptr;
 	}
 
 	// Check null
 	UClass* SpawnClass = SpawnActor->StaticClass();
 	if (SpawnClass == nullptr) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return;
+		return nullptr;
 	}
 
 	// Spawn actor
@@ -108,9 +109,21 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	FTransform SpawnTransform;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
-
 	
+	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
+	
+	return tmpLane;
+}
+
+void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
+
+	if (NextLaneNums.IsEmpty()) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
+		return;
+	}
+
+	ALane* tmpLane = SpawnLane();
 
 	//ALane* tmpLane = GetWorld()->SpawnActor<>();
 	tmpLane->SetLaneId(NextLaneNums[0]);
@@ -182,11 +195,33 @@ ALane* ALaneManager::GetLaneById(int32 LaneId) {
 
 void ALaneManager::InitLaneMaterial() {
 	LaneMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetLaneMaterialPath();
+
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
+	/*
 	AssetLoader.RequestAsyncLoad(
 		LaneMaterialPath,
 		FStreamableDelegate::CreateUObject(this, &ALaneManager::LaneMaterialDeferred)
 	);
+	AssetLoader.RequestAsyncLoad(
+		LaneMaterialPath,
+		FStreamableDelegate::CreateUObject(this, &ALaneManager::LaneMaterialDeferred)
+	);
+	*/
+	for (auto& Path : LaneMaterialPath)
+	{
+		// Load Material Synchronously
+		UMaterial* MaterialAsset = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, *Path.ToString()));
+
+		if (MaterialAsset)
+		{
+			LaneMaterial.Add(MaterialAsset);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load material at path: %s"), *Path.ToString());
+		}
+	}
+
 }
 
 void ALaneManager::LaneMaterialDeferred() {
@@ -201,6 +236,7 @@ TArray<UMaterial*> ALaneManager::GetLaneMaterial() const {
 	return LaneMaterial;
 }
 
+//<<<<<<< HEAD
 int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 	
 	UE_LOG(LogTemp, Warning, TEXT("Start Getting Position"));
@@ -211,9 +247,20 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 	for (const auto& Pair : Lanes)
 	{
 		const ALane* TargetLane = Pair.Value;
+		if (!IsValid(TargetLane))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid Lane detected, skipping process"));
+			continue;
+		}
 		int32 LaneId = TargetLane->GetLaneId();
 		UE_LOG(LogTemp, Warning, TEXT("GetPosition: Checking Lane ID = %d"), LaneId);
 		TArray<FLanePoint> TargetLaneArray = TargetLane->LaneArray;
+		if (!TargetLaneArray.IsValidIndex(0))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid LaneArray detected, skipping process"));
+			continue;
+		}
+
 
 		FIntPoint TargetStart = TargetLaneArray[0].Coordination;
 		FIntPoint TargetEnd;
@@ -227,8 +274,10 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 				//Check if same Direction
 				if ((Diff.X == 0 && TargetDiff.X == 0)) {
 					if (Start.X == TargetStart.X) {
-						if ((Start.Y >= FMath::Min(TargetStart.Y, TargetEnd.Y) && Start.Y <= FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
-							(End.Y >= FMath::Min(TargetStart.Y, TargetEnd.Y) && End.Y <= FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
+						UE_LOG(LogTemp, Warning, TEXT("GetPosition: X!!! %d = X %d position Taken %d Lane ID = %d"), Start.X, TargetStart.X, TargetLaneArray[k - 1].LanePosition, LaneId);
+
+						if ((Start.Y > FMath::Min(TargetStart.Y, TargetEnd.Y) && Start.Y < FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
+							(End.Y > FMath::Min(TargetStart.Y, TargetEnd.Y) && End.Y < FMath::Max(TargetStart.Y, TargetEnd.Y)) ||
 							(FMath::Min(Start.Y, End.Y) <= FMath::Min(TargetStart.Y, TargetEnd.Y) && FMath::Max(Start.Y, End.Y) >= FMath::Max(TargetStart.Y, TargetEnd.Y)))
 						{
 							TakenPosition.Add(TargetLaneArray[k - 1].LanePosition);
@@ -236,12 +285,15 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 
 						}
 					}
+					continue;
 				}
 				
 				if (Diff.Y == 0 && TargetDiff.Y == 0) {
 					if (Start.Y == TargetStart.Y) {
-						if ((Start.X >= FMath::Min(TargetStart.X, TargetEnd.X) && Start.X <= FMath::Max(TargetStart.X, TargetEnd.X)) ||
-							(End.X >= FMath::Min(TargetStart.X, TargetEnd.X) && End.X <= FMath::Max(TargetStart.X, TargetEnd.X)) ||
+						UE_LOG(LogTemp, Warning, TEXT("GetPosition: Y!!! %d = Y %d position Taken %d Lane ID = %d"), Start.Y, TargetStart.Y, TargetLaneArray[k - 1].LanePosition, LaneId);
+
+						if ((Start.X > FMath::Min(TargetStart.X, TargetEnd.X) && Start.X < FMath::Max(TargetStart.X, TargetEnd.X)) ||
+							(End.X > FMath::Min(TargetStart.X, TargetEnd.X) && End.X < FMath::Max(TargetStart.X, TargetEnd.X)) ||
 							(FMath::Min(Start.X, End.X) <= FMath::Min(TargetStart.X, TargetEnd.X) && FMath::Max(Start.X, End.X) >= FMath::Max(TargetStart.X, TargetEnd.X)))
 						{
 							TakenPosition.Add(TargetLaneArray[k - 1].LanePosition);
@@ -249,6 +301,8 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 
 						}
 					}
+					continue;
+
 				}
 
 				if(Diff.X * TargetDiff.Y == Diff.Y * TargetDiff.X) {
@@ -261,8 +315,8 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 					{
 						UE_LOG(LogTemp, Warning, TEXT("GetPosition:  (Start.Y - Start.X) == TargetStart.Y - TargetStart.X)   Lane ID = %d"), LaneId);
 
-						if ( ( (Start.X >= FMath::Min(TargetStart.X, TargetEnd.X) ) && (Start.X <= FMath::Max(TargetStart.X, TargetEnd.X) ) ) ||
-							( (End.X >= FMath::Min(TargetStart.X, TargetEnd.X) ) && ( End.X <= FMath::Max(TargetStart.X, TargetEnd.X)) ) ||
+						if ( ( (Start.X > FMath::Min(TargetStart.X, TargetEnd.X) ) && (Start.X < FMath::Max(TargetStart.X, TargetEnd.X) ) ) ||
+							( (End.X > FMath::Min(TargetStart.X, TargetEnd.X) ) && ( End.X < FMath::Max(TargetStart.X, TargetEnd.X)) ) ||
 							( (FMath::Min(Start.X, End.X) <= FMath::Min(TargetStart.X, TargetEnd.X) ) && (FMath::Max(Start.X, End.X) >= FMath::Max(TargetStart.X, TargetEnd.X) ) ))
 						{
 							TakenPosition.Add(TargetLaneArray[k - 1].LanePosition);
@@ -270,6 +324,7 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 
 						}
 					}
+					continue;
 				}
 
 				TargetStart = TargetEnd;
@@ -297,4 +352,77 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Position : INVALID"));
 	return - 1;
+}
+
+void ALaneManager::Save()
+{
+	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(ULaneManagerSaveGame::StaticClass()));
+
+	tmp->CanAssignBridge = CanAssignBridge;
+	tmp->CanAssignTunnel = CanAssignTunnel;
+	tmp->NextLaneNums = NextLaneNums;
+
+	for (auto& i : Lanes)
+	{
+		tmp->Lanes.Add(i.Key);
+	}
+
+	SaveManagerRef->Save(tmp, SaveActorType::LaneManager);
+}
+
+bool ALaneManager::Load()
+{
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
+	if (!SaveManagerRef) {
+		SaveManagerRef = GameMode->GetSaveManager();
+	}
+
+	InitLaneMaterial();
+
+	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::LaneManager));
+
+	if (!IsValid(tmp)) 
+	{
+		return false;
+	}
+
+	CanAssignBridge = tmp->CanAssignBridge;
+	CanAssignTunnel = tmp->CanAssignTunnel;
+	NextLaneNums = tmp->NextLaneNums;
+
+	for (auto& i : tmp->Lanes)
+	{
+		ALane* tmpLane = LoadLane(i);
+
+		Lanes.Add(i, tmpLane);
+	}
+
+	for (const auto& i : Lanes)
+	{
+		i.Value->SetHandleTransform();
+	}
+
+	return true;
+
+}
+
+ALane* ALaneManager::LoadLane(int32 LaneId)
+{
+
+	ALane* tmpLane = SpawnLane();
+
+	tmpLane->SetLaneId(LaneId);
+
+	if (LaneMaterial.IsValidIndex(7))
+	{
+		tmpLane->InitLaneMaterial(LaneMaterial);
+
+		bool hasSave = tmpLane -> Load();
+
+		tmpLane->SetHasSaveFile(hasSave);
+	}
+
+	return tmpLane;
 }

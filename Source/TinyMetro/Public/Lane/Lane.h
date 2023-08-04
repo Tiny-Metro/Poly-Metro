@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "LanePoint.h"
 #include "MeshComponentArray.h"
-//#include "LaneManager.h"
 #include "../GridGenerator/GridManager.h"
 #include "../Train/TrainDirection.h"
 #include "../Station/StationManager.h"
@@ -49,6 +48,9 @@ public:
 	TArray<FLanePoint> LaneArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AGridManager* GridManagerRef;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -67,15 +69,21 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ABridgeTunnelManager* BTMangerREF;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spline")
+	USplineComponent* LaneSpline;
 
 protected:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnyWhere)
 	int32 LaneId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> LaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString LanedHandleMeshPath = TEXT("StaticMesh'/Game/Lane/UpdatedMeshMatrial/SM_LaneEdge.SM_LaneEdge'");
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> RemoveLaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -286,20 +294,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClearLanePoint();
 
+
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetLaneSpline(USplineComponent* Spline);
+	void SetLaneSpline();
 
 public:
 	UFUNCTION(BlueprintCallable)
 	void HandleScaling(bool IsScaling, float Length);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	double SectionLength;
+	double SectionLength = 100;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void HandleFullLength(bool IsFullLength, USplineComponent* Spline);
+	void HandleFullLength(bool IsFullLength);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 EndLoop;
@@ -316,7 +325,7 @@ public:
 	void ChangeRemoveMaterialAtIndex(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
-	void SetSplineMeshes(USplineComponent* Spline);
+	void SetSplineMeshes();
 
 private:
 	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
@@ -335,6 +344,9 @@ public:
 	UStaticMeshComponent* EndHandle;
 
 	UFUNCTION(BlueprintCallable)
+	void InitHandles();
+
+	UFUNCTION(BlueprintCallable)
 	void SetHandleMaterial();
 	
 	UFUNCTION(BlueprintCallable)
@@ -344,19 +356,19 @@ public:
 	void SetMesh(UStaticMesh* Mesh, UStaticMesh* Through);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveLaneFromStart(int32 Index, USplineComponent* Spline);
+	void RemoveLaneFromStart(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	void ClearSplineMeshAt(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveLaneFromEnd(int32 Index, int32 ExStationNum, USplineComponent* Spline);
+	void RemoveLaneFromEnd(int32 Index, int32 ExStationNum);
 
 	UFUNCTION(BlueprintCallable)
-	void ExtendStart(AStation* NewStation, USplineComponent* Spline);
+	void ExtendStart(AStation* NewStation);
 
 	UFUNCTION(BlueprintCallable)
-	void ExtendEnd(AStation* NewStation, USplineComponent* Spline);
+	void ExtendEnd(AStation* NewStation);
 
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
@@ -374,12 +386,13 @@ private:
 	int32 GetRequiredConnector(TArray<TArray<FIntPoint>>& AreaArray, GridType type);
 //Helper Functions
 	ConnectorType GetConnectorType(GridType Type);
-//REFACTORING
 private: 
 	// Sets coord, bend, through,, lane position etc
 	TArray<FLanePoint> GetLanePath(AStation* StartStation, AStation* EndStation);
-	void SetMeshByIndex(int32 StartIndex, int32 LastIndex, USplineComponent* Spline);
-	void SetSplineMeshComponent(USplineComponent* Spline, FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
+	TArray<FLanePoint> GetLanePathByPoint(FIntPoint StartStation, FIntPoint EndStation);
+	void GetLaneArrays(FIntPoint StartStationCoord, FIntPoint AddedStationCoord, TArray<FLanePoint>& PreLaneArray);
+	void SetMeshByIndex(int32 StartIndex, int32 LastIndex);
+	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
 	FVector LineIntersection(FVector A, FVector B, FVector C, FVector D);
 
 	float CalculateOffset(int32 LanePosition);
@@ -387,6 +400,28 @@ private:
 	FVector CalculatePerpendicular(FVector LineDirection, float Offset, float off);
 	FVector ChangePerpendicularToStandard(FVector Perpendicular);
 
-	void UpdateLocationAndSpline(USplineComponent* Spline);
+	void UpdateLocationAndSpline();
 	void GetLaneArray(const TArray<class AStation*>& NewStationPoint, TArray<FLanePoint>& PreLaneArray);
+public:
+	UFUNCTION(BlueprintCallable)
+	bool CheckExtendable(FIntPoint StartingStationCoordinate, FIntPoint AddedStationCoordinate);
+	void InitLaneSpline();
+
+//	bool IsBuildble();
+
+
+public: //Save
+	UFUNCTION()
+	void Save();
+
+	UFUNCTION()
+	bool Load();
+
+	void SpawnLaneMesh();
+
+private:
+	bool HasSaveFile = false;
+
+public:
+	void SetHasSaveFile(bool hasSave);
 };
