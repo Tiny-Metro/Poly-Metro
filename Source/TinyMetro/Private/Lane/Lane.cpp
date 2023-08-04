@@ -259,6 +259,12 @@ void ALane::SetAlreadyDeleted(bool _Delete)
 	AlreadyDeleted = _Delete;
 }
 
+void ALane::StopHandleEditing()
+{
+	IsStartHandleEditing = false;
+	IsEndHandleEditing = false;
+}
+
 int32 ALane::GetLaneId() const
 {
 	return LaneId;

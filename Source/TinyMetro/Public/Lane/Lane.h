@@ -107,6 +107,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle SpawnTrainCheckTimer;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool IsStartHandleEditing = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool IsEndHandleEditing = false;
+
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -131,6 +137,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetAlreadyDeleted(bool _Delete);
+
+	UFUNCTION(BlueprintCallable)
+	void StopHandleEditing();
+
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
