@@ -1462,7 +1462,10 @@ bool ALane::Load()
 	//StationPoint Save
 	for (const auto& i : tmp->StationPoint)
 	{
+		AStation* Station = StationManagerRef->GetStationById(i);
 		StationPoint.Add(StationManagerRef->GetStationById(i));
+
+		Station->SetActivate(true);
 	}
 
 	//PointArray Save

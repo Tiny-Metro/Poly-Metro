@@ -353,7 +353,7 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 	UE_LOG(LogTemp, Warning, TEXT("Position : INVALID"));
 	return - 1;
 }
-//=======
+
 void ALaneManager::Save()
 {
 	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(ULaneManagerSaveGame::StaticClass()));
@@ -380,11 +380,11 @@ bool ALaneManager::Load()
 	}
 
 	InitLaneMaterial();
-	UE_LOG(LogTemp, Warning, TEXT("LaneManager: Load Lane Manager - Warning - Lane Material Num, = %d"), LaneMaterial.Num());
 
 	ULaneManagerSaveGame* tmp = Cast<ULaneManagerSaveGame>(SaveManagerRef->Load(SaveActorType::LaneManager));
 
-	if (!IsValid(tmp)) {
+	if (!IsValid(tmp)) 
+	{
 		return false;
 	}
 
@@ -401,8 +401,6 @@ bool ALaneManager::Load()
 
 	for (const auto& i : Lanes)
 	{
-//		i.Value->SpawnLaneMesh();
-
 		i.Value->SetHandleTransform();
 	}
 
@@ -417,10 +415,8 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 
 	tmpLane->SetLaneId(LaneId);
 
-	UE_LOG(LogTemp, Warning, TEXT("LaneManager: Warning - Lane Material Nu, = %d"), LaneMaterial.Num() );
 	if (LaneMaterial.IsValidIndex(7))
 	{
-
 		tmpLane->InitLaneMaterial(LaneMaterial);
 
 		bool hasSave = tmpLane -> Load();
