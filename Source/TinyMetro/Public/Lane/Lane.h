@@ -204,25 +204,25 @@ public : // BlueprintNativeEvent
 
 public: //Delay Removing
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationsToBeRemovedAtEnd;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationsToBeRemovedAtStart;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationPointBeforeRemovedEnd;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationPointBeforeRemovedStart;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	bool DoesStationsToBeRemovedAtStart= false;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	bool DoesStationsToBeRemovedAtEnd = false;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	bool DoesLaneToBeRemoved = false;
 
 	UFUNCTION(BlueprintCallable)
