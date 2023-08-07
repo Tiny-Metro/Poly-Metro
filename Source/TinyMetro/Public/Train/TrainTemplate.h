@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TrainDirection.h"
+#include "TrainInfo.h"
 #include "../Station/StationInfo.h"
 #include "../Station/Passenger.h"
 #include "TrainTemplate.generated.h"
@@ -134,6 +135,8 @@ public:
 	UFUNCTION()
 	void SetDespawnNextStation();
 
+	UFUNCTION(BlueprintCallable)
+	FTrainInfo GetTrainInfo();
 	UFUNCTION()
 	void SetTrainInfoWidget(class UTrainInfoWidget* Widget);
 
@@ -142,10 +145,8 @@ public:
 	virtual void WeeklyTask();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 TrainId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 ServiceLaneId;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	FTrainInfo TrainInfo;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
@@ -172,8 +173,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> LineTraceIgnoreActors;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	bool IsUpgrade = false;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorDragged = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float OnPressedTime;
@@ -193,10 +192,6 @@ protected:
 	FStationInfo NextStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class AStation* Destination;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 TotalBoardPassenger = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 WeeklyBoardPassenger = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
@@ -210,8 +205,6 @@ protected:
 	float TouchTime = 0.0f;
 	UPROPERTY(BlueprintReadWrite)
 	bool TouchInput = false;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 ShiftCount = -1;
 	UPROPERTY(BlueprintReadWrite)
 	float TrainSafeDistance = 250.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
