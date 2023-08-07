@@ -68,6 +68,10 @@ void APolicy::SetTransfer(bool Flag) {
 	StationManagerRef->SetTransfer(Flag);
 }
 
+FPolicyData APolicy::GetPolicyData() const {
+	return PolicyData;
+}
+
 int APolicy::GetServiceCostLevel() {
 	return PolicyData.ServiceCostLevel;
 }

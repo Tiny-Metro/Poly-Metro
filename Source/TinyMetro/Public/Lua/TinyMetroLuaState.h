@@ -22,6 +22,8 @@ public:
 	void InitReferClasses();
 
 	UFUNCTION()
+	FLuaValue GetPolicyData();
+	UFUNCTION()
 	FLuaValue GetDefaultStatistics();
 	UFUNCTION()
 	FLuaValue GetLaneStatistics();
@@ -53,4 +55,6 @@ protected:
 	class AStationManager* StationManagerRef;
 	UPROPERTY()
 	class ATrainManager* TrainManagerRef;
+	UPROPERTY()
+	class APolicy* PolicyRef;
 };

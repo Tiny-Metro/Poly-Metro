@@ -7,12 +7,14 @@
 #include "Station/StationManager.h"
 #include "Train/TrainManager.h"
 #include "Train/Train.h"
+#include "Policy/Policy.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
 UTinyMetroLuaState::UTinyMetroLuaState() {
 	bRawLuaFunctionCall = true;
 
+    Table.Add(TEXT("GetPolicyData"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetPolicyData)));
     Table.Add(TEXT("GetDefaultStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetDefaultStatistics)));
     Table.Add(TEXT("GetLaneStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetLaneStatistics)));
     Table.Add(TEXT("GetLaneDetailStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetLaneDetailStatistics)));
@@ -38,6 +40,22 @@ void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
     if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
     if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
+    if (!IsValid(PolicyRef)) PolicyRef = GameModeRef->GetPolicy();
+}
+
+FLuaValue UTinyMetroLuaState::GetPolicyData() {
+    InitReferClasses();
+    FLuaValue policyTable = CreateLuaTable();
+    auto policyData = PolicyRef->GetPolicyData();
+
+    policyTable.SetField(TEXT("ServiceLevel"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(policyData.ServiceCostLevel));
+    policyTable.SetField(TEXT("IsPrioritySeat"), ULuaBlueprintFunctionLibrary::LuaCreateBool(policyData.PrioritySeat));
+    policyTable.SetField(TEXT("IsCCTV"), ULuaBlueprintFunctionLibrary::LuaCreateBool(policyData.HasCCTV));
+    policyTable.SetField(TEXT("IsElevator"), ULuaBlueprintFunctionLibrary::LuaCreateBool(policyData.HasElevator));
+    policyTable.SetField(TEXT("IsBicycle"), ULuaBlueprintFunctionLibrary::LuaCreateBool(policyData.HasBicycle));
+    policyTable.SetField(TEXT("IsTransfer"), ULuaBlueprintFunctionLibrary::LuaCreateBool(policyData.HasTransfer));
+
+    return policyTable;
 }
 
 // Return StatisticsManager::DefaultStatistics

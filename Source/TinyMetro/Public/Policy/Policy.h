@@ -63,6 +63,8 @@ public :
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
+	FPolicyData GetPolicyData() const;
+	UFUNCTION(BlueprintCallable, Category = "Policy")
 	int GetServiceCostLevel();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
 	bool GetPrioritySeat();
