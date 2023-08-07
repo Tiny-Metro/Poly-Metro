@@ -5,6 +5,8 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Statistics/StatisticsManager.h"
 #include "Station/StationManager.h"
+#include "Train/TrainManager.h"
+#include "Train/Train.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -21,6 +23,7 @@ UTinyMetroLuaState::UTinyMetroLuaState() {
     Table.Add(TEXT("GetTunnelStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTunnelStatistics)));
     Table.Add(TEXT("GetBankStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetBankStatistics)));
     Table.Add(TEXT("GetStationInfos"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetStationInfos)));
+    Table.Add(TEXT("GetTrainInfos"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTrainInfos)));
 }
 
 UTinyMetroLuaState* UTinyMetroLuaState::CreateInstance(UWorld* WorldContextObject) {
@@ -34,6 +37,7 @@ void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
     if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
+    if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
 }
 
 // Return StatisticsManager::DefaultStatistics
@@ -194,6 +198,31 @@ TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
         tmp.SetField(TEXT("WeeklyTransferPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyTransferPassenger));
         tmp.SetField(TEXT("IsActive"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsActive));
         tmp.SetField(TEXT("IsDestroyed"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsDestroyed));
+    }
+
+    return infoTable;
+}
+
+TArray<FLuaValue> UTinyMetroLuaState::GetTrainInfos() {
+    InitReferClasses();
+    TArray<FLuaValue> infoTable;
+
+    for (auto& i : TrainManagerRef->GetAllTrain()) {
+        auto trainInfo = i->GetTrainInfo();
+        FLuaValue tmp = CreateLuaTable();
+        tmp.SetField(TEXT("Id"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.Id));
+        tmp.SetField(TEXT("ServiceLaneId"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.ServiceLaneId));
+        if (trainInfo.Type == TrainType::Train) {
+            tmp.SetField(TEXT("TrainType"), ULuaBlueprintFunctionLibrary::LuaCreateString(TEXT("Train")));
+            tmp.SetField(TEXT("SubtrainCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(Cast<ATrain>(i)->GetSubtrainCount()));
+        }else {
+            tmp.SetField(TEXT("TrainType"), ULuaBlueprintFunctionLibrary::LuaCreateString(TEXT("Subtrain")));
+            tmp.SetField(TEXT("SubtrainCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(-1));
+        }
+        tmp.SetField(TEXT("TotalPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.TotalBoardPassenger));
+        tmp.SetField(TEXT("WeeklyPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.WeeklyBoardPassenger));
+        tmp.SetField(TEXT("ShiftCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.ShiftCount));
+        tmp.SetField(TEXT("IsUpgrade"), ULuaBlueprintFunctionLibrary::LuaCreateBool(trainInfo.IsUpgrade));
     }
 
     return infoTable;

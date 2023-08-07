@@ -41,6 +41,8 @@ public:
 	FLuaValue GetBankStatistics();
 	UFUNCTION()
 	TArray<FLuaValue> GetStationInfos();
+	UFUNCTION()
+	TArray<FLuaValue> GetTrainInfos();
 
 protected:
 	UPROPERTY()
@@ -49,4 +51,6 @@ protected:
 	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY()
 	class AStationManager* StationManagerRef;
+	UPROPERTY()
+	class ATrainManager* TrainManagerRef;
 };
