@@ -92,6 +92,10 @@ ATrain* ATrainManager::GetNearestTrain(FVector CurrentLocation, class ALane* Lan
 	}
 }
 
+TArray<ATrainTemplate*> ATrainManager::GetAllTrain() {
+	return Trains;
+}
+
 void ATrainManager::InitTrainMaterial() {
 	TrainMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
