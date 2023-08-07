@@ -107,6 +107,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle SpawnTrainCheckTimer;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool IsStartHandleEditing = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool IsEndHandleEditing = false;
+
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -131,6 +137,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetAlreadyDeleted(bool _Delete);
+
+	UFUNCTION(BlueprintCallable)
+	void StopHandleEditing();
+
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Lane")
@@ -194,25 +204,25 @@ public : // BlueprintNativeEvent
 
 public: //Delay Removing
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationsToBeRemovedAtEnd;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationsToBeRemovedAtStart;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationPointBeforeRemovedEnd;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	TArray <AStation*> StationPointBeforeRemovedStart;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	bool DoesStationsToBeRemovedAtStart= false;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	bool DoesStationsToBeRemovedAtEnd = false;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnyWhere)
 	bool DoesLaneToBeRemoved = false;
 
 	UFUNCTION(BlueprintCallable)
