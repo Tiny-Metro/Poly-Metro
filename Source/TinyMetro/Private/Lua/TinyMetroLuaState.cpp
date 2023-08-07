@@ -64,15 +64,15 @@ FLuaValue UTinyMetroLuaState::GetDefaultStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto defaultStatistics = StatisticsManagerRef->DefaultStatistics;
 
-    statisticsTable.SetField(TEXT("TotalArrivePassenger"), FLuaValue(defaultStatistics.TotalArrivePassenger));
-    statisticsTable.SetField(TEXT("WeeklyArrivePassenger"), FLuaValue(defaultStatistics.WeeklyArrivePassenger));
-    statisticsTable.SetField(TEXT("TotalIncome"), FLuaValue(defaultStatistics.TotalIncome));
-    statisticsTable.SetField(TEXT("WeeklyIncome"), FLuaValue(defaultStatistics.WeeklyIncome));
-    statisticsTable.SetField(TEXT("TotalSpending"), FLuaValue(defaultStatistics.TotalSpending));
-    statisticsTable.SetField(TEXT("WeeklySpending"), FLuaValue(defaultStatistics.WeeklySpending));
-    statisticsTable.SetField(TEXT("AverageComplain"), FLuaValue(defaultStatistics.AverageComplain));
-    statisticsTable.SetField(TEXT("ServiceStationCount"), FLuaValue(defaultStatistics.ServiceStationCount));
-    statisticsTable.SetField(TEXT("UpgradeStationCount"), FLuaValue(defaultStatistics.UpgradeStationCount));
+    statisticsTable.SetField(TEXT("TotalArrivePassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.TotalArrivePassenger));
+    statisticsTable.SetField(TEXT("WeeklyArrivePassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.WeeklyArrivePassenger));
+    statisticsTable.SetField(TEXT("TotalIncome"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.TotalIncome));
+    statisticsTable.SetField(TEXT("WeeklyIncome"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.WeeklyIncome));
+    statisticsTable.SetField(TEXT("TotalSpending"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.TotalSpending));
+    statisticsTable.SetField(TEXT("WeeklySpending"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.WeeklySpending));
+    statisticsTable.SetField(TEXT("AverageComplain"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(defaultStatistics.AverageComplain));
+    statisticsTable.SetField(TEXT("ServiceStationCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.ServiceStationCount));
+    statisticsTable.SetField(TEXT("UpgradeStationCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.UpgradeStationCount));
 
     FLuaValue test;
 
@@ -85,8 +85,8 @@ FLuaValue UTinyMetroLuaState::GetLaneStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto laneStatistics = StatisticsManagerRef->LaneStatistics;
 
-    statisticsTable.SetField(TEXT("TotalLaneCount"), FLuaValue(laneStatistics.TotalLaneCount));
-    statisticsTable.SetField(TEXT("TotalModifyAndDeleteCount"), FLuaValue(laneStatistics.TotalModifyAndDeleteCount));
+    statisticsTable.SetField(TEXT("TotalLaneCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.TotalLaneCount));
+    statisticsTable.SetField(TEXT("TotalModifyAndDeleteCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.TotalModifyAndDeleteCount));
     
     return FLuaValue();
 }
@@ -125,8 +125,8 @@ FLuaValue UTinyMetroLuaState::GetShopStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto shopStatistics = StatisticsManagerRef->ShopStatistics;
 
-    statisticsTable.SetField(TEXT("TotalUsingMoney"), FLuaValue(shopStatistics.TotalUsingMoney));
-    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalUsingMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TotalUsingMoney));
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TotalPurchaseCount));
 
     return statisticsTable;
 }
@@ -136,11 +136,11 @@ FLuaValue UTinyMetroLuaState::GetTrainStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto shopStatistics = StatisticsManagerRef->ShopStatistics;
 
-    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TrainStatistics.TotalPurchaseCount));
-    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.TrainStatistics.TotalPlacementCount));
-    statisticsTable.SetField(TEXT("TotalShiftCount"), FLuaValue(shopStatistics.TrainStatistics.TotalShiftCount));
-    statisticsTable.SetField(TEXT("TotalRetrievalCount"), FLuaValue(shopStatistics.TrainStatistics.TotalRetrievalCount));
-    statisticsTable.SetField(TEXT("TotalUpgradeCount"), FLuaValue(shopStatistics.TrainStatistics.TotalUpgradeCount));
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TrainStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TrainStatistics.TotalPlacementCount));
+    statisticsTable.SetField(TEXT("TotalShiftCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TrainStatistics.TotalShiftCount));
+    statisticsTable.SetField(TEXT("TotalRetrievalCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TrainStatistics.TotalRetrievalCount));
+    statisticsTable.SetField(TEXT("TotalUpgradeCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TrainStatistics.TotalUpgradeCount));
 
     return statisticsTable;
 }
@@ -150,11 +150,11 @@ FLuaValue UTinyMetroLuaState::GetSubtrainStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto shopStatistics = StatisticsManagerRef->ShopStatistics;
 
-    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalPurchaseCount));
-    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalPlacementCount));
-    statisticsTable.SetField(TEXT("TotalShiftCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalShiftCount));
-    statisticsTable.SetField(TEXT("TotalRetrievalCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalRetrievalCount));
-    statisticsTable.SetField(TEXT("TotalUpgradeCount"), FLuaValue(shopStatistics.SubtrainStatistics.TotalUpgradeCount));
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalPlacementCount));
+    statisticsTable.SetField(TEXT("TotalShiftCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalShiftCount));
+    statisticsTable.SetField(TEXT("TotalRetrievalCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalRetrievalCount));
+    statisticsTable.SetField(TEXT("TotalUpgradeCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalUpgradeCount));
 
     return FLuaValue();
 }
@@ -164,8 +164,8 @@ FLuaValue UTinyMetroLuaState::GetBridgeStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto shopStatistics = StatisticsManagerRef->ShopStatistics;
 
-    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.BridgeStatistics.TotalPurchaseCount));
-    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.BridgeStatistics.TotalPlacementCount));
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.BridgeStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.BridgeStatistics.TotalPlacementCount));
 
     return FLuaValue();
 }
@@ -175,8 +175,8 @@ FLuaValue UTinyMetroLuaState::GetTunnelStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto shopStatistics = StatisticsManagerRef->ShopStatistics;
 
-    statisticsTable.SetField(TEXT("TotalPurchaseCount"), FLuaValue(shopStatistics.TunnelStatistics.TotalPurchaseCount));
-    statisticsTable.SetField(TEXT("TotalPlacementCount"), FLuaValue(shopStatistics.TunnelStatistics.TotalPlacementCount));
+    statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TunnelStatistics.TotalPurchaseCount));
+    statisticsTable.SetField(TEXT("TotalPlacementCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TunnelStatistics.TotalPlacementCount));
 
     return FLuaValue();
 }
@@ -187,10 +187,10 @@ FLuaValue UTinyMetroLuaState::GetBankStatistics() {
     FLuaValue statisticsTable = CreateLuaTable();
     auto bankStatistics = StatisticsManagerRef->BankStatistics;
 
-    statisticsTable.SetField(TEXT("TotalUsingLoanCount"), FLuaValue(bankStatistics.TotalUsingLoanCount));
-    statisticsTable.SetField(TEXT("TotalRepayMoney"), FLuaValue(bankStatistics.TotalRepayMoney));
-    statisticsTable.SetField(TEXT("TotalLoanMoney"), FLuaValue(bankStatistics.TotalLoanMoney));
-    statisticsTable.SetField(TEXT("TotalRepayInterestMoney"), FLuaValue(bankStatistics.TotalRepayInterestMoney));
+    statisticsTable.SetField(TEXT("TotalUsingLoanCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalUsingLoanCount));
+    statisticsTable.SetField(TEXT("TotalRepayMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalRepayMoney));
+    statisticsTable.SetField(TEXT("TotalLoanMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalLoanMoney));
+    statisticsTable.SetField(TEXT("TotalRepayInterestMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalRepayInterestMoney));
 
     return statisticsTable;
 }
