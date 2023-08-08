@@ -2086,7 +2086,7 @@ void ALane::ExtendStart(AStation* NewStation){
 
 	AddLaneArray.Add(Start);
 //Add LaneLoc
-	TArray<FVector> NewLaneLocation;
+//	TArray<FVector> NewLaneLocation;
 
 	if (!GridManagerRef) {
 		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
@@ -2097,8 +2097,8 @@ void ALane::ExtendStart(AStation* NewStation){
 //Add Spline Mesh
 	UpdateLocationAndSpline();
 
-	int32 NewPointNum = NewLaneLocation.Num();
-	SetMeshByIndex(0, NewPointNum + 1);	
+	int32 NewPointNum = AddLaneArray.Num();
+	SetMeshByIndex(0, NewPointNum - 1);	
 
 	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
 	ConnectBT(DeletedBridge, GridType::Water);
@@ -2138,7 +2138,7 @@ void ALane::ExtendEnd(AStation* NewStation){
 
 	int32 NumSplinePoints = LaneSpline->GetNumberOfSplinePoints();
 
-	SetMeshByIndex(legacyNum - 1, NumSplinePoints - 1);
+	SetMeshByIndex(legacyNum, NumSplinePoints - 1);
 
 	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
 	ConnectBT(DeletedBridge, GridType::Water);
@@ -2333,7 +2333,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 			SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
 
 		}
-		else if (i == LastIndex)
+		else if (i == LaneArray.Num() -1 )
 		{
 			/* --- Back Mesh Only --- */
 
