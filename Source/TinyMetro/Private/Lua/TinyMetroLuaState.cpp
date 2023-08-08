@@ -3,6 +3,8 @@
 
 #include "Lua/TinyMetroLuaState.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "PlayerState/TinyMetroPlayerState.h"
+#include "Timer/Timer.h"
 #include "Statistics/StatisticsManager.h"
 #include "Station/StationManager.h"
 #include "Train/TrainManager.h"
@@ -14,6 +16,11 @@
 UTinyMetroLuaState::UTinyMetroLuaState() {
 	bRawLuaFunctionCall = true;
 
+    Table.Add(TEXT("AddIncome"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UTinyMetroLuaState, AddIncome, FLuaValue)));
+    Table.Add(TEXT("AddMoney"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UTinyMetroLuaState, AddMoney, FLuaValue)));
+    Table.Add(TEXT("AddItem"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UTinyMetroLuaState, AddItem, FLuaValue, FLuaValue)));
+
+    Table.Add(TEXT("GetTimestamp"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTimestamp)));
     Table.Add(TEXT("GetPolicyData"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetPolicyData)));
     Table.Add(TEXT("GetDefaultStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetDefaultStatistics)));
     Table.Add(TEXT("GetLaneStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetLaneStatistics)));
@@ -37,10 +44,53 @@ UTinyMetroLuaState* UTinyMetroLuaState::CreateInstance(UWorld* WorldContextObjec
 
 void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (!IsValid(PlayerStateRef)) PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    if (!IsValid(TimerRef)) TimerRef = GameModeRef->GetTimer();
     if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
     if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
     if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
     if (!IsValid(PolicyRef)) PolicyRef = GameModeRef->GetPolicy();
+}
+
+void UTinyMetroLuaState::AddIncome(FLuaValue Money) {
+    InitReferClasses();
+    PlayerStateRef->AddIncome(Money.ToInteger());
+}
+
+void UTinyMetroLuaState::AddMoney(FLuaValue Money) {
+    InitReferClasses();
+    PlayerStateRef->AddMoney(Money.ToInteger());
+}
+
+void UTinyMetroLuaState::AddItem(FLuaValue Item, FLuaValue Amount) {
+    InitReferClasses();
+    FString itemName = Item.ToString().ToUpper();
+
+    if (itemName == TEXT("TRAIN")) {
+        PlayerStateRef->AddItem(ItemType::Train, Amount.ToInteger());
+    } else if (itemName == TEXT("SUBTRAIN")) {
+        PlayerStateRef->AddItem(ItemType::Subtrain, Amount.ToInteger());
+    } else if (itemName == TEXT("LANE")) {
+        PlayerStateRef->AddItem(ItemType::Lane, Amount.ToInteger());
+    } else if (itemName == TEXT("BRIDGE")) {
+        PlayerStateRef->AddItem(ItemType::Bridge, Amount.ToInteger());
+    } else if (itemName == TEXT("TUNNEL")) {
+        PlayerStateRef->AddItem(ItemType::Tunnel, Amount.ToInteger());
+    }
+}
+
+FLuaValue UTinyMetroLuaState::GetTimestamp() {
+    InitReferClasses();
+    FLuaValue timeTable = CreateLuaTable();
+    auto timestamp = TimerRef->GetTimestamp();
+    
+    timeTable.SetField(TEXT("Date"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(timestamp.Date));
+    const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("Day"), true);
+    FString dayName = enumPtr->GetNameStringByValue((uint8)timestamp.DayoftheWeek);
+    timeTable.SetField(TEXT("DayoftheWeek"), ULuaBlueprintFunctionLibrary::LuaCreateString(dayName));
+    timeTable.SetField(TEXT("Week"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(timestamp.Week));
+
+    return timeTable;
 }
 
 FLuaValue UTinyMetroLuaState::GetPolicyData() {

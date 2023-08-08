@@ -22,6 +22,14 @@ public:
 	void InitReferClasses();
 
 	UFUNCTION()
+	void AddIncome(FLuaValue Money);
+	UFUNCTION()
+	void AddMoney(FLuaValue Money);
+	UFUNCTION()
+	void AddItem(FLuaValue Item, FLuaValue Amount);
+	UFUNCTION()
+	FLuaValue GetTimestamp();
+	UFUNCTION()
 	FLuaValue GetPolicyData();
 	UFUNCTION()
 	FLuaValue GetDefaultStatistics();
@@ -49,6 +57,10 @@ public:
 protected:
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY()
+	class ATinyMetroPlayerState* PlayerStateRef;
+	UPROPERTY()
+	class ATimer* TimerRef;
 	UPROPERTY()
 	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY()

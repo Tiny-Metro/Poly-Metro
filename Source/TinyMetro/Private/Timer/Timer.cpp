@@ -24,6 +24,9 @@ void ATimer::BeginPlay()
 	//StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
 	Daytime = GameModeRef->GetDaytime();
 
+	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("Day"), true);
+	FString dayName = enumPtr->GetNameStringByValue((uint8)Timestamp.DayoftheWeek);
+	GEngine->AddOnScreenDebugMessage(0, 5.0f, FColor::Black, dayName);
 }
 
 // Called every frame
