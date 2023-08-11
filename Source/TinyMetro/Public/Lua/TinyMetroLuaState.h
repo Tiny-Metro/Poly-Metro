@@ -27,6 +27,16 @@ public:
 	void AddMoney(FLuaValue Money);
 	UFUNCTION()
 	void AddItem(FLuaValue Item, FLuaValue Amount);
+
+	UFUNCTION()
+	void AddStation(FLuaValue Amount);
+	UFUNCTION()
+	void DestroyStation(FLuaValue Amount);
+	UFUNCTION()
+	void ScaleComplain(FLuaValue ScaleFactor);
+	UFUNCTION()
+	void AddComplainIncreaseRate(FLuaValue Rate);
+
 	UFUNCTION()
 	FLuaValue GetTimestamp();
 	UFUNCTION()
@@ -59,6 +69,8 @@ protected:
 	class ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY()
 	class ATinyMetroPlayerState* PlayerStateRef;
+	UPROPERTY()
+	class AGridManager* GridManagerRef;
 	UPROPERTY()
 	class ATimer* TimerRef;
 	UPROPERTY()

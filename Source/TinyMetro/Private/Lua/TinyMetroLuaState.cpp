@@ -4,6 +4,7 @@
 #include "Lua/TinyMetroLuaState.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "GridGenerator/GridManager.h"
 #include "Timer/Timer.h"
 #include "Statistics/StatisticsManager.h"
 #include "Station/StationManager.h"
@@ -45,6 +46,7 @@ UTinyMetroLuaState* UTinyMetroLuaState::CreateInstance(UWorld* WorldContextObjec
 void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
     if (!IsValid(PlayerStateRef)) PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+    if (!IsValid(GridManagerRef)) GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
     if (!IsValid(TimerRef)) TimerRef = GameModeRef->GetTimer();
     if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
     if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
@@ -77,6 +79,30 @@ void UTinyMetroLuaState::AddItem(FLuaValue Item, FLuaValue Amount) {
     } else if (itemName == TEXT("TUNNEL")) {
         PlayerStateRef->AddItem(ItemType::Tunnel, Amount.ToInteger());
     }
+}
+
+void UTinyMetroLuaState::AddStation(FLuaValue Amount) {
+    InitReferClasses();
+
+    for (int i = 0; i < Amount.ToInteger(); i++) {
+        StationManagerRef->SpawnStation(
+            GridManagerRef->GetGridCellDataRandom(),
+            StationManagerRef->GetRandomStationType());
+    }
+}
+
+void UTinyMetroLuaState::DestroyStation(FLuaValue Amount) {
+    InitReferClasses();
+
+    for (int i = 0; i < Amount.ToInteger(); i++) {
+        StationManagerRef->DestroyRandomStation();
+    }
+}
+
+void UTinyMetroLuaState::ScaleComplain(FLuaValue ScaleFactor) {
+}
+
+void UTinyMetroLuaState::AddComplainIncreaseRate(FLuaValue Rate) {
 }
 
 FLuaValue UTinyMetroLuaState::GetTimestamp() {
