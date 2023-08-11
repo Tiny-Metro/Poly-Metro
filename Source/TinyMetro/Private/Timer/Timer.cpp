@@ -71,3 +71,7 @@ FTimestamp ATimer::GetTimestamp() {
 	return Timestamp;
 }
 
+int32 ATimer::GetDaytime() const {
+	return Daytime;
+}
+
