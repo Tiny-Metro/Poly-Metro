@@ -9,7 +9,7 @@
 #include "Policy.generated.h"
 
 
-class AStationManager;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPolicyUpdateTask);
 
 UCLASS()
 class TINYMETRO_API APolicy : public AActor
@@ -33,7 +33,7 @@ protected :
 	FPolicyData PolicyData;
 
 	UPROPERTY()
-	AStationManager* StationManagerRef;
+	class AStationManager* StationManagerRef;
 
 public :
 	UPROPERTY(VisibleAnywhere, Category = "Policy data")
@@ -45,7 +45,9 @@ public :
 		FServiceData(4, -1, 3),
 		FServiceData(5, -2, 4)
 	};
-	
+
+	UPROPERTY(BlueprintAssignable)
+	FPolicyUpdateTask PolicyUpdateTask;
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")

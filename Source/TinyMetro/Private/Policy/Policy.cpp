@@ -34,38 +34,32 @@ void APolicy::Tick(float DeltaTime)
 
 void APolicy::SetServiceCostLevel(int costLevel) {
 	PolicyData.ServiceCostLevel = costLevel;
-
-	StationManagerRef->SetServiceData(ServiceLevel[costLevel]);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetPrioritySeat(bool Flag) {
 	PolicyData.PrioritySeat = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.05 * (Flag ? 1 : -1), -1);
-	// TODO : Imple in StationManager
-	//StationManagerRef->AddFreePassengerSpawnProbability(0.2 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetCCTV(bool Flag) {
 	PolicyData.HasCCTV = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.1 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetElevator(bool Flag) {
 	PolicyData.HasElevator = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.15 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetBicycle(bool Flag) {
 	PolicyData.HasBicycle = Flag;
-	// TODO : Imple in StationManager
-	//StationManagerRef->AddPassengerSpawnProbability(0.1 * (Flag ? 1 : -1), -1);
-	StationManagerRef->AddComplainIncreaseRate(0.1 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetTransfer(bool Flag) {
 	PolicyData.HasTransfer = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.2 * (Flag ? 1 : -1), -1);
-	StationManagerRef->SetTransfer(Flag);
+	PolicyUpdateTask.Broadcast();
 }
 
 FPolicyData APolicy::GetPolicyData() const {
