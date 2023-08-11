@@ -110,9 +110,9 @@ void AStation::BeginPlay()
 		GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
 	}
 	StationManager = GameModeRef->GetStationManager();
-	Daytime = GameModeRef->GetDaytime();
 	TimerRef = GameModeRef->GetTimer();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	PolicyRef = GameModeRef->GetPolicy();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationInfo.Type]);
@@ -124,7 +124,7 @@ void AStation::BeginPlay()
 	// Set off alarm pulse
 	if (SpawnAlarm) {
 		FTimerHandle alarmHandle;
-		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, Daytime);
+		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, TimerRef->GetDaytime());
 	}
 
 	if (IsUpgrade) {
@@ -133,6 +133,8 @@ void AStation::BeginPlay()
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
 	TimerRef->WeeklyTask.AddDynamic(this, &AStation::WeeklyTask);
+
+	PolicyRef->PolicyUpdateTask.AddDynamic(this, &AStation::UpdatePolicy);
 
 	GameModeRef->GetSaveManager()->SaveTask.AddDynamic(this, &AStation::Save);
 }
@@ -156,7 +158,6 @@ void AStation::Tick(float DeltaTime)
 }
 
 void AStation::SetStationId(int32 Id) {
-	StationId = Id;
 	StationInfo.Id = Id;
 }
 
@@ -173,18 +174,18 @@ void AStation::SetGridCellData(FGridCellData _GridCellData) {
 	CurrentGridCellData = _GridCellData;
 }
 
-void AStation::SetPolicy(APolicy* _Policy) {
-	Policy = _Policy;
-}
-
 FGridCellData AStation::GetCurrentGridCellData() const {
 	return CurrentGridCellData;
 }
 
 void AStation::WeeklyTask() {
+	// Init values
 	StationInfo.WeeklyProfit = 0;
 	StationInfo.WeeklyTransferPassenger = 0;
 	StationInfo.WeeklyUsingPassenger = 0;
+
+	// Maintenance cost
+	PlayerStateRef->AddIncome(-MaintenanceCost - PolicyServiceLevel.WeeklyCost);
 }
 
 void AStation::DailyTask() {
@@ -274,11 +275,6 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 void AStation::GetOffPassenger(FPassenger P) {
 	if (P.Destination == this->StationInfo.Type) {
 		// Passenger arrive destination
-		if (P.IsFree) {
-			ArriveFreePassenger++;
-		} else {
-			ArrivePaidPassenger++;
-		}
 		P.Destination = StationType::None;
 	} else {
 		Passenger.Add(P);
@@ -300,88 +296,6 @@ void AStation::RemoveLane(int32 LId)
 	Lanes.Remove(LId);
 }
 
-TMap<StationType, int32> AStation::GetSpawnPassengerStatistics() const {
-	return TotalSpawnPassenger;
-}
-
-TMap<StationType, int32> AStation::GetSpawnTotalPassenger() const {
-	TMap<StationType, int32> result;
-	for (auto i : SpawnPaidPassenger) {
-		result[i.Key] += i.Value;
-	}
-	for (auto i : SpawnFreePassenger) {
-		result[i.Key] += i.Value;
-	}
-	return result;
-}
-
-TMap<StationType, int32> AStation::GetSpawnPaidPassenger() const {
-	return SpawnPaidPassenger;
-}
-
-TMap<StationType, int32> AStation::GetSpawnFreePassenger() const {
-	return SpawnFreePassenger;
-}
-
-int32 AStation::GetArriveTotalPassengerCount() const {
-	return GetArrivePaidPassengerCount() + GetArriveFreePassengerCount();
-}
-
-int32 AStation::GetArrivePaidPassengerCount() const {
-	return ArrivePaidPassenger;
-}
-
-int32 AStation::GetArriveFreePassengerCount() const {
-	return ArriveFreePassenger;
-}
-
-int32 AStation::GetWaitTotalPassengerCount() const {
-	return GetWaitFreePassengerCount() + GetWaitPaidPassengerCount();
-}
-
-int32 AStation::GetWaitPaidPassengerCount() const {
-	int32 result = 0;
-	for (auto& i : Passenger) {
-		if (!i.IsFree) {
-			result++;
-		}
-	}
-	return result;
-}
-
-int32 AStation::GetWaitFreePassengerCount() const {
-	int32 result = 0;
-	for (auto& i : Passenger) {
-		if (i.IsFree) {
-			result++;
-		}
-	}
-	return result;
-}
-
-TMap<StationType, int32> AStation::GetDestroyedTotalPassenger() const {
-	TMap<StationType, int32> result;
-	for (auto i : DestroyedPaidPassenger) {
-		result[i.Key] += i.Value;
-	}
-	for (auto i : DestroyedFreePassenger) {
-		result[i.Key] += i.Value;
-	}
-	return result;
-}
-
-TMap<StationType, int32> AStation::GetDestroyedPaidPassenger() const {
-	return DestroyedPaidPassenger;
-}
-
-TMap<StationType, int32> AStation::GetDestroyedFreePassenger() const {
-	return DestroyedFreePassenger;
-}
-
-int32 AStation::GetWaitPassenger() const {
-	return Passenger.Num();
-}
-
 void AStation::SpawnPassenger(StationType Destination) {
 	FPassenger tmp;
 	tmp.Destination = Destination;
@@ -391,15 +305,6 @@ void AStation::SpawnPassenger(StationType Destination) {
 	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
 		tmp.IsFree = true;
 	}
-
-	if (tmp.IsFree) {
-		SpawnFreePassenger[tmp.Destination]++;
-		StationManager->NotifySpawnPassenger(tmp.Destination, true);
-	} else {
-		SpawnPaidPassenger[tmp.Destination]++;
-		StationManager->NotifySpawnPassenger(tmp.Destination, false);
-	}
-	TotalSpawnPassenger[tmp.Destination]++;
 
 	// Update Passenger using count
 	StationInfo.TotalUsingPassenger++;
@@ -419,6 +324,16 @@ void AStation::DespawnPassenger(StationType Destination) {
 	UpdatePassengerMesh();
 }
 
+float AStation::GetPassengerSpawnProbability() const {
+	return PassengerSpawnProbability + AdditionalPassengerSpawnProbabilityByEvent;
+}
+
+float AStation::GetFreePassengerSpawnProbability() const {
+	return FreePassengerSpawnProbability + 
+		FreePassengerSpawnProbabilityByEvent +
+		FreePassengerSpawnProbabilityByPolicy;
+}
+
 void AStation::DespawnRandomPassenger() {
 	int64 removeIndex = FMath::RandRange(0, Passenger.Num() - 1);
 	if (Passenger.IsValidIndex(removeIndex)) {
@@ -433,6 +348,10 @@ void AStation::SetPassengerSpawnEnable(bool Flag) {
 
 bool AStation::GetPassengerSpawnEnable() const {
 	return IsPassengerSpawnEnable;
+}
+
+int32 AStation::GetWaitPassenger() const {
+	return Passenger.Num();
 }
 
 void AStation::CalculateComplain() {
@@ -466,7 +385,7 @@ void AStation::SetComplainGauge(float Per) {
 	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", Per);
 }
 
-void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
+void AStation::AddComplainIncreaseRate(float Rate) {
 	ComplainIncreaseRate += Rate;
 	/*if (Period != -1) {
 		GetWorld()->GetTimerManager().SetTimer(
@@ -481,20 +400,20 @@ void AStation::AddComplainIncreaseRate(float Rate, int32 Period) {
 	}*/
 }
 
+float AStation::GetComplainIncreateRate() const {
+	return ComplainIncreaseRate + ComplainIncreaseRateByPolicy + ComplainIncreaseRateByEvent;
+}
+
 void AStation::SetComplainIncreaseEnable(bool Flag) {
 	IsComplainIncreaseEnable = Flag;
 }
 
-void AStation::SetComplainByRate(float Rate) {
+void AStation::ScaleComplain(float Rate) {
 	StationInfo.Complain *= Rate;
 }
 
 void AStation::AddComplain(float Value, bool IsFixedValue) {
 	StationInfo.Complain += (Value * (IsFixedValue ? 1.0f : ComplainIncreaseRate));
-}
-
-void AStation::MaintenanceCost(int32 Cost) {
-
 }
 
 void AStation::UpdateStationMesh() {
@@ -541,14 +460,6 @@ void AStation::SetStationState(StationState S) {
 
 StationType AStation::GetStationType() const {
 	return StationInfo.Type;
-}
-
-void AStation::AddComplain(double ReduceRate) {
-	StationInfo.Complain *= ReduceRate;
-}
-
-void AStation::AddComplain(int32 ReduceValue) {
-	StationInfo.Complain += (ReduceValue * ComplainIncreaseRate);
 }
 
 float AStation::GetComplain() const {
@@ -631,6 +542,9 @@ void AStation::ComplainRoutine() {
 		if (!IsActive && SpawnDay > ComplainSpawnDay) {
 			StationInfo.Complain += ComplainFromInactive * ComplainIncreaseRate;
 		}
+
+		// Compalin from service level
+		StationInfo.Complain += PolicyServiceLevel.DailyComplain;
 	}
 	// Update Complain gauge Mesh
 	SetComplainGauge(StationInfo.Complain / ComplainMax);
@@ -663,8 +577,11 @@ void AStation::UpdatePassengerMesh() {
 
 void AStation::PassengerSpawnRoutine(float DeltaTime) {
 	PassengerSpawnCurrent += DeltaTime * PassengerSpawnSpeed;
+	// Check tick (Time)
 	if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
-		if (IsPassengerSpawnEnable) {
+		// Check spawn enable
+		if (IsPassengerSpawnEnable && StationInfo.IsDestroyed) {
+			// Check spawn probability
 			if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
 				SpawnPassenger(StationManager->CalculatePassengerDest(StationInfo.Type));
 			}
@@ -677,6 +594,47 @@ void AStation::OffSpawnAlarm() {
 	SpawnAlarm = false;
 	PulseComponent->SetMaterial(0, nullptr);
 	PulseComponent->SetWorldScale3D(FVector(0));
+}
+
+void AStation::EventEnd() {
+	ComplainIncreaseRateByEvent = 0.0f;
+	AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
+}
+
+void AStation::UpdatePolicy() {
+	auto policyData = PolicyRef->GetPolicyData();
+	PolicyServiceLevel = PolicyRef->ServiceLevel[policyData.ServiceCostLevel];
+	MaintenanceCost = 0;
+	ComplainIncreaseRateByPolicy = 0.0f;
+	FreePassengerSpawnProbabilityByPolicy = 0.0f;
+	AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+
+	MaintenanceCost += PolicyServiceLevel.WeeklyCost;
+
+	if (policyData.PrioritySeat) {
+		ComplainIncreaseRateByPolicy -= 0.05f;
+		FreePassengerSpawnProbabilityByPolicy += 0.2f;
+	}
+
+	if (policyData.HasCCTV) {
+		ComplainIncreaseRateByPolicy -= 0.1f;
+		MaintenanceCost += 5;
+	}
+
+	if (policyData.HasElevator) {
+		ComplainIncreaseRateByPolicy -= 0.15f;
+		MaintenanceCost += 10;
+	}
+
+	if (policyData.HasBicycle) {
+		AdditionalPassengerSpawnProbabilityByPolicy += 0.1f;
+		ComplainIncreaseRateByPolicy += 0.1f;
+	}
+
+	if (policyData.HasTransfer) {
+		ComplainIncreaseRateByPolicy -= 0.2f;
+		TransferStation = true;
+	}
 }
 
 // Not used
@@ -714,7 +672,9 @@ void AStation::SpawnPassenger() {
 
 double AStation::GetPassengerSpawnProbability() {
 	
-	return PassengerSpawnProbability * AdditionalPassengerSpawnProbability;
+	return PassengerSpawnProbability + 
+		AdditionalPassengerSpawnProbabilityByEvent +
+		AdditionalPassengerSpawnProbabilityByPolicy;
 }
 
 
