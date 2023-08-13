@@ -2411,8 +2411,8 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 				/* --- Front Mesh --- */
 
 				// Set Start/End Pos/Tangent
-				StartPos = LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-				EndPos = ((StartPos + LaneSpline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
+				StartPos = LaneSpline->GetLocationAtSplinePoint(index, ESplineCoordinateSpace::Local);
+				EndPos = ((StartPos + LaneSpline->GetLocationAtSplinePoint(index + 1, ESplineCoordinateSpace::Local)) / 2.0f);
 
 				StartTangent = EndTangent;
 				if (LaneArray[i].IsBendingPoint) {
@@ -2430,81 +2430,6 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 	UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex."));
 
 }
-
-		//if (i == 0) {
-		//	/* --- Front Mesh Only --- */
-
-		//	// Set Start/End Pos/Tangent
-		//	StartPos = LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-		//	EndPos = ((StartPos + LaneSpline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
-		//	 
-
-		//	StartTangent = LaneSpline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
-		//	Length = StartTangent.Size();
-		//	ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
-		//	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
-		//	EndTangent = StartTangent;
-
-		//	//Add&Set Spline Mesh Component (mesh)
-		//	SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
-
-		//}
-		//else if (i == LaneArray.Num() -1 )
-		//{
-		//	/* --- Back Mesh Only --- */
-
-		//	// Set Start/End Pos/Tangent
-		//	StartPos = (LaneSpline->GetLocationAtSplinePoint(i - 1, ESplineCoordinateSpace::Local) + LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local)) / 2.0f;
-		//	EndPos = LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-
-		//	StartTangent = EndTangent;
-		//	//Add&Set Spline Mesh Component (mesh)
-		//	SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);				
-		//}
-		//else
-		//{
-		//	/* --- Back Mesh --- */
-
-		//	// Set Start/End Pos/Tangent
-		//	StartPos = (LaneSpline->GetLocationAtSplinePoint(i - 1, ESplineCoordinateSpace::Local) + LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local)) / 2.0f;
-		//	EndPos = LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-
-		//	StartTangent = LaneSpline->GetTangentAtSplinePoint(i-1, ESplineCoordinateSpace::Local);
-		//	Length = StartTangent.Size();
-		//	ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
-		//	StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
-		//	EndTangent = StartTangent;
-
-		//	StartTangent = EndTangent;
-		//		//Set Spline Mesh Component (mesh)
-		//	SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
-
-		//	/* --- Middle Mesh (if there is any) --- */
-		//	if (LaneArray[i].IsBendingPoint) {
-		//			// Set Start/End Pos/Tangent
-		//		StartPos = EndPos;
-		//		EndTangent = LaneSpline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
-
-		//		//Set Spline Mesh Component (mesh)
-		//		SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
-		//	}
-
-		//	/* --- Front Mesh --- */
-
-		//	// Set Start/End Pos/Tangent
-		//	StartPos = LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
-		//	EndPos = ((StartPos + LaneSpline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local)) / 2.0f);
-
-		//	StartTangent = EndTangent;
-		//	if (LaneArray[i].IsBendingPoint) {
-		//		StartTangent = LaneSpline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
-		//		Length = EndTangent.Size();
-		//		ClampedLength = FMath::Clamp(Length, 0.0f, SectionLength);
-		//		StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
-		//	}
-		//		//Set Spline Mesh Component (mesh)
-		//		SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
-		//}
 
 void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index) 
 {
