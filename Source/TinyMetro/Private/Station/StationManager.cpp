@@ -319,7 +319,12 @@ TArray<AStation*> AStationManager::GetAllStations() {
 }
 
 TArray<FStationInfo> AStationManager::GetAllStationInfo() {
-	return TArray<FStationInfo>();
+	TArray<FStationInfo> arr;
+	for (auto& i : Station) {
+		arr.Add(i->GetStationInfo());
+	}
+
+	return arr;
 }
 
 PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
