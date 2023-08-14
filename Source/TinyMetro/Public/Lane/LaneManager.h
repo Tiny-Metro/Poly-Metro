@@ -101,7 +101,7 @@ public:
 	void SetUILaneNum(int32 Num);
 
 	UFUNCTION(BlueprintCallable)
-	int32 GetUILaneNum(int32 Num);
+	int32 GetUILaneNum();
 
 	UFUNCTION(BlueprintCallable)
 	void SetSelectedLaneNum(int32 Num);
