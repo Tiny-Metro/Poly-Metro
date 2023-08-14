@@ -108,6 +108,8 @@ public:
 	UFUNCTION()
 	bool CalculateFreePassegnerSpawnProbability() const;
 	UFUNCTION()
+	void AddPassengerDestinationTypeWeight(StationType Type, float Amount);
+	UFUNCTION()
 	StationType CalculatePassengerDestination(StationType Except) const;
 	float GetComplainAverage();
 
@@ -218,11 +220,24 @@ protected:
 	
 	// Passenger spawn
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double PassengerSpawnProbability = 0.6f;
+	float PassengerSpawnProbability = 0.6f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
+	float AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+	float AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	TMap<StationType, float> PassengerDestinationTypeWeight = {
+		TPair<StationType, float>(StationType::Circle, 1.0f),
+		TPair<StationType, float>(StationType::Triangle, 1.0f),
+		TPair<StationType, float>(StationType::Rectangle, 1.0f),
+		TPair<StationType, float>(StationType::Cross, 1.0f),
+		TPair<StationType, float>(StationType::Rhombus, 1.0f),
+		TPair<StationType, float>(StationType::Oval, 1.0f),
+		TPair<StationType, float>(StationType::Diamond, 1.0f),
+		TPair<StationType, float>(StationType::Pentagon, 1.0f),
+		TPair<StationType, float>(StationType::Star, 1.0f),
+		TPair<StationType, float>(StationType::Fan, 1.0f)
+	};
 
 	// Passenger Spawn (Free)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")

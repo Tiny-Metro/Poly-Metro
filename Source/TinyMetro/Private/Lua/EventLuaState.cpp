@@ -42,6 +42,12 @@ void UEventLuaState::AddPassengerSpawnProbability(FLuaValue Amount) {
 }
 
 void UEventLuaState::AddPassengerSpawnProbabilityByType(FLuaValue Type, FLuaValue Amount) {
+    InitReferClasses();
+    bool tmp;
+
+    StationManagerRef->AddPassengerDestinationTypeWeight(
+        AStationManager::StationTypeFromString(Type.ToString(), tmp),
+        Amount.ToFloat());
 }
 
 void UEventLuaState::ScaleComplain(FLuaValue ScaleFactor) {

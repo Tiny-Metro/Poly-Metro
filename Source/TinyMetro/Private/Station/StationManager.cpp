@@ -129,14 +129,24 @@ bool AStationManager::CalculateFreePassegnerSpawnProbability() const {
 	}
 }
 
+void AStationManager::AddPassengerDestinationTypeWeight(StationType Type, float Amount) {
+	if (Type == StationType::None) return;
+	PassengerDestinationTypeWeight[Type] += Amount;
+}
+
 StationType AStationManager::CalculatePassengerDestination(StationType Except) const {
-	StationType tmp;
+	TArray<StationType> arr;
+	
+	for (auto& i : Station) {
+		auto tmpType = i->GetStationType();
+		if (Except != tmpType) {
+			for (int count = 0;  count < PassengerDestinationTypeWeight[tmpType] * 100; count++) {
+				arr.Add(tmpType);
+			}
+		}
+	}
 
-	do {
-		tmp = Station[FMath::RandRange(0, Station.Num()-1)]->GetStationType();
-	} while (tmp == Except);
-
-	return tmp;
+	return arr[FMath::RandRange(0, arr.Num() - 1)];
 }
 
 float AStationManager::GetComplainAverage() {
@@ -624,6 +634,10 @@ bool AStationManager::Load() {
 void AStationManager::EventEnd() {
 	AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
 	FreePassengerSpawnProbabilityByEvent = 0.0f;
+
+	for (auto& i : PassengerDestinationTypeWeight) {
+		i.Value = 1.0f;
+	}
 }
 
 void AStationManager::UpdatePolicy() {
