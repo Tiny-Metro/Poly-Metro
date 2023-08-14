@@ -105,7 +105,7 @@ void AStationManager::TestFunction() {
 			FString::Printf(TEXT(":)")));
 }
 
-StationType AStationManager::CalculatePassengerDest(StationType Except) const {
+StationType AStationManager::CalculatePassengerDestination(StationType Except) const {
 	StationType tmp;
 
 	do {

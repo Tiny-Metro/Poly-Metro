@@ -90,7 +90,7 @@ protected:
 	void TestFunction();
 
 public:	
-	StationType CalculatePassengerDest(StationType Except) const;
+	StationType CalculatePassengerDestination(StationType Except) const;
 	float GetComplainAverage();
 
 
