@@ -2,7 +2,7 @@
 
 
 #include "Finance/Investment.h"
-#include "Finance/InvestmentLuaState.h"
+#include "Lua/InvestmentLuaState.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 
 UInvestment::UInvestment() {

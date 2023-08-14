@@ -4,7 +4,7 @@
 #include "Finance/Bank.h"
 #include "Sample/SampleTimer.h"
 #include "Station/StationManager.h"
-#include "Finance/InvestmentLuaState.h"
+#include "Lua/InvestmentLuaState.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
