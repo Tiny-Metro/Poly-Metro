@@ -40,10 +40,10 @@ void AConsoleProcessor::StringTest(FString Str) {
 // Command : passenger_info {stationId}
 // Return : Total Passenger : [], Wait Passenger : [], {Type Passengers} 
 FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) {
-	int32 TotalPassenger, WaitPassenger;
-	TMap<StationType, int32> passengerStatistics;
-	FString result = TEXT("");
-	if (Cmd.Num() == 1) {
+	//int32 TotalPassenger, WaitPassenger;
+	//TMap<StationType, int32> passengerStatistics;
+	FString result = TEXT("Not implemented command");
+	/*if (Cmd.Num() == 1) {
 		Success = true;
 		passengerStatistics = StationManagerRef->GetSpawnPassengerStatistics(TotalPassenger, WaitPassenger);
 	} else {
@@ -68,7 +68,7 @@ FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) 
 			result += enumPtr->GetNameStringByIndex((int32)i.Key);
 			result += " : " + FString::FromInt(i.Value) + "\n";
 		}
-	}
+	}*/
 
 	return result;
 }
