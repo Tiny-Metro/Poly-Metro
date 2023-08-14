@@ -22,22 +22,6 @@ public:
 	void InitReferClasses();
 
 	UFUNCTION()
-	void AddIncome(FLuaValue Money);
-	UFUNCTION()
-	void AddMoney(FLuaValue Money);
-	UFUNCTION()
-	void AddItem(FLuaValue Item, FLuaValue Amount);
-
-	UFUNCTION()
-	void AddStation(FLuaValue Amount);
-	UFUNCTION()
-	void DestroyStation(FLuaValue Amount);
-	UFUNCTION()
-	void ScaleComplain(FLuaValue ScaleFactor);
-	UFUNCTION()
-	void AddComplainIncreaseRate(FLuaValue Rate);
-
-	UFUNCTION()
 	FLuaValue GetTimestamp();
 	UFUNCTION()
 	FLuaValue GetPolicyData();

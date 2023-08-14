@@ -17,10 +17,6 @@
 UTinyMetroLuaState::UTinyMetroLuaState() {
 	bRawLuaFunctionCall = true;
 
-    Table.Add(TEXT("AddIncome"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UTinyMetroLuaState, AddIncome, FLuaValue)));
-    Table.Add(TEXT("AddMoney"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UTinyMetroLuaState, AddMoney, FLuaValue)));
-    Table.Add(TEXT("AddItem"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UTinyMetroLuaState, AddItem, FLuaValue, FLuaValue)));
-
     Table.Add(TEXT("GetTimestamp"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTimestamp)));
     Table.Add(TEXT("GetPolicyData"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetPolicyData)));
     Table.Add(TEXT("GetDefaultStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetDefaultStatistics)));
@@ -54,62 +50,11 @@ void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(PolicyRef)) PolicyRef = GameModeRef->GetPolicy();
 }
 
-void UTinyMetroLuaState::AddIncome(FLuaValue Money) {
-    InitReferClasses();
-    PlayerStateRef->AddIncome(Money.ToInteger());
-}
-
-void UTinyMetroLuaState::AddMoney(FLuaValue Money) {
-    InitReferClasses();
-    PlayerStateRef->AddMoney(Money.ToInteger());
-}
-
-void UTinyMetroLuaState::AddItem(FLuaValue Item, FLuaValue Amount) {
-    InitReferClasses();
-    FString itemName = Item.ToString().ToUpper();
-
-    if (itemName == TEXT("TRAIN")) {
-        PlayerStateRef->AddItem(ItemType::Train, Amount.ToInteger());
-    } else if (itemName == TEXT("SUBTRAIN")) {
-        PlayerStateRef->AddItem(ItemType::Subtrain, Amount.ToInteger());
-    } else if (itemName == TEXT("LANE")) {
-        PlayerStateRef->AddItem(ItemType::Lane, Amount.ToInteger());
-    } else if (itemName == TEXT("BRIDGE")) {
-        PlayerStateRef->AddItem(ItemType::Bridge, Amount.ToInteger());
-    } else if (itemName == TEXT("TUNNEL")) {
-        PlayerStateRef->AddItem(ItemType::Tunnel, Amount.ToInteger());
-    }
-}
-
-void UTinyMetroLuaState::AddStation(FLuaValue Amount) {
-    InitReferClasses();
-
-    for (int i = 0; i < Amount.ToInteger(); i++) {
-        StationManagerRef->SpawnStation(
-            GridManagerRef->GetGridCellDataRandom(),
-            StationManagerRef->GetRandomStationType());
-    }
-}
-
-void UTinyMetroLuaState::DestroyStation(FLuaValue Amount) {
-    InitReferClasses();
-
-    for (int i = 0; i < Amount.ToInteger(); i++) {
-        StationManagerRef->DestroyRandomStation();
-    }
-}
-
-void UTinyMetroLuaState::ScaleComplain(FLuaValue ScaleFactor) {
-}
-
-void UTinyMetroLuaState::AddComplainIncreaseRate(FLuaValue Rate) {
-}
-
 FLuaValue UTinyMetroLuaState::GetTimestamp() {
     InitReferClasses();
     FLuaValue timeTable = CreateLuaTable();
     auto timestamp = TimerRef->GetTimestamp();
-    
+
     timeTable.SetField(TEXT("Date"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(timestamp.Date));
     const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("Day"), true);
     FString dayName = enumPtr->GetNameStringByValue((uint8)timestamp.DayoftheWeek);
@@ -292,7 +237,10 @@ TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
         tmp.SetField(TEXT("WeeklyTransferPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyTransferPassenger));
         tmp.SetField(TEXT("IsActive"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsActive));
         tmp.SetField(TEXT("IsDestroyed"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsDestroyed));
+        infoTable.Add(tmp);
     }
+
+    UE_LOG(LogTemp, Log, TEXT("GetStationInfos::Count = %d"), infoTable.Num());
 
     return infoTable;
 }
