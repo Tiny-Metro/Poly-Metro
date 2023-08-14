@@ -98,7 +98,7 @@ void ALaneManager::SetUILaneNum(int32 Num)
 	}
 }
 
-int32 ALaneManager::GetUILaneNum(int32 Num)
+int32 ALaneManager::GetUILaneNum()
 {
 	return UILaneNum;
 }
