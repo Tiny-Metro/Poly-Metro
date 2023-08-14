@@ -40,4 +40,7 @@ struct TINYMETRO_API FLanePoint {
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool WillBeRemoved = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<int32> SplineIndex;
 };
