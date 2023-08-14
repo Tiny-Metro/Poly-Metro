@@ -84,6 +84,32 @@ void ALaneManager::RemoveDestroyedLane(int LaneNum)
 	Lanes.Remove(LaneNum);
 }
 
+void ALaneManager::SetUILaneNum(int32 Num)
+{
+	UILaneNum = Num;
+
+	if (UILaneNum == 0)
+	{
+		LaneCancelDelegate.Broadcast();
+	}
+	else
+	{
+		LaneSelectDelegate.Broadcast();
+	}
+}
+
+int32 ALaneManager::GetUILaneNum(int32 Num)
+{
+	return UILaneNum;
+}
+
+void ALaneManager::SetSelectedLaneNum(int32 Num)
+{
+	SelectedLaneNum = Num;
+
+	SetUILaneNum(Num);
+}
+
 ALane* ALaneManager::SpawnLane()
 {
 	// Load BP Class
