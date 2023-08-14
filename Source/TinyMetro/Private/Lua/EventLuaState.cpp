@@ -35,6 +35,15 @@ void UEventLuaState::DestroyStation(FLuaValue Amount) {
     }
 }
 
+void UEventLuaState::AddPassengerSpawnProbability(FLuaValue Amount) {
+    InitReferClasses();
+
+    StationManagerRef->AddPassegnerSpawnProbabilityByEvent(Amount.ToFloat());
+}
+
+void UEventLuaState::AddPassengerSpawnProbabilityByType(FLuaValue Type, FLuaValue Amount) {
+}
+
 void UEventLuaState::ScaleComplain(FLuaValue ScaleFactor) {
 }
 
