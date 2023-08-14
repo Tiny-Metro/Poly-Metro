@@ -110,10 +110,6 @@ public:
 	UFUNCTION()
 	void DespawnPassenger(StationType Destination);
 	UFUNCTION()
-	float GetPassengerSpawnProbability() const;
-	UFUNCTION()
-	float GetFreePassengerSpawnProbability() const;
-	UFUNCTION()
 	void DespawnRandomPassenger();
 	UFUNCTION()
 	void SetPassengerSpawnEnable(bool Flag);
@@ -173,7 +169,6 @@ public:
 
 protected:
 	void SpawnPassenger();
-	double GetPassengerSpawnProbability();
 	void UpdatePassengerMesh();
 
 protected:
@@ -217,18 +212,7 @@ protected:
 	float PassengerSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnSpeed = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double PassengerSpawnProbability = 0.6f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbability = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbabilityByEvent = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbabilityByPolicy = 0.0f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	bool IsPassengerSpawnEnable = true;
 

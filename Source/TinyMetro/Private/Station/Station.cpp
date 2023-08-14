@@ -299,12 +299,7 @@ void AStation::RemoveLane(int32 LId)
 void AStation::SpawnPassenger(StationType Destination) {
 	FPassenger tmp;
 	tmp.Destination = Destination;
-	//tmp->SetPassengerRoute(StationManager->GetShortestRoute(StationInfo.Id, NewPassengerDestination));
-	//UPassenger* tmp = NewObject<UPassenger>();
-	//tmp->SetDestination(StationManager->CalculatePassengerDest(StationInfo.Type));
-	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
-		tmp.IsFree = true;
-	}
+	tmp.IsFree = StationManager->CalculateFreePassegnerSpawnProbability();
 
 	// Update Passenger using count
 	StationInfo.TotalUsingPassenger++;
@@ -322,16 +317,6 @@ void AStation::DespawnPassenger(StationType Destination) {
 		}
 	}
 	UpdatePassengerMesh();
-}
-
-float AStation::GetPassengerSpawnProbability() const {
-	return PassengerSpawnProbability + AdditionalPassengerSpawnProbabilityByEvent;
-}
-
-float AStation::GetFreePassengerSpawnProbability() const {
-	return FreePassengerSpawnProbability + 
-		FreePassengerSpawnProbabilityByEvent +
-		FreePassengerSpawnProbabilityByPolicy;
 }
 
 void AStation::DespawnRandomPassenger() {
@@ -582,7 +567,7 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 		// Check spawn enable
 		if (IsPassengerSpawnEnable && StationInfo.IsDestroyed) {
 			// Check spawn probability
-			if (FMath::RandRange(0.0, 1.0) > GetPassengerSpawnProbability()) {
+			if (StationManager->CalculatePassegnerSpawnProbability()) {
 				SpawnPassenger(StationManager->CalculatePassengerDestination(StationInfo.Type));
 			}
 		}
@@ -598,7 +583,6 @@ void AStation::OffSpawnAlarm() {
 
 void AStation::EventEnd() {
 	ComplainIncreaseRateByEvent = 0.0f;
-	AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
 }
 
 void AStation::UpdatePolicy() {
@@ -606,14 +590,11 @@ void AStation::UpdatePolicy() {
 	PolicyServiceLevel = PolicyRef->ServiceLevel[policyData.ServiceCostLevel];
 	MaintenanceCost = 0;
 	ComplainIncreaseRateByPolicy = 0.0f;
-	FreePassengerSpawnProbabilityByPolicy = 0.0f;
-	AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
 
 	MaintenanceCost += PolicyServiceLevel.WeeklyCost;
 
 	if (policyData.PrioritySeat) {
 		ComplainIncreaseRateByPolicy -= 0.05f;
-		FreePassengerSpawnProbabilityByPolicy += 0.2f;
 	}
 
 	if (policyData.HasCCTV) {
@@ -627,7 +608,6 @@ void AStation::UpdatePolicy() {
 	}
 
 	if (policyData.HasBicycle) {
-		AdditionalPassengerSpawnProbabilityByPolicy += 0.1f;
 		ComplainIncreaseRateByPolicy += 0.1f;
 	}
 
@@ -668,13 +648,6 @@ void AStation::SpawnPassenger() {
 			15.0f,
 			FColor::Yellow,
 			FString::Printf(TEXT("Passenger Spawn!")));*/
-}
-
-double AStation::GetPassengerSpawnProbability() {
-	
-	return PassengerSpawnProbability + 
-		AdditionalPassengerSpawnProbabilityByEvent +
-		AdditionalPassengerSpawnProbabilityByPolicy;
 }
 
 

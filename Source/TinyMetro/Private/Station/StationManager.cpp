@@ -9,6 +9,7 @@
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSpawnBorderWidget.h"
 #include "Station/StationManagerSaveGame.h"
+#include "Policy/Policy.h"
 #include "SaveSystem/TMSaveManager.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
@@ -37,6 +38,7 @@ void AStationManager::BeginPlay()
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	SaveManagerRef = GameMode->GetSaveManager();
 	TimerRef = GameMode->GetTimer();
+	PolicyRef = GameMode->GetPolicy();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -92,6 +94,8 @@ void AStationManager::BeginPlay()
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
 	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
+	PolicyRef->PolicyUpdateTask.AddDynamic(this, &AStationManager::UpdatePolicy);
+
 	SaveManagerRef->SaveTask.AddDynamic(this, &AStationManager::Save);
 
 }
@@ -103,6 +107,26 @@ void AStationManager::TestFunction() {
 			15.0f,
 			FColor::Yellow,
 			FString::Printf(TEXT(":)")));
+}
+
+void AStationManager::AddPassegnerSpawnProbabilityByEvent(float Amount) {
+	AdditionalPassengerSpawnProbabilityByEvent += Amount;
+}
+
+bool AStationManager::CalculatePassegnerSpawnProbability() const {
+	if (FMath::RandRange(0.0f, 1.0f) >= (PassengerSpawnProbability + AdditionalPassengerSpawnProbabilityByEvent + AdditionalPassengerSpawnProbabilityByPolicy)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool AStationManager::CalculateFreePassegnerSpawnProbability() const {
+	if (FMath::RandRange(0.0f, 1.0f) >= (FreePassengerSpawnProbability + FreePassengerSpawnProbabilityByEvent + FreePassengerSpawnProbabilityByPolicy)) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 StationType AStationManager::CalculatePassengerDestination(StationType Except) const {
@@ -595,6 +619,26 @@ bool AStationManager::Load() {
 	}
 
 	return true;
+}
+
+void AStationManager::EventEnd() {
+	AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
+	FreePassengerSpawnProbabilityByEvent = 0.0f;
+}
+
+void AStationManager::UpdatePolicy() {
+	auto policyData = PolicyRef->GetPolicyData();
+	FreePassengerSpawnProbabilityByPolicy = 0.0f;
+	AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+
+
+	if (policyData.PrioritySeat) {
+		FreePassengerSpawnProbabilityByPolicy += 0.2f;
+	}
+
+	if (policyData.HasBicycle) {
+		AdditionalPassengerSpawnProbabilityByPolicy += 0.1f;
+	}
 }
 
 // Called every frame

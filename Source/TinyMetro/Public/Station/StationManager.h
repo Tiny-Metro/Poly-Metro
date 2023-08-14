@@ -83,6 +83,15 @@ public:
 	UFUNCTION()
 	bool Load();
 
+	// Event
+	UFUNCTION()
+	void EventEnd();
+
+	// Policy 
+	// Broadcast by Policy actor
+	UFUNCTION()
+	void UpdatePolicy();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -90,6 +99,15 @@ protected:
 	void TestFunction();
 
 public:	
+	UFUNCTION()
+	void AddPassegnerSpawnProbabilityByEvent(float Amount);
+	// Calculate probability, return spawn or not
+	UFUNCTION()
+	bool CalculatePassegnerSpawnProbability() const;
+	// Calculate free probability, return spawn or not
+	UFUNCTION()
+	bool CalculateFreePassegnerSpawnProbability() const;
+	UFUNCTION()
 	StationType CalculatePassengerDestination(StationType Except) const;
 	float GetComplainAverage();
 
@@ -161,6 +179,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	ATinyMetroGameModeBase* GameMode;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class APolicy* PolicyRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATimer* TimerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATMSaveManager* SaveManagerRef;
@@ -195,6 +215,22 @@ protected:
 	int32 StationSpawnRange = 7;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 NextStationId = 0;
+	
+	// Passenger spawn
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	double PassengerSpawnProbability = 0.6f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	double AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	double AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+
+	// Passenger Spawn (Free)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	float FreePassengerSpawnProbability = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	float FreePassengerSpawnProbabilityByEvent = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
+	float FreePassengerSpawnProbabilityByPolicy = 0.0f;
 
 	// Info Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
