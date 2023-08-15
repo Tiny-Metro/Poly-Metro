@@ -8,6 +8,13 @@
 #include <Kismet/GameplayStatics.h>
 
 UEventLuaState::UEventLuaState() {
+    Table.Add(TEXT("AddStation"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UEventLuaState, AddStation, FLuaValue)));
+    Table.Add(TEXT("DestroyStation"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UEventLuaState, DestroyStation, FLuaValue)));
+    Table.Add(TEXT("AddPassengerSpawnProbability"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UEventLuaState, AddPassengerSpawnProbability, FLuaValue)));
+    Table.Add(TEXT("AddPassengerSpawnProbabilityByType"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UEventLuaState, AddPassengerSpawnProbabilityByType, FLuaValue, FLuaValue)));
+    Table.Add(TEXT("ScaleComplain"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UEventLuaState, ScaleComplain, FLuaValue)));
+    Table.Add(TEXT("AddComplainIncreaseRate"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UEventLuaState, AddComplainIncreaseRate, FLuaValue)));
+
 }
 
 UEventLuaState* UEventLuaState::CreateInstance(UWorld* WorldContextObject) {
@@ -51,7 +58,17 @@ void UEventLuaState::AddPassengerSpawnProbabilityByType(FLuaValue Type, FLuaValu
 }
 
 void UEventLuaState::ScaleComplain(FLuaValue ScaleFactor) {
+    InitReferClasses();
+
+    for (auto& i : StationManagerRef->GetAllStations()) {
+        i->ScaleComplain(ScaleFactor.ToFloat());
+    }
 }
 
 void UEventLuaState::AddComplainIncreaseRate(FLuaValue Rate) {
+    InitReferClasses();
+
+    for (auto& i : StationManagerRef->GetAllStations()) {
+        i->AddComplainIncreaseRate(Rate.ToFloat());
+    }
 }

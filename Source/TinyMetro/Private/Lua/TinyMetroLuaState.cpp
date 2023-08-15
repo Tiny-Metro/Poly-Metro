@@ -30,6 +30,17 @@ UTinyMetroLuaState::UTinyMetroLuaState() {
     Table.Add(TEXT("GetBankStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetBankStatistics)));
     Table.Add(TEXT("GetStationInfos"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetStationInfos)));
     Table.Add(TEXT("GetTrainInfos"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTrainInfos)));
+
+    Table.Add(TEXT("Circle"), FLuaValue(TEXT("Circle")));
+    Table.Add(TEXT("Triangle"), FLuaValue(TEXT("Triangle")));
+    Table.Add(TEXT("Rectangle"), FLuaValue(TEXT("Rectangle")));
+    Table.Add(TEXT("Cross"), FLuaValue(TEXT("Cross")));
+    Table.Add(TEXT("Rhombus"), FLuaValue(TEXT("Rhombus")));
+    Table.Add(TEXT("Oval"), FLuaValue(TEXT("Oval")));
+    Table.Add(TEXT("Diamond"), FLuaValue(TEXT("Diamond")));
+    Table.Add(TEXT("Pentagon"), FLuaValue(TEXT("Pentagon")));
+    Table.Add(TEXT("Star"), FLuaValue(TEXT("Star")));
+    Table.Add(TEXT("Fan"), FLuaValue(TEXT("Fan")));
 }
 
 UTinyMetroLuaState* UTinyMetroLuaState::CreateInstance(UWorld* WorldContextObject) {
@@ -220,10 +231,12 @@ TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
     InitReferClasses();
     TArray<FLuaValue> infoTable;
     auto stationInfos = StationManagerRef->GetAllStationInfo();
+    bool tmpBool;
 
     for (auto& i : stationInfos) {
         FLuaValue tmp = CreateLuaTable();
         tmp.SetField(TEXT("Id"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.Id));
+        tmp.SetField(TEXT("StationType"), ULuaBlueprintFunctionLibrary::LuaCreateString(AStationManager::StationTypeToString(i.Type, tmpBool)));
         tmp.SetField(TEXT("ServiceLaneCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.ServiceLaneCount));
         tmp.SetField(TEXT("TotalUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.TotalUsingPassenger));
         tmp.SetField(TEXT("WeeklyUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyUsingPassenger));
@@ -237,10 +250,9 @@ TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
         tmp.SetField(TEXT("WeeklyTransferPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyTransferPassenger));
         tmp.SetField(TEXT("IsActive"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsActive));
         tmp.SetField(TEXT("IsDestroyed"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsDestroyed));
+        tmp.SetField(TEXT("IsUpgrade"), ULuaBlueprintFunctionLibrary::LuaCreateBool(i.IsUpgrade));
         infoTable.Add(tmp);
     }
-
-    UE_LOG(LogTemp, Log, TEXT("GetStationInfos::Count = %d"), infoTable.Num());
 
     return infoTable;
 }
@@ -265,6 +277,7 @@ TArray<FLuaValue> UTinyMetroLuaState::GetTrainInfos() {
         tmp.SetField(TEXT("WeeklyPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.WeeklyBoardPassenger));
         tmp.SetField(TEXT("ShiftCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.ShiftCount));
         tmp.SetField(TEXT("IsUpgrade"), ULuaBlueprintFunctionLibrary::LuaCreateBool(trainInfo.IsUpgrade));
+        infoTable.Add(tmp);
     }
 
     return infoTable;
