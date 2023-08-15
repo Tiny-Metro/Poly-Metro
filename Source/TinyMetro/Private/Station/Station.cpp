@@ -127,7 +127,7 @@ void AStation::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, TimerRef->GetDaytime());
 	}
 
-	if (IsUpgrade) {
+	if (StationInfo.IsUpgrade) {
 		Upgrade();
 	}
 
@@ -200,7 +200,6 @@ void AStation::Save() {
 	tmp->Passenger = Passenger;
 	tmp->PassengerSpawnCurrent = PassengerSpawnCurrent;
 	tmp->SpawnDay = SpawnDay;
-	tmp->IsUpgrade = IsUpgrade;
 	tmp->StationInfo = StationInfo;
 
 	GameModeRef->GetSaveManager()->Save(tmp, SaveActorType::Station, StationInfo.Id);
@@ -218,7 +217,6 @@ void AStation::Load() {
 		Passenger = tmp->Passenger;
 		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
 		SpawnDay = tmp->SpawnDay;
-		IsUpgrade = tmp->IsUpgrade;
 		StationInfo = tmp->StationInfo;
 	}
 }
@@ -478,7 +476,7 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 }
 
 void AStation::Upgrade() {
-	IsUpgrade = true;
+	StationInfo.IsUpgrade = true;
 	ComplainPassengerNum += UpgradePermissionComplainPassenger;
 
 	auto meshScale = StationMeshComponent->GetComponentScale();
@@ -497,7 +495,7 @@ void AStation::Upgrade() {
 }
 
 bool AStation::CanUpgrade() const {
-	if (!IsUpgrade && PlayerStateRef->GetMoney() >= UpgradeCost) return true;
+	if (!StationInfo.IsUpgrade && PlayerStateRef->GetMoney() >= UpgradeCost) return true;
 	else return false;
 }
 

@@ -259,8 +259,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Config")
 	int32 UpgradePermissionComplainPassenger = 3;
 	UPROPERTY(BlueprintReadOnly, Category = "Config")
-	bool IsUpgrade = false;
-	UPROPERTY(BlueprintReadOnly, Category = "Config")
 	float UpgradeCost = 300.0f;
 
 	// New station

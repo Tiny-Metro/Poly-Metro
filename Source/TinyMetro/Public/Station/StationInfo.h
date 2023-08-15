@@ -47,6 +47,8 @@ public:
 	bool IsActive = false;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	bool IsDestroyed = false;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	bool IsUpgrade = false;
 
 
 	FStationInfo() { Id = 0; Type = StationType::Circle; }
