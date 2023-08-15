@@ -8,6 +8,7 @@
 #include "../../PlayerState/TinyMetroPlayerState.h"
 #include "ConnectorType.h"
 #include "ConnectorData.h"
+#include "BridgeTunnel.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -64,12 +65,12 @@ private:
 	bool IsPointsValid(const TArray<FIntPoint>& points);
 
 public:
-	FConnectorData* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
-	FConnectorData* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
+	ABridgeTunnel* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
+	ABridgeTunnel* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FConnectorData> Connectors;
+	TArray<ABridgeTunnel*> Connectors;
 
 	UFUNCTION(BlueprintCallable)
 	void DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points);
@@ -77,11 +78,11 @@ public:
 	void DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF);
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteConnector(FConnectorData connectorData);
+	void DeleteConnector(ABridgeTunnel* Connector);
 
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectConnector(FConnectorData connectorData);
+	void DisconnectConnector(ABridgeTunnel* Connector);
 
 	UFUNCTION(BlueprintCallable)
 	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points);

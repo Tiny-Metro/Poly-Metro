@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
+#include "ConnectorData.h"
 #include "BridgeTunnel.generated.h"
 
 UCLASS()
@@ -25,6 +25,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FConnectorData ConnectorInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 count;
 
 public:
@@ -35,4 +38,5 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CountDown();
 	virtual void CountDown_Implementation();
+
 };
