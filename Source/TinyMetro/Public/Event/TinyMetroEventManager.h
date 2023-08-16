@@ -4,25 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TinyMetroEventOccurData.h"
 #include "TinyMetroEventManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEventOccurTask);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEventEndTask);
 
 UCLASS()
 class TINYMETRO_API ATinyMetroEventManager : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ATinyMetroEventManager();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+	// Sets default values for this actor's properties
+	ATinyMetroEventManager();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Initializer
 	UFUNCTION()
-	void DailyTask();
+	void InitializeEvent();
+
+	// Event
 	UFUNCTION()
 	void SimulateProbability();
 	UFUNCTION()
@@ -30,16 +37,36 @@ protected:
 	UFUNCTION()
 	void UpdateEventWeight();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// Occur specific event
+	// Not used in game (Only test)
+	UFUNCTION()
+	bool OccurSpecificEvent(int32 EventId);
+
+	// Broadcast by Timer
+	UFUNCTION()
+	void DailyTask();
+
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	bool Load();
 
 	UPROPERTY(BlueprintAssignable)
 	FEventOccurTask EventOccurTask;
+	UPROPERTY(BlueprintAssignable)
+	FEventEndTask EventEndTask;
 
 protected:
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY()
+	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere)
+	class UEventLuaState* LuaState;
+
 	UPROPERTY()
 	TArray<float> EventOccurProbability = {
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -69,4 +96,14 @@ protected:
 	uint32 Day = 0;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	int32 EventPeriod = 0;
+
+	UPROPERTY()
+	TArray<int32> EventCandidate;
+	UPROPERTY(BlueprintReadOnly)
+	class UTinyMetroEvent* SelectedEvent;
+	UPROPERTY()
+	TMap<int32, class UTinyMetroEvent*> EventArr;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FTinyMetroEventOccurData> EventOccurLog;
 };
