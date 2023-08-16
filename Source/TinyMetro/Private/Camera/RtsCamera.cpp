@@ -140,5 +140,10 @@ void ARtsCamera::DisengageRotation()
 	rotationMode = false;
 }
 
+void ARtsCamera::JumpTo(FVector NewLocation)
+{
+	FVector NewCameraLocation = FVector(NewLocation.X, NewLocation.Y, GetActorLocation().Z); 
+	SetActorLocation(NewCameraLocation);
+}
 
 

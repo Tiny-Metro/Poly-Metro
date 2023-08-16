@@ -46,7 +46,9 @@ class TINYMETRO_API ARtsCamera: public APawn
 	void EngageRotation();
 	void DisengageRotation();
 	void Orbit(float magnitude);
+	void JumpTo(FVector NewLocation);
 	bool rotationMode = false;
+
 
 	FVector2D mouseScreenLocationGrab;
 	UFloatingPawnMovement* MovementComponent;
