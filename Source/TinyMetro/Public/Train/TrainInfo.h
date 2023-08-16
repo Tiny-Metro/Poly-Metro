@@ -4,33 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "DefaultStatistics.generated.h"
+#include "TrainType.h"
+#include "TrainInfo.generated.h"
 
 /**
  * 
  */
 USTRUCT(BlueprintType)
-struct TINYMETRO_API FDefaultStatistics
+struct TINYMETRO_API FTrainInfo
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TotalArrivePassenger = 0;
+	int32 Id = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 WeeklyArrivePassenger = 0;
+	int32 ServiceLaneId = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TotalIncome = 0;
+	TrainType Type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 WeeklyIncome = 0;
+	int32 TotalBoardPassenger = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TotalSpending = 0;
+	int32 WeeklyBoardPassenger = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 WeeklySpending = 0;
+	int32 ShiftCount = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float AverageComplain = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ServiceStationCount = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 UpgradeStationCount = 0;
-
+	bool IsUpgrade = false;
 };

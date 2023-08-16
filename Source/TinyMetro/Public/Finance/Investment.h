@@ -55,7 +55,7 @@ protected:
 	FString ScriptFileName;
 	UPROPERTY()
 	FString ScriptDirectory;
-
+	UPROPERTY()
 	class UInvestmentLuaState* LuaState;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FInvestmentData InvestmentData;

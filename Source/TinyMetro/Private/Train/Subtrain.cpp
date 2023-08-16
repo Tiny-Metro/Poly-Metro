@@ -88,7 +88,7 @@ void ASubtrain::SetTrainMaterial(ALane* Lane) {
 
 void ASubtrain::UpdatePassengerSlot() {
 	Super::UpdatePassengerSlot();
-	if (IsUpgrade) {
+	if (TrainInfo.IsUpgrade) {
 		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
 		}
@@ -108,12 +108,12 @@ void ASubtrain::UpdateTrainMesh() {
 	Super::UpdateTrainMesh();
 	if (IsValid(OwnerTrain)) {
 		if (OwnerTrain->GetIsUpgrade()) {
-			TrainMeshComponent->SetStaticMesh(UpgradeSubtrainMesh[IsUpgrade]);
+			TrainMeshComponent->SetStaticMesh(UpgradeSubtrainMesh[TrainInfo.IsUpgrade]);
 		} else {
-			TrainMeshComponent->SetStaticMesh(SubtrainMesh[IsUpgrade]);
+			TrainMeshComponent->SetStaticMesh(SubtrainMesh[TrainInfo.IsUpgrade]);
 		}
 	} else {
-		TrainMeshComponent->SetStaticMesh(SubtrainMesh[IsUpgrade]);
+		TrainMeshComponent->SetStaticMesh(SubtrainMesh[TrainInfo.IsUpgrade]);
 	}
 }
 
@@ -155,6 +155,7 @@ void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 void ASubtrain::BeginPlay() {
 	Super::BeginPlay();
 	AiControllerRef = Cast<ASubtrainAiController>(GetController());
+	TrainInfo.Type = TrainType::SubTrain;
 }
 
 //FVector ASubtrain::GetNextTrainPosition() {
@@ -191,4 +192,16 @@ void ASubtrain::AttachToTrain(ATrain* Train) {
 	IsAttached = true;
 	OwnerTrain = Train;
 	OwnerTrainId = Train->GetTrainId();
+}
+
+void ASubtrain::SetIndex(int32 Idx) {
+	Index = Idx;
+}
+
+int32 ASubtrain::GetIndex() const {
+	return Index;
+}
+
+void ASubtrain::WeeklyTask() {
+	UE_LOG(LogTemp, Log, TEXT("Subtrain::WeeklyTask"));
 }

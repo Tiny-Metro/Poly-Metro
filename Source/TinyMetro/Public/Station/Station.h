@@ -38,8 +38,8 @@ public:
 	int32 GetStationId() const;
 
 	// Station complain function
-	UFUNCTION(BlueprintCallable)
-	void CalculateComplain();
+	UFUNCTION()
+	void ComplainRoutine();
 	UFUNCTION(BlueprintCallable)
 	void SetActivate(bool Flag);
 	UFUNCTION()
@@ -49,17 +49,13 @@ public:
 	UFUNCTION()
 	void SetComplainGauge(float Per);
 	UFUNCTION()
-	void AddComplainIncreaseRate(float Rate, int32 Period);
-	UFUNCTION()
 	void SetComplainIncreaseEnable(bool Flag);
 	UFUNCTION()
-	void SetComplainByRate(float Rate);
+	void ScaleComplain(float Rate);
 	UFUNCTION()
 	void AddComplain(float Value, bool IsFixedValue = false);
-
-	// Mainenance
 	UFUNCTION()
-	void MaintenanceCost(int32 Cost);
+	float GetComplain() const;
 
 	// Station state Getter, Setter
 	UFUNCTION(BlueprintCallable)
@@ -79,8 +75,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetGridCellData(FGridCellData GridCellData);
 
-	UFUNCTION(BlueprintCallable)
-	void SetPolicy(APolicy* Policy);
 	UFUNCTION(BlueprintCallable)
 	void UpdateStationMesh();
 
@@ -102,38 +96,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveLane(int32 LId);
 
-	// Station statistics
-	UFUNCTION(BlueprintCallable)
-	TMap<StationType, int32> GetSpawnPassengerStatistics() const;
-	UFUNCTION()
-	TMap<StationType, int32> GetSpawnTotalPassenger() const;
-	UFUNCTION()
-	TMap<StationType, int32> GetSpawnPaidPassenger() const;
-	UFUNCTION()
-	TMap<StationType, int32> GetSpawnFreePassenger() const;
-	UFUNCTION()
-	int32 GetArriveTotalPassengerCount() const;
-	UFUNCTION()
-	int32 GetArrivePaidPassengerCount() const;
-	UFUNCTION()
-	int32 GetArriveFreePassengerCount() const;
-	UFUNCTION()
-	int32 GetWaitTotalPassengerCount() const;
-	UFUNCTION()
-	int32 GetWaitPaidPassengerCount() const;
-	UFUNCTION()
-	int32 GetWaitFreePassengerCount() const;
-	UFUNCTION()
-	TMap<StationType, int32> GetDestroyedTotalPassenger() const;
-	UFUNCTION()
-	TMap<StationType, int32> GetDestroyedPaidPassenger() const;
-	UFUNCTION()
-	TMap<StationType, int32> GetDestroyedFreePassenger() const;
-
-	UFUNCTION(BlueprintCallable)
-	int32 GetWaitPassenger() const;
-
 	// Passenger
+	UFUNCTION()
+	void PassengerSpawnRoutine(float DeltaTime);
 	UFUNCTION()
 	void SpawnPassenger(StationType Destination);
 	UFUNCTION()
@@ -145,7 +110,7 @@ public:
 	UFUNCTION()
 	bool GetPassengerSpawnEnable() const;
 	UFUNCTION()
-	void PassengerSpawnRoutine(float DeltaTime);
+	int32 GetWaitPassenger() const;
 	
 	/*Return passenger at Index
 	Key is passenger's pointer, set nullptr when passenger don't want ride
@@ -153,12 +118,7 @@ public:
 	*/
 	FPassenger GetOnPassenger(int32 Index, class ATrainTemplate* Train);
 	void GetOffPassenger(FPassenger P);
-    
-
-	void AddComplain(double ReduceRate);
-	void AddComplain(int32 ReduceValue);
-
-	int32 GetComplain() const;
+ 
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
 
@@ -192,51 +152,58 @@ public:
 	UFUNCTION()
 	void OffSpawnAlarm();
 
+	// Event
+	UFUNCTION()
+	void EventEnd();
+
+	// Policy 
+	// Broadcast by Policy actor
+	UFUNCTION()
+	void UpdatePolicy();
+
 protected:
 	void SpawnPassenger();
-	double GetPassengerSpawnProbability();
-	void ComplainRoutine();
 	void UpdatePassengerMesh();
 
 protected:
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	APolicy* PolicyRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATinyMetroPlayerState* PlayerStateRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AStationManager* StationManager;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	int32 MaintenanceCost = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	FServiceData PolicyServiceLevel;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	float ComplainMax = 100;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
 	float ComplainFromInactive = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
 	float ComplainFromPassenger = 5;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Complain")
-	float ComplainCurrent = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	int32 ComplainPassengerNum = 5;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	int32 ComplainSpawnDay = 10;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
-	float ComplainIncreaseRate = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	bool IsComplainIncreaseEnable = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnRequire = 6.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnCurrent = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
 	float PassengerSpawnSpeed = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double PassengerSpawnProbability = 0.6;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	double AdditionalPassengerSpawnProbability = 1.0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
-	float FreePassengerSpawnProbability = 0.0f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	bool IsPassengerSpawnEnable = true;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	int32 StationId = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	int32 Daytime = 0;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 SpawnDay = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
@@ -247,12 +214,6 @@ protected:
 	StationType StationTypeValue = StationType::Circle;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FGridCellData CurrentGridCellData;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	APolicy* Policy;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	class ATimer* TimerRef;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
-	class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY(BlueprintReadOnly, Category = "TimerRoutine")
 	FTimerHandle TimerSpawnPassenger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Passenger")
@@ -263,6 +224,8 @@ protected:
 	FStationInfo StationInfo;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	bool TransferStation = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	int32 Fare = 2;
 
 	// Touch
 	UPROPERTY(BlueprintReadWrite)
@@ -284,8 +247,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Config")
 	int32 UpgradePermissionComplainPassenger = 3;
 	UPROPERTY(BlueprintReadOnly, Category = "Config")
-	bool IsUpgrade = false;
-	UPROPERTY(BlueprintReadOnly, Category = "Config")
 	float UpgradeCost = 300.0f;
 
 	// New station
@@ -293,76 +254,6 @@ protected:
 	UStaticMeshComponent* PulseComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
 	bool SpawnAlarm = true;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> SpawnPaidPassenger = {
-		TPair<StationType, int32>(StationType::Circle, 0),
-		TPair<StationType, int32>(StationType::Triangle, 0),
-		TPair<StationType, int32>(StationType::Rectangle, 0),
-		TPair<StationType, int32>(StationType::Cross, 0),
-		TPair<StationType, int32>(StationType::Rhombus, 0),
-		TPair<StationType, int32>(StationType::Oval, 0),
-		TPair<StationType, int32>(StationType::Diamond, 0),
-		TPair<StationType, int32>(StationType::Pentagon, 0),
-		TPair<StationType, int32>(StationType::Star, 0),
-		TPair<StationType, int32>(StationType::Fan, 0)
-	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> SpawnFreePassenger = {
-		TPair<StationType, int32>(StationType::Circle, 0),
-		TPair<StationType, int32>(StationType::Triangle, 0),
-		TPair<StationType, int32>(StationType::Rectangle, 0),
-		TPair<StationType, int32>(StationType::Cross, 0),
-		TPair<StationType, int32>(StationType::Rhombus, 0),
-		TPair<StationType, int32>(StationType::Oval, 0),
-		TPair<StationType, int32>(StationType::Diamond, 0),
-		TPair<StationType, int32>(StationType::Pentagon, 0),
-		TPair<StationType, int32>(StationType::Star, 0),
-		TPair<StationType, int32>(StationType::Fan, 0)
-	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> TotalSpawnPassenger = {
-		TPair<StationType, int32>(StationType::Circle, 0),
-		TPair<StationType, int32>(StationType::Triangle, 0),
-		TPair<StationType, int32>(StationType::Rectangle, 0),
-		TPair<StationType, int32>(StationType::Cross, 0),
-		TPair<StationType, int32>(StationType::Rhombus, 0),
-		TPair<StationType, int32>(StationType::Oval, 0),
-		TPair<StationType, int32>(StationType::Diamond, 0),
-		TPair<StationType, int32>(StationType::Pentagon, 0),
-		TPair<StationType, int32>(StationType::Star, 0),
-		TPair<StationType, int32>(StationType::Fan, 0)
-	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 ArrivePaidPassenger = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	int32 ArriveFreePassenger = 0; 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> DestroyedPaidPassenger = {
-		TPair<StationType, int32>(StationType::Circle, 0),
-		TPair<StationType, int32>(StationType::Triangle, 0),
-		TPair<StationType, int32>(StationType::Rectangle, 0),
-		TPair<StationType, int32>(StationType::Cross, 0),
-		TPair<StationType, int32>(StationType::Rhombus, 0),
-		TPair<StationType, int32>(StationType::Oval, 0),
-		TPair<StationType, int32>(StationType::Diamond, 0),
-		TPair<StationType, int32>(StationType::Pentagon, 0),
-		TPair<StationType, int32>(StationType::Star, 0),
-		TPair<StationType, int32>(StationType::Fan, 0)
-	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Passenger")
-	TMap<StationType, int32> DestroyedFreePassenger = {
-		TPair<StationType, int32>(StationType::Circle, 0),
-		TPair<StationType, int32>(StationType::Triangle, 0),
-		TPair<StationType, int32>(StationType::Rectangle, 0),
-		TPair<StationType, int32>(StationType::Cross, 0),
-		TPair<StationType, int32>(StationType::Rhombus, 0),
-		TPair<StationType, int32>(StationType::Oval, 0),
-		TPair<StationType, int32>(StationType::Diamond, 0),
-		TPair<StationType, int32>(StationType::Pentagon, 0),
-		TPair<StationType, int32>(StationType::Star, 0),
-		TPair<StationType, int32>(StationType::Fan, 0)
-	};
 
 protected:
 	// Station meshses

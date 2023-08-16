@@ -39,6 +39,8 @@ public:
 	ATrainTemplate* GetTrainById(int32 TrainId, TrainType& Type);
 	UFUNCTION(BlueprintCallable)
 	ATrain* GetNearestTrain(FVector CurrentLocation, class ALane* LaneRef);
+	UFUNCTION(BlueprintCallable)
+	TArray<ATrainTemplate*> GetAllTrain();
 
 	UFUNCTION()
 	void InitTrainMaterial();

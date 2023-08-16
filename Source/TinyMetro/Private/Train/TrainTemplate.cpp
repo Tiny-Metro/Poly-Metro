@@ -75,17 +75,20 @@ void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	LaneManagerRef = GameModeRef->GetLaneManager();
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	StationManagerRef = GameModeRef->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-	TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
-	StatisticsManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStatisticsManager();
+	TrainManagerRef = GameModeRef->GetTrainManager();
+	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+	TimerRef = GameModeRef->GetTimer();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
 	//InitTrainMesh();
 
+	TimerRef->WeeklyTask.AddDynamic(this, &ATrainTemplate::WeeklyTask);
 }
 
 void ATrainTemplate::UpdatePassengerMesh() {
@@ -146,11 +149,10 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 		if (!Passenger.Contains(i)) {
 			Passenger.Add(i, P);
 
-			TotalPassenger++;
+			TrainInfo.TotalBoardPassenger++;
+			TrainInfo.WeeklyBoardPassenger++;
 
 			// TODO : Transfer passenger
-			// Get money
-			PlayerStateRef->AddMoney(Fare);
 			{
 				FScopeLock Lock(StatisticsManagerRef->GetDefaultStatisticsKey().Pin().Get());
 				StatisticsManagerRef->DefaultStatistics.TotalArrivePassenger++;
@@ -164,7 +166,7 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 }
 
 void ATrainTemplate::UpdatePassengerSlot() {
-	if (IsUpgrade) {
+	if (TrainInfo.IsUpgrade) {
 		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
 		}
@@ -182,11 +184,20 @@ bool ATrainTemplate::CanUpgrade() const {
 	return false;
 }
 
+int32 ATrainTemplate::GetTotalBoardPassenger() const {
+	return TrainInfo.TotalBoardPassenger;
+}
+
+int32 ATrainTemplate::GetWeeklyBoardPassenger() const {
+	return TrainInfo.WeeklyBoardPassenger;
+}
+
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
-	ServiceLaneId = Lane->GetLaneId();
+	TrainInfo.ServiceLaneId = Lane->GetLaneId();
+	TrainInfo.ShiftCount++;
 	UpdateTrainMesh();
 }
 
@@ -288,12 +299,26 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	TouchTime = 0.0f;
 }
 
+int32 ATrainTemplate::GetShiftCount() const {
+	return TrainInfo.ShiftCount;
+}
+
 void ATrainTemplate::SetDespawnNextStation() {
 	DeferredDespawn = true;
 }
 
+FTrainInfo ATrainTemplate::GetTrainInfo() {
+	return TrainInfo;
+}
+
 void ATrainTemplate::SetTrainInfoWidget(UTrainInfoWidget* Widget) {
 	TrainInfoWidget = Widget;
+}
+
+// Broadcast by TimerRef
+void ATrainTemplate::WeeklyTask() {
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::WeeklyTask"));
+	TrainInfo.WeeklyBoardPassenger = 0;
 }
 
 // Called every frame
@@ -389,19 +414,19 @@ void ATrainTemplate::SetTrainSpeed(float Speed) {
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {
-	TrainId = Id;
+	TrainInfo.Id = Id;
 }
 
 int32 ATrainTemplate::GetTrainId() const {
-	return TrainId;
+	return TrainInfo.Id;
 }
 
 void ATrainTemplate::SetServiceLaneId(int32 Id) {
-	ServiceLaneId = Id;
+	TrainInfo.ServiceLaneId = Id;
 }
 
 int32 ATrainTemplate::GetServiceLaneId() const {
-	return ServiceLaneId;
+	return TrainInfo.ServiceLaneId;
 }
 
 void ATrainTemplate::SetTrainDirection(TrainDirection Dir) {
@@ -413,14 +438,14 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 }
 
 void ATrainTemplate::Upgrade() {
-	IsUpgrade = true;
+	TrainInfo.IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
 	SetTrainSpeed(TRAIN_UPGRADE_SPEED);
 	UpdateTrainMesh();
 }
 
 bool ATrainTemplate::GetIsUpgrade() const {
-	return IsUpgrade;
+	return TrainInfo.IsUpgrade;
 }
 
 void ATrainTemplate::Test() {

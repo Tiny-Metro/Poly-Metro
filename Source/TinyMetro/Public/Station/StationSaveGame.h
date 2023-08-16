@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "Passenger.h"
+#include "StationInfo.h"
 #include "StationSaveGame.generated.h"
 
 /**
@@ -26,5 +27,7 @@ public:
 	int32 SpawnDay = 0;
 	UPROPERTY(BlueprintReadWrite)
 	bool IsUpgrade;
+	UPROPERTY(BlueprintReadWrite)
+	FStationInfo StationInfo;
 
 };

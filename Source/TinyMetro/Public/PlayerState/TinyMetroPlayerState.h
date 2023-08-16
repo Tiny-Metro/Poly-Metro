@@ -63,6 +63,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddMoney(int32 Amount);
 	UFUNCTION(BlueprintCallable)
+	void AddIncome(int32 Amount);
+	UFUNCTION(BlueprintCallable)
 	void AddSales(int32 Sale);
 	void Test();
 

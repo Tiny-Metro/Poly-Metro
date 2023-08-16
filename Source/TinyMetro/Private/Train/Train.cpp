@@ -136,6 +136,8 @@ void ATrain::BeginPlay() {
 	Super::BeginPlay();
 	TotalTravel = 0.0f;
 	AiControllerRef = Cast<ATrainAiController>(GetController());
+
+	TrainInfo.Type = TrainType::Train;
 }
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -144,7 +146,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		
 		auto Station = Cast<AStation>(OtherActor);
 		// Check passing station
-		if (Station->GetLanes().Contains(ServiceLaneId)) {
+		if (Station->GetLanes().Contains(TrainInfo.ServiceLaneId)) {
 
 			if (DeferredDespawn) {
 				for (auto& i : Subtrains) {
@@ -156,7 +158,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 			// Set current, next Station
 			SetCurrentStation(Station->GetStationInfo());
-			SetNextStation(LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
+			SetNextStation(LaneManagerRef->GetLaneById(TrainInfo.ServiceLaneId)->GetNextStation(
 					Station,
 					GetTrainDirection()
 				)->GetStationInfo()
@@ -221,7 +223,7 @@ void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 	//UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
 	bool tmp;
-	auto LaneTmp = LaneManagerRef->GetLaneById(ServiceLaneId);
+	auto LaneTmp = LaneManagerRef->GetLaneById(TrainInfo.ServiceLaneId);
 	auto NextPoint = LaneTmp->GetNextLocation(
 		this,
 		GridManagerRef->GetGridCellDataByCoord(CurLocation, tmp).WorldCoordination,
@@ -323,7 +325,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 
 void ATrain::UpdatePassengerSlot() {
 	Super::UpdatePassengerSlot();
-	if (IsUpgrade) {
+	if (TrainInfo.IsUpgrade) {
 		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
 		}
@@ -344,7 +346,7 @@ void ATrain::DespawnTrain() {
 
 void ATrain::UpdateTrainMesh() {
 	Super::UpdateTrainMesh();
-	TrainMeshComponent->SetStaticMesh(TrainMesh[IsUpgrade]);
+	TrainMeshComponent->SetStaticMesh(TrainMesh[TrainInfo.IsUpgrade]);
 	SetTrainMaterial(LaneRef);
 }
 
@@ -366,6 +368,10 @@ bool ATrain::CanUpgrade() const {
 	} else {
 		return true;
 	}
+}
+
+int32 ATrain::GetSubtrainCount() const {
+	return Subtrains.Num();
 }
 
 void ATrain::ActiveMoveTest() {
@@ -406,6 +412,26 @@ void ATrain::GetOnPassenger(AStation* Station) {
 	}
 }
 
+int32 ATrain::GetTotalPassenger() const {
+	int32 result = 0;
+	for (auto& i : Subtrains) {
+		result += i->GetTotalBoardPassenger();
+	}
+	result += GetTotalBoardPassenger();
+
+	return result;
+}
+
+int32 ATrain::GetWeeklyPassenger() const {
+	int32 result = 0;
+	for (auto& i : Subtrains) {
+		result += i->GetWeeklyBoardPassenger();
+	}
+	result += GetWeeklyBoardPassenger();
+
+	return result;
+}
+
 void ATrain::GetOffPassenger(AStation* Station, bool& Success) {
 	// Log
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
@@ -444,7 +470,7 @@ void ATrain::UpdateSubtrainDistance() {
 	// Total distance from Train to last Subtrain
 	float totalDistance = 0.0f;
 	if (Subtrains.IsValidIndex(0)) {
-		if (IsUpgrade) {
+		if (TrainInfo.IsUpgrade) {
 			if (Subtrains[0]->GetIsUpgrade()) {
 				// Upgrade Train and Upgrade Subtrain
 				defaultDistance = DIST_UP_TRAIN_UP_SUBTRAIN;
@@ -499,12 +525,24 @@ void ATrain::UpdateSubtrainDistance() {
 void ATrain::DetachSubtrain(ASubtrain* T) {
 	Subtrains.Remove(T);
 	UpdateSubtrainDistance();
+	IndexingSubtrain();
 }
 
 void ATrain::UpdateSubtrainSpeed() {
 	for (auto& i : Subtrains) {
-		i->SetTrainSpeed(IsUpgrade ? TRAIN_UPGRADE_SPEED : TRAIN_DEFAULT_SPEED);
+		i->SetTrainSpeed(TrainInfo.IsUpgrade ? TRAIN_UPGRADE_SPEED : TRAIN_DEFAULT_SPEED);
 	}
+}
+
+void ATrain::IndexingSubtrain() {
+	for (int i = 0; i < Subtrains.Num(); i++) {
+		Subtrains[i]->SetIndex(i);
+	}
+}
+
+void ATrain::WeeklyTask() {
+	Super::WeeklyTask();
+	UE_LOG(LogTemp, Log, TEXT("Train::WeeklyTask"));
 }
 
 void ATrain::AddSubtrain(ASubtrain* T) {
@@ -514,5 +552,6 @@ void ATrain::AddSubtrain(ASubtrain* T) {
 	T->SetActorLocation(this->GetActorLocation());
 	UpdateSubtrainDistance();
 	UpdateSubtrainSpeed();
+	IndexingSubtrain();
 }
 

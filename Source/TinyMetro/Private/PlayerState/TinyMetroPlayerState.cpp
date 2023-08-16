@@ -164,6 +164,10 @@ void ATinyMetroPlayerState::AddMoney(int32 Amount) {
 	Money += Amount;
 }
 
+void ATinyMetroPlayerState::AddIncome(int32 Amount) {
+	Money += Amount;
+}
+
 void ATinyMetroPlayerState::AddSales(int32 Sale) {
 	Sales += Sale;
 }
