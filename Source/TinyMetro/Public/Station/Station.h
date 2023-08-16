@@ -41,8 +41,6 @@ public:
 	UFUNCTION()
 	void ComplainRoutine();
 	UFUNCTION(BlueprintCallable)
-	void CalculateComplain();
-	UFUNCTION(BlueprintCallable)
 	void SetActivate(bool Flag);
 	UFUNCTION()
 	void UpdateComplainMesh();
@@ -50,10 +48,6 @@ public:
 	void InitComplainGauge();
 	UFUNCTION()
 	void SetComplainGauge(float Per);
-	UFUNCTION()
-	void AddComplainIncreaseRate(float Rate);
-	UFUNCTION()
-	float GetComplainIncreateRate() const;
 	UFUNCTION()
 	void SetComplainIncreaseEnable(bool Flag);
 	UFUNCTION()
@@ -197,12 +191,6 @@ protected:
 	int32 ComplainPassengerNum = 5;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	int32 ComplainSpawnDay = 10;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
-	float ComplainIncreaseRate = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
-	float ComplainIncreaseRateByPolicy = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
-	float ComplainIncreaseRateByEvent = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	bool IsComplainIncreaseEnable = true;
 

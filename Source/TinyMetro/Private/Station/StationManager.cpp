@@ -10,6 +10,7 @@
 #include "Station/StationSpawnBorderWidget.h"
 #include "Station/StationManagerSaveGame.h"
 #include "Policy/Policy.h"
+#include "Event/TinyMetroEventManager.h"
 #include "SaveSystem/TMSaveManager.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
@@ -94,10 +95,13 @@ void AStationManager::BeginPlay()
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
 	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
+	// Register Policy update
 	PolicyRef->PolicyUpdateTask.AddDynamic(this, &AStationManager::UpdatePolicy);
 
-	SaveManagerRef->SaveTask.AddDynamic(this, &AStationManager::Save);
+	// Register Event end
+	GameMode->GetEventManager()->EventEndTask.AddDynamic(this, &AStationManager::EventEnd);
 
+	SaveManagerRef->SaveTask.AddDynamic(this, &AStationManager::Save);
 }
 
 void AStationManager::TestFunction() {
@@ -394,14 +398,14 @@ float AStationManager::GetPassengerSpawnSpeed(StationType Type) const {
 	}
 }
 
-void AStationManager::AddComplainIncreaseRate(float Rate) {
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Active) {
-				i->AddComplainIncreaseRate(Rate);
-			}
-		}
-	}
+void AStationManager::AddComplainIncreaseRateByEvent(float Rate) {
+	ComplainIncreaseRateByEvent += Rate;
+}
+
+float AStationManager::GetComplainIncreaseRate() const {
+	return ComplainIncreaseRate + 
+		ComplainIncreaseRateByEvent + 
+		ComplainIncreaseRateByPolicy;
 }
 
 void AStationManager::SetPassengerSpawnEnable(bool Flag) {
@@ -634,6 +638,7 @@ bool AStationManager::Load() {
 void AStationManager::EventEnd() {
 	AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
 	FreePassengerSpawnProbabilityByEvent = 0.0f;
+	ComplainIncreaseRateByEvent = 0.0f;
 
 	for (auto& i : PassengerDestinationTypeWeight) {
 		i.Value = 1.0f;
@@ -644,7 +649,20 @@ void AStationManager::UpdatePolicy() {
 	auto policyData = PolicyRef->GetPolicyData();
 	FreePassengerSpawnProbabilityByPolicy = 0.0f;
 	AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+	ComplainIncreaseRateByPolicy = 0.0f;
 
+
+	if (policyData.PrioritySeat) {
+		ComplainIncreaseRateByPolicy -= 0.05f;
+	}
+
+	if (policyData.HasCCTV) {
+		ComplainIncreaseRateByPolicy -= 0.1f;
+	}
+
+	if (policyData.HasElevator) {
+		ComplainIncreaseRateByPolicy -= 0.15f;
+	}
 
 	if (policyData.PrioritySeat) {
 		FreePassengerSpawnProbabilityByPolicy += 0.2f;
@@ -652,6 +670,11 @@ void AStationManager::UpdatePolicy() {
 
 	if (policyData.HasBicycle) {
 		AdditionalPassengerSpawnProbabilityByPolicy += 0.1f;
+		ComplainIncreaseRateByPolicy += 0.1f;
+	}
+
+	if (policyData.HasTransfer) {
+		ComplainIncreaseRateByPolicy -= 0.2f;
 	}
 }
 

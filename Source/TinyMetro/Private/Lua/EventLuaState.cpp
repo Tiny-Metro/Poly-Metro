@@ -68,7 +68,5 @@ void UEventLuaState::ScaleComplain(FLuaValue ScaleFactor) {
 void UEventLuaState::AddComplainIncreaseRate(FLuaValue Rate) {
     InitReferClasses();
 
-    for (auto& i : StationManagerRef->GetAllStations()) {
-        i->AddComplainIncreaseRate(Rate.ToFloat());
-    }
+    StationManagerRef->AddComplainIncreaseRateByEvent(Rate.ToFloat());
 }

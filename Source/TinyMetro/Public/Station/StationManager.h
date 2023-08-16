@@ -76,6 +76,11 @@ public:
 	static StationType StationTypeFromString(FString Str, bool& Success);
 	UFUNCTION(BlueprintCallable)
 	static FString StationTypeToString(StationType Type, bool& Success);
+
+	UFUNCTION()
+	void AddComplainIncreaseRateByEvent(float Rate);
+	UFUNCTION()
+	float GetComplainIncreaseRate() const;
 	
 	// Save & Load
 	UFUNCTION()
@@ -140,9 +145,6 @@ public:
 	float GetDefaultFreePassengerSpawnProbability() const;
 	UFUNCTION()
 	float GetPassengerSpawnSpeed(StationType Type) const;
-	
-	UFUNCTION(BlueprintCallable)
-	void AddComplainIncreaseRate(float Rate);
 
 	UFUNCTION()
 	void SetPassengerSpawnEnable(bool Flag);
@@ -246,6 +248,14 @@ protected:
 	float FreePassengerSpawnProbabilityByEvent = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Passenger")
 	float FreePassengerSpawnProbabilityByPolicy = 0.0f;
+
+	// Complain
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	float ComplainIncreaseRate = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	float ComplainIncreaseRateByPolicy = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	float ComplainIncreaseRateByEvent = 0.0f;
 
 	// Info Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

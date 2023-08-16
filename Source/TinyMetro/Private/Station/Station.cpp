@@ -337,9 +337,6 @@ int32 AStation::GetWaitPassenger() const {
 	return Passenger.Num();
 }
 
-void AStation::CalculateComplain() {
-}
-
 void AStation::SetActivate(bool Flag) {
 	IsActive = Flag;
 	State = Flag ? StationState::Active : StationState::Inactive;
@@ -368,25 +365,6 @@ void AStation::SetComplainGauge(float Per) {
 	ComplainDynamicMaterial->SetScalarParameterValue("Gauge", Per);
 }
 
-void AStation::AddComplainIncreaseRate(float Rate) {
-	ComplainIncreaseRate += Rate;
-	/*if (Period != -1) {
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerComplain,
-			FTimerDelegate::CreateLambda([&]() {
-				AdditionalPassengerSpawnProbability -= Rate;
-				}),
-			Period,
-			false,
-			0.0f
-		);
-	}*/
-}
-
-float AStation::GetComplainIncreateRate() const {
-	return ComplainIncreaseRate + ComplainIncreaseRateByPolicy + ComplainIncreaseRateByEvent;
-}
-
 void AStation::SetComplainIncreaseEnable(bool Flag) {
 	IsComplainIncreaseEnable = Flag;
 }
@@ -396,7 +374,7 @@ void AStation::ScaleComplain(float Rate) {
 }
 
 void AStation::AddComplain(float Value, bool IsFixedValue) {
-	StationInfo.Complain += (Value * (IsFixedValue ? 1.0f : ComplainIncreaseRate));
+	StationInfo.Complain += (Value * (IsFixedValue ? 1.0f : StationManager->GetComplainIncreaseRate()));
 }
 
 void AStation::UpdateStationMesh() {
@@ -518,12 +496,12 @@ void AStation::ComplainRoutine() {
 	if (IsComplainIncreaseEnable) {
 		// Complain from Passenger
 		if (Passenger.Num() > ComplainPassengerNum) {
-			StationInfo.Complain += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * ComplainIncreaseRate;
+			StationInfo.Complain += (ComplainFromPassenger * (Passenger.Num() - ComplainPassengerNum)) * StationManager->GetComplainIncreaseRate();
 		}
 
 		// Complain from not activate
 		if (!IsActive && SpawnDay > ComplainSpawnDay) {
-			StationInfo.Complain += ComplainFromInactive * ComplainIncreaseRate;
+			StationInfo.Complain += ComplainFromInactive * StationManager->GetComplainIncreaseRate();
 		}
 
 		// Compalin from service level
@@ -580,37 +558,24 @@ void AStation::OffSpawnAlarm() {
 }
 
 void AStation::EventEnd() {
-	ComplainIncreaseRateByEvent = 0.0f;
 }
 
 void AStation::UpdatePolicy() {
 	auto policyData = PolicyRef->GetPolicyData();
 	PolicyServiceLevel = PolicyRef->ServiceLevel[policyData.ServiceCostLevel];
 	MaintenanceCost = 0;
-	ComplainIncreaseRateByPolicy = 0.0f;
 
 	MaintenanceCost += PolicyServiceLevel.WeeklyCost;
 
-	if (policyData.PrioritySeat) {
-		ComplainIncreaseRateByPolicy -= 0.05f;
-	}
-
 	if (policyData.HasCCTV) {
-		ComplainIncreaseRateByPolicy -= 0.1f;
 		MaintenanceCost += 5;
 	}
 
 	if (policyData.HasElevator) {
-		ComplainIncreaseRateByPolicy -= 0.15f;
 		MaintenanceCost += 10;
 	}
 
-	if (policyData.HasBicycle) {
-		ComplainIncreaseRateByPolicy += 0.1f;
-	}
-
 	if (policyData.HasTransfer) {
-		ComplainIncreaseRateByPolicy -= 0.2f;
 		TransferStation = true;
 	}
 }
