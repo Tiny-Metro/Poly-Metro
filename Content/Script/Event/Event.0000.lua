@@ -1,7 +1,13 @@
-Data = {}
-Data.title = 'Title'
-Data.message = 'Message'
-Data.period = 0
+-- Event data
+function EventData()
+    Data = {}
+    Data.title = 'Title'
+    Data.flavor_text = 'Flavor text'
+    Data.message = 'Event message'
+    Data.period = 0
+    
+    return Data
+end
 
 -- Event occur weight
 function Weight()
@@ -11,5 +17,3 @@ end
 -- Event start (event effect)
 function Start()
 end
-
-return Data
