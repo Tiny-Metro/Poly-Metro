@@ -14,6 +14,10 @@ UInvestmentLuaState::UInvestmentLuaState() {
     Table.Add(TEXT("AddItem"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UInvestmentLuaState, AddItem, FLuaValue, FLuaValue)));
 
     Table.Add(TEXT("Train"), FLuaValue(TEXT("Train")));
+
+    Table.Add(TEXT("success"), FLuaValue(TEXT("success")));
+    Table.Add(TEXT("continue"), FLuaValue(TEXT("continue")));
+    Table.Add(TEXT("fail"), FLuaValue(TEXT("fail")));
 }
 
 UInvestmentLuaState* UInvestmentLuaState::CreateInstance(UWorld* WorldContextObject) {
