@@ -117,6 +117,7 @@ void ATinyMetroEventManager::UpdateEventWeight() {
 
 void ATinyMetroEventManager::InitializeEvent() {
 	TArray<FString> findFiles;
+	IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
 	FRegexPattern pattern(TEXT("Event\\.[1-9]\\d{3}\\.lua"));
 	FString scriptDir = FPaths::ProjectContentDir()
 		.Append(TEXT("Script"))
@@ -126,7 +127,6 @@ void ATinyMetroEventManager::InitializeEvent() {
 	if (!Load()) {
 		// Load fail : New game
 		// Copy files to Content/Script/Event/Saved
-		IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
 		platformFile.FindFiles(findFiles, *scriptDir, TEXT("lua"));
 		for (auto& i : findFiles) {
 			FRegexMatcher matcher(pattern, i);
@@ -143,6 +143,13 @@ void ATinyMetroEventManager::InitializeEvent() {
 			}
 		}
 	}
+
+	scriptDir
+		.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
+		.Append(TEXT("Saved"));
+
+	findFiles.Empty();
+	platformFile.FindFiles(findFiles, *scriptDir, TEXT("lua"));
 
 	// Read files
 	// Read directory = saved directory
