@@ -1,25 +1,37 @@
-Data = {}
-Data.title = '환승 시스템 요청'
-Data.content = '대중교통 간 환승 시스템을 도입해야 한다는 목소리가 커지고 있습니다. 정부에서는 환승 시스템을 20일간 시범 도입하는 방안을 고려하고 있습니다.'
-Data.time_require = 20
-Data.require_message = '환승 시스템 20일 동안 활성화'
-Data.accept_message = '+300$'
-Data.award_message = '+300$, 7일간 승객 20% 증가'
-Data.reward_message = '-300$, 7일간 승객 20% 감소'
+-- Investment condition
+function InvestmentData()
+    Data = {}
+    Data.message = 'Mission require text'
+    Data.time_require = 7
+    Data.award = 'Reward text'
 
-function InvestmentStart()
-    AddMoney(1111)
-    SetTransfer(true)
-    print("Code 1000 : StationCount = "..GetStationCount())
+    return Data
 end
 
-function InvestmentSuccess()
+-- Call when investment start
+-- Used save info when start
+function Start()
+    
 end
 
-function InvestmentFail()
+-- Investment appear condition
+function Appearance()
+    return true
 end
 
-function InvestmentCheck()
+-- Investment success condition
+function Process()
+    missionState = GetTimestamp()
+    print(missionState.Date)
+    if missionState.Date > 5 then
+        return success
+    else
+        return continue
+    end
 end
 
-return Data
+-- Investment award
+function Award()
+    print('success!')
+    AddIncome(5000)
+end
