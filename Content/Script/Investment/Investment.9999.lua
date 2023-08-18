@@ -1,17 +1,19 @@
 -- Investment condition
 function InvestmentData()
     Data = {}
-    Data.message = 'Mission require text'
+    Data.message = '테스트 미션 : 3일 후 완료됩니다.'
     Data.time_require = 7
-    Data.award = 'Reward text'
+    Data.award = '5000$'
 
     return Data
 end
 
+saveDate = {}
+
 -- Call when investment start
 -- Used save info when start
 function Start()
-    
+    saveDate = GetTimestamp()
 end
 
 -- Investment appear condition
@@ -21,17 +23,14 @@ end
 
 -- Investment success condition
 function Process()
+    print(saveDate.Date)
     missionState = GetTimestamp()
-    print(missionState.Date)
-    if missionState.Date > 5 then
+    if saveDate.Date + 2 < missionState.Date then
         return success
-    else
-        return continue
     end
 end
 
 -- Investment award
 function Award()
-    print('success!')
     AddIncome(5000)
 end
