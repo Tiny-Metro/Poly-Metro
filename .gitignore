@@ -75,3 +75,7 @@ DerivedDataCache/*
 
 # Directory for test
 Content/Test/**
+
+# Saved script file
+Contnet/Script/Investment/Saved/**
+Contnet/Script/Event/Saved/**
