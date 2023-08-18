@@ -1,3 +1,4 @@
+-- Event data
 function EventData()
     Data = {}
     Data[0] = {}
