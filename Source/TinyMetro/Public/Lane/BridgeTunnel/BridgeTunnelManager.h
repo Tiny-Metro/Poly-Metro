@@ -9,6 +9,7 @@
 #include "ConnectorType.h"
 #include "ConnectorData.h"
 #include "BridgeTunnel.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -71,6 +72,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<ABridgeTunnel*> Connectors;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 0;
 
 	UFUNCTION(BlueprintCallable)
 	void DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points);
@@ -93,4 +96,14 @@ public:
 public:
 	bool IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points);
 	bool AreArraysEqual(const TArray<FIntPoint>& Array1, const TArray<FIntPoint>& Array2);
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+
+	void Save();
+	bool Load();
 };

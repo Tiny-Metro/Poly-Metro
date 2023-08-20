@@ -3,6 +3,10 @@
 
 #include "Lane/BridgeTunnel/BridgeTunnelManager.h"
 #include "GridGenerator/GridCellData.h"
+#include "SaveSystem/TMSaveManager.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include "GameFramework/Controller.h" //
+#include "Lane/BridgeTunnel/BridgeTunnelManagerSaveGame.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -16,8 +20,12 @@ ABridgeTunnelManager::ABridgeTunnelManager()
 void ABridgeTunnelManager::BeginPlay()
 {
 	Super::BeginPlay();
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
+	SaveManagerRef = GameMode->GetSaveManager();
 }
 
 // Called every frame
@@ -39,7 +47,7 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 		UE_LOG(LogTemp, Warning, TEXT("The givien pointsArray is invalid"));
 		return; 
 	}
-
+	Count++;
 	ABridgeTunnel* existingConnector = FindConnector(type, points);
 
 	if (existingConnector != nullptr) {
@@ -148,14 +156,12 @@ ABridgeTunnel* ABridgeTunnelManager::FindConnector(ConnectorType type, const TAr
 	{
 		UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 		return nullptr;
-
 	}
 
 	TArray<FIntPoint> processedPoints = ProcessArray(points);
 	TArray<FIntPoint> reversedPoints = processedPoints;
 	Algo::Reverse(reversedPoints);
 
-	UE_LOG(LogTemp, Warning, TEXT("????????"));
 	UE_LOG(LogTemp, Warning, TEXT("Number of elements in processedPoints: %d"), processedPoints.Num());
 	for (int i = 0; i < processedPoints.Num(); i++)
 	{
@@ -253,4 +259,33 @@ bool ABridgeTunnelManager::IsConnectorExist(ConnectorType type, const TArray<FIn
 
 	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 	return false;
+}
+
+void ABridgeTunnelManager::Save()
+{
+	UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UBridgeTunnelManagerSaveGame::StaticClass()));
+	tmp->Count = Count;
+
+	SaveManagerRef->Save(tmp, SaveActorType::BridgeTunnelManager, -1);
+
+}
+bool ABridgeTunnelManager::Load() 
+{
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
+	if (!SaveManagerRef) {
+		SaveManagerRef = GameMode->GetSaveManager();
+	}	
+	
+	UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(SaveManagerRef->Load(SaveActorType::BridgeTunnelManager, -1));
+
+	if (!IsValid(tmp)) {
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame is not valid"));
+		return false;
+	}
+
+	Count = tmp->Count;
+
+	return true;
 }
