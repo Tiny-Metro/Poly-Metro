@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ConnectorData.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "BridgeTunnel.generated.h"
 
 UCLASS()
@@ -29,7 +30,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 count;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ConnectorId;
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CountUp();
@@ -39,4 +41,20 @@ public:
 	void CountDown();
 	virtual void CountDown_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void BuildBridgeTunnel();
+	virtual void BuildBridgeTunnel_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+	void BuildTest();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+
+	void Save();
+	bool Load();
 };
