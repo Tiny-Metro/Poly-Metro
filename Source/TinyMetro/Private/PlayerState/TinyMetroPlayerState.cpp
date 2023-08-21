@@ -74,8 +74,8 @@ bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
 	}
 }
 
-bool ATinyMetroPlayerState::CanUseMoney(int32 Money) const {
-	return this->Money >= Money ? true : false;
+bool ATinyMetroPlayerState::CanUseMoney(int32 Val) const {
+	return this->Money >= Val ? true : false;
 }
 
 int32 ATinyMetroPlayerState::GetSales() const {

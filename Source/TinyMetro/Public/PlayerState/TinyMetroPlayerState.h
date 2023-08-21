@@ -29,7 +29,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
 	UFUNCTION(BlueprintCallable)
-	bool CanUseMoney(int32 Money) const;
+	bool CanUseMoney(int32 Val) const;
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetSales() const;
