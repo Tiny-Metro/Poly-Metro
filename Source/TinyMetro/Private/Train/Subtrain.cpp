@@ -7,6 +7,7 @@
 #include "Train/SubtrainAiController.h"
 #include "Lane/Lane.h"
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "Statistics/StatisticsManager.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetMathLibrary.h>
 
@@ -118,10 +119,12 @@ void ASubtrain::UpdateTrainMesh() {
 }
 
 void ASubtrain::Upgrade() {
-	Super::Upgrade();
-	// TODO : Money function division
-	PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeSubtrain());
-	TrainManagerRef->ReportSubtrainUpgrade();
+	if (PlayerStateRef->CanUseMoney(TrainManagerRef->GetCostUpgradeSubtrain())) {
+		Super::Upgrade();
+		PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeSubtrain());
+		TrainManagerRef->ReportSubtrainUpgrade();
+		StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalUpgradeCount++;
+	}
 }
 
 bool ASubtrain::CanUpgrade() const {
@@ -143,7 +146,9 @@ void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 			SetActorLocation(StartLocation);
 			TrainRef->AddSubtrain(this);
 			ServiceStart(GetActorLocation(), LaneRef, nullptr);
+			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalShiftCount++;
 		} else {
+			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalRetrievalCount++;
 			DespawnTrain();
 		}
 	}
