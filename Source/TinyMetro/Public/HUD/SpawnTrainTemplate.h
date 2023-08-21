@@ -36,6 +36,8 @@ protected:
 	class ALaneManager* LaneManagerRef;
 	UPROPERTY(BlueprintReadOnly)
 	class ATinyMetroPlayerState* PlayerStateRef;
+	UPROPERTY(BlueprintReadOnly)
+	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY(BlueprintReadWrite)
 	class ALane* LaneRef;
 
