@@ -2,6 +2,7 @@
 
 
 #include "Finance/Loan.h"
+#include "Statistics/StatisticsManager.h"
 #include <Kismet/GameplayStatics.h>
 
 void ULoan::Repay() {
@@ -9,13 +10,20 @@ void ULoan::Repay() {
 		RepayAll();
 	} else {
 		PlayerState->AddMoney(-(RepayPerWeek));
+		StatisticsManagerRef->BankStatistics.TotalRepayMoney += RepayPerWeek;
 		Balance -= RepayPerWeek;
 		RemainTime--;
 	}
 }
 
+void ULoan::NotifyWeeklyTask() {
+	// Auto repay
+	if (IsActivate) Repay();
+}
+
 void ULoan::RepayAll() {
 	PlayerState->AddMoney(-(Balance));
+	StatisticsManagerRef->BankStatistics.TotalRepayMoney += Balance;
 	DisableLoan();
 }
 
@@ -35,47 +43,13 @@ bool ULoan::GetAvailable() {
 void ULoan::ActivateLoan() {
 	IsActivate = true;
 	PlayerState->AddMoney(LoanData.Amount);
-	World->GetTimerManager().SetTimer(
-		LoanHandle,
-		FTimerDelegate::CreateLambda([LoanData = LoanData, this]() {
-			// Auto repay logic
-			this->Repay();
-
-			////Log
-			//if (GEngine)
-			//	GEngine->AddOnScreenDebugMessage(
-			//		-1,
-			//		15.0f,
-			//		FColor::Yellow,
-			//		FString::Printf(TEXT("SampleTimer : %d"), LoanData.Amount));
-			}),
-		Daytime * 7,
-		true,
-		(Daytime * 7) - (FMath::Fmod(World->GetTimeSeconds(), Daytime * 7))
-		);
-
-	////Log
-	//if (GEngine)
-	//	GEngine->AddOnScreenDebugMessage(
-	//		-1,
-	//		15.0f,
-	//		FColor::Yellow,
-	//		FString::Printf(TEXT("Total : %f"), FMath::Fmod(3.3, 2.2)));
-
+	StatisticsManagerRef->BankStatistics.TotalUsingLoanCount++;
+	StatisticsManagerRef->BankStatistics.TotalLoanMoney += LoanData.Amount;
 }
 
 void ULoan::DisableLoan() {
-	World->GetTimerManager().ClearTimer(LoanHandle);
 	IsActivate = false;
 	InitLoan(LoanData);
-
-	////Log
-	//if (GEngine)
-	//	GEngine->AddOnScreenDebugMessage(
-	//		-1,
-	//		15.0f,
-	//		FColor::Yellow,
-	//		FString::Printf(TEXT("Disable Loan : %d"), 0));
 }
 
 void ULoan::SetLoanData(FLoanData Data) {
@@ -92,7 +66,11 @@ void ULoan::SetPlayerState(ATinyMetroPlayerState* P) {
 }
 
 void ULoan::SetWorld(UWorld* W) {
-	World = W;
+	WorldContextReference = W;
+}
+
+void ULoan::SetStatisticsManager(AStatisticsManager* S) {
+	StatisticsManagerRef = S;
 }
 
 void ULoan::SetAvailabilityFunction(TFunction<bool(void)> Func) {
