@@ -6,6 +6,7 @@
 #include "Station/StationManager.h"
 #include "Timer/Timer.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Statistics/StatisticsManager.h"
 #include "Lua/InvestmentLuaState.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -25,6 +26,7 @@ void ABank::BeginPlay() {
 	if (!IsValid(LuaState)) LuaState = UInvestmentLuaState::CreateInstance(GetWorld());
 	if (!IsValid(TimerRef)) TimerRef = GameModeRef->GetTimer();
 	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 
 	// Set daytime
 	Daytime = GameModeRef->GetDaytime();
@@ -187,6 +189,7 @@ ULoan* ABank::CreateLoan(FLoanData Data, TFunction<bool(void)> Func) {
 	Temp->SetDaytime(Daytime);
 	Temp->SetWorld(GetWorld());
 	Temp->SetAvailabilityFunction(Func);
+	Temp->SetStatisticsManager(StatisticsManagerRef);
 	return Temp;
 }
 
@@ -226,6 +229,12 @@ void ABank::DailyTask() {
 }
 
 void ABank::WeeklyTask() {
+	// Loan weekly task
+	for (auto& i : Loan) {
+		i->NotifyWeeklyTask();
+	}
+
+	// Investment weekly task
 	if (InvestmentStock < MaxInvestmetStock) InvestmentStock++;
 	ChangeInvestment();
 	InvestmentUpdateTask.Broadcast();
@@ -244,6 +253,10 @@ void ABank::Tick(float DeltaTime)
 
 	for (auto& i : Investment) {
 		i.Value->InvestmentProcess();
+	}
+
+	for (auto& i : Loan) {
+		i->GetAvailable();
 	}
 
 }

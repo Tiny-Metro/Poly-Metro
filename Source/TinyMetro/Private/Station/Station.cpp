@@ -5,12 +5,13 @@
 #include "Station/StationManager.h"
 #include "Station/PathQueue.h"
 #include "Station/StationInfoWidget.h"
+#include "Station/StationSaveGame.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
 #include "SaveSystem/TMSaveManager.h"
-#include "Station/StationSaveGame.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Statistics/StatisticsManager.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include <Engine/AssetManager.h>
@@ -113,6 +114,7 @@ void AStation::BeginPlay()
 	TimerRef = GameModeRef->GetTimer();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	PolicyRef = GameModeRef->GetPolicy();
+	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationInfo.Type]);
@@ -248,6 +250,12 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 					PlayerStateRef->AddMoney(Fare);
 					StationInfo.TotalProfit += Fare;
 					StationInfo.WeeklyProfit += Fare;
+
+					{
+						FScopeLock lock(StatisticsManagerRef->GetLaneStatisticsKey().Pin().Get());
+						StatisticsManagerRef->LaneStatistics.Lanes[Train->GetServiceLaneId()].TotalProfit += Fare;
+						StatisticsManagerRef->LaneStatistics.Lanes[Train->GetServiceLaneId()].WeeklyProfit += Fare;
+					}
 				}
 				tmp.IsAlreadyPaid = true;
 
@@ -270,9 +278,14 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 }
 
 // Train -> Station
-void AStation::GetOffPassenger(FPassenger P) {
+void AStation::GetOffPassenger(FPassenger P, ATrainTemplate* Train) {
 	if (P.Destination == this->StationInfo.Type) {
 		// Passenger arrive destination
+		{
+			FScopeLock lock(StatisticsManagerRef->GetLaneStatisticsKey().Pin().Get());
+			StatisticsManagerRef->LaneStatistics.Lanes[Train->GetServiceLaneId()].TotalArrivePassenger++;
+			StatisticsManagerRef->LaneStatistics.Lanes[Train->GetServiceLaneId()].WeeklyArrivePassenger++;
+		}
 		P.Destination = StationType::None;
 	} else {
 		Passenger.Add(P);

@@ -9,6 +9,7 @@
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSpawnBorderWidget.h"
 #include "Station/StationManagerSaveGame.h"
+#include "Statistics/StatisticsManager.h"
 #include "Policy/Policy.h"
 #include "Event/TinyMetroEventManager.h"
 #include "SaveSystem/TMSaveManager.h"
@@ -27,6 +28,18 @@ AStationManager::AStationManager()
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
 	AdjList = NewObject<UAdjList>();
+
+	// Init Floyd-Warshall
+	// Init adj matrix
+	FAdjArray adjTmp;
+	adjTmp.Init(TNumericLimits<float>::Max(), 301);
+	adj.Init(adjTmp, 301);
+
+	// Init path array
+	FPath pathTmp;
+	pathTmp.Init(-1, 301);
+	AdjPath.Init(pathTmp, 301);
+	AdjDist.Init(adjTmp, 301);
 }
 
 // Called when the game starts or when spawned
@@ -40,6 +53,7 @@ void AStationManager::BeginPlay()
 	SaveManagerRef = GameMode->GetSaveManager();
 	TimerRef = GameMode->GetTimer();
 	PolicyRef = GameMode->GetPolicy();
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -78,18 +92,6 @@ void AStationManager::BeginPlay()
 			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
 		}
 	}
-
-	// Init Floyd-Warshall
-	// Init adj matrix
-	FAdjArray adjTmp;
-	adjTmp.Init(TNumericLimits<float>::Max(), 301);
-	adj.Init(adjTmp, 301);
-
-	// Init path array
-	FPath pathTmp;
-	pathTmp.Init(-1, 301);
-	AdjPath.Init(pathTmp, 301);
-	AdjDist.Init(adjTmp, 301);
 
 	// Register Timer tasks
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
@@ -685,13 +687,16 @@ void AStationManager::Tick(float DeltaTime)
 
 	StationSpawnRoutine(DeltaTime);
 
-	//if (Policy == nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(":("));
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1, 
-			15.0f, 
-			FColor::Yellow, 
-			FString::Printf(TEXT("%d : %f"), GetWorld()->TimeSeconds, DeltaTime));*/
+	float averageComplain = 0.0f;
+	int32 serviceStationCount = 0;
+
+	for (auto& i : Station) {
+		if (i->GetStationInfo().IsActive) serviceStationCount++;
+		averageComplain += i->GetComplain();
+	}
+	
+	StatisticsManagerRef->DefaultStatistics.AverageComplain = averageComplain;
+	StatisticsManagerRef->DefaultStatistics.ServiceStationCount = serviceStationCount;
 
 }
 

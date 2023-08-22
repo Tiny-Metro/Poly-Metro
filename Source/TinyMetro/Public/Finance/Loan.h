@@ -21,6 +21,7 @@ public:
 	void SetDaytime(int32 T);
 	void SetPlayerState(ATinyMetroPlayerState* P);
 	void SetWorld(UWorld* W);
+	void SetStatisticsManager(class AStatisticsManager* S);
 	void SetAvailabilityFunction(TFunction<bool(void)> Func);
 	void InitLoan(FLoanData Data);
 
@@ -38,9 +39,18 @@ public:
 	void RepayAll();
 	void Repay();
 
-protected:
+	// Weekly logic (Call by Bank actor)
+	UFUNCTION()
+	void NotifyWeeklyTask();
 
 protected:
+	UPROPERTY(BlueprintReadOnly)
+	ATinyMetroPlayerState* PlayerState;
+	UPROPERTY(BlueprintReadOnly)
+	class AStatisticsManager* StatisticsManagerRef;
+	UPROPERTY(BlueprintReadOnly)
+	UWorld* WorldContextReference;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FLoanData LoanData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
@@ -55,12 +65,6 @@ protected:
 	bool IsActivate = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	bool IsAvailable = false;
-	UPROPERTY(BlueprintReadOnly)
-	ATinyMetroPlayerState* PlayerState;
-	UPROPERTY(BlueprintReadOnly)
-	UWorld* World;
-	UPROPERTY(BlueprintReadOnly)
-	FTimerHandle LoanHandle;
 
 	TFunction<bool(void)> CheckAvailable;
 

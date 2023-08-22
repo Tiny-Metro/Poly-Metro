@@ -77,6 +77,8 @@ protected:
 	class ATimer* TimerRef;
 	UPROPERTY(VisibleAnywhere)
 	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY(VisibleAnywhere)
+	class AStatisticsManager* StatisticsManagerRef;
 
 	UPROPERTY(VisibleAnywhere)
 	bool IsLoadSuccess = false;

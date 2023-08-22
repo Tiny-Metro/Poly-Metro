@@ -2,6 +2,9 @@
 
 
 #include "Shop/Shop.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include "PlayerState/TinyMetroPlayerState.h"
+#include "Statistics/StatisticsManager.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -17,13 +20,9 @@ void AShop::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//PlayerState = GetWorld()->GetPlayerControllerIterator()->Get()->GetPlayerState<ATinyMetroPlayerState>();
-	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-	if (IsValid(PlayerState)) {
-		UE_LOG(LogTemp, Log, TEXT("Shop::BeginPlay : PlayerState Valid"));
-	}else{
-		UE_LOG(LogTemp, Log, TEXT("Shop::BeginPlay : PlayerState Invalid"));
-	}
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(PlayerState)) PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 
 	UpdateShopInfo();
 	
@@ -37,8 +36,8 @@ void AShop::Tick(float DeltaTime)
 }
 
 void AShop::UpdateShopInfo() {
-	ShopInfo.CostTrain += CostTrainIncrease * PurchaseNumTrain;
-	ShopInfo.CostSubtrain += CostSubtrainIncrease * PurchaseNumSubtrain;
+	ShopInfo.CostTrain += CostTrainIncrease * StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalPurchaseCount;
+	ShopInfo.CostSubtrain += CostSubtrainIncrease * StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalPurchaseCount;
 
 }
 
@@ -48,66 +47,60 @@ FShopInfo AShop::GetShopInfo() {
 }
 
 FShopInfo AShop::PurchaseTrain(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::Train, ShopInfo.CostTrain, Amount);
+	Success = PlayerState->CanUseMoney(ShopInfo.CostTrain * Amount);
 	if (Success) {
-		PurchaseNumTrain += Amount;
+		PlayerState->AddItem(ItemType::Train, Amount);
+
+		StatisticsManagerRef->ShopStatistics.TotalUsingMoney += ShopInfo.CostTrain * Amount;
+		StatisticsManagerRef->ShopStatistics.TotalPurchaseCount += Amount;
+		StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalPurchaseCount += Amount;
 	}
 	return GetShopInfo();
 }
 
 FShopInfo AShop::PurchaseSubtrain(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::Subtrain, ShopInfo.CostSubtrain, Amount);
+	Success = PlayerState->CanUseMoney(ShopInfo.CostSubtrain * Amount);
 	if (Success) {
-		PurchaseNumSubtrain += Amount;
+		PlayerState->AddItem(ItemType::Subtrain, Amount);
+
+		StatisticsManagerRef->ShopStatistics.TotalUsingMoney += ShopInfo.CostSubtrain * Amount;
+		StatisticsManagerRef->ShopStatistics.TotalPurchaseCount += Amount;
+		StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalPurchaseCount += Amount;
 	}
 	return GetShopInfo();
 }
 
 FShopInfo AShop::PurchaseLane(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::Lane, ShopInfo.CostLane, Amount);
+	Success = PlayerState->CanUseMoney(ShopInfo.CostLane * Amount);
 	if (Success) {
-		PurchaseNumLane += Amount;
+		PlayerState->AddItem(ItemType::Lane, Amount);
+
+		StatisticsManagerRef->ShopStatistics.TotalUsingMoney += ShopInfo.CostLane * Amount;
+		StatisticsManagerRef->ShopStatistics.TotalPurchaseCount += Amount;
 	}
 	return GetShopInfo();
 }
 
 FShopInfo AShop::PurchaseTunnel(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::Tunnel, ShopInfo.CostTunnel, Amount);
+	Success = PlayerState->CanUseMoney(ShopInfo.CostTunnel * Amount);
 	if (Success) {
-		PurchaseNumTunnel += Amount;
+		PlayerState->AddItem(ItemType::Tunnel, Amount);
+
+		StatisticsManagerRef->ShopStatistics.TotalUsingMoney += ShopInfo.CostTunnel * Amount;
+		StatisticsManagerRef->ShopStatistics.TotalPurchaseCount += Amount;
+		StatisticsManagerRef->ShopStatistics.TunnelStatistics.TotalPurchaseCount += Amount;
 	}
 	return GetShopInfo();
 }
 
 FShopInfo AShop::PurchaseBridge(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::Bridge, ShopInfo.CostBridge, Amount);
+	Success = PlayerState->CanUseMoney(ShopInfo.CostBridge * Amount);
 	if (Success) {
-		PurchaseNumBridge += Amount;
+		PlayerState->AddItem(ItemType::Bridge, Amount);
+
+		StatisticsManagerRef->ShopStatistics.TotalUsingMoney += ShopInfo.CostBridge * Amount;
+		StatisticsManagerRef->ShopStatistics.TotalPurchaseCount += Amount;
+		StatisticsManagerRef->ShopStatistics.BridgeStatistics.TotalPurchaseCount += Amount;
 	}
 	return GetShopInfo();
 }
-
-FShopInfo AShop::PurchaseUpgradeTrain(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::UpgradeTrain, ShopInfo.CostUpgradeTrain, Amount);
-	if (Success) {
-		PurchaseNumUpgradeTrain += Amount;
-	}
-	return GetShopInfo();
-}
-
-FShopInfo AShop::PurchaseUpgradeSubtrain(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::UpgradeSubtrain, ShopInfo.CostUpgradeSubtrain, Amount);
-	if (Success) {
-		PurchaseNumUpgradeSubtrain += Amount;
-	}
-	return GetShopInfo();
-}
-
-FShopInfo AShop::PurchaseUpgradeStation(int32 Amount, bool& Success) {
-	Success = PlayerState->BuyItem(ItemType::UpgradeStation, ShopInfo.CostUpgradeStation, Amount);
-	if (Success) {
-		PurchaseNumUpgradeStation += Amount;
-	}
-	return GetShopInfo();
-}
-

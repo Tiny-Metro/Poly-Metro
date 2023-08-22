@@ -11,6 +11,7 @@
 #include "Components/BoxComponent.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "Statistics/StatisticsManager.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/KismetMathLibrary.h>
@@ -278,8 +279,11 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 
 			SetActorLocation(StartLocation);
 			ServiceStart(StartLocation, LaneRef, Destination);
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalShiftCount++;
 		} else {
 			// TODO : if upgrade, return upgrade cost
+
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalRetrievalCount++;
 			DespawnTrain();
 		}
 	}
@@ -351,14 +355,17 @@ void ATrain::UpdateTrainMesh() {
 }
 
 void ATrain::Upgrade() {
-	Super::Upgrade();
-	// TODO : Money function division
-	PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeTrain());
-	TrainManagerRef->ReportTrainUpgrade();
-	UpdateSubtrainSpeed();
-	UpdateSubtrainDistance();
-	for (auto& i : Subtrains) {
-		i->UpdateTrainMesh();
+	// Check upgrade available
+	if (PlayerStateRef->CanUseMoney(TrainManagerRef->GetCostUpgradeTrain())) {
+		Super::Upgrade();
+		PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeTrain());
+		TrainManagerRef->ReportTrainUpgrade();
+		UpdateSubtrainSpeed();
+		UpdateSubtrainDistance();
+		for (auto& i : Subtrains) {
+			i->UpdateTrainMesh();
+		}
+		StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalUpgradeCount++;
 	}
 }
 

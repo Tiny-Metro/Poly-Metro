@@ -4,6 +4,8 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
+#include "Timer/Timer.h"
+#include "Statistics/StatisticsManager.h"
 #include <Kismet/GameplayStatics.h>
 
 FGamePlayInfo ATinyMetroPlayerState::GetPlayInfo() {
@@ -24,30 +26,15 @@ FGamePlayInfo ATinyMetroPlayerState::GetPlayInfo() {
 	return info;
 }
 
-ATinyMetroPlayerState::ATinyMetroPlayerState() {
-	// Get StationManager
-	StationManager = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
-}
-
 void ATinyMetroPlayerState::BeginPlay() {
+	Super::BeginPlay();
 	TinyMetroGameModeBase = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	DayTime = TinyMetroGameModeBase->GetDaytime();
-
+	StationManager = TinyMetroGameModeBase->GetStationManager();
 	Timer = TinyMetroGameModeBase->GetTimer();
 	TMSaveManager = TinyMetroGameModeBase->GetSaveManager();
-	/*TMSaveManager = GetWorld()->SpawnActorDeferred<ATMSaveManager>(ATMSaveManager::StaticClass(),
-		FTransform());
-	TMSaveManager->FinishSpawning(FTransform());*/
-	/*
-	if (IsValid(TinyMetroGameModeBase)) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
-			FString::Printf(TEXT("Hi %d"), DayTime));
-	}*/
-
-	
-	//GetDay();
-	//GetDayTime();
+	StatisticsManagerRef = TinyMetroGameModeBase->GetStatisticsManager();
 	
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickInterval(1.0);
@@ -77,12 +64,18 @@ bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
 		}
 
 		Money -= Cost * Amount;
+		StatisticsManagerRef->DefaultStatistics.TotalSpending -= Cost * Amount;
+		StatisticsManagerRef->DefaultStatistics.WeeklySpending -= Cost * Amount;
 		Profit -= Cost * Amount;
 
 		return true;
 	} else {
 		return false;
 	}
+}
+
+bool ATinyMetroPlayerState::CanUseMoney(int32 Val) const {
+	return this->Money >= Val ? true : false;
 }
 
 int32 ATinyMetroPlayerState::GetSales() const {
@@ -93,52 +86,6 @@ int32 ATinyMetroPlayerState::GetProfit() const {
 	return Profit;
 }
 
-float ATinyMetroPlayerState::GetPlayTimeSec() {
-
-	return Timer->ElapseTimeSec;
-}
-
-void ATinyMetroPlayerState::SetPlayTimeSec(float elapseTimeSec) {
-
-	if (Timer == nullptr || Timer == NULL) {
-		UE_LOG(LogTemp, Error, TEXT("Timer is nullptr!"));
-		return;
-	}
-	else {
-		Timer->ElapseTimeSec = elapseTimeSec;
-	}
-
-}
-
-int32 ATinyMetroPlayerState::GetDay() {
-
-	if (TinyMetroGameModeBase == nullptr) {
-		UE_LOG(LogTemp, Error, TEXT("TinyMetroGameModeBase is nullptr!"));
-	}
-	float CurrentSec= GetPlayTimeSec();
-
-	int32 CurrentDay = CurrentSec / DayTime;
-	/*
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
-		FString::Printf(TEXT("CurrentDay %d"), CurrentDay));*/
-
-	return CurrentDay;
-
-}
-
-
-float ATinyMetroPlayerState::GetDayTime() {
-
-	float CurrentHour = GetPlayTimeSec() - (GetDay() * DayTime);
-
-	/*
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
-		FString::Printf(TEXT("CurrentHour %f"),CurrentHour));*/
-
-	return CurrentHour;
-
-}
-
 int32 ATinyMetroPlayerState::GetValidBridgeCount() 
 {
 	return ValidBridge;
@@ -147,25 +94,22 @@ int32 ATinyMetroPlayerState::GetValidTunnelCount()
 {
 	return ValidTunnel;
 }
-int32& ATinyMetroPlayerState::GetMoney() {
+int32 ATinyMetroPlayerState::GetMoney() {
 	return Money;
 }
 
 void ATinyMetroPlayerState::Tick(float DeltaTime) {
-	// Test code : Need to Remove
-	Money++;
-	/*if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-			FString::Printf(TEXT("Money : %d"), Money));
-	}*/
 }
 
 void ATinyMetroPlayerState::AddMoney(int32 Amount) {
 	Money += Amount;
+	
 }
 
 void ATinyMetroPlayerState::AddIncome(int32 Amount) {
 	Money += Amount;
+	StatisticsManagerRef->DefaultStatistics.TotalIncome += Amount;
+	StatisticsManagerRef->DefaultStatistics.WeeklyIncome += Amount;
 }
 
 void ATinyMetroPlayerState::AddSales(int32 Sale) {

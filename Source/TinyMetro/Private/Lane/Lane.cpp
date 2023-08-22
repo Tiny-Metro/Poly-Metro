@@ -1481,6 +1481,12 @@ bool ALane::Load()
 		Station->SetActivate(true);
 	}
 
+	//AdjList Load
+	for (int i = 0; i < StationPoint.Num()-1 ; i++)
+	{
+		AddAdjListDistance(StationPoint[i], StationPoint[i+1]);
+	}
+
 	//PointArray Save
 	for (const auto& i : tmp->PointArray)
 	{

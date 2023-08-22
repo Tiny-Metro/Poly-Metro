@@ -117,7 +117,7 @@ public:
 	Value is bool of Index's validation. return true when index is valid
 	*/
 	FPassenger GetOnPassenger(int32 Index, class ATrainTemplate* Train);
-	void GetOffPassenger(FPassenger P);
+	void GetOffPassenger(FPassenger P, class ATrainTemplate* Train);
  
 	TArray<int32> GetLanes();
 	void SetLanes(int32 AdditionalLaneId);
@@ -176,6 +176,8 @@ protected:
 	class ATinyMetroPlayerState* PlayerStateRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	AStationManager* StationManager;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 MaintenanceCost = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")

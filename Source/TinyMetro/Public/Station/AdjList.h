@@ -22,7 +22,7 @@ public:
 
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TMap<FStationInfo, UAdjArrayItem*> AdjList;
 	
 };
