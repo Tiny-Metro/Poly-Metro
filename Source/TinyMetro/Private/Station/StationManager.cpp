@@ -9,6 +9,7 @@
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSpawnBorderWidget.h"
 #include "Station/StationManagerSaveGame.h"
+#include "Statistics/StatisticsManager.h"
 #include "Policy/Policy.h"
 #include "Event/TinyMetroEventManager.h"
 #include "SaveSystem/TMSaveManager.h"
@@ -40,6 +41,7 @@ void AStationManager::BeginPlay()
 	SaveManagerRef = GameMode->GetSaveManager();
 	TimerRef = GameMode->GetTimer();
 	PolicyRef = GameMode->GetPolicy();
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -685,13 +687,16 @@ void AStationManager::Tick(float DeltaTime)
 
 	StationSpawnRoutine(DeltaTime);
 
-	//if (Policy == nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(":("));
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1, 
-			15.0f, 
-			FColor::Yellow, 
-			FString::Printf(TEXT("%d : %f"), GetWorld()->TimeSeconds, DeltaTime));*/
+	float averageComplain = 0.0f;
+	int32 serviceStationCount = 0;
+
+	for (auto& i : Station) {
+		if (i->GetStationInfo().IsActive) serviceStationCount++;
+		averageComplain += i->GetComplain();
+	}
+	
+	StatisticsManagerRef->DefaultStatistics.AverageComplain = averageComplain;
+	StatisticsManagerRef->DefaultStatistics.ServiceStationCount = serviceStationCount;
 
 }
 

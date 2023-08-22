@@ -22,36 +22,21 @@ class TINYMETRO_API ATinyMetroPlayerState : public APlayerState
 public:
 	UFUNCTION(BlueprintCallable)
 	FGamePlayInfo GetPlayInfo();
-	ATinyMetroPlayerState();
-
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	// Call by shop
 	UFUNCTION(BlueprintCallable)
 	bool BuyItem(ItemType Type, int32 Cost, int32 Amount);
+	UFUNCTION(BlueprintCallable)
+	bool CanUseMoney(int32 Val) const;
 	
 	UFUNCTION(BlueprintCallable)
 	int32 GetSales() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetProfit() const;
 	UFUNCTION(BlueprintCallable)
-	int32& GetMoney();
-
-	virtual void Tick(float DeltaTime) override;
-
-public:
-	//게임 플레이 시간
-	UFUNCTION()
-	float GetPlayTimeSec();
-
-	UFUNCTION()
-	void SetPlayTimeSec(float elapseTimeSec);
-
-	UFUNCTION()
-	int32 GetDay();
-
-	UFUNCTION()
-	float GetDayTime();
+	int32 GetMoney();
 
 	UFUNCTION()
 	int32 GetValidBridgeCount();
@@ -129,6 +114,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class AStationManager* StationManager;
 
+	UPROPERTY(VisibleAnywhere, Category = "Config")
+	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY()
 	class ATimer* Timer;
 
