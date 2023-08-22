@@ -241,7 +241,7 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 					PassengerRoute.Dequeue();
 					//Passenger[i]->SetPassengerPath(PassengerRoute);
 				} else {
-					Station->GetOffPassenger(Passenger[i]);
+					Station->GetOffPassenger(Passenger[i], this);
 					//Passenger.Add(i, nullptr);
 					Passenger.Remove(i);
 					//Passenger.Remove(i);
@@ -250,7 +250,7 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 					return;
 				}
 			} else {
-				Station->GetOffPassenger(Passenger[i]);
+				Station->GetOffPassenger(Passenger[i], this);
 				//Passenger.Add(i, nullptr);
 				Passenger.Remove(i);
 				UpdatePassengerMesh();
