@@ -213,7 +213,7 @@ void ATrainTemplate::DropPassenger() {
 
 	if (IsValid(CurrentStationPointer)) {
 		for (auto& i : Passenger) {
-			CurrentStationPointer->GetOffPassenger(i.Value);
+			CurrentStationPointer->GetOffPassenger(i.Value, this);
 			Passenger.Remove(i.Key);
 			UpdatePassengerMesh();
 		}
