@@ -15,6 +15,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManager.h"
+#include "Statistics/StatisticsManager.h"
 
 // Sets default values
 ALane::ALane()
@@ -59,6 +60,8 @@ void ALane::BeginPlay()
 	LaneManagerRef = GameMode->GetLaneManager();
 
 	SaveManagerRef = GameMode->GetSaveManager();
+
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
 
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
@@ -2485,4 +2488,9 @@ void ALane::InitLaneSpline()
 void ALane::SetHasSaveFile(bool hasSave)
 {
 	HasSaveFile = hasSave;
+}
+
+void ALane::SubTotalLaneCount()
+{
+	StatisticsManagerRef->LaneStatistics.TotalLaneCount--;
 }

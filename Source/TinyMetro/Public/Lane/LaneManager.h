@@ -70,6 +70,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	class ATMSaveManager* SaveManagerRef;
 
+	UPROPERTY(BlueprintReadOnly)
+	class AStatisticsManager* StatisticsManagerRef;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> LaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

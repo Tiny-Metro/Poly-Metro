@@ -7,6 +7,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManagerSaveGame.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Statistics/StatisticsManager.h"
 
 
 // Sets default values
@@ -25,6 +26,7 @@ void ALaneManager::BeginPlay()
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 	SaveManagerRef = GameMode->GetSaveManager();
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
 	
 	InitLaneMaterial();
 
@@ -189,6 +191,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	Lanes.Add(NextLaneNums[0], tmpLane);
 	//Lanes.Add(tmpLane);
+
+	StatisticsManagerRef->LaneStatistics.TotalLaneCount++;
 
 	tmpLane->SpawnTrain();
 
@@ -356,9 +360,7 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 				TargetStart = TargetEnd;
 			}
 
-				
-
-			}
+		}
 	}
 
 	if (TakenPosition.Num() == 0) {

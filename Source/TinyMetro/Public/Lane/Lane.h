@@ -72,6 +72,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATMSaveManager* SaveManagerRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class AStatisticsManager* StatisticsManagerRef;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spline")
 	USplineComponent* LaneSpline;
 
@@ -434,4 +437,8 @@ private:
 
 public:
 	void SetHasSaveFile(bool hasSave);
+
+protected: //Statistics
+	UFUNCTION(BlueprintCallable)
+	void SubTotalLaneCount();
 };
