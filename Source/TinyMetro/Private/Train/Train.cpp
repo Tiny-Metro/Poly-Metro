@@ -552,6 +552,13 @@ void ATrain::WeeklyTask() {
 	UE_LOG(LogTemp, Log, TEXT("Train::WeeklyTask"));
 }
 
+void ATrain::Save() {
+}
+
+bool ATrain::Load() {
+	return false;
+}
+
 void ATrain::AddSubtrain(ASubtrain* T) {
 	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.AddUnique(T);

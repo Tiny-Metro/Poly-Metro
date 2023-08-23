@@ -210,3 +210,10 @@ int32 ASubtrain::GetIndex() const {
 void ASubtrain::WeeklyTask() {
 	UE_LOG(LogTemp, Log, TEXT("Subtrain::WeeklyTask"));
 }
+
+void ASubtrain::Save() {
+}
+
+bool ASubtrain::Load() {
+	return false;
+}

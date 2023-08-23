@@ -2,12 +2,18 @@
 
 
 #include "Train/TrainManager.h"
+#include "Train/TrainManagerSaveGame.h"
+#include "Train/TrainSpawnData.h"
+#include "Train/SubtrainSpawnData.h"
+#include "Train/TrainInfoWidget.h"
 #include "Train/Train.h"
 #include "Train/Subtrain.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "Lane/Lane.h"
-#include "Train/TrainInfoWidget.h"
 #include <Blueprint/UserWidget.h>
 #include "GameModes/TinyMetroGameModeBase.h"
+#include <Kismet/GameplayStatics.h>
 #include <Engine/AssetManager.h>
 
 // Sets default values
@@ -23,6 +29,10 @@ void ATrainManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Init references
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+
 	InitTrainMaterial();
 	InitPassengerMaterial();
 
@@ -32,9 +42,8 @@ void ATrainManager::BeginPlay()
 		TrainInfoWidget->AddToViewport();
 		TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-}
 
-void ATrainManager::Load() {
+	SaveManagerRef->SaveTask.AddDynamic(this, &ATrainManager::Save);
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
@@ -262,6 +271,51 @@ int32 ATrainManager::GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId)
 	return result;
 }
 
+void ATrainManager::SpawnTrain(int32 TrainId, FVector SpawnLocation) {
+	// Load BP Class
+	if (!TrainBlueprintClass) TrainBlueprintClass = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
+	// Cast to BP
+	if (!GeneratedTrainBlueprint) GeneratedTrainBlueprint = Cast<UBlueprint>(TrainBlueprintClass);
+
+	// Spawn actor
+	FActorSpawnParameters SpawnParams;
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(SpawnLocation);
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ATrain* tmp = Cast<ATrain>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedTrainBlueprint->GeneratedClass, SpawnTransform));
+	tmp->SetTrainId(TrainId);
+	tmp->Load();
+
+	tmp->FinishSpawning(SpawnTransform);
+
+	Trains.Add(MoveTemp(tmp));
+}
+
+void ATrainManager::SpawnSubtrain(int32 TrainId, int32 OwnerId, FVector SpawnLocation) {
+	// Load BP Class
+	if (!SubtrainBlueprintClass) SubtrainBlueprintClass = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_SubTrain.BP_Subtrain'")));
+	// Cast to BP
+	if (!GeneratedSubtrainBlueprint) GeneratedSubtrainBlueprint = Cast<UBlueprint>(SubtrainBlueprintClass);
+
+	// Spawn actor
+	FActorSpawnParameters SpawnParams;
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(SpawnLocation);
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ASubtrain* tmp = Cast<ASubtrain>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedSubtrainBlueprint->GeneratedClass, SpawnTransform));
+	tmp->SetTrainId(TrainId);
+	tmp->SetOwnerTrainId(OwnerId);
+	tmp->Load();
+
+	tmp->FinishSpawning(SpawnTransform);
+
+	Trains.Add(MoveTemp(tmp));
+}
+
 float ATrainManager::GetCostUpgradeTrain() const {
 	return CostUpgradeTrain;
 }
@@ -283,6 +337,57 @@ void ATrainManager::ReportTrainUpgrade() {
 void ATrainManager::ReportSubtrainUpgrade() {
 	UE_LOG(LogTemp, Log, TEXT("TrainManager::ReportSubtrainUprade : Subtrain Upgrade"))
 }
+
+void ATrainManager::Save() {
+	UTrainManagerSaveGame* tmp = Cast<UTrainManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UTrainManagerSaveGame::StaticClass()));
+
+	tmp->NextTrainId = NextTrainId;
+	tmp->CostUpgradeTrain = CostUpgradeTrain;
+	tmp->CostUpgradeSubtrain = CostUpgradeSubtrain;
+	for (auto& i : Trains) {
+		auto trainInfo = i->GetTrainInfo();
+		if (trainInfo.Type == TrainType::Train) {
+			FTrainSpawnData trainSpawnData;
+			trainSpawnData.Id = trainInfo.Id;
+			trainSpawnData.Location = i->GetActorLocation();
+
+			tmp->TrainSapwnData.Add(trainSpawnData);
+		} else {
+			FSubtrainSpawnData subtrainSpawnData;
+			subtrainSpawnData.Id = trainInfo.Id;
+			subtrainSpawnData.Location = i->GetActorLocation();
+			
+			tmp->SubtrainSapwnData.Add(subtrainSpawnData);
+		}
+	}
+
+	SaveManagerRef->Save(tmp, SaveActorType::TrainManager);
+}
+
+bool ATrainManager::Load() {
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	UTrainManagerSaveGame* tmp = Cast<UTrainManagerSaveGame>(SaveManagerRef->Load(SaveActorType::TrainManager));
+
+	if (!IsValid(tmp)) {
+		return false;
+	}
+
+	NextTrainId = tmp->NextTrainId;
+	CostUpgradeTrain = tmp->CostUpgradeTrain;
+	CostUpgradeSubtrain = tmp->CostUpgradeSubtrain;
+
+	for (auto& i : tmp->TrainSapwnData) {
+		SpawnTrain(i.Id, i.Location);
+	}
+
+	for (auto& i : tmp->SubtrainSapwnData) {
+		SpawnSubtrain(i.Id, i.OwnTrainId, i.Location);
+	}
+
+	return true;
+}
+
 int32 ATrainManager::GetStationCountByOrigin(FStationInfo Origin, ALane* Lane) {
 	TArray<ATrainTemplate*> arr;
 	for (auto& i : Trains) {

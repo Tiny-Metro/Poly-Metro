@@ -25,10 +25,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Test
-	UFUNCTION()
-		void Load();
-
 	UFUNCTION(BlueprintCallable)
 	void AddTrain(ATrainTemplate* Train);
 	UFUNCTION(BlueprintCallable)
@@ -81,6 +77,12 @@ public:
 	UFUNCTION()
 	int32 GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId = -1) const;
 
+	// Spawn Train, Subtrain (Call by Load)
+	UFUNCTION()
+	void SpawnTrain(int32 TrainId, FVector SpawnLocation);
+	UFUNCTION()
+	void SpawnSubtrain(int32 TrainId, int32 OwnerId, FVector SpawnLocation);
+
 	// Get upgrade cost
 	UFUNCTION()
 	float GetCostUpgradeTrain() const;
@@ -93,7 +95,29 @@ public:
 	UFUNCTION()
 	void ReportSubtrainUpgrade();
 
-public:
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	bool Load();
+
+
+protected:
+	// Train, Subtrain asset
+	UPROPERTY()
+	UObject* TrainBlueprintClass = nullptr;
+	UPROPERTY()
+	UBlueprint* GeneratedTrainBlueprint = nullptr;
+	UPROPERTY()
+	UObject* SubtrainBlueprintClass = nullptr;
+	UPROPERTY()
+	UBlueprint* GeneratedSubtrainBlueprint = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	class ATMSaveManager* SaveManagerRef;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
