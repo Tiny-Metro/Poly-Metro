@@ -28,6 +28,18 @@ AStationManager::AStationManager()
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
 	AdjList = NewObject<UAdjList>();
+
+	// Init Floyd-Warshall
+	// Init adj matrix
+	FAdjArray adjTmp;
+	adjTmp.Init(TNumericLimits<float>::Max(), 301);
+	adj.Init(adjTmp, 301);
+
+	// Init path array
+	FPath pathTmp;
+	pathTmp.Init(-1, 301);
+	AdjPath.Init(pathTmp, 301);
+	AdjDist.Init(adjTmp, 301);
 }
 
 // Called when the game starts or when spawned
@@ -80,18 +92,6 @@ void AStationManager::BeginPlay()
 			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
 		}
 	}
-
-	// Init Floyd-Warshall
-	// Init adj matrix
-	FAdjArray adjTmp;
-	adjTmp.Init(TNumericLimits<float>::Max(), 301);
-	adj.Init(adjTmp, 301);
-
-	// Init path array
-	FPath pathTmp;
-	pathTmp.Init(-1, 301);
-	AdjPath.Init(pathTmp, 301);
-	AdjDist.Init(adjTmp, 301);
 
 	// Register Timer tasks
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);

@@ -16,7 +16,13 @@ class TINYMETRO_API UAdjList : public UObject
 	GENERATED_BODY()
 
 public:
-	UAdjArrayItem& operator[] (FStationInfo item) { return *AdjList[item]; }
+	UAdjArrayItem& operator[] (FStationInfo item) 
+	{ 
+		for (auto& i : AdjList) {
+			if (item == i.Key) return *i.Value;
+		}
+		return *AdjList[item]; 
+	}
 
 	void Add(FStationInfo Item, UAdjArrayItem* ArrayItem);
 
