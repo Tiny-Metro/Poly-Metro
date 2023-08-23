@@ -21,6 +21,7 @@ void ABridgeTunnel::BeginPlay()
 	Super::BeginPlay();
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	SaveManagerRef = GameMode->GetSaveManager();
+	SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnel::Save);
 }
 
 // Called every frameD

@@ -26,6 +26,14 @@ void ABridgeTunnelManager::BeginPlay()
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	SaveManagerRef = GameMode->GetSaveManager();
+	if (SaveManagerRef)
+	{
+		SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnelManager::Save);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is not valid in ABridgeTunnelManager::BeginPlay()"));
+	}
 }
 
 // Called every frame
@@ -261,31 +269,38 @@ bool ABridgeTunnelManager::IsConnectorExist(ConnectorType type, const TArray<FIn
 	return false;
 }
 
-void ABridgeTunnelManager::Save()
-{
-	UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UBridgeTunnelManagerSaveGame::StaticClass()));
-	tmp->Count = Count;
+	void ABridgeTunnelManager::Save()
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame SAVED"));
+		UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UBridgeTunnelManagerSaveGame::StaticClass()));
+		tmp->Count = Count;
+		if (!IsValid(tmp)) 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager tmp in Save is not valid"));
+		}
 
-	SaveManagerRef->Save(tmp, SaveActorType::BridgeTunnelManager, -1);
+		SaveManagerRef->Save(tmp, SaveActorType::BridgeTunnelManager);
 
-}
-bool ABridgeTunnelManager::Load() 
-{
-	if (!GameMode) {
-		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	}
-	if (!SaveManagerRef) {
-		SaveManagerRef = GameMode->GetSaveManager();
-	}	
+	bool ABridgeTunnelManager::Load() 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame LOADED"));
+
+		if (!GameMode) {
+			GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		}
+		if (!SaveManagerRef) {
+			SaveManagerRef = GameMode->GetSaveManager();
+		}	
 	
-	UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(SaveManagerRef->Load(SaveActorType::BridgeTunnelManager, -1));
+		UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(SaveManagerRef->Load(SaveActorType::BridgeTunnelManager));
 
-	if (!IsValid(tmp)) {
-		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame is not valid"));
-		return false;
+		if (!IsValid(tmp)) {
+			UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager tmp in Load is not valid"));
+			return false;
+		}
+
+		Count = tmp->Count;
+
+		return true;
 	}
-
-	Count = tmp->Count;
-
-	return true;
-}
