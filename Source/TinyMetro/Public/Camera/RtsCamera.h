@@ -18,13 +18,13 @@ class TINYMETRO_API ARtsCamera : public APawn
 	void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere, Category = "Sensitivity")
-		float PitchChangeRate = 90.0f;
+		float PitchChangeRate = 9000.0f;
 	UPROPERTY(EditAnywhere, Category = "Sensitivity")
-		float YawRate = 150.0f;
+		float YawRate = 15000.0f;
 	UPROPERTY(EditAnywhere, Category = "Sensitivity")
-		float PanRate = 50.0f;
+		float PanRate = 100.0f;
 	UPROPERTY(EditAnywhere, Category = "Sensitivity")
-		float ZoomRate = 10.0f;
+		float ZoomRate = 1000000000.0f;
 	UPROPERTY(EditAnywhere, Category = "Sensitivity")
 		float ScreenEdgePanZonePercent = 15.0f;
 
@@ -33,9 +33,14 @@ class TINYMETRO_API ARtsCamera : public APawn
 	UPROPERTY(EditAnywhere, Category = "Bounds")
 		float MinPitch = 285.0f;
 	UPROPERTY(EditAnywhere, Category = "Bounds")
-		float MaxZoom = 3000.0f;
+		float MaxZoom = 30000.0f;
 	UPROPERTY(EditAnywhere, Category = "Bounds")
 		float MinZoom = 300.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS Camera")
+		FRotator InitialRotation;
+
+
 
 
 	void PanForward(float magnitude);
