@@ -1,82 +1,92 @@
 #include "Camera/RtsCamera.h"
 #include "Engine/Classes/Components/SphereComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "..\..\Public\Camera\RtsCamera.h"
 
 
 ARtsCamera::ARtsCamera(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	
 	CustomCollisionComponent = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("RtsCamera_CollisionComponent0"));
 	CustomCollisionComponent->InitSphereRadius(100.0f);
 	CustomCollisionComponent->CanCharacterStepUpOn = ECB_No;
 	CustomCollisionComponent->SetCanEverAffectNavigation(false);
-	CustomCollisionComponent->SetRelativeLocation(FVector(0, 0, 6000.f)); //초기위치,높이 설정
-	CustomCollisionComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	
 	RootComponent = CustomCollisionComponent;
 
 	MovementComponent = ObjectInitializer.CreateDefaultSubobject<UFloatingPawnMovement>(this, FName("RtsCameran_MovementComponent0"));
 	MovementComponent->UpdatedComponent = CustomCollisionComponent;
+
 }
 
-void ARtsCamera::SetupPlayerInputComponent(UInputComponent* Inputelemental)
+
+
+
+void ARtsCamera::SetupPlayerInputComponent(UInputComponent* Inputelemental) 
 {
 	check(Inputelemental);
-
-	Inputelemental->BindAxis("Pan Forward", this, &ARtsCamera::PanForward);
-	Inputelemental->BindAxis("Pan Right", this, &ARtsCamera::PanRight);
+	
+	
 	Inputelemental->BindAxis("Mouse Wheel", this, &ARtsCamera::ZoomIn);
+
 
 	Inputelemental->BindAction("Rotate Camera", IE_Pressed, this, &ARtsCamera::EngageRotation);
 	Inputelemental->BindAction("Rotate Camera", IE_Released, this, &ARtsCamera::DisengageRotation);
 }
 
 void ARtsCamera::Tick(float DeltaSeconds)
-{
-	if (Controller)
-	{
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			FVector2D mouseLocation;
-			if (playerController->GetMousePosition(mouseLocation.X, mouseLocation.Y))
-			{
-				int32 screenWidth, screenHeight;
-				playerController->GetViewportSize(screenWidth, screenHeight);
-
-				if (rotationMode)
-				{
-					FVector2D DeltaMouse = mouseScreenLocationGrab - mouseLocation;
-					float RotationSpeed = 1.0f;  // 회전 속도 조절
-					DeltaMouse *= RotationSpeed * GetWorld()->GetDeltaSeconds();
-
-					FRotator NewRotation = GetActorRotation();
-					NewRotation.Roll += DeltaMouse.X;
-					NewRotation.Pitch += DeltaMouse.Y;
-					SetActorRotation(NewRotation);
-
-					mouseScreenLocationGrab = mouseLocation;
-				}
-				else
-				{
-					FVector MovementInput = FVector::ZeroVector;
-
-					if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
-						MovementInput.Y -= 1;
-					else if (mouseLocation.X > screenWidth * (1 - ScreenEdgePanZonePercent / 100))
-						MovementInput.Y += 1;
-
-					if (mouseLocation.Y < screenHeight * ScreenEdgePanZonePercent / 100)
-						MovementInput.X += 1;
-					else if (mouseLocation.Y > screenHeight * (1 - ScreenEdgePanZonePercent / 100))
-						MovementInput.X -= 1;
-
-					MovementInput.Normalize();
-					PanRight(MovementInput.Y);
-					PanForward(MovementInput.X);
-				}
-			}
-		}
+{ 
+	if (playerController == nullptr) {
+		playerController = Cast<APlayerController>(GetController());
 	}
+
+	if (playerController->GetMousePosition(mouseLocation.X, mouseLocation.Y)) // 마우스 포지션 가져오는 부분
+		{
+			int32 screenWidth, screenHeight;
+			playerController->GetViewportSize(screenWidth, screenHeight);
+
+		if (rotationMode)
+		{
+				DeltaMouse = mouseScreenLocationGrab - mouseLocation;
+				DeltaMouse *= RotationSpeed * DeltaSeconds;
+				
+				NewRotation = GetActorRotation();
+
+				NewRotation.Roll += DeltaMouse.X;
+				NewRotation.Pitch += DeltaMouse.Y;
+				SetActorRotation(NewRotation);
+
+				mouseScreenLocationGrab = mouseLocation;
+			}
+
+		else
+		{
+			FVector MovementInput = FVector::ZeroVector;
+
+			if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
+				MovementInput.Y -= 1;
+			else if (mouseLocation.X > screenWidth * (1 - ScreenEdgePanZonePercent / 100))
+				MovementInput.Y += 1;
+
+			if (mouseLocation.Y < screenHeight * ScreenEdgePanZonePercent / 100)
+				MovementInput.X += 1;
+			else if (mouseLocation.Y > screenHeight * (1 - ScreenEdgePanZonePercent / 100))
+				MovementInput.X -= 1;
+
+			MovementInput.Normalize();
+			PanRight(MovementInput.Y);
+			PanForward(MovementInput.X);
+		}
+		}		
+}
+
+
+void ARtsCamera::BeginPlay()
+{
+	Super::BeginPlay();
+	playerController = Cast<APlayerController>(GetController());
+	CustomCollisionComponent->SetWorldLocation(initLocation);
+	CustomCollisionComponent->SetWorldRotation(initRotation);
 }
 
 
@@ -85,14 +95,14 @@ void ARtsCamera::Tick(float DeltaSeconds)
 
 void ARtsCamera::ChangePitch(const float magnitude)
 {
-	if (magnitude != 0 && rotationMode && Controller)
+	if (magnitude != 0 && rotationMode && playerController)
 		if (magnitude < 0 && GetControlRotation().Pitch < MaxPitch || magnitude > 0 && GetControlRotation().Pitch > MinPitch)
 			AddControllerPitchInput(magnitude * PitchChangeRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ARtsCamera::Yaw(const float magnitude)
 {
-	if (magnitude != 0 && rotationMode && Controller)
+	if (magnitude != 0 && rotationMode && playerController)
 	{
 		AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
 	}
@@ -101,35 +111,36 @@ void ARtsCamera::Yaw(const float magnitude)
 
 void ARtsCamera::Orbit(const float magnitude)
 {
-	if (magnitude != 0 && rotationMode && Controller)
+	if (magnitude != 0 && rotationMode && playerController)
 	{
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
-			AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * -(YawRate / 4) * GetWorld()->GetDeltaSeconds());
-		}
+		
+		AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * -(YawRate / 4) * GetWorld()->GetDeltaSeconds());
 	}
-
 }
 
+
+
+
 void ARtsCamera::PanForward(const float magnitude)
-{
-	if (magnitude != 0 && !rotationMode && Controller)
-		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * 4000 * GetWorld()->GetDeltaSeconds());
+{	
+	UE_LOG(LogTemp, Log, TEXT("panforward: %f"), magnitude);
+	if (magnitude != 0 && !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ARtsCamera::PanRight(const float magnitude)
 {
-	if (magnitude != 0 && !rotationMode && Controller)
+	UE_LOG(LogTemp, Log, TEXT("panright: %f"), magnitude);
+	if (magnitude != 0 && !rotationMode && playerController)
 		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ARtsCamera::ZoomIn(const float magnitude)
 {
-	if (magnitude != 0 && !rotationMode && Controller)
+	if (magnitude != 0 && !rotationMode && playerController)
 		if (magnitude > 0 && GetActorLocation().Z > MinZoom || magnitude < 0 && GetActorLocation().Z < MaxZoom)
-			AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), 1000000000000 * magnitude * ZoomRate * GetWorld()->GetDeltaSeconds());
+			AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Z),  magnitude * -ZoomRate * GetWorld()->GetDeltaSeconds());
 }
 
 
@@ -137,49 +148,41 @@ void ARtsCamera::ZoomIn(const float magnitude)
 
 void ARtsCamera::EngageRotation()
 {
-	if (Controller)
+	if (playerController)
 	{
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			if (playerController->IsInputKeyDown(EKeys::RightMouseButton))  // 오른쪽 마우스 버튼이 눌려있는지 확인
-			{
-				rotationMode = true;
-				playerController->bShowMouseCursor = false;  // 마우스 커서 숨김
-				playerController->bEnableClickEvents = false;
-				playerController->bEnableMouseOverEvents = false;
+		rotationMode = true;
+		playerController->bShowMouseCursor = false;  // 마우스 커서 숨김
+		playerController->bEnableClickEvents = false;
+		playerController->bEnableMouseOverEvents = false;
 
-				// 초기 회전값 저장
-				InitialRotation = GetActorRotation();
-			}
-		}
+		// 초기 회전값 저장
+		InitialRotation = GetActorRotation();
+		
 	}
 }
 
 
 void ARtsCamera::DisengageRotation()
 {
-	if (rotationMode)
+	if (rotationMode && playerController)
 	{
 		rotationMode = false;
 
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			playerController->bShowMouseCursor = true;  // 마우스 커서 표시
-			playerController->bEnableClickEvents = true;
-			playerController->bEnableMouseOverEvents = true;
+		
+		
+		playerController->bShowMouseCursor = true;  // 마우스 커서 표시
+		playerController->bEnableClickEvents = true;
+		playerController->bEnableMouseOverEvents = true;
 
-			// 초기 회전값으로 초기화
-			SetActorRotation(InitialRotation);  // InitialRotation은 클래스 멤버 변수로 선언되어야 합니다.
-		}
+		// 초기 회전값으로 초기화
+		SetActorRotation(InitialRotation);  // InitialRotation은 클래스 멤버 변수로 선언되어야 합니다.
 	}
 }
+
 
 void ARtsCamera::JumpTo(FVector NewLocation)
 {
 	FVector NewCameraLocation = FVector(NewLocation.X, NewLocation.Y, GetActorLocation().Z);
 	SetActorLocation(NewCameraLocation);
 }
-
 
