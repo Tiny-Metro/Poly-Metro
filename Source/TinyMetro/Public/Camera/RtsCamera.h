@@ -59,6 +59,8 @@ class TINYMETRO_API ARtsCamera : public APawn
 
 	void PanForward(float magnitude);
 	void PanRight(float magnitude);
+	void PanBackward(float magnitude);
+	void PanLeft(float magnitude);
 	void ZoomIn(float magnitude);
 	void ChangePitch(float magnitude);
 	void Yaw(float magnitude);

@@ -129,12 +129,27 @@ void ARtsCamera::PanForward(const float magnitude)
 		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
 }
 
+void ARtsCamera::PanBackward(const float magnitude)
+{
+	UE_LOG(LogTemp, Log, TEXT("panBackward: %f"), magnitude);
+	if (magnitude != 0 && !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * -PanRate * GetWorld()->GetDeltaSeconds());
+}
+
 void ARtsCamera::PanRight(const float magnitude)
 {
 	UE_LOG(LogTemp, Log, TEXT("panright: %f"), magnitude);
 	if (magnitude != 0 && !rotationMode && playerController)
 		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
 }
+
+void ARtsCamera::PanLeft(const float magnitude)
+{
+	UE_LOG(LogTemp, Log, TEXT("panleft: %f"), magnitude);
+	if (magnitude != 0 && !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * -PanRate * GetWorld()->GetDeltaSeconds());
+}
+
 
 void ARtsCamera::ZoomIn(const float magnitude)
 {
