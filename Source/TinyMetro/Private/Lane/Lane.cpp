@@ -2494,3 +2494,13 @@ void ALane::SubTotalLaneCount()
 {
 	StatisticsManagerRef->LaneStatistics.TotalLaneCount--;
 }
+
+void ALane::AddTotalModifyAndDeleteCount()
+{
+	StatisticsManagerRef->LaneStatistics.TotalModifyAndDeleteCount++;
+}
+
+void ALane::AddModifyAndReduceCountInEachLane()
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].TotalModifyAndReduceCount++;
+}

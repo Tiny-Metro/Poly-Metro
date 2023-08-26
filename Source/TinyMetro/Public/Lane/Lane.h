@@ -441,4 +441,10 @@ public:
 protected: //Statistics
 	UFUNCTION(BlueprintCallable)
 	void SubTotalLaneCount();
+
+	UFUNCTION(BlueprintCallable)
+	void AddTotalModifyAndDeleteCount();
+
+	UFUNCTION(BlueprintCallable)
+	void AddModifyAndReduceCountInEachLane();
 };
