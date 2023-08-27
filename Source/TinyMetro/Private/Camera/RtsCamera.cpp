@@ -41,8 +41,7 @@ void ARtsCamera::Tick(float DeltaSeconds)
 
 	if (playerController->GetMousePosition(mouseLocation.X, mouseLocation.Y)) // 마우스 포지션 가져오는 부분
 		{
-			screenWidth, screenHeight;
-			playerController->GetViewportSize(screenWidth, screenHeight);
+			
 
 		if (rotationMode)
 		{
@@ -60,7 +59,6 @@ void ARtsCamera::Tick(float DeltaSeconds)
 
 		else
 		{
-			FVector MovementInput = FVector::ZeroVector;
 
 			if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
 				PanLeft();
@@ -83,7 +81,6 @@ void ARtsCamera::BeginPlay()
 	CustomCollisionComponent->SetWorldLocation(initLocation);
 	CustomCollisionComponent->SetWorldRotation(initRotation);
 
-	screenWidth, screenHeight;
 	playerController->GetViewportSize(screenWidth, screenHeight);
 
 }
