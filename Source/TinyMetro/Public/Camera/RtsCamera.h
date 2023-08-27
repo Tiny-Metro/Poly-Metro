@@ -56,10 +56,10 @@ class TINYMETRO_API ARtsCamera : public APawn
 
 	
 
-	void PanForward(bool mousecheck);
-	void PanRight(bool mousecheck);
-	void PanBackward(bool mousecheck);
-	void PanLeft(bool mousecheck);
+	void PanForward();
+	void PanRight();
+	void PanBackward();
+	void PanLeft();
 	void ZoomIn(float magnitude);
 	void ChangePitch(float magnitude);
 	void Yaw(float magnitude);
@@ -67,7 +67,6 @@ class TINYMETRO_API ARtsCamera : public APawn
 	void DisengageRotation();
 	void Orbit(float magnitude);
 	bool rotationMode = false;
-	bool mousecheck;
 	
 
 	
@@ -87,7 +86,7 @@ class TINYMETRO_API ARtsCamera : public APawn
 	
 	FVector2D DeltaMouse;
 	FRotator NewRotation;
-
+	int32 screenWidth, screenHeight;
 
 
 
