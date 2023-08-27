@@ -447,4 +447,17 @@ protected: //Statistics
 
 	UFUNCTION(BlueprintCallable)
 	void AddModifyAndReduceCountInEachLane();
+
+	UFUNCTION(BlueprintCallable)
+	void AddServiceStationCount(int32 Num);
+
+	UFUNCTION(BlueprintCallable)
+	void SubServiceStationCount(int32 Num);
+
+	UFUNCTION(BlueprintCallable)
+	float GetStationComplainAverage();
+
+	/*
+	UFUNCTION(BlueprintCallable) // Lane Deleted
+	void InitializeCurrentLaneStatics();*/
 };

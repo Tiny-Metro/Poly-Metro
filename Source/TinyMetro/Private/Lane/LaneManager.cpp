@@ -194,6 +194,8 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 
 	StatisticsManagerRef->LaneStatistics.TotalLaneCount++;
 
+	StatisticsManagerRef->LaneStatistics.Lanes[tmpLane->GetLaneId()].ServiceStationCount += 2;
+
 	tmpLane->SpawnTrain();
 
 	UE_LOG(LogTemp, Warning, TEXT("StationPoint Num : %d"), tmpLane->StationPoint.Num());
