@@ -50,11 +50,8 @@ class TINYMETRO_API ARtsCamera : public APawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS Camera")
 	FRotator initRotation = FRotator(0.f, -90.f, 0.f);
 
-
 	UFUNCTION(BlueprintCallable, Category = "Camera")
 	void JumpTo(FVector NewLocation);
-
-	
 
 	void PanForward();
 	void PanRight();
@@ -68,26 +65,19 @@ class TINYMETRO_API ARtsCamera : public APawn
 	void Orbit(float magnitude);
 	bool rotationMode = false;
 	
-
-	
 	FVector2D mouseLocation;
 	FVector2D mouseScreenLocationGrab;
 
 	UPROPERTY(BlueprintReadOnly)
 	APlayerController* playerController;
 
-	
 	UPROPERTY(BlueprintReadOnly)
 	UFloatingPawnMovement* MovementComponent;
 
 	UPROPERTY(BlueprintReadOnly)
 	USphereComponent* CustomCollisionComponent;
 
-	
 	FVector2D DeltaMouse;
 	FRotator NewRotation;
 	int32 screenWidth, screenHeight;
-
-
-
 };
