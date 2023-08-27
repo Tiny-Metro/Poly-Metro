@@ -64,18 +64,21 @@ void ARtsCamera::Tick(float DeltaSeconds)
 			FVector MovementInput = FVector::ZeroVector;
 
 			if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
-				MovementInput.Y -= 1;
+				//MovementInput.Y -= 1;
+				PanLeft(mousecheck);
 			else if (mouseLocation.X > screenWidth * (1 - ScreenEdgePanZonePercent / 100))
-				MovementInput.Y += 1;
-
+				//MovementInput.Y += 1;
+				PanRight(mousecheck);
 			if (mouseLocation.Y < screenHeight * ScreenEdgePanZonePercent / 100)
-				MovementInput.X += 1;
+				//MovementInput.X += 1;
+				PanForward(mousecheck);
 			else if (mouseLocation.Y > screenHeight * (1 - ScreenEdgePanZonePercent / 100))
-				MovementInput.X -= 1;
+				//MovementInput.X -= 1;
+				PanBackward(mousecheck);
 
-			MovementInput.Normalize();
-			PanRight(MovementInput.Y);
-			PanForward(MovementInput.X);
+			//MovementInput.Normalize();
+			//PanRight(MovementInput.Y);
+			//PanForward(MovementInput.X);
 		}
 		}		
 }
@@ -122,32 +125,32 @@ void ARtsCamera::Orbit(const float magnitude)
 
 
 
-void ARtsCamera::PanForward(const float magnitude)
+void ARtsCamera::PanForward(bool bmousecheck)
 {	
-	UE_LOG(LogTemp, Log, TEXT("panforward: %f"), magnitude);
-	if (magnitude != 0 && !rotationMode && playerController)
-		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
+	
+	if (!rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), PanRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ARtsCamera::PanBackward(const float magnitude)
+void ARtsCamera::PanBackward(bool bmousecheck)
 {
-	UE_LOG(LogTemp, Log, TEXT("panBackward: %f"), magnitude);
-	if (magnitude != 0 && !rotationMode && playerController)
-		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * -PanRate * GetWorld()->GetDeltaSeconds());
+	
+	if (!rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), -PanRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ARtsCamera::PanRight(const float magnitude)
+void ARtsCamera::PanRight(bool bmousecheck)
 {
-	UE_LOG(LogTemp, Log, TEXT("panright: %f"), magnitude);
-	if (magnitude != 0 && !rotationMode && playerController)
-		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
+	
+	if ( !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), PanRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ARtsCamera::PanLeft(const float magnitude)
+void ARtsCamera::PanLeft(bool bmousecheck)
 {
-	UE_LOG(LogTemp, Log, TEXT("panleft: %f"), magnitude);
-	if (magnitude != 0 && !rotationMode && playerController)
-		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * -PanRate * GetWorld()->GetDeltaSeconds());
+	
+	if ( !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), -PanRate * GetWorld()->GetDeltaSeconds());
 }
 
 

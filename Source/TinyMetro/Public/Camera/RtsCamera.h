@@ -54,13 +54,12 @@ class TINYMETRO_API ARtsCamera : public APawn
 	UFUNCTION(BlueprintCallable, Category = "Camera")
 	void JumpTo(FVector NewLocation);
 
+	
 
-
-
-	void PanForward(float magnitude);
-	void PanRight(float magnitude);
-	void PanBackward(float magnitude);
-	void PanLeft(float magnitude);
+	void PanForward(bool mousecheck);
+	void PanRight(bool mousecheck);
+	void PanBackward(bool mousecheck);
+	void PanLeft(bool mousecheck);
 	void ZoomIn(float magnitude);
 	void ChangePitch(float magnitude);
 	void Yaw(float magnitude);
@@ -68,7 +67,8 @@ class TINYMETRO_API ARtsCamera : public APawn
 	void DisengageRotation();
 	void Orbit(float magnitude);
 	bool rotationMode = false;
-
+	bool mousecheck;
+	
 
 	
 	FVector2D mouseLocation;
@@ -88,7 +88,7 @@ class TINYMETRO_API ARtsCamera : public APawn
 	FVector2D DeltaMouse;
 	FRotator NewRotation;
 
-	
+
 
 
 };
