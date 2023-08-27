@@ -5,10 +5,6 @@
 class UFloatingPawnMovement;
 class USphereComponent;
 
-/**
- * Default Pawn used with conjunction with RtsCameraController.
- */
-
 UCLASS()
 class TINYMETRO_API ARtsCamera : public APawn
 {

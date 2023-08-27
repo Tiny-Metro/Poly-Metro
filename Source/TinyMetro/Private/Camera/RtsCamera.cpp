@@ -31,31 +31,28 @@ void ARtsCamera::Tick(float DeltaSeconds)
 
 	if (playerController->GetMousePosition(mouseLocation.X, mouseLocation.Y)) 
 	{
-			if (rotationMode)
-			{
-					DeltaMouse = mouseScreenLocationGrab - mouseLocation;
-					DeltaMouse *= RotationSpeed * DeltaSeconds;
-				
-					NewRotation = GetActorRotation();
-
-					NewRotation.Roll += DeltaMouse.X;
-					NewRotation.Pitch += DeltaMouse.Y;
-					SetActorRotation(NewRotation);
-					mouseScreenLocationGrab = mouseLocation;
-			}
+		if (rotationMode)
+		{
+			DeltaMouse = mouseScreenLocationGrab - mouseLocation;
+			DeltaMouse *= RotationSpeed * DeltaSeconds;
+			NewRotation = GetActorRotation();
+			NewRotation.Roll += DeltaMouse.X;
+			NewRotation.Pitch += DeltaMouse.Y;
+			SetActorRotation(NewRotation);
+			mouseScreenLocationGrab = mouseLocation;
+		}
 			
-			else
-			{
-				if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
-					PanLeft();
-				else if (mouseLocation.X > screenWidth * (1 - ScreenEdgePanZonePercent / 100))
-					PanRight();
-				if (mouseLocation.Y < screenHeight * ScreenEdgePanZonePercent / 100)
-					PanForward();
-				else if (mouseLocation.Y > screenHeight * (1 - ScreenEdgePanZonePercent / 100))
-					PanBackward();
-
-			}
+		else
+		{
+			if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
+				PanLeft();
+			else if (mouseLocation.X > screenWidth * (1 - ScreenEdgePanZonePercent / 100))
+				PanRight();
+			if (mouseLocation.Y < screenHeight * ScreenEdgePanZonePercent / 100)
+				PanForward();
+			else if (mouseLocation.Y > screenHeight * (1 - ScreenEdgePanZonePercent / 100))
+				PanBackward();
+		}
 	}		
 }
 
@@ -82,7 +79,6 @@ void ARtsCamera::Yaw(const float magnitude)
 	{
 		AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
 	}
-
 }
 
 void ARtsCamera::Orbit(const float magnitude)
