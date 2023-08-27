@@ -185,6 +185,8 @@ bool ALane::GetIsCircularLine() const
 void ALane::SetIsCircularLine(bool _Circular)
 {
 	IsCircularLine = _Circular;
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = _Circular;
 }
   
 FLanePoint ALane::GetNearestLanePoint(FVector Location) {
