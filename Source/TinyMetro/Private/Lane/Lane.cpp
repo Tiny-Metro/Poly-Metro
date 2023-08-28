@@ -1487,6 +1487,29 @@ bool ALane::Load()
 		AddAdjListDistance(StationPoint[i], StationPoint[i+1]);
 	}
 
+	//SetLane
+	for (int i = 0; i < StationPoint.Num(); i++)
+	{
+		if (i == StationPoint.Num() - 1)
+		{
+			if (IsCircularLine)
+			{
+				break;
+			}
+			else
+			{
+				StationPoint[i]->SetLanes(LaneId);
+			}
+		}
+		else
+		{
+			StationPoint[i]->SetLanes(LaneId);
+		}
+		
+	}
+
+
+
 	//PointArray Save
 	for (const auto& i : tmp->PointArray)
 	{
