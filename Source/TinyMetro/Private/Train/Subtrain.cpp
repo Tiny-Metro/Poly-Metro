@@ -5,10 +5,13 @@
 #include "Train/Train.h"
 #include "Train/TrainManager.h"
 #include "Train/SubtrainAiController.h"
+#include "Train/SubtrainSaveGame.h"
 #include "Lane/Lane.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Statistics/StatisticsManager.h"
+#include "SaveSystem/TMSaveManager.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
 
 ASubtrain::ASubtrain() {
@@ -119,12 +122,17 @@ void ASubtrain::UpdateTrainMesh() {
 }
 
 void ASubtrain::Upgrade() {
-	if (PlayerStateRef->CanUseMoney(TrainManagerRef->GetCostUpgradeSubtrain())) {
-		Super::Upgrade();
-		PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeSubtrain());
-		TrainManagerRef->ReportSubtrainUpgrade();
-		StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalUpgradeCount++;
+	if (!TrainInfo.IsUpgrade) {
+		if (PlayerStateRef->CanUseMoney(TrainManagerRef->GetCostUpgradeSubtrain())) {
+			PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeSubtrain());
+			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalUpgradeCount++;
+		} else {
+			return;
+		}
 	}
+
+	Super::Upgrade();
+	TrainManagerRef->ReportSubtrainUpgrade();
 }
 
 bool ASubtrain::CanUpgrade() const {
@@ -216,4 +224,8 @@ void ASubtrain::Save() {
 
 bool ASubtrain::Load() {
 	return false;
+}
+
+void ASubtrain::FinishLoad() {
+	Super::FinishLoad();
 }

@@ -43,15 +43,21 @@ void ATrainManager::BeginPlay()
 		TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
+	for (auto& i : Trains) {
+		i->FinishLoad();
+	}
+
 	SaveManagerRef->SaveTask.AddDynamic(this, &ATrainManager::Save);
 }
 
 void ATrainManager::AddTrain(ATrainTemplate* Train) {
 	RefreshTrainArray();
-	if (Trains.Find(Train) == INDEX_NONE) {
-		Train->SetTrainId(NextTrainId++);
-		Train->SetTrainInfoWidget(TrainInfoWidget);
-		Trains.AddUnique(Train);
+	if (IsValid(Train)) {
+		if (Trains.Find(Train) == INDEX_NONE) {
+			Train->SetTrainId(NextTrainId++);
+			Train->SetTrainInfoWidget(TrainInfoWidget);
+			Trains.AddUnique(Train);
+		}
 	}
 }
 
@@ -106,17 +112,12 @@ TArray<ATrainTemplate*> ATrainManager::GetAllTrain() {
 }
 
 void ATrainManager::InitTrainMaterial() {
-	TrainMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
+	TArray<FSoftObjectPath> TrainMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetTrainMaterialPath();
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
-	AssetLoader.RequestAsyncLoad(
-		TrainMaterialPath,
-		FStreamableDelegate::CreateUObject(this, &ATrainManager::TrainMaterialDeferred)
+	AssetLoader.RequestSyncLoad(
+		TrainMaterialPath
 	);
-}
-
-void ATrainManager::TrainMaterialDeferred() {
 	for (auto& i : TrainMaterialPath) {
-		//TAssetPtr<UMaterial> tmp(i);
 		TrainMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
 	}
 }
@@ -126,17 +127,13 @@ TArray<UMaterial*> ATrainManager::GetTrainMaterial() const {
 }
 
 void ATrainManager::InitPassengerMaterial() {
-	PassengerMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetPassengerMaterialPath();
+	TArray<FSoftObjectPath> PassengerMaterialPath = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode())->GetPassengerMaterialPath();
 	auto& AssetLoader = UAssetManager::GetStreamableManager();
-	AssetLoader.RequestAsyncLoad(
-		PassengerMaterialPath,
-		FStreamableDelegate::CreateUObject(this, &ATrainManager::PassengerMaterialDeferred)
+	AssetLoader.RequestSyncLoad(
+		PassengerMaterialPath
 	);
-}
 
-void ATrainManager::PassengerMaterialDeferred() {
 	for (auto& i : PassengerMaterialPath) {
-		//TAssetPtr<UMaterial> tmp(i);
 		PassengerMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
 	}
 }
@@ -146,11 +143,9 @@ TArray<UMaterial*> ATrainManager::GetPassengerMaterial() const {
 }
 
 void ATrainManager::RefreshTrainArray() {
-	for (int i = 0; i < Trains.Num(); i++) {
-		if (Trains.IsValidIndex(i)) {
-			if (!IsValid(Trains[i])) {
-				Trains.RemoveAt(i--);
-			}
+	for (auto& i : Trains) {
+		if (!IsValid(i)) {
+			Trains.Remove(i);
 		}
 	}
 }

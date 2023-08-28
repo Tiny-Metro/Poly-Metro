@@ -41,14 +41,10 @@ public:
 	UFUNCTION()
 	void InitTrainMaterial();
 	UFUNCTION()
-	void TrainMaterialDeferred();
-	UFUNCTION()
 	TArray<UMaterial*> GetTrainMaterial() const;
 
 	UFUNCTION()
 	void InitPassengerMaterial();
-	UFUNCTION()
-	void PassengerMaterialDeferred();
 	UFUNCTION()
 	TArray<UMaterial*> GetPassengerMaterial() const;
 
@@ -124,13 +120,9 @@ protected:
 	int32 NextTrainId = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> TrainMaterial;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<FSoftObjectPath> TrainMaterialPath;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> PassengerMaterial;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<FSoftObjectPath> PassengerMaterialPath;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UTrainInfoWidget* TrainInfoWidget;
 

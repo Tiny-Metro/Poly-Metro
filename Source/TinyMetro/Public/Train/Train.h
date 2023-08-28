@@ -71,10 +71,9 @@ public:
 	virtual void WeeklyTask() override;
 
 	// Save & Load
-	UFUNCTION()
-	void Save();
-	UFUNCTION()
-	bool Load();
+	virtual void Save();
+	virtual bool Load();
+	virtual void FinishLoad();
 
 protected:
 
