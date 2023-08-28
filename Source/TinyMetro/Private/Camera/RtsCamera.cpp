@@ -5,145 +5,152 @@
 
 ARtsCamera::ARtsCamera(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
 	CustomCollisionComponent = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, FName("RtsCamera_CollisionComponent0"));
 	CustomCollisionComponent->InitSphereRadius(100.0f);
 	CustomCollisionComponent->CanCharacterStepUpOn = ECB_No;
 	CustomCollisionComponent->SetCanEverAffectNavigation(false);
-	CustomCollisionComponent->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	RootComponent = CustomCollisionComponent;
-
 	MovementComponent = ObjectInitializer.CreateDefaultSubobject<UFloatingPawnMovement>(this, FName("RtsCameran_MovementComponent0"));
 	MovementComponent->UpdatedComponent = CustomCollisionComponent;
 }
 
-void ARtsCamera::SetupPlayerInputComponent(UInputComponent* Inputelemental)
+void ARtsCamera::SetupPlayerInputComponent(UInputComponent* Inputelemental) 
 {
 	check(Inputelemental);
-
-	Inputelemental->BindAxis("Pan Forward", this, &ARtsCamera::PanForward);
-	Inputelemental->BindAxis("Pan Right", this, &ARtsCamera::PanRight);
 	Inputelemental->BindAxis("Mouse Wheel", this, &ARtsCamera::ZoomIn);
-
 	Inputelemental->BindAction("Rotate Camera", IE_Pressed, this, &ARtsCamera::EngageRotation);
 	Inputelemental->BindAction("Rotate Camera", IE_Released, this, &ARtsCamera::DisengageRotation);
 }
 
 void ARtsCamera::Tick(float DeltaSeconds)
-{
-	if (Controller)
+{ 
+	if (playerController == nullptr) 
 	{
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			FVector2D mouseLocation;
-			if (playerController->GetMousePosition(mouseLocation.X, mouseLocation.Y))
-			{
-				int32 screenWidth = 0;
-				int32 screenHeight = 1000;
-				playerController->GetViewportSize(screenWidth, screenHeight);
-
-				if (rotationMode) //Main Camera rotation calls
-				{
-					Orbit((mouseScreenLocationGrab.X - mouseLocation.X) / screenWidth);
-					ChangePitch((mouseScreenLocationGrab.Y - mouseLocation.Y) * -1 / screenWidth);
-				}
-				else //  Mouse on screen edge pan
-				{
-					const float xPanZone = screenWidth * ScreenEdgePanZonePercent / 100;
-					const float yPanZone = screenHeight * ScreenEdgePanZonePercent / 100;
-
-					if (mouseLocation.X < xPanZone)							PanRight((1 - mouseLocation.X / xPanZone) * -1);
-					else if (mouseLocation.X > screenWidth - xPanZone)		PanRight(1 - (screenWidth - mouseLocation.X) / xPanZone);
-					if (mouseLocation.Y < yPanZone)							PanForward(1 - mouseLocation.Y / yPanZone);
-					else if (mouseLocation.Y > screenHeight - yPanZone)		PanForward((1 - (screenHeight - mouseLocation.Y) / yPanZone) * -1);
-
-				}
-
-
-			}
-		}
+		playerController = Cast<APlayerController>(GetController());
 	}
+
+	if (playerController->GetMousePosition(mouseLocation.X, mouseLocation.Y)) 
+	{
+		if (rotationMode)
+		{
+			DeltaMouse = mouseScreenLocationGrab - mouseLocation;
+			DeltaMouse *= RotationSpeed * DeltaSeconds;
+			NewRotation = GetActorRotation();
+			NewRotation.Roll += DeltaMouse.X;
+			NewRotation.Pitch += DeltaMouse.Y;
+			SetActorRotation(NewRotation);
+			mouseScreenLocationGrab = mouseLocation;
+		}
+			
+		else
+		{
+			if (mouseLocation.X < screenWidth * ScreenEdgePanZonePercent / 100)
+				PanLeft();
+			else if (mouseLocation.X > screenWidth * (1 - ScreenEdgePanZonePercent / 100))
+				PanRight();
+			if (mouseLocation.Y < screenHeight * ScreenEdgePanZonePercent / 100)
+				PanForward();
+			else if (mouseLocation.Y > screenHeight * (1 - ScreenEdgePanZonePercent / 100))
+				PanBackward();
+		}
+	}		
+}
+
+
+void ARtsCamera::BeginPlay()
+{
+	Super::BeginPlay();
+	playerController = Cast<APlayerController>(GetController());
+	CustomCollisionComponent->SetWorldLocation(initLocation);
+	CustomCollisionComponent->SetWorldRotation(initRotation);
+	playerController->GetViewportSize(screenWidth, screenHeight);
 }
 
 void ARtsCamera::ChangePitch(const float magnitude)
 {
-	if (magnitude != 0 && rotationMode && Controller)
+	if (magnitude != 0 && rotationMode && playerController)
 		if (magnitude < 0 && GetControlRotation().Pitch < MaxPitch || magnitude > 0 && GetControlRotation().Pitch > MinPitch)
 			AddControllerPitchInput(magnitude * PitchChangeRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ARtsCamera::Yaw(const float magnitude)
 {
-	if (magnitude != 0 && rotationMode && Controller)
+	if (magnitude != 0 && rotationMode && playerController)
 	{
 		AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
 	}
-
 }
 
 void ARtsCamera::Orbit(const float magnitude)
 {
-	if (magnitude != 0 && rotationMode && Controller)
+	if (magnitude != 0 && rotationMode && playerController)
 	{
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
-			AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * -(YawRate / 4) * GetWorld()->GetDeltaSeconds());
-		}
+		AddControllerYawInput(magnitude * YawRate * GetWorld()->GetDeltaSeconds());
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * -(YawRate / 4) * GetWorld()->GetDeltaSeconds());
 	}
-
 }
 
-void ARtsCamera::PanForward(const float magnitude)
+void ARtsCamera::PanForward()
+{	
+	if (!rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), PanRate * GetWorld()->GetDeltaSeconds());
+}
+
+void ARtsCamera::PanBackward()
 {
-	if (magnitude != 0 && !rotationMode && Controller)
-		AddMovementInput(FRotationMatrix(FRotator(0, GetControlRotation().Yaw, 0)).GetScaledAxis(EAxis::X), magnitude * 4000 * GetWorld()->GetDeltaSeconds());
+	if (!rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), -PanRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ARtsCamera::PanRight(const float magnitude)
+void ARtsCamera::PanRight()
 {
-	if (magnitude != 0 && !rotationMode && Controller)
-		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), magnitude * PanRate * GetWorld()->GetDeltaSeconds());
+	if ( !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), PanRate * GetWorld()->GetDeltaSeconds());
 }
+
+void ARtsCamera::PanLeft()
+{
+	if ( !rotationMode && playerController)
+		AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y), -PanRate * GetWorld()->GetDeltaSeconds());
+}
+
 
 void ARtsCamera::ZoomIn(const float magnitude)
 {
-	if (magnitude != 0 && !rotationMode && Controller)
+	if (magnitude != 0 && !rotationMode && playerController)
 		if (magnitude > 0 && GetActorLocation().Z > MinZoom || magnitude < 0 && GetActorLocation().Z < MaxZoom)
-			AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::X), magnitude * ZoomRate * GetWorld()->GetDeltaSeconds());
+			AddMovementInput(FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Z),  magnitude * -ZoomRate * GetWorld()->GetDeltaSeconds());
 }
-
-
-
 
 void ARtsCamera::EngageRotation()
 {
-	if (Controller)
+	if (playerController)
 	{
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		if (playerController != nullptr)
-		{
-			FVector2D mousePosition;
-			if (playerController->GetMousePosition(mousePosition.X, mousePosition.Y))
-			{
-				mouseScreenLocationGrab = mousePosition;
-				rotationMode = true;
-			}
-		}
+		rotationMode = true;
+		playerController->bShowMouseCursor = false;  
+		playerController->bEnableClickEvents = false;
+		playerController->bEnableMouseOverEvents = false;
+		InitialRotation = GetActorRotation();		
 	}
 }
 
+
 void ARtsCamera::DisengageRotation()
 {
-	rotationMode = false;
+	if (rotationMode && playerController)
+	{
+		rotationMode = false;
+		playerController->bShowMouseCursor = true;  
+		playerController->bEnableClickEvents = true;
+		playerController->bEnableMouseOverEvents = true;
+		SetActorRotation(InitialRotation);  
+	}
 }
+
 
 void ARtsCamera::JumpTo(FVector NewLocation)
 {
 	FVector NewCameraLocation = FVector(NewLocation.X, NewLocation.Y, GetActorLocation().Z);
 	SetActorLocation(NewCameraLocation);
 }
-
 
