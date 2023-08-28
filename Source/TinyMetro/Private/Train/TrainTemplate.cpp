@@ -10,6 +10,7 @@
 #include "Lane/Lane.h"
 #include "Station/PathQueue.h"
 #include "Statistics/StatisticsManager.h"
+#include "SaveSystem/TMSaveManager.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -75,6 +76,8 @@ void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::BeginPlay"));
+
 	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	LaneManagerRef = GameModeRef->GetLaneManager();
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
@@ -83,12 +86,15 @@ void ATrainTemplate::BeginPlay()
 	TrainManagerRef = GameModeRef->GetTrainManager();
 	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 	TimerRef = GameModeRef->GetTimer();
+	SaveManagerRef = GameModeRef->GetSaveManager();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
 	//InitTrainMesh();
 
 	TimerRef->WeeklyTask.AddDynamic(this, &ATrainTemplate::WeeklyTask);
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ATrainTemplate::Save);
 }
 
 void ATrainTemplate::UpdatePassengerMesh() {
@@ -121,7 +127,15 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
 	if (IsValid(Lane)) {
+		if (!TrainMaterial.IsValidIndex(Lane->GetLaneId())) {
+			InitTrainMaterial();
+		}
+		if (!PassengerMaterial.IsValidIndex(Lane->GetLaneId())) {
+			InitPassengerMaterial();
+		}
+		UE_LOG(LogTemp, Log, TEXT("TrainTemplate::SetTrainMaterial %d %d"), TrainMaterial.Num(), PassengerMaterial.Num());
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 		for (auto& i : PassengerMeshComponent) {
 			i->SetMaterial(0, PassengerMaterial[Lane->GetLaneId()]);
 		}
@@ -193,7 +207,7 @@ int32 ATrainTemplate::GetWeeklyBoardPassenger() const {
 }
 
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
-	Destination = D;
+	//Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
 	TrainInfo.ServiceLaneId = Lane->GetLaneId();
@@ -321,6 +335,27 @@ void ATrainTemplate::WeeklyTask() {
 	TrainInfo.WeeklyBoardPassenger = 0;
 }
 
+void ATrainTemplate::Save() {
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
+	if (!IsValid(LaneManagerRef)) LaneManagerRef = GameModeRef->GetLaneManager();
+	if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
+}
+
+bool ATrainTemplate::Load() {
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
+	if (!IsValid(LaneManagerRef)) LaneManagerRef = GameModeRef->GetLaneManager();
+	if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
+	IsLoaded = true;
+	return false;
+}
+
+void ATrainTemplate::FinishLoad() {
+}
+
 // Called every frame
 void ATrainTemplate::Tick(float DeltaTime)
 {
@@ -380,6 +415,9 @@ void ATrainTemplate::InitTrainMaterial() {
 	);*/
 
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetTrainMaterial();
+	for (int i = 1; i < TrainMaterial.Num() - 1; i++) {
+		TrainMaterial.RemoveAt(i);
+	}
 	TrainMaterial.Append(tmp);
 }
 
@@ -406,6 +444,9 @@ void ATrainTemplate::TrainMaterialDeferred() {
 
 void ATrainTemplate::InitPassengerMaterial() {
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetPassengerMaterial();
+	for (int i = 1; i < PassengerMaterial.Num() - 1; i++) {
+		PassengerMaterial.RemoveAt(i);
+	}
 	PassengerMaterial.Append(tmp);
 }
 

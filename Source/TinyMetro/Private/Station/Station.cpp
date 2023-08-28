@@ -554,7 +554,7 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 	// Check tick (Time)
 	if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 		// Check spawn enable
-		if (IsPassengerSpawnEnable && StationInfo.IsDestroyed) {
+		if (IsPassengerSpawnEnable && !StationInfo.IsDestroyed) {
 			// Check spawn probability
 			if (StationManager->CalculatePassegnerSpawnProbability()) {
 				SpawnPassenger(StationManager->CalculatePassengerDestination(StationInfo.Type));

@@ -70,6 +70,11 @@ public:
 	// Weekly tasks
 	virtual void WeeklyTask() override;
 
+	// Save & Load
+	virtual void Save();
+	virtual bool Load();
+	virtual void FinishLoad();
+
 protected:
 
 	// Called when the game starts or when spawned

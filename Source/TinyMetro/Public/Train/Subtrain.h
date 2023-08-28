@@ -52,6 +52,11 @@ public:
 	// Weekly tasks
 	virtual void WeeklyTask() override;
 
+	// Save & Load
+	virtual void Save();
+	virtual bool Load();
+	virtual void FinishLoad();
+
 protected:
 	virtual void BeginPlay() override;
 
