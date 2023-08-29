@@ -144,4 +144,8 @@ public:
 
 	UFUNCTION()
 	class ALane* LoadLane(int32 LaneId);
+
+	//Lane Statics
+	UFUNCTION(BlueprintCallable)
+	void CheckTransferStation();
 };

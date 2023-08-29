@@ -193,8 +193,9 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	//Lanes.Add(tmpLane);
 
 	StatisticsManagerRef->LaneStatistics.TotalLaneCount++;
-
 	StatisticsManagerRef->LaneStatistics.Lanes[tmpLane->GetLaneId()].ServiceStationCount += 2;
+	
+	CheckTransferStation();
 
 	tmpLane->SpawnTrain();
 
@@ -455,4 +456,44 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 	}
 
 	return tmpLane;
+}
+
+void ALaneManager::CheckTransferStation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("In?"));
+
+	for (auto& Item : Lanes)
+	{
+		ALane* Lane = Item.Value;
+		int32 Sum = 0;
+
+		for (int i = 0; i<Lane->StationPoint.Num(); i++)
+		{
+			if (i == Lane->StationPoint.Num() - 1)
+			{
+				if (Lane->GetIsCircularLine())
+				{
+					break;
+				}
+				else
+				{
+					if (Lane->StationPoint[i]->GetStationInfo().ServiceLaneCount >= 2)
+					{
+						Sum++;
+					}
+				}
+			}
+			else
+			{
+				if (Lane->StationPoint[i]->GetStationInfo().ServiceLaneCount >= 2)
+				{
+					Sum++;
+				}
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Lane %d , StationPoint %d , Sum :: %d"), Item.Key, i, Sum);
+		}
+
+		StatisticsManagerRef->LaneStatistics.Lanes[Item.Key].TransferStationCount = Sum;
+	}
 }
