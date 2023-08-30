@@ -73,6 +73,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<ABridgeTunnel*> Connectors;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<int32, ABridgeTunnel*> Connectorss;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Count = 0;
 
 	UFUNCTION(BlueprintCallable)
@@ -104,6 +106,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATMSaveManager* SaveManagerRef;
 
+	UFUNCTION()
 	void Save();
+	UFUNCTION()
 	bool Load();
+
+	UFUNCTION()
+	ABridgeTunnel* LoadBridgeTunnel(int32 connectorId);
+
+	ABridgeTunnel* SpawnConnector();
+
 };

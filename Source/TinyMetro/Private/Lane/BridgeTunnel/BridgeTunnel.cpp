@@ -12,7 +12,10 @@ ABridgeTunnel::ABridgeTunnel()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	if (!GridManagerRef)
+	{
+		GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -20,8 +23,19 @@ void ABridgeTunnel::BeginPlay()
 {
 	Super::BeginPlay();
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
 	SaveManagerRef = GameMode->GetSaveManager();
-	SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnel::Save);
+	if (SaveManagerRef)
+	{
+		SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnel::Save);
+		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is Put SaveTask in ABridgeTunnel::BeginPlay()"));
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is not valid in ABridgeTunnel::BeginPlay()"));
+	}
 }
 
 // Called every frameD
@@ -40,15 +54,23 @@ void ABridgeTunnel::BuildTest()
 }
 void ABridgeTunnel::Save()
 {
+	UE_LOG(LogTemp, Warning, TEXT("BridgeTunnel %d Saved Called "), ConnectorId);
+
 	UBridgeTunnelSaveGame* tmp = Cast<UBridgeTunnelSaveGame>(UGameplayStatics::CreateSaveGameObject(UBridgeTunnelSaveGame::StaticClass()));
 	tmp->ConnectorId = ConnectorId;
 	tmp->count = count;
 
 	FConnectorData ConnectorData;
-	ConnectorData.PointArr = ConnectorInfo.PointArr;
+	for (const auto& i : ConnectorInfo.PointArr)
+	{
+		ConnectorData.PointArr.Add(i);
+	}
 	ConnectorData.Type = ConnectorInfo.Type;
 	tmp->ConnectorInfo = ConnectorData;
-
+	if (!IsValid(tmp))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnel tmp in Save is not valid"));
+	}
 
 	SaveManagerRef->Save(tmp, SaveActorType::BridgeTunnel, ConnectorId);
 }
@@ -67,10 +89,14 @@ bool ABridgeTunnel::Load()
 		return false;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Lane %d is loaded"), ConnectorId);
+	UE_LOG(LogTemp, Warning, TEXT("BridgeTunnel  %d is loaded"), ConnectorId);
 	
 	ConnectorId = tmp ->ConnectorId;
-	ConnectorInfo = tmp ->ConnectorInfo;
+	for (const auto& i : tmp->ConnectorInfo.PointArr)
+	{
+		ConnectorInfo.PointArr.Add(i);
+	}
+	ConnectorInfo.Type = tmp->ConnectorInfo.Type;
 	count = tmp -> count;
 
 	BuildBridgeTunnel();

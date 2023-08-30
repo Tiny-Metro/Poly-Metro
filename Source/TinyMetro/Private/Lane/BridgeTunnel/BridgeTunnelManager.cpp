@@ -29,6 +29,8 @@ void ABridgeTunnelManager::BeginPlay()
 	if (SaveManagerRef)
 	{
 		SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnelManager::Save);
+		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is Put SaveTask in ABridgeTunnelManager::BeginPlay()"));
+
 	}
 	else
 	{
@@ -274,6 +276,11 @@ bool ABridgeTunnelManager::IsConnectorExist(ConnectorType type, const TArray<FIn
 		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame SAVED"));
 		UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UBridgeTunnelManagerSaveGame::StaticClass()));
 		tmp->Count = Count;
+		for (auto& i : Connectorss)
+		{
+			tmp->Connectors.Add(i.Key);
+		}
+
 		if (!IsValid(tmp)) 
 		{
 			UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager tmp in Save is not valid"));
@@ -301,6 +308,51 @@ bool ABridgeTunnelManager::IsConnectorExist(ConnectorType type, const TArray<FIn
 		}
 
 		Count = tmp->Count;
+		
+		for (auto& i : tmp->Connectors)
+		{
+			ABridgeTunnel* tmpBridgeTunnel = LoadBridgeTunnel(i);
+
+			Connectorss.Add(i, tmpBridgeTunnel);
+		}
 
 		return true;
+	}
+	ABridgeTunnel* ABridgeTunnelManager::LoadBridgeTunnel(int32 connectorId)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager LOAD BridgeTunnel"));
+		ABridgeTunnel* tmpBridgeTunnel = SpawnConnector();
+		tmpBridgeTunnel->ConnectorId = connectorId;
+		tmpBridgeTunnel->Load();
+		return tmpBridgeTunnel;
+	}
+	ABridgeTunnel* ABridgeTunnelManager::SpawnConnector()
+	{
+		// Load BP Class
+		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BridgeTunnel/BP_BridgeTunnel.BP_BridgeTunnel'")));
+
+		// Cast to BP
+		UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+		// Check object validation
+		if (!SpawnActor) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / BridgeTunnel")));
+			return nullptr;
+		}
+
+		// Check null
+		UClass* SpawnClass = SpawnActor->StaticClass();
+		if (SpawnClass == nullptr) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+			return nullptr;
+		}
+
+		// Spawn actor
+		FActorSpawnParameters SpawnParams;
+		FTransform SpawnTransform;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		ABridgeTunnel* tmpBridgeTunnel = Cast<ABridgeTunnel>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
+
+		return tmpBridgeTunnel;
 	}

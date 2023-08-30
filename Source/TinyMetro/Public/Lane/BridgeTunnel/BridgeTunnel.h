@@ -55,6 +55,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATMSaveManager* SaveManagerRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ATinyMetroPlayerState* PlayerStateRef;
+
+
+	UFUNCTION()
 	void Save();
+
+	UFUNCTION()
 	bool Load();
 };

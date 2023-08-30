@@ -14,5 +14,8 @@ class TINYMETRO_API UBridgeTunnelManagerSaveGame : public USaveGame
 	
 public:	
 	UPROPERTY()
+	TArray<int32> Connectors;
+
+	UPROPERTY()
 	int32 Count;
 };
