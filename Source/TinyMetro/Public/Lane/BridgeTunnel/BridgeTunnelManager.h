@@ -71,9 +71,7 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<ABridgeTunnel*> Connectors;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<int32, ABridgeTunnel*> Connectorss;
+	TMap<int32, ABridgeTunnel*> Connectors;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Count = 0;
 
