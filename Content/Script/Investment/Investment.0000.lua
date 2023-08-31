@@ -1,31 +1,28 @@
-Data = {}
-Data.title = 'Title'
-Data.content = 'ContentDescription'
-Data.time_require = -1
-Data.require_message = 'RequireMessage'
-Data.accept_message = 'AcceptEffectMessage'
-Data.award_message = 'SuccessEffectMessage'
-Data.reward_message = 'FailEffectMessage'
+-- Investment condition
+function InvestmentData()
+    Data = {}
+    Data.message = 'Mission require text'
+    Data.time_require = 0
+    Data.award = 'Reward text'
 
-function InvestmentAppear()
+    return Data
+end
+
+-- Call when investment start
+-- Used save info when start
+function Start()
+end
+
+-- Investment appear condition
+function Appearance()
     return true
 end
 
---Action when investment start
-function InvestmentStart()
+-- Investment success condition
+function Process()
+    return continue
 end
 
---Action when investment success
-function InvestmentSuccess()
+-- Investment award
+function Award()
 end
-
---Action when investment fail
-function InvestmentFail()
-end
-
---Investment condition check (success or fail)
---Don't need to check for time require
-function InvestmentCheck()
-end
-
-return Data

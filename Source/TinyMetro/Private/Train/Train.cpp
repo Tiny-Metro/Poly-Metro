@@ -4,6 +4,7 @@
 #include "Train/Train.h"
 #include "Train/TrainManager.h"
 #include "Train/SubtrainAiController.h"
+#include "Train/TrainSaveGame.h"
 #include "Station/Station.h"
 #include "Station/PathQueue.h"
 #include "Lane/Lane.h"
@@ -11,9 +12,12 @@
 #include "Components/BoxComponent.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "Statistics/StatisticsManager.h"
+#include "SaveSystem/TMSaveManager.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <Kismet/GameplayStatics.h>
 #include <Engine/AssetManager.h>
 
 void ATrain::Tick(float DeltaTime) {
@@ -56,7 +60,7 @@ void ATrain::Tick(float DeltaTime) {
 		//	
 		//}
 
-		Destination = StationManagerRef->GetNearestStation(MouseToWorldLocation, LaneRef);
+		auto Destination = StationManagerRef->GetNearestStation(MouseToWorldLocation, LaneRef);
 		this->SetActorLocationAndRotation(
 			MouseToWorldLocation,
 			FRotator(
@@ -134,18 +138,25 @@ void ATrain::BeginPlay() {
 		FVector(-270.0f, -55.0f, 190.0f)
 	};*/
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Log, TEXT("Train::BeginPlay2"));
+
 	TotalTravel = 0.0f;
 	AiControllerRef = Cast<ATrainAiController>(GetController());
+
+	TrainInfo.Type = TrainType::Train;
+
 }
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor->IsA(AStation::StaticClass()) && !IsActorDragged) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Train::Overlap"));
 		
 		auto Station = Cast<AStation>(OtherActor);
 		// Check passing station
-		if (Station->GetLanes().Contains(ServiceLaneId)) {
-
+		if (Station->GetLanes().Contains(TrainInfo.ServiceLaneId)) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Train::Overlap::StopStation"));
+			
 			if (DeferredDespawn) {
 				for (auto& i : Subtrains) {
 					i->DespawnTrain();
@@ -156,7 +167,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 			// Set current, next Station
 			SetCurrentStation(Station->GetStationInfo());
-			SetNextStation(LaneManagerRef->GetLaneById(ServiceLaneId)->GetNextStation(
+			SetNextStation(LaneManagerRef->GetLaneById(TrainInfo.ServiceLaneId)->GetNextStation(
 					Station,
 					GetTrainDirection()
 				)->GetStationInfo()
@@ -202,7 +213,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			//	true,
 			//	0.0f
 			//);
-
+			
 			AiControllerRef->SetTrainDestination(
 				GetNextTrainDestination(AiControllerRef->GetTrainDestination())
 			);
@@ -221,7 +232,7 @@ void ATrain::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 FVector ATrain::GetNextTrainDestination(FVector CurLocation) {
 	//UE_LOG(LogTemp, Log, TEXT("Train::GetNextTrainDestination"));
 	bool tmp;
-	auto LaneTmp = LaneManagerRef->GetLaneById(ServiceLaneId);
+	auto LaneTmp = LaneManagerRef->GetLaneById(TrainInfo.ServiceLaneId);
 	auto NextPoint = LaneTmp->GetNextLocation(
 		this,
 		GridManagerRef->GetGridCellDataByCoord(CurLocation, tmp).WorldCoordination,
@@ -265,6 +276,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	// Drag & Drop operation
 	if (!IsSingleClick) {
 		if (IsValid(LaneRef)) {
+			UE_LOG(LogTemp, Log, TEXT("TrainRelease::Lane Valid"));
 			/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 				FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
 			FVector StartLocation = GridManagerRef->Approximate(
@@ -275,9 +287,14 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 				FString::Printf(TEXT("Train::Release after - %lf, %lf"), StartLocation.X, StartLocation.Y));*/
 
 			SetActorLocation(StartLocation);
-			ServiceStart(StartLocation, LaneRef, Destination);
+			//ServiceStart(StartLocation, LaneRef, Destination);
+			ServiceStart(StartLocation, LaneRef, StationManagerRef->GetNearestStation(StartLocation, LaneRef));
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalShiftCount++;
 		} else {
+			UE_LOG(LogTemp, Log, TEXT("TrainRelease::Lane Invalid"));
 			// TODO : if upgrade, return upgrade cost
+
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalRetrievalCount++;
 			DespawnTrain();
 		}
 	}
@@ -286,7 +303,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	IsSingleClick = false;
 }
 
-void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
+void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Super::ServiceStart(StartLocation, Lane, D);
 	bool tmp;
 
@@ -295,25 +312,27 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
+
+	if (!IsValid(GridManagerRef)) GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	// Set train direction (Down or Up)
 	SetTrainDirection(Lane->SetDirectionInit(
 		D,
 		GridManagerRef->GetGridCellDataByCoord(StartLocation, tmp).WorldCoordination
 	));
 
-	// Set train destination (Next grid)
-	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
 
 	// Initialize train's Current, Next station
 	CurrentStation.Id = -1;
 	NextStation = D->GetStationInfo();
 
 	// Set train material
-	LaneRef = Lane;
 	SetTrainMaterial(LaneRef);
 	
 
+	// Set train destination (Next grid)
 	// Train move start
+	if(!IsValid(AiControllerRef)) AiControllerRef = Cast<ATrainAiController>(GetController());
+	AiControllerRef->SetTrainDestination(GetNextTrainDestination(StartLocation));
 	AiControllerRef->Patrol();
 
 	FVector cubeLocation = this->GetActorLocation();
@@ -323,7 +342,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 
 void ATrain::UpdatePassengerSlot() {
 	Super::UpdatePassengerSlot();
-	if (IsUpgrade) {
+	if (TrainInfo.IsUpgrade) {
 		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
 		}
@@ -344,14 +363,21 @@ void ATrain::DespawnTrain() {
 
 void ATrain::UpdateTrainMesh() {
 	Super::UpdateTrainMesh();
-	TrainMeshComponent->SetStaticMesh(TrainMesh[IsUpgrade]);
+	TrainMeshComponent->SetStaticMesh(TrainMesh[TrainInfo.IsUpgrade]);
 	SetTrainMaterial(LaneRef);
 }
 
 void ATrain::Upgrade() {
+	if (!TrainInfo.IsUpgrade) {
+		if (PlayerStateRef->CanUseMoney(TrainManagerRef->GetCostUpgradeTrain())) {
+			PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeTrain());
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalUpgradeCount++;
+		} else {
+			return;
+		}
+	}
+
 	Super::Upgrade();
-	// TODO : Money function division
-	PlayerStateRef->AddMoney(-TrainManagerRef->GetCostUpgradeTrain());
 	TrainManagerRef->ReportTrainUpgrade();
 	UpdateSubtrainSpeed();
 	UpdateSubtrainDistance();
@@ -366,6 +392,10 @@ bool ATrain::CanUpgrade() const {
 	} else {
 		return true;
 	}
+}
+
+int32 ATrain::GetSubtrainCount() const {
+	return Subtrains.Num();
 }
 
 void ATrain::ActiveMoveTest() {
@@ -406,6 +436,26 @@ void ATrain::GetOnPassenger(AStation* Station) {
 	}
 }
 
+int32 ATrain::GetTotalPassenger() const {
+	int32 result = 0;
+	for (auto& i : Subtrains) {
+		result += i->GetTotalBoardPassenger();
+	}
+	result += GetTotalBoardPassenger();
+
+	return result;
+}
+
+int32 ATrain::GetWeeklyPassenger() const {
+	int32 result = 0;
+	for (auto& i : Subtrains) {
+		result += i->GetWeeklyBoardPassenger();
+	}
+	result += GetWeeklyBoardPassenger();
+
+	return result;
+}
+
 void ATrain::GetOffPassenger(AStation* Station, bool& Success) {
 	// Log
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
@@ -444,7 +494,7 @@ void ATrain::UpdateSubtrainDistance() {
 	// Total distance from Train to last Subtrain
 	float totalDistance = 0.0f;
 	if (Subtrains.IsValidIndex(0)) {
-		if (IsUpgrade) {
+		if (TrainInfo.IsUpgrade) {
 			if (Subtrains[0]->GetIsUpgrade()) {
 				// Upgrade Train and Upgrade Subtrain
 				defaultDistance = DIST_UP_TRAIN_UP_SUBTRAIN;
@@ -499,20 +549,75 @@ void ATrain::UpdateSubtrainDistance() {
 void ATrain::DetachSubtrain(ASubtrain* T) {
 	Subtrains.Remove(T);
 	UpdateSubtrainDistance();
+	IndexingSubtrain();
 }
 
 void ATrain::UpdateSubtrainSpeed() {
 	for (auto& i : Subtrains) {
-		i->SetTrainSpeed(IsUpgrade ? TRAIN_UPGRADE_SPEED : TRAIN_DEFAULT_SPEED);
+		i->SetTrainSpeed(TrainInfo.IsUpgrade ? TRAIN_UPGRADE_SPEED : TRAIN_DEFAULT_SPEED);
+	}
+}
+
+void ATrain::IndexingSubtrain() {
+	for (int i = 0; i < Subtrains.Num(); i++) {
+		Subtrains[i]->SetIndex(i);
+	}
+}
+
+void ATrain::WeeklyTask() {
+	Super::WeeklyTask();
+	UE_LOG(LogTemp, Log, TEXT("Train::WeeklyTask"));
+}
+
+void ATrain::Save() {
+	Super::Save();
+	UTrainSaveGame* tmp = Cast<UTrainSaveGame>(UGameplayStatics::CreateSaveGameObject(UTrainSaveGame::StaticClass()));
+	tmp->TrainInfo = TrainInfo;
+	tmp->Passenger = Passenger;
+	tmp->DestinationStationId = NextStation.Id;
+	tmp->Status = Status;
+
+	SaveManagerRef->Save(tmp, SaveActorType::Train, TrainInfo.Id);
+}
+
+bool ATrain::Load() {
+	Super::Load();
+	UTrainSaveGame* tmp = Cast<UTrainSaveGame>(SaveManagerRef->Load(SaveActorType::Train, TrainInfo.Id));
+
+	// Load fail
+	if (!IsValid(tmp)) return false;
+
+	TrainInfo = tmp->TrainInfo;
+	Passenger = tmp->Passenger;
+	NextStation.Id = tmp->DestinationStationId;
+	Status = tmp->Status;
+	//Destination = StationManagerRef->GetStationById(tmp->DestinationStationId);
+	LaneRef = LaneManagerRef->Lanes[TrainInfo.ServiceLaneId];
+
+	return true;
+}
+
+void ATrain::FinishLoad() {
+	if (IsLoaded) {
+		Super::FinishLoad();
+		if (IsValid(LaneRef)) {
+			ServiceStart(GetActorLocation(), LaneRef, StationManagerRef->GetStationById(NextStation.Id));
+			UpdatePassengerMesh();
+		}
+		if (TrainInfo.IsUpgrade) {
+			Upgrade();
+		}
+	} else {
+		DespawnTrain();
 	}
 }
 
 void ATrain::AddSubtrain(ASubtrain* T) {
-	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.AddUnique(T);
 	T->AttachToTrain(this);
 	T->SetActorLocation(this->GetActorLocation());
 	UpdateSubtrainDistance();
 	UpdateSubtrainSpeed();
+	IndexingSubtrain();
 }
 

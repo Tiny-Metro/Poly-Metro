@@ -1,8 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Camera/RtsController.h"
+#include "Camera/RtsCamera.h"
 
-void ARtsController::AutoCameraZoomIn_Implementation(FVector Location) {}
-void ARtsController::AutoCameraZoomOut_Implementation(FVector Location) {}
-void ARtsController::GameOverZoomIn_Implementation(FVector Location) {}
+
+ARtsController::ARtsController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Crosshairs;
+}
+
+
+
+void ARtsController::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ARtsController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}

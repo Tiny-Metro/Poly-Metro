@@ -10,6 +10,7 @@
 #include "Lane/Lane.h"
 #include "Station/PathQueue.h"
 #include "Statistics/StatisticsManager.h"
+#include "SaveSystem/TMSaveManager.h"
 #include <Engine/AssetManager.h>
 #include <GameFramework/CharacterMovementComponent.h>
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
@@ -75,17 +76,25 @@ void ATrainTemplate::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LaneManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetLaneManager();
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::BeginPlay"));
+
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	LaneManagerRef = GameModeRef->GetLaneManager();
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	StationManagerRef = GameModeRef->GetStationManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-	TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
-	StatisticsManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStatisticsManager();
+	TrainManagerRef = GameModeRef->GetTrainManager();
+	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+	TimerRef = GameModeRef->GetTimer();
+	SaveManagerRef = GameModeRef->GetSaveManager();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
 	//InitTrainMesh();
 
+	TimerRef->WeeklyTask.AddDynamic(this, &ATrainTemplate::WeeklyTask);
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ATrainTemplate::Save);
 }
 
 void ATrainTemplate::UpdatePassengerMesh() {
@@ -108,7 +117,7 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 		UGameplayStatics::GetPlayerController(GetWorld(), 0),
 		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
 		WorldPosition, WorldDirection);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000000.0f) + WorldPosition,
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 1000000000.0f) + WorldPosition,
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
 	WorldLocation = HitResult.Location;
@@ -118,7 +127,15 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
 	if (IsValid(Lane)) {
+		if (!TrainMaterial.IsValidIndex(Lane->GetLaneId())) {
+			InitTrainMaterial();
+		}
+		if (!PassengerMaterial.IsValidIndex(Lane->GetLaneId())) {
+			InitPassengerMaterial();
+		}
+		//UE_LOG(LogTemp, Log, TEXT("TrainTemplate::SetTrainMaterial %d %d"), TrainMaterial.Num(), PassengerMaterial.Num());
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
+		//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 		for (auto& i : PassengerMeshComponent) {
 			i->SetMaterial(0, PassengerMaterial[Lane->GetLaneId()]);
 		}
@@ -146,11 +163,10 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 		if (!Passenger.Contains(i)) {
 			Passenger.Add(i, P);
 
-			TotalPassenger++;
+			TrainInfo.TotalBoardPassenger++;
+			TrainInfo.WeeklyBoardPassenger++;
 
 			// TODO : Transfer passenger
-			// Get money
-			PlayerStateRef->AddMoney(Fare);
 			{
 				FScopeLock Lock(StatisticsManagerRef->GetDefaultStatisticsKey().Pin().Get());
 				StatisticsManagerRef->DefaultStatistics.TotalArrivePassenger++;
@@ -164,7 +180,7 @@ bool ATrainTemplate::AddPassenger(FPassenger P) {
 }
 
 void ATrainTemplate::UpdatePassengerSlot() {
-	if (IsUpgrade) {
+	if (TrainInfo.IsUpgrade) {
 		for (int i = 0; i < PassengerMeshPositionUpgrade.Num(); i++) {
 			PassengerMeshComponent[i]->SetRelativeLocation(PassengerMeshPositionUpgrade[i]);
 		}
@@ -182,11 +198,21 @@ bool ATrainTemplate::CanUpgrade() const {
 	return false;
 }
 
+int32 ATrainTemplate::GetTotalBoardPassenger() const {
+	return TrainInfo.TotalBoardPassenger;
+}
+
+int32 ATrainTemplate::GetWeeklyBoardPassenger() const {
+	return TrainInfo.WeeklyBoardPassenger;
+}
+
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
-	Destination = D;
+	//Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
-	ServiceLaneId = Lane->GetLaneId();
+	LaneRef = Lane;
+	TrainInfo.ServiceLaneId = Lane->GetLaneId();
+	TrainInfo.ShiftCount++;
 	UpdateTrainMesh();
 }
 
@@ -202,7 +228,7 @@ void ATrainTemplate::DropPassenger() {
 
 	if (IsValid(CurrentStationPointer)) {
 		for (auto& i : Passenger) {
-			CurrentStationPointer->GetOffPassenger(i.Value);
+			CurrentStationPointer->GetOffPassenger(i.Value, this);
 			Passenger.Remove(i.Key);
 			UpdatePassengerMesh();
 		}
@@ -230,7 +256,7 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 					PassengerRoute.Dequeue();
 					//Passenger[i]->SetPassengerPath(PassengerRoute);
 				} else {
-					Station->GetOffPassenger(Passenger[i]);
+					Station->GetOffPassenger(Passenger[i], this);
 					//Passenger.Add(i, nullptr);
 					Passenger.Remove(i);
 					//Passenger.Remove(i);
@@ -239,7 +265,7 @@ void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
 					return;
 				}
 			} else {
-				Station->GetOffPassenger(Passenger[i]);
+				Station->GetOffPassenger(Passenger[i], this);
 				//Passenger.Add(i, nullptr);
 				Passenger.Remove(i);
 				UpdatePassengerMesh();
@@ -288,12 +314,47 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	TouchTime = 0.0f;
 }
 
+int32 ATrainTemplate::GetShiftCount() const {
+	return TrainInfo.ShiftCount;
+}
+
 void ATrainTemplate::SetDespawnNextStation() {
 	DeferredDespawn = true;
 }
 
+FTrainInfo ATrainTemplate::GetTrainInfo() {
+	return TrainInfo;
+}
+
 void ATrainTemplate::SetTrainInfoWidget(UTrainInfoWidget* Widget) {
 	TrainInfoWidget = Widget;
+}
+
+// Broadcast by TimerRef
+void ATrainTemplate::WeeklyTask() {
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::WeeklyTask"));
+	TrainInfo.WeeklyBoardPassenger = 0;
+}
+
+void ATrainTemplate::Save() {
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
+	if (!IsValid(LaneManagerRef)) LaneManagerRef = GameModeRef->GetLaneManager();
+	if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
+}
+
+bool ATrainTemplate::Load() {
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
+	if (!IsValid(LaneManagerRef)) LaneManagerRef = GameModeRef->GetLaneManager();
+	if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
+	IsLoaded = true;
+	return false;
+}
+
+void ATrainTemplate::FinishLoad() {
 }
 
 // Called every frame
@@ -325,9 +386,11 @@ void ATrainTemplate::Tick(float DeltaTime)
 			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
 		LaneRef = Cast<ALane>(MouseToWorldActor);
 		SetTrainMaterial(LaneRef);
-		if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
-			MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
-			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		if (IsValid(MouseToWorldActor)) {
+			if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
+				MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
+				LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+			}
 		}
 
 	} else {
@@ -355,6 +418,9 @@ void ATrainTemplate::InitTrainMaterial() {
 	);*/
 
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetTrainMaterial();
+	for (int i = 1; i < TrainMaterial.Num() - 1; i++) {
+		TrainMaterial.RemoveAt(i);
+	}
 	TrainMaterial.Append(tmp);
 }
 
@@ -381,6 +447,9 @@ void ATrainTemplate::TrainMaterialDeferred() {
 
 void ATrainTemplate::InitPassengerMaterial() {
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetPassengerMaterial();
+	for (int i = 1; i < PassengerMaterial.Num() - 1; i++) {
+		PassengerMaterial.RemoveAt(i);
+	}
 	PassengerMaterial.Append(tmp);
 }
 
@@ -389,19 +458,19 @@ void ATrainTemplate::SetTrainSpeed(float Speed) {
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {
-	TrainId = Id;
+	TrainInfo.Id = Id;
 }
 
 int32 ATrainTemplate::GetTrainId() const {
-	return TrainId;
+	return TrainInfo.Id;
 }
 
 void ATrainTemplate::SetServiceLaneId(int32 Id) {
-	ServiceLaneId = Id;
+	TrainInfo.ServiceLaneId = Id;
 }
 
 int32 ATrainTemplate::GetServiceLaneId() const {
-	return ServiceLaneId;
+	return TrainInfo.ServiceLaneId;
 }
 
 void ATrainTemplate::SetTrainDirection(TrainDirection Dir) {
@@ -413,14 +482,14 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 }
 
 void ATrainTemplate::Upgrade() {
-	IsUpgrade = true;
+	TrainInfo.IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
 	SetTrainSpeed(TRAIN_UPGRADE_SPEED);
 	UpdateTrainMesh();
 }
 
 bool ATrainTemplate::GetIsUpgrade() const {
-	return IsUpgrade;
+	return TrainInfo.IsUpgrade;
 }
 
 void ATrainTemplate::Test() {

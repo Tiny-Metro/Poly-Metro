@@ -9,6 +9,9 @@
 #include "../Station/StationManager.h"
 #include "LaneManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLaneSelectDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLaneCancelDelegate);
+
 UCLASS()
 class TINYMETRO_API ALaneManager : public AActor
 {
@@ -41,9 +44,11 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool IsPlacementValid;
 
-	UPROPERTY(BlueprintReadWrite)
-	int32 SelectedLaneNum;
+	UPROPERTY(BlueprintAssignable)
+	FLaneSelectDelegate LaneSelectDelegate;
 
+	UPROPERTY(BlueprintAssignable)
+	FLaneCancelDelegate LaneCancelDelegate;
 
 protected:
 
@@ -70,6 +75,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> LaneMaterialPath;
 
+	UPROPERTY(BlueprintReadOnly)
+	int32 SelectedLaneNum;
+
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly)
+	int32 UILaneNum;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetCanAssginBridge(bool AssginBridge);
@@ -86,7 +97,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveDestroyedLane(int LaneNum);
 
+	UFUNCTION(BlueprintCallable)
+	void SetUILaneNum(int32 Num);
 
+	UFUNCTION(BlueprintCallable)
+	int32 GetUILaneNum();
+
+	UFUNCTION(BlueprintCallable)
+	void SetSelectedLaneNum(int32 Num);
 
 public:
 	UFUNCTION(BlueprintCallable)

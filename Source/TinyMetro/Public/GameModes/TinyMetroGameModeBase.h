@@ -55,6 +55,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class AStatisticsManager* GetStatisticsManager() const;
 
+	// Test
+	UFUNCTION(BlueprintCallable)
+	void TestFunction();
+
 protected:
 	UPROPERTY(Config)
 	int32 TestValue;

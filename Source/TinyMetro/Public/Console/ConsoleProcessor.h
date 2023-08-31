@@ -54,5 +54,7 @@ protected:
 	class ABank* BankRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATinyMetroEventManager* EventManagerRef;
 
 };

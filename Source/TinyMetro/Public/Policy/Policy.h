@@ -9,7 +9,7 @@
 #include "Policy.generated.h"
 
 
-class AStationManager;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPolicyUpdateTask);
 
 UCLASS()
 class TINYMETRO_API APolicy : public AActor
@@ -27,13 +27,22 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void InitPolicy();
+
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
 
 protected :
 	UPROPERTY(VisibleAnywhere, Category = "Policy data")
 	FPolicyData PolicyData;
 
 	UPROPERTY()
-	AStationManager* StationManagerRef;
+	class AStationManager* StationManagerRef;
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef;
 
 public :
 	UPROPERTY(VisibleAnywhere, Category = "Policy data")
@@ -45,7 +54,9 @@ public :
 		FServiceData(4, -1, 3),
 		FServiceData(5, -2, 4)
 	};
-	
+
+	UPROPERTY(BlueprintAssignable)
+	FPolicyUpdateTask PolicyUpdateTask;
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Policy")
@@ -62,6 +73,8 @@ public :
 	void SetTransfer(bool Flag);
 
 public :
+	UFUNCTION(BlueprintCallable, Category = "Policy")
+	FPolicyData GetPolicyData() const;
 	UFUNCTION(BlueprintCallable, Category = "Policy")
 	int GetServiceCostLevel();
 	UFUNCTION(BlueprintCallable, Category = "Policy")
@@ -91,14 +104,4 @@ public :
 
 public :
 	int32 CalculateComplainPercentage();
-
-public:
-	void InitPolicy();
-
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "Policy data")
-	float TotalComplainIncrease = 0.0f;
-	UPROPERTY(VisibleAnywhere, Category = "Policy data")
-	int32 TotalCost = 0.0f;
-
 };

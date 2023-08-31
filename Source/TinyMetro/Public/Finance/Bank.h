@@ -8,6 +8,8 @@
 #include "Investment.h"
 #include "Bank.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInvestmentUpdateTask);
+
 UCLASS()
 class TINYMETRO_API ABank : public AActor
 {
@@ -25,36 +27,42 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// UFunction loan
+	// Function loan
 	UFUNCTION(BlueprintCallable)
 	TArray<ULoan*> GetAllLoan() const;
-public:
-	// UFunction investment
+	ULoan* CreateLoan(FLoanData Data, TFunction<bool(void)> Func);
+	UFUNCTION()
+	void InitLoan();
+
+	// Function investment
+	UFUNCTION()
+	void InitInvestment();
+	UFUNCTION()
+	void ChangeInvestment();
+	UFUNCTION(BlueprintCallable)
+	void ChangeAllInvestment();
 	UFUNCTION(BlueprintCallable)
 	int32 GetInvestmentStock() const;
-	UFUNCTION(BlueprintCallable)
-	TArray<UInvestment*> GetAllInvestment() const;
-	UFUNCTION(BlueprintCallable)
-	TArray<UInvestment*> GetAvailableInvestment() const;
-	UFUNCTION(BlueprintCallable)
-	TArray<UInvestment*> RefreshInvestment();
-	UFUNCTION(BlueprintCallable)
-	void UpdateInvestment();
+	UFUNCTION()
+	void UpdateInvestmentCandidate();
+	UFUNCTION()
+	void RemoveFinishedInvestment();
+
+	// Broadcast by Timer
 	UFUNCTION(BlueprintCallable)
 	void DailyTask();
+	UFUNCTION(BlueprintCallable)
+	void WeeklyTask();
 
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	bool Load();
 
-protected:
-	// Function loan
-	ULoan* CreateLoan(FLoanData Data, TFunction<bool(void)> Func);
-	void InitLoan();
-protected:
-	// Function investment
-	void InitInvestment();
-	//UInvestment* CreateInvestment(FInvestmentData Data, TFunction<InvestmentResult(void)> Func);
-	void ChangeInvestment(int Index);
-	void ChangeAllInvestment();
-
+	// Delegate
+	UPROPERTY(BlueprintAssignable)
+	FInvestmentUpdateTask InvestmentUpdateTask;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
@@ -65,24 +73,34 @@ protected:
 	ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY(VisibleAnywhere)
 	class UInvestmentLuaState* LuaState;
+	UPROPERTY(VisibleAnywhere)
+	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere)
+	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY(VisibleAnywhere)
+	class AStatisticsManager* StatisticsManagerRef;
+
+	UPROPERTY(VisibleAnywhere)
+	bool IsLoadSuccess = false;
 
 protected:
 	// For loan
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ULoan*> Loan;
-	//UPROPERTY(BlueprintReadOnly)
-	//ATinyMetroGameModeBase* GameMode;
 
 protected:
 	// For investment
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
 	int32 InvestmentStock = 1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	TArray<UInvestment*> Investment;
+	TMap<int32, UInvestment*> Investment;
+	// Store appearable investment Id
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	TArray<int32> AvailInvestment;
+	TArray<int32> InvestmentCandidate;
+	// Store investment Id what visible in UI
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	TArray<int32> VisibleInvestmentIndex;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
 	int32 MaxInvestmetStock = 3;
-	FTimerHandle InvestmentUpdateHandle;
 
 };

@@ -31,6 +31,8 @@ public:
 	void SkipTime(int32 Skipday = 1);
 	UFUNCTION(BlueprintCallable)
 	FTimestamp GetTimestamp();
+	UFUNCTION(BlueprintCallable)
+	int32 GetDaytime() const;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")

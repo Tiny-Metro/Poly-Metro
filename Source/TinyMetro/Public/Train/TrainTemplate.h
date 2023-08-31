@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TrainDirection.h"
+#include "TrainInfo.h"
 #include "../Station/StationInfo.h"
 #include "../Station/Passenger.h"
 #include "TrainTemplate.generated.h"
@@ -97,6 +98,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanUpgrade() const;
 
+	// Return class field { TotalBoardPassenger, WeeklyBoardPassenger }
+	UFUNCTION(BlueprintCallable)
+	int32 GetTotalBoardPassenger() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetWeeklyBoardPassenger() const;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ServiceStart(FVector StartLocation, class ALane* Lane, UPARAM(DisplayName = "Destination")class AStation* D);
@@ -123,19 +129,35 @@ public:
 	virtual void TrainOnPressed(AActor* Target, FKey ButtonPressed);
 	UFUNCTION()
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
+	UFUNCTION(BlueprintCallable)
+	int32 GetShiftCount() const;
 
 	UFUNCTION()
 	void SetDespawnNextStation();
 
+	UFUNCTION(BlueprintCallable)
+	FTrainInfo GetTrainInfo();
 	UFUNCTION()
 	void SetTrainInfoWidget(class UTrainInfoWidget* Widget);
 
+	// Weekly tasks
+	UFUNCTION()
+	virtual void WeeklyTask();
+
+	// Save & Load
+	UFUNCTION()
+	virtual void Save();
+	UFUNCTION()
+	virtual bool Load();
+	UFUNCTION()
+	virtual void FinishLoad();
+
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 TrainId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 ServiceLaneId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	FTrainInfo TrainInfo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALane* LaneRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALaneManager* LaneManagerRef;
@@ -150,14 +172,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TMap<int32, FPassenger> Passenger;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> LineTraceIgnoreActors;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	bool IsUpgrade = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorDragged = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -166,8 +190,6 @@ protected:
 	float LongClickInterval;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float TotalTravel = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 TotalPassenger = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	int32 MaxPassengerSlotUpgrade = 8;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -178,11 +200,8 @@ protected:
 	FStationInfo CurrentStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FStationInfo NextStation;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	class AStation* Destination;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	int32 Fare = 2;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	//class AStation* Destination;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
@@ -215,6 +234,10 @@ protected:
 	
 	// Check click & longclick
 	bool IsSingleClick = false;
+
+	// Save & Load flag
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsLoaded = false;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

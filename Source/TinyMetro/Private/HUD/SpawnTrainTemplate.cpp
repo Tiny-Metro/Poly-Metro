@@ -6,6 +6,7 @@
 #include "GridGenerator/GridManager.h"
 #include "Station/StationManager.h"
 #include "Train/TrainManager.h"
+#include "Statistics/StatisticsManager.h"
 #include <UMG/Public/Blueprint/WidgetLayoutLibrary.h>
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetSystemLibrary.h>
@@ -21,7 +22,7 @@ void USpawnTrainTemplate::NativeConstruct() {
 	TrainManagerRef = GameModeRef->GetTrainManager();
 	LaneManagerRef = GameModeRef->GetLaneManager();
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 }
 
 AActor* USpawnTrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocation) {

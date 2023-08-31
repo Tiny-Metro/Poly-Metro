@@ -16,6 +16,11 @@
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/HUD.h>
 
+// Test include
+#include "Lua/InvestmentLuaState.h"
+#include "Lua/EventLuaState.h"
+#include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
+
 ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
     PlayerStateClass = ATinyMetroPlayerState::StaticClass();
     static ConstructorHelpers::FClassFinder<APawn> RTS_Camera(
@@ -74,7 +79,9 @@ void ATinyMetroGameModeBase::StartPlay() {
     LaneManager = GetWorld()->SpawnActor<ALaneManager>();
     LaneManager->Load();
     TrainManager = GetWorld()->SpawnActor<ATrainManager>();
+    TrainManager->Load();
     Policy = GetWorld()->SpawnActor<APolicy>();
+    Policy->Load();
     Bank = GetWorld()->SpawnActor<ABank>();
     Timer = GetWorld()->SpawnActor<ATimer>();
     Shop = GetWorld()->SpawnActor<AShop>();
@@ -163,4 +170,24 @@ ATinyMetroEventManager* ATinyMetroGameModeBase::GetEventManager() const {
 
 AStatisticsManager* ATinyMetroGameModeBase::GetStatisticsManager() const {
     return StatisticsManager;
+}
+
+void ATinyMetroGameModeBase::TestFunction() {
+    UInvestmentLuaState* InvestmentLuaState = UInvestmentLuaState::CreateInstance(GetWorld());
+    UEventLuaState* EventLuaState = UEventLuaState::CreateInstance(GetWorld());
+
+    FString ScriptDirectory = TEXT("Script");
+    ScriptDirectory.Append(FGenericPlatformMisc::GetDefaultPathSeparator());
+
+    FString ScriptFileName = TEXT("TestScript.lua");
+    ScriptDirectory.Append(ScriptFileName);
+
+    auto readLua = ULuaBlueprintFunctionLibrary::LuaRunFile(GetWorld(), InvestmentLuaState->GetSelfLuaState(),
+        ScriptDirectory, false);
+
+    auto readLuaEvent = ULuaBlueprintFunctionLibrary::LuaRunFile(GetWorld(), EventLuaState->GetSelfLuaState(),
+        ScriptDirectory, false);
+
+    auto luaFunction = ULuaBlueprintFunctionLibrary::LuaGlobalCall(GetWorld(), EventLuaState->GetClass(),
+        TEXT("TestFunction"), TArray<FLuaValue>());
 }

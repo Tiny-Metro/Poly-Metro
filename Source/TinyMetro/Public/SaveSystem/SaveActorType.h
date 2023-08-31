@@ -19,4 +19,5 @@ enum class SaveActorType : uint8
 	StatisticsManager = 6 UMETA(DisplayName = "StatisticsManager"),
 	BridgeTunnelManager = 7 UMETA(DisplayName = "BridgeTunnelManager"),
 	BridgeTunnel = 8 UMETA(DisplayName = "BridgeTunnel")
+	Policy = 9 UMETA(DisplayName = "Policy")
 };

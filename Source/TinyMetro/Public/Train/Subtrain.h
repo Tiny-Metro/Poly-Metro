@@ -44,6 +44,18 @@ public:
 	void DetachFromTrain();
 	UFUNCTION(BlueprintCallable)
 	void AttachToTrain(class ATrain* Train);
+	UFUNCTION(BlueprintCallable)
+	void SetIndex(int32 Idx);
+	UFUNCTION(BlueprintCallable)
+	int32 GetIndex() const;
+
+	// Weekly tasks
+	virtual void WeeklyTask() override;
+
+	// Save & Load
+	virtual void Save();
+	virtual bool Load();
+	virtual void FinishLoad();
 
 protected:
 	virtual void BeginPlay() override;
@@ -53,9 +65,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 OwnerTrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
-	class ATrain* TrainRef;
+	class ATrain* OwnerTrainRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
-	class ATrain* OwnerTrain;
+	int32 Index = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class ASubtrainAiController* AiControllerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

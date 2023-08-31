@@ -2,7 +2,9 @@
 
 
 #include "Policy/Policy.h"
+#include "Policy/PolicySaveGame.h"
 #include "Station/StationManager.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -19,10 +21,13 @@ void APolicy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
-
+	auto GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if( !IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	
 	InitPolicy();
 	
+	SaveManagerRef->SaveTask.AddDynamic(this, &APolicy::Save);
 }
 
 // Called every frame
@@ -32,40 +37,63 @@ void APolicy::Tick(float DeltaTime)
 
 }
 
+void APolicy::InitPolicy() {
+	SetServiceCostLevel(PolicyData.ServiceCostLevel);
+	SetPrioritySeat(PolicyData.PrioritySeat);
+	SetCCTV(PolicyData.HasCCTV);
+	SetElevator(PolicyData.HasElevator);
+	SetBicycle(PolicyData.HasBicycle);
+	SetTransfer(PolicyData.HasTransfer);
+}
+
+void APolicy::Save() {
+	UPolicySaveGame* tmp = Cast<UPolicySaveGame>(UGameplayStatics::CreateSaveGameObject(UPolicySaveGame::StaticClass()));
+
+	tmp->PolicyData = PolicyData;
+
+	SaveManagerRef->Save(tmp, SaveActorType::Policy);
+}
+
+void APolicy::Load() {
+	UPolicySaveGame* tmp = Cast<UPolicySaveGame>(SaveManagerRef->Load(SaveActorType::Policy));
+
+	if (!IsValid(tmp)) return;
+
+	PolicyData = tmp->PolicyData;
+}
+
 void APolicy::SetServiceCostLevel(int costLevel) {
 	PolicyData.ServiceCostLevel = costLevel;
-
-	StationManagerRef->SetServiceData(ServiceLevel[costLevel]);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetPrioritySeat(bool Flag) {
 	PolicyData.PrioritySeat = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.05 * (Flag ? 1 : -1), -1);
-	// TODO : Imple in StationManager
-	//StationManagerRef->AddFreePassengerSpawnProbability(0.2 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetCCTV(bool Flag) {
 	PolicyData.HasCCTV = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.1 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetElevator(bool Flag) {
 	PolicyData.HasElevator = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.15 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetBicycle(bool Flag) {
 	PolicyData.HasBicycle = Flag;
-	// TODO : Imple in StationManager
-	//StationManagerRef->AddPassengerSpawnProbability(0.1 * (Flag ? 1 : -1), -1);
-	StationManagerRef->AddComplainIncreaseRate(0.1 * (Flag ? 1 : -1), -1);
+	PolicyUpdateTask.Broadcast();
 }
 
 void APolicy::SetTransfer(bool Flag) {
 	PolicyData.HasTransfer = Flag;
-	StationManagerRef->AddComplainIncreaseRate(-0.2 * (Flag ? 1 : -1), -1);
-	StationManagerRef->SetTransfer(Flag);
+	PolicyUpdateTask.Broadcast();
+}
+
+FPolicyData APolicy::GetPolicyData() const {
+	return PolicyData;
 }
 
 int APolicy::GetServiceCostLevel() {
@@ -140,14 +168,4 @@ int32 APolicy::CalculateComplainPercentage() {
 	}
 
 	return currentPercentage;
-}
-
-
-void APolicy::InitPolicy() {
-	PolicyData.ServiceCostLevel = 3;
-	PolicyData.PrioritySeat = false;
-	PolicyData.HasCCTV = false;
-	PolicyData.HasElevator = false;
-	PolicyData.HasBicycle = false;
-	PolicyData.HasTransfer = false;
 }

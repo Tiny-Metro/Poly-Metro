@@ -6,6 +6,7 @@
 #include "GridGenerator/GridManager.h"
 #include "Finance/Bank.h"
 #include "Timer/Timer.h"
+#include "Event/TinyMetroEventManager.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -21,11 +22,13 @@ AConsoleProcessor::AConsoleProcessor()
 void AConsoleProcessor::BeginPlay()
 {
 	Super::BeginPlay();
-	StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	auto GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	BankRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetBank();
-	TimerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTimer();
+	StationManagerRef = GameModeRef->GetStationManager();
+	BankRef = GameModeRef->GetBank();
+	TimerRef = GameModeRef->GetTimer();
+	EventManagerRef = GameModeRef->GetEventManager();
 }
 
 void AConsoleProcessor::TextTest(FText Txt) {
@@ -40,10 +43,10 @@ void AConsoleProcessor::StringTest(FString Str) {
 // Command : passenger_info {stationId}
 // Return : Total Passenger : [], Wait Passenger : [], {Type Passengers} 
 FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) {
-	int32 TotalPassenger, WaitPassenger;
-	TMap<StationType, int32> passengerStatistics;
-	FString result = TEXT("");
-	if (Cmd.Num() == 1) {
+	//int32 TotalPassenger, WaitPassenger;
+	//TMap<StationType, int32> passengerStatistics;
+	FString result = TEXT("Not implemented command");
+	/*if (Cmd.Num() == 1) {
 		Success = true;
 		passengerStatistics = StationManagerRef->GetSpawnPassengerStatistics(TotalPassenger, WaitPassenger);
 	} else {
@@ -68,7 +71,7 @@ FString AConsoleProcessor::CmdPassengerInfo(TArray<FString> Cmd, bool& Success) 
 			result += enumPtr->GetNameStringByIndex((int32)i.Key);
 			result += " : " + FString::FromInt(i.Value) + "\n";
 		}
-	}
+	}*/
 
 	return result;
 }
@@ -89,8 +92,27 @@ FString AConsoleProcessor::CmdMoney(TArray<FString> Cmd, bool& Success) {
 	return result;
 }
 
+// event : Occur random event
+// evnet {event_id} : Occur {event_id} event
 FString AConsoleProcessor::CmdOccurEvent(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	if (Cmd.IsValidIndex(1)) {
+		// event {event_id}
+		int32 eventId = FCString::Atoi((*Cmd[1]));
+		if (EventManagerRef->OccurSpecificEvent(eventId)) {
+			Success = true;
+			return FString::Printf(TEXT("Event %d is occured"), eventId);
+		} else {
+			Success = false;
+			return TEXT("Invalid ID");
+		}
+	} else {
+		// event
+		EventManagerRef->UpdateEventWeight();
+		EventManagerRef->OccurEvent();
+
+		Success = true;
+		return TEXT("Random event occured");
+	}
 }
 
 // add_station : Spawn random station at random point
@@ -489,7 +511,7 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 		} else if (splitStr[0] == TEXT("money")) {
 			Result = CmdMoney(splitStr, Success);
 		} else if (splitStr[0] == TEXT("event")) {
-			// TODO : event command
+			Result = CmdOccurEvent(splitStr, Success);
 		} else if (splitStr[0] == TEXT("add_station")) {
 			Result = CmdAddStation(splitStr, Success);
 		} else if (splitStr[0] == TEXT("del_station")) {

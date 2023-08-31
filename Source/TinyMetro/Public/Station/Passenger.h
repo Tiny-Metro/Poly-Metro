@@ -29,6 +29,10 @@ public:
 	bool IsFree;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<bool> RandomFree = {true, false, false, false, false};
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool IsAlreadyPaid = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float WaitTime = 0.0f;
 	
 	//PathQueue ShortestPath;
 

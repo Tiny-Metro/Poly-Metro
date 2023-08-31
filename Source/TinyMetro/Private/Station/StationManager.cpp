@@ -9,6 +9,9 @@
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSpawnBorderWidget.h"
 #include "Station/StationManagerSaveGame.h"
+#include "Statistics/StatisticsManager.h"
+#include "Policy/Policy.h"
+#include "Event/TinyMetroEventManager.h"
 #include "SaveSystem/TMSaveManager.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
@@ -25,6 +28,18 @@ AStationManager::AStationManager()
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
 	AdjList = NewObject<UAdjList>();
+
+	// Init Floyd-Warshall
+	// Init adj matrix
+	FAdjArray adjTmp;
+	adjTmp.Init(TNumericLimits<float>::Max(), 301);
+	adj.Init(adjTmp, 301);
+
+	// Init path array
+	FPath pathTmp;
+	pathTmp.Init(-1, 301);
+	AdjPath.Init(pathTmp, 301);
+	AdjDist.Init(adjTmp, 301);
 }
 
 // Called when the game starts or when spawned
@@ -35,9 +50,10 @@ void AStationManager::BeginPlay()
 	// Init default data
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	PlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
-	PolicyRef = GameMode->GetPolicy();
 	SaveManagerRef = GameMode->GetSaveManager();
 	TimerRef = GameMode->GetTimer();
+	PolicyRef = GameMode->GetPolicy();
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -46,11 +62,6 @@ void AStationManager::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Valid"));
 	} else {
 		UE_LOG(LogTemp, Log, TEXT("PlayerState Invalid"));
-	}
-	if (IsValid(PolicyRef)) {
-		UE_LOG(LogTemp, Log, TEXT("Policy Valid"));
-	} else {
-		UE_LOG(LogTemp, Log, TEXT("Policy Invalid"));
 	}
 
 	// Init info widget
@@ -82,24 +93,17 @@ void AStationManager::BeginPlay()
 		}
 	}
 
-	// Init Floyd-Warshall
-	// Init adj matrix
-	FAdjArray adjTmp;
-	adjTmp.Init(TNumericLimits<float>::Max(), 301);
-	adj.Init(adjTmp, 301);
-
-	// Init path array
-	FPath pathTmp;
-	pathTmp.Init(-1, 301);
-	AdjPath.Init(pathTmp, 301);
-	AdjDist.Init(adjTmp, 301);
-
 	// Register Timer tasks
 	GameMode->GetTimer()->DailyTask.AddDynamic(this, &AStationManager::DailyTask);
 	GameMode->GetTimer()->WeeklyTask.AddDynamic(this, &AStationManager::WeeklyTask);
 
-	SaveManagerRef->SaveTask.AddDynamic(this, &AStationManager::Save);
+	// Register Policy update
+	PolicyRef->PolicyUpdateTask.AddDynamic(this, &AStationManager::UpdatePolicy);
 
+	// Register Event end
+	GameMode->GetEventManager()->EventEndTask.AddDynamic(this, &AStationManager::EventEnd);
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &AStationManager::Save);
 }
 
 void AStationManager::TestFunction() {
@@ -111,14 +115,44 @@ void AStationManager::TestFunction() {
 			FString::Printf(TEXT(":)")));
 }
 
-StationType AStationManager::CalculatePassengerDest(StationType Except) const {
-	StationType tmp;
+void AStationManager::AddPassegnerSpawnProbabilityByEvent(float Amount) {
+	AdditionalPassengerSpawnProbabilityByEvent += Amount;
+}
 
-	do {
-		tmp = Station[FMath::RandRange(0, Station.Num()-1)]->GetStationType();
-	} while (tmp == Except);
+bool AStationManager::CalculatePassegnerSpawnProbability() const {
+	if (FMath::RandRange(0.0f, 1.0f) >= (PassengerSpawnProbability + AdditionalPassengerSpawnProbabilityByEvent + AdditionalPassengerSpawnProbabilityByPolicy)) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
-	return tmp;
+bool AStationManager::CalculateFreePassegnerSpawnProbability() const {
+	if (FMath::RandRange(0.0f, 1.0f) >= (FreePassengerSpawnProbability + FreePassengerSpawnProbabilityByEvent + FreePassengerSpawnProbabilityByPolicy)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void AStationManager::AddPassengerDestinationTypeWeight(StationType Type, float Amount) {
+	if (Type == StationType::None) return;
+	PassengerDestinationTypeWeight[Type] += Amount;
+}
+
+StationType AStationManager::CalculatePassengerDestination(StationType Except) const {
+	TArray<StationType> arr;
+	
+	for (auto& i : Station) {
+		auto tmpType = i->GetStationType();
+		if (Except != tmpType) {
+			for (int count = 0;  count < PassengerDestinationTypeWeight[tmpType] * 100; count++) {
+				arr.Add(tmpType);
+			}
+		}
+	}
+
+	return arr[FMath::RandRange(0, arr.Num() - 1)];
 }
 
 float AStationManager::GetComplainAverage() {
@@ -243,6 +277,18 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 }
 
+void AStationManager::DestroyRandomStation() {
+	int index = 0;
+
+	// Select random station not destroyed
+	do {
+		index = FMath::RandRange(0, Station.Num() - 1);
+	} while (!Station[index]->GetStationInfo().IsDestroyed);
+
+	// Destroy
+	Station[index]->SetStationState(StationState::Destroyed);
+}
+
 void AStationManager::StationSpawnRoutine(float DeltaTime) {
 	// Spawn routine
 	// Add time
@@ -255,10 +301,6 @@ void AStationManager::StationSpawnRoutine(float DeltaTime) {
 		// Initialize time
 		StationSpawnCurrent -= StationSpawnRequire;
 	}
-}
-
-void AStationManager::PolicyMaintenanceRoutine() {
-
 }
 
 void AStationManager::AddAdjListItem(AStation* Start, AStation* End, float Length)
@@ -316,6 +358,15 @@ TArray<AStation*> AStationManager::GetAllStations() {
 	return Station;
 }
 
+TArray<FStationInfo> AStationManager::GetAllStationInfo() {
+	TArray<FStationInfo> arr;
+	for (auto& i : Station) {
+		arr.Add(i->GetStationInfo());
+	}
+
+	return arr;
+}
+
 PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
 	if (ShortestPath.Find(Start) == nullptr) {
 		return PathQueue();
@@ -324,9 +375,6 @@ PathQueue AStationManager::GetShortestPath(int32 Start, StationType Type) {
 		return PathQueue();
 	}
 	return ShortestPath[Start][Type];
-}
-
-void AStationManager::PassengerPropertyTick(float DeltaTime) {
 }
 
 float AStationManager::GetDefaultPassengerSpawnSpeed() const {
@@ -348,41 +396,18 @@ float AStationManager::GetPassengerSpawnSpeed(StationType Type) const {
 		float addFactor = 0.0f;
 		float multiFactor = 1.0f;
 
-		// Calc multiple factor
-		for (auto& i : MultiplePassengerSpawnSpeedArr[Type]) {
-			multiFactor *= i.Key;
-		}
-
-		// Calc add factor
-		for (auto& i : AddPassengerSpawnSpeedArr[Type]) {
-			addFactor += i.Key;
-		}
-
-		return PassengerSpawnSpeed[Type] * multiFactor + addFactor;
+		return multiFactor + addFactor;
 	}
 }
 
-void AStationManager::AddComplainIncreaseRate(float Rate, int32 Period) {
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Active) {
-				i->AddComplainIncreaseRate(Rate, Period);
-			}
-		}
-	}
+void AStationManager::AddComplainIncreaseRateByEvent(float Rate) {
+	ComplainIncreaseRateByEvent += Rate;
 }
 
-void AStationManager::SetServiceData(FServiceData _ServiceData) {
-	ServiceData = _ServiceData;
-}
-
-void AStationManager::NotifySpawnPassenger(StationType Type, bool IsFree) {
-	if (IsFree) {
-		TotalSpawnPassengerFree[Type]++;
-	} else {
-		TotalSpawnPassengerNotFree[Type]++;
-	}
-	TotalSpawnPassenger[Type]++;
+float AStationManager::GetComplainIncreaseRate() const {
+	return ComplainIncreaseRate + 
+		ComplainIncreaseRateByEvent + 
+		ComplainIncreaseRateByPolicy;
 }
 
 void AStationManager::SetPassengerSpawnEnable(bool Flag) {
@@ -396,236 +421,12 @@ bool AStationManager::GetPassengerSpawnEnable() const {
 	return IsPassengerSpawnEnable;
 }
 
-int32 AStationManager::GetTotalPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		auto passenger = i->GetSpawnTotalPassenger();
-		if (Type == StationType::None) {
-			for (auto& j : passenger) {
-				result += j.Value;
-			}
-		} else {
-			result += passenger[Type];
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetFreePassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		auto passenger = i->GetSpawnFreePassenger();
-		if (Type == StationType::None) {
-			for (auto& j : passenger) {
-				result += j.Value;
-			}
-		} else {
-			result += passenger[Type];
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetPaidPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		auto passenger = i->GetSpawnPaidPassenger();
-		if (Type == StationType::None) {
-			for (auto& j : passenger) {
-				result += j.Value;
-			}
-		} else {
-			result += passenger[Type];
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetArriveTotalPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (Type == StationType::None) {
-			result += i->GetArriveTotalPassengerCount();
-		} else {
-			if (i->GetStationType() == Type) {
-				result += i->GetArriveTotalPassengerCount();
-			}
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetArriveFreePassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (Type == StationType::None) {
-			result += i->GetArriveFreePassengerCount();
-		} else {
-			if (i->GetStationType() == Type) {
-				result += i->GetArriveFreePassengerCount();
-			}
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetArrivePaidPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (Type == StationType::None) {
-			result += i->GetArrivePaidPassengerCount();
-		} else {
-			if (i->GetStationType() == Type) {
-				result += i->GetArrivePaidPassengerCount();
-			}
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetWaitTotalPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (Type == StationType::None) {
-			result += i->GetWaitTotalPassengerCount();
-		} else {
-			if (i->GetStationType() == Type) {
-				result += i->GetWaitTotalPassengerCount();
-			}
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetWaitFreePassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (Type == StationType::None) {
-			result += i->GetWaitFreePassengerCount();
-		} else {
-			if (i->GetStationType() == Type) {
-				result += i->GetWaitFreePassengerCount();
-			}
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetWaitPaidPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (Type == StationType::None) {
-			result += i->GetWaitPaidPassengerCount();
-		} else {
-			if (i->GetStationType() == Type) {
-				result += i->GetWaitPaidPassengerCount();
-			}
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetDestroyedTotalPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		auto passenger = i->GetDestroyedTotalPassenger();
-		if (Type == StationType::None) {
-			for (auto& j : passenger) {
-				result += j.Value;
-			}
-		} else {
-			result += passenger[Type];
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetDestroyedFreePassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		auto passenger = i->GetDestroyedFreePassenger();
-		if (Type == StationType::None) {
-			for (auto& j : passenger) {
-				result += j.Value;
-			}
-		} else {
-			result += passenger[Type];
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetDestroyedPaidPassengerCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		auto passenger = i->GetDestroyedPaidPassenger();
-		if (Type == StationType::None) {
-			for (auto& j : passenger) {
-				result += j.Value;
-			}
-		} else {
-			result += passenger[Type];
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetRideTotalPassengerCount(StationType Type) const {
-	return GetTotalPassengerCount(Type) 
-		- GetArriveTotalPassengerCount(Type)
-		- GetWaitTotalPassengerCount(Type)
-		- GetDestroyedTotalPassengerCount(Type);
-}
-
-int32 AStationManager::GetRideFreePassengerCount(StationType Type) const {
-	return GetFreePassengerCount(Type)
-		- GetArriveFreePassengerCount(Type)
-		- GetWaitFreePassengerCount(Type)
-		- GetDestroyedFreePassengerCount(Type);
-}
-
-int32 AStationManager::GetRidePaidPassengerCount(StationType Type) const {
-	return GetPaidPassengerCount(Type)
-		- GetArrivePaidPassengerCount(Type)
-		- GetWaitPaidPassengerCount(Type)
-		- GetDestroyedPaidPassengerCount(Type);
-}
-
-TMap<StationType, int32> AStationManager::GetSpawnPassengerStatistics(int32& TotalPassenger, int32& WaitPassenger, int32 SID) {
-	TMap<StationType, int32> result;
-	TotalPassenger = 0;
-	WaitPassenger = 0;
-	if (SID == -1) {
-		result = TotalSpawnPassenger;
-		for (auto& i : Station) {
-			WaitPassenger += i->GetWaitPassenger();
-		}
-	} else {
-		auto station = GetStationById(SID);
-		if (IsValid(station)) {
-			result = station->GetSpawnPassengerStatistics();
-			WaitPassenger = station->GetWaitPassenger();
-		} else {
-			WaitPassenger = -1;
-			UE_LOG(LogTemp, Error, TEXT("Invalid station ID"));
-		}
-	}
-	
-	for (auto& i : result) {
-		TotalPassenger += i.Value;
-	}
-
-	return result;
-}
-
 void AStationManager::WeeklyTask() {
 	for (auto& i : Station) {
 		if (IsValid(i)) {
 			if (i->GetStationState() == StationState::Active) {
 				// Add weekly tasks
 				
-				// From policy (Cost)
-				PlayerState->AddMoney(PolicyRef->GetTotalCost());
 			}
 		}
 	}
@@ -641,10 +442,7 @@ void AStationManager::DailyTask() {
 	for (auto& i : Station) {
 		if (IsValid(i)) {
 			if (i->GetStationState() == StationState::Active) {
-				// Add weekly tasks
 
-				// From service level (Complain)
-				i->AddComplain(-ServiceData.DailyComplain);
 			}
 		}
 	}
@@ -659,95 +457,6 @@ void AStationManager::SetTransfer(bool Flag) {
 		}
 	}
 }
-
-int32 AStationManager::GetStationCount() const {
-	return Station.Num();
-}
-
-int32 AStationManager::GetActiveStationCount() const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Active) result++;
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetInactiveStationCount() const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Inactive) result++;
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetDestroyedStationCount() const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationState() == StationState::Destroyed) result++;
-		}
-	}
-	return result;
-}
-
-int32 AStationManager::GetTypeStationCount(StationType Type) const {
-	int32 result = 0;
-	for (auto& i : Station) {
-		if (IsValid(i)) {
-			if (i->GetStationType() == Type) result++;
-		}
-	}
-	return result;
-}
-
-FStationInfo AStationManager::GetRandomStationInfo() const {
-	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	do {
-		randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	} while (!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]));
-	return Station[randomIndex]->GetStationInfo();
-}
-
-FStationInfo AStationManager::GetRandomActiveStationInfo() const {
-	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	do {
-		randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
-		&& Station[randomIndex]->GetStationState() == StationState::Active);
-	return Station[randomIndex]->GetStationInfo();
-}
-
-FStationInfo AStationManager::GetRandomInactiveStationInfo() const {
-	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	do {
-		randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
-		&& Station[randomIndex]->GetStationState() == StationState::Inactive);
-	return Station[randomIndex]->GetStationInfo();
-}
-
-FStationInfo AStationManager::GetRandomDestroyedStationInfo() const {
-	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	do {
-		randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
-		&& Station[randomIndex]->GetStationState() == StationState::Destroyed);
-	return Station[randomIndex]->GetStationInfo();
-}
-
-FStationInfo AStationManager::GetRandomTypeStationInfo(StationType Type) const {
-	int32 randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	do {
-		randomIndex = FMath::RandRange(0, Station.Num() - 1);
-	} while ((!Station.IsValidIndex(randomIndex) && !IsValid(Station[randomIndex]))
-		&& Station[randomIndex]->GetStationType() == Type);
-	return Station[randomIndex]->GetStationInfo();
-}
-
 AStation* AStationManager::GetNearestStationByType(int32 Start, StationType Type) {
 	int32 StationNum = Station.Num();
 	int32 NearestStationId = -1;
@@ -928,6 +637,49 @@ bool AStationManager::Load() {
 	return true;
 }
 
+void AStationManager::EventEnd() {
+	AdditionalPassengerSpawnProbabilityByEvent = 0.0f;
+	FreePassengerSpawnProbabilityByEvent = 0.0f;
+	ComplainIncreaseRateByEvent = 0.0f;
+
+	for (auto& i : PassengerDestinationTypeWeight) {
+		i.Value = 1.0f;
+	}
+}
+
+void AStationManager::UpdatePolicy() {
+	auto policyData = PolicyRef->GetPolicyData();
+	FreePassengerSpawnProbabilityByPolicy = 0.0f;
+	AdditionalPassengerSpawnProbabilityByPolicy = 0.0f;
+	ComplainIncreaseRateByPolicy = 0.0f;
+
+
+	if (policyData.PrioritySeat) {
+		ComplainIncreaseRateByPolicy -= 0.05f;
+	}
+
+	if (policyData.HasCCTV) {
+		ComplainIncreaseRateByPolicy -= 0.1f;
+	}
+
+	if (policyData.HasElevator) {
+		ComplainIncreaseRateByPolicy -= 0.15f;
+	}
+
+	if (policyData.PrioritySeat) {
+		FreePassengerSpawnProbabilityByPolicy += 0.2f;
+	}
+
+	if (policyData.HasBicycle) {
+		AdditionalPassengerSpawnProbabilityByPolicy += 0.1f;
+		ComplainIncreaseRateByPolicy += 0.1f;
+	}
+
+	if (policyData.HasTransfer) {
+		ComplainIncreaseRateByPolicy -= 0.2f;
+	}
+}
+
 // Called every frame
 void AStationManager::Tick(float DeltaTime)
 {
@@ -935,13 +687,16 @@ void AStationManager::Tick(float DeltaTime)
 
 	StationSpawnRoutine(DeltaTime);
 
-	//if (Policy == nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(":("));
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1, 
-			15.0f, 
-			FColor::Yellow, 
-			FString::Printf(TEXT("%d : %f"), GetWorld()->TimeSeconds, DeltaTime));*/
+	float averageComplain = 0.0f;
+	int32 serviceStationCount = 0;
+
+	for (auto& i : Station) {
+		if (i->GetStationInfo().IsActive) serviceStationCount++;
+		averageComplain += i->GetComplain();
+	}
+	
+	StatisticsManagerRef->DefaultStatistics.AverageComplain = averageComplain;
+	StatisticsManagerRef->DefaultStatistics.ServiceStationCount = serviceStationCount;
 
 }
 

@@ -42,38 +42,21 @@ public:
 	FShopInfo PurchaseTunnel(int32 Amount, bool& Success);
 	UFUNCTION(BlueprintCallable)
 	FShopInfo PurchaseBridge(int32 Amount, bool& Success);
-	UFUNCTION(BlueprintCallable)
-	FShopInfo PurchaseUpgradeTrain(int32 Amount, bool& Success);
-	UFUNCTION(BlueprintCallable)
-	FShopInfo PurchaseUpgradeSubtrain(int32 Amount, bool& Success);
-	UFUNCTION(BlueprintCallable)
-	FShopInfo PurchaseUpgradeStation(int32 Amount, bool& Success);
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	ATinyMetroPlayerState* PlayerState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	AStationManager* StationManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	class AStatisticsManager* StatisticsManagerRef;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Goods")
 	FShopInfo ShopInfo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Goods")
 	int32 CostTrainIncrease = 50;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Goods")
 	int32 CostSubtrainIncrease = 25;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumTrain = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumSubtrain = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumLane = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumTunnel = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumBridge = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumUpgradeTrain = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumUpgradeSubtrain = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PurchaseNumUpgradeStation = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	ATinyMetroPlayerState* PlayerState;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	AStationManager* StationManager;
 };
