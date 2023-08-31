@@ -276,6 +276,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	// Drag & Drop operation
 	if (!IsSingleClick) {
 		if (IsValid(LaneRef)) {
+			UE_LOG(LogTemp, Log, TEXT("TrainRelease::Lane Valid"));
 			/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 				FString::Printf(TEXT("Train::Release before - %lf, %lf"), this->GetActorLocation().X, this->GetActorLocation().Y));*/
 			FVector StartLocation = GridManagerRef->Approximate(
@@ -290,6 +291,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 			ServiceStart(StartLocation, LaneRef, StationManagerRef->GetNearestStation(StartLocation, LaneRef));
 			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalShiftCount++;
 		} else {
+			UE_LOG(LogTemp, Log, TEXT("TrainRelease::Lane Invalid"));
 			// TODO : if upgrade, return upgrade cost
 
 			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalRetrievalCount++;
@@ -301,7 +303,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	IsSingleClick = false;
 }
 
-void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D) {
+void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Super::ServiceStart(StartLocation, Lane, D);
 	bool tmp;
 
@@ -324,7 +326,6 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, class AStation* D)
 	NextStation = D->GetStationInfo();
 
 	// Set train material
-	LaneRef = Lane;
 	SetTrainMaterial(LaneRef);
 	
 
@@ -606,11 +607,12 @@ void ATrain::FinishLoad() {
 		if (TrainInfo.IsUpgrade) {
 			Upgrade();
 		}
+	} else {
+		DespawnTrain();
 	}
 }
 
 void ATrain::AddSubtrain(ASubtrain* T) {
-	Cast<ASubtrainAiController>(T->GetController())->SetTargetTrain(this);
 	Subtrains.AddUnique(T);
 	T->AttachToTrain(this);
 	T->SetActorLocation(this->GetActorLocation());

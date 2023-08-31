@@ -117,7 +117,7 @@ AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocati
 		UGameplayStatics::GetPlayerController(GetWorld(), 0),
 		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
 		WorldPosition, WorldDirection);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 10000000.0f) + WorldPosition,
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 1000000000.0f) + WorldPosition,
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
 		HitResult, true);
 	WorldLocation = HitResult.Location;
@@ -133,7 +133,7 @@ void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
 		if (!PassengerMaterial.IsValidIndex(Lane->GetLaneId())) {
 			InitPassengerMaterial();
 		}
-		UE_LOG(LogTemp, Log, TEXT("TrainTemplate::SetTrainMaterial %d %d"), TrainMaterial.Num(), PassengerMaterial.Num());
+		//UE_LOG(LogTemp, Log, TEXT("TrainTemplate::SetTrainMaterial %d %d"), TrainMaterial.Num(), PassengerMaterial.Num());
 		TrainMeshComponent->SetMaterial(0, TrainMaterial[Lane->GetLaneId()]);
 		//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 		for (auto& i : PassengerMeshComponent) {
@@ -210,6 +210,7 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 	//Destination = D;
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	LaneRef = Lane;
 	TrainInfo.ServiceLaneId = Lane->GetLaneId();
 	TrainInfo.ShiftCount++;
 	UpdateTrainMesh();
@@ -385,9 +386,11 @@ void ATrainTemplate::Tick(float DeltaTime)
 			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
 		LaneRef = Cast<ALane>(MouseToWorldActor);
 		SetTrainMaterial(LaneRef);
-		if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
-			MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
-			LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+		if (IsValid(MouseToWorldActor)) {
+			if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
+				MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
+				LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
+			}
 		}
 
 	} else {

@@ -41,7 +41,7 @@ class TINYMETRO_API ARtsCamera : public APawn
 	float RotationSpeed = 1.0f;  // 회전 속도 조절
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS Camera")
-	FVector initLocation = FVector(0, 0, 6000.f);
+	FVector initLocation = FVector(0, 3500.0f, 6000.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS Camera")
 	FRotator initRotation = FRotator(0.f, -90.f, 0.f);

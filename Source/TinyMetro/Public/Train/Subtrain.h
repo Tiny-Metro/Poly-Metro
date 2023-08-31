@@ -65,9 +65,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 OwnerTrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
-	class ATrain* TrainRef;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
-	class ATrain* OwnerTrain;
+	class ATrain* OwnerTrainRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 Index = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
