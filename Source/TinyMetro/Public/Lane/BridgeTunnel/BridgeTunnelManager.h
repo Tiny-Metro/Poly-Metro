@@ -112,7 +112,7 @@ public:
 	bool Load();
 
 	UFUNCTION()
-	ABridgeTunnel* LoadBridgeTunnel(int32 connectorId);
+	ABridgeTunnel* LoadConnector(int32 connectorId);
 
 	ABridgeTunnel* SpawnConnector();
 
