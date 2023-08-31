@@ -31,11 +31,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 count;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ConnectorId;
+	int32 ConnectorId ;
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CountUp();
 	virtual void CountUp_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Register();
+	virtual void Register_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SendDeathCertificate();
+	virtual void SendDeathCertificate_Implementation();
+
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CountDown();
@@ -44,9 +53,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void BuildBridgeTunnel();
 	virtual void BuildBridgeTunnel_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-	void BuildTest();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

@@ -22,4 +22,6 @@ struct TINYMETRO_API FConnectorData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ConnectorType Type;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<int32, int32> LaneUseCount;
 };

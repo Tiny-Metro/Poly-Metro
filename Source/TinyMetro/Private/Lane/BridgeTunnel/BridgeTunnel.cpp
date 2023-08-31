@@ -12,10 +12,6 @@ ABridgeTunnel::ABridgeTunnel()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	if (!GridManagerRef)
-	{
-		GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
-	}
 }
 
 // Called when the game starts or when spawned
@@ -48,10 +44,9 @@ void ABridgeTunnel::CountUp_Implementation() {};
 void ABridgeTunnel::CountDown_Implementation() {};
 void ABridgeTunnel::BuildBridgeTunnel_Implementation() {};
 
-void ABridgeTunnel::BuildTest()
-{
-	BuildBridgeTunnel();
-}
+void ABridgeTunnel::Register_Implementation() {};
+void ABridgeTunnel::SendDeathCertificate_Implementation() {};
+
 void ABridgeTunnel::Save()
 {
 	UE_LOG(LogTemp, Warning, TEXT("BridgeTunnel %d Saved Called "), ConnectorId);
@@ -66,6 +61,10 @@ void ABridgeTunnel::Save()
 		ConnectorData.PointArr.Add(i);
 	}
 	ConnectorData.Type = ConnectorInfo.Type;
+	for (const auto& i : ConnectorInfo.LaneUseCount)
+	{
+		ConnectorData.LaneUseCount.Add(i);
+	}
 	tmp->ConnectorInfo = ConnectorData;
 	if (!IsValid(tmp))
 	{
@@ -95,6 +94,10 @@ bool ABridgeTunnel::Load()
 	for (const auto& i : tmp->ConnectorInfo.PointArr)
 	{
 		ConnectorInfo.PointArr.Add(i);
+	}
+	for (const auto& i : tmp->ConnectorInfo.LaneUseCount)
+	{
+		ConnectorInfo.LaneUseCount.Add(i);
 	}
 	ConnectorInfo.Type = tmp->ConnectorInfo.Type;
 	count = tmp -> count;
