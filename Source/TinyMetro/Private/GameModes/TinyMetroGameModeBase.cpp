@@ -81,6 +81,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     TrainManager = GetWorld()->SpawnActor<ATrainManager>();
     TrainManager->Load();
     Policy = GetWorld()->SpawnActor<APolicy>();
+    Policy->Load();
     Bank = GetWorld()->SpawnActor<ABank>();
     Timer = GetWorld()->SpawnActor<ATimer>();
     Shop = GetWorld()->SpawnActor<AShop>();
