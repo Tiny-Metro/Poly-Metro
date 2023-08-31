@@ -27,6 +27,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void InitPolicy();
 
 	// Save & Load
 	UFUNCTION()
@@ -103,5 +104,4 @@ public :
 
 public :
 	int32 CalculateComplainPercentage();
-
 };

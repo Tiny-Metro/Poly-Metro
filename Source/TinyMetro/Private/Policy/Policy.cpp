@@ -25,7 +25,6 @@ void APolicy::BeginPlay()
 	if( !IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
 	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
 	
-
 	InitPolicy();
 	
 	SaveManagerRef->SaveTask.AddDynamic(this, &APolicy::Save);
@@ -36,6 +35,15 @@ void APolicy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APolicy::InitPolicy() {
+	SetServiceCostLevel(PolicyData.ServiceCostLevel);
+	SetPrioritySeat(PolicyData.PrioritySeat);
+	SetCCTV(PolicyData.HasCCTV);
+	SetElevator(PolicyData.HasElevator);
+	SetBicycle(PolicyData.HasBicycle);
+	SetTransfer(PolicyData.HasTransfer);
 }
 
 void APolicy::Save() {
