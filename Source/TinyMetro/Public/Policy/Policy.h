@@ -27,6 +27,13 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void InitPolicy();
+
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
 
 protected :
 	UPROPERTY(VisibleAnywhere, Category = "Policy data")
@@ -34,6 +41,8 @@ protected :
 
 	UPROPERTY()
 	class AStationManager* StationManagerRef;
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef;
 
 public :
 	UPROPERTY(VisibleAnywhere, Category = "Policy data")
@@ -95,14 +104,4 @@ public :
 
 public :
 	int32 CalculateComplainPercentage();
-
-public:
-	void InitPolicy();
-
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "Policy data")
-	float TotalComplainIncrease = 0.0f;
-	UPROPERTY(VisibleAnywhere, Category = "Policy data")
-	int32 TotalCost = 0.0f;
-
 };

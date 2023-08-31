@@ -32,16 +32,16 @@ public:
 
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int ServiceCostLevel;      // 서비스 비용 단계
+	int ServiceCostLevel = 3;      // 서비스 비용 단계
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool PrioritySeat;  // 교통약자 좌석 배치
+	bool PrioritySeat = false;  // 교통약자 좌석 배치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool HasCCTV;          // CCTV 설치
+	bool HasCCTV = false;          // CCTV 설치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool HasElevator;      // 엘레베이터 설치
+	bool HasElevator = false;      // 엘레베이터 설치
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool HasBicycle;       // 자전거 탑승 허가
+	bool HasBicycle = false;       // 자전거 탑승 허가
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool HasTransfer;      // 환승 시스템
+	bool HasTransfer = false;      // 환승 시스템
 
 };
