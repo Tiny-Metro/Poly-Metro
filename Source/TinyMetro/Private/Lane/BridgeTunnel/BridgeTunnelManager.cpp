@@ -3,7 +3,13 @@
 
 #include "Lane/BridgeTunnel/BridgeTunnelManager.h"
 #include "GridGenerator/GridCellData.h"
+#include "SaveSystem/TMSaveManager.h"
+#include "GameModes/TinyMetroGameModeBase.h"
+#include "GameFramework/Controller.h" //
+#include "Lane/BridgeTunnel/BridgeTunnelManagerSaveGame.h"
 #include <Kismet/GameplayStatics.h>
+#include <Containers/Map.h>
+#include <Containers/Array.h>
 
 // Sets default values
 ABridgeTunnelManager::ABridgeTunnelManager()
@@ -16,8 +22,22 @@ ABridgeTunnelManager::ABridgeTunnelManager()
 void ABridgeTunnelManager::BeginPlay()
 {
 	Super::BeginPlay();
+	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+
 	GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
+
+	SaveManagerRef = GameMode->GetSaveManager();
+	if (SaveManagerRef)
+	{
+		SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnelManager::Save);
+		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is Put SaveTask in ABridgeTunnelManager::BeginPlay()"));
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is not valid in ABridgeTunnelManager::BeginPlay()"));
+	}
 }
 
 // Called every frame
@@ -39,11 +59,11 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 		UE_LOG(LogTemp, Warning, TEXT("The givien pointsArray is invalid"));
 		return; 
 	}
-
-	FConnectorData* existingConnector = FindConnector(type, points);
+	Count++;
+	ABridgeTunnel* existingConnector = FindConnector(type, points);
 
 	if (existingConnector != nullptr) {
-		existingConnector->ConnectorREF->CountUp();
+		existingConnector->CountUp();
 		return;
 	}
 
@@ -127,37 +147,55 @@ bool ABridgeTunnelManager::IsPointsValid(const TArray<FIntPoint>& points) {
 	return true;
 }
 
-FConnectorData* ABridgeTunnelManager::FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF) {
+ABridgeTunnel* ABridgeTunnelManager::FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF) {
+	if (Connectors.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
+		return nullptr;
 
-	for (FConnectorData& connector : Connectors) {
-		if (ConnectorREF == connector.ConnectorREF) {
-			return &connector;
+	}
+
+	TArray<ABridgeTunnel*> connectorsArray;
+	Connectors.GenerateValueArray(connectorsArray);
+
+	for (ABridgeTunnel* connector : connectorsArray) 
+	{
+		if (ConnectorREF == connector) {
+			return connector;
 		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 	return nullptr;
 }
-FConnectorData* ABridgeTunnelManager::FindConnector(ConnectorType type, const TArray<FIntPoint> points) {
+ABridgeTunnel* ABridgeTunnelManager::FindConnector(ConnectorType type, const TArray<FIntPoint> points) 
+{
+	if (Connectors.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
+		return nullptr;
+	}
+
 	TArray<FIntPoint> processedPoints = ProcessArray(points);
 	TArray<FIntPoint> reversedPoints = processedPoints;
 	Algo::Reverse(reversedPoints);
 
-	UE_LOG(LogTemp, Warning, TEXT("????????"));
 	UE_LOG(LogTemp, Warning, TEXT("Number of elements in processedPoints: %d"), processedPoints.Num());
 	for (int i = 0; i < processedPoints.Num(); i++)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("elements : %d     %d"), processedPoints[i].X, processedPoints[i].Y);
-
 	}
 
+	TArray<ABridgeTunnel*> connectorsArray;
+	Connectors.GenerateValueArray(connectorsArray);
 
-	for (FConnectorData& connector : Connectors) {
-		if (type == connector.Type && AreArraysEqual(processedPoints, connector.PointArr) ){ //connector.PointArr == processedPoints) {
-			return &connector;
+	for (ABridgeTunnel* connector : connectorsArray) {
+		FConnectorData targetConnectorInfo = connector->ConnectorInfo;
+		if (type == targetConnectorInfo.Type && AreArraysEqual(processedPoints, targetConnectorInfo.PointArr) ){
+			return connector;
 		}
-		if (type == connector.Type && AreArraysEqual(reversedPoints, connector.PointArr)){//connector.PointArr == reversedPoints) {
-			return &connector;
+		if (type == targetConnectorInfo.Type && AreArraysEqual(reversedPoints, targetConnectorInfo.PointArr)){
+			return connector;
 		}
 	}
 
@@ -183,55 +221,153 @@ bool ABridgeTunnelManager::AreArraysEqual(const TArray<FIntPoint>& Array1, const
 }
 
 void ABridgeTunnelManager::DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
-	FConnectorData* ConnectorToDelete = FindConnector(type, points);
-	if (ConnectorToDelete != nullptr) {
-		ConnectorToDelete->ConnectorREF->Destroy();
-		Connectors.Remove(*ConnectorToDelete);
+	ABridgeTunnel* ConnectorToDelete = FindConnector(type, points);
+	if (ConnectorToDelete != nullptr) 
+	{
+		Connectors.Remove(ConnectorToDelete->ConnectorId);
+		ConnectorToDelete->Destroy();
 	}
 }
 void ABridgeTunnelManager::DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF) {
-	FConnectorData* ConnectorToDelete = FindConnector(ConnectorREF);
+	ABridgeTunnel* ConnectorToDelete = FindConnector(ConnectorREF);
 	if (ConnectorToDelete != nullptr) {
-		ConnectorToDelete->ConnectorREF->Destroy();
-		Connectors.Remove(*ConnectorToDelete);
+		Connectors.Remove(ConnectorToDelete->ConnectorId);
+		ConnectorToDelete->Destroy();
 	}
 }
-void ABridgeTunnelManager::DeleteConnector(FConnectorData connectorData) {
-		connectorData.ConnectorREF->Destroy();
-		Connectors.Remove(connectorData);
+void ABridgeTunnelManager::DeleteConnector(ABridgeTunnel* Connector) {
+	Connectors.Remove(Connector->ConnectorId);
+	Connector->Destroy();
 }
-void ABridgeTunnelManager::DisconnectConnector(FConnectorData connectorData) {
-	connectorData.ConnectorREF->CountDown();
+void ABridgeTunnelManager::DisconnectConnector(ABridgeTunnel* Connector) {
+	Connector->CountDown();
 }
 
 void ABridgeTunnelManager::DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
-	FConnectorData* ConnectorToDelete = FindConnector(type, points);
+	ABridgeTunnel* ConnectorToDelete = FindConnector(type, points);
 	if (ConnectorToDelete == nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!The givien pointsArray is invalid!!!!!!!!"));
 		return;
 	}
-	DisconnectConnector(*ConnectorToDelete);
+	DisconnectConnector(ConnectorToDelete);
 }
 void ABridgeTunnelManager::DisconnectByActorRef(ABridgeTunnel* ConnectorREF) {
-	FConnectorData* ConnectorToDelete = FindConnector(ConnectorREF);
-	DisconnectConnector(*ConnectorToDelete);
+	ABridgeTunnel* ConnectorToDelete = FindConnector(ConnectorREF);
+	DisconnectConnector(ConnectorToDelete);
 }
 
 bool ABridgeTunnelManager::IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points) 
 {
+	if (Connectors.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
+		return false;
+	}
 	TArray<FIntPoint> processedPoints = ProcessArray(points);
 	TArray<FIntPoint> reversedPoints = processedPoints;
 	Algo::Reverse(reversedPoints);
 
-	for (FConnectorData& connector : Connectors) {
-		if (type == connector.Type && connector.PointArr == processedPoints) {
-			return true;
-		}
-		if (type == connector.Type && connector.PointArr == reversedPoints) {
-			return true;
+	TArray<ABridgeTunnel*> connectorsArray;
+	Connectors.GenerateValueArray(connectorsArray);
+
+	for (ABridgeTunnel* target : connectorsArray) {
+		if(target != nullptr)
+		{
+			FConnectorData connector = target->ConnectorInfo;
+			if (type == connector.Type && connector.PointArr == processedPoints) {
+				return true;
+			}
+			if (type == connector.Type && connector.PointArr == reversedPoints) {
+				return true;
+			}
 		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("There is no such Connector in the Connectors"));
 	return false;
+}
+
+void ABridgeTunnelManager::Save()
+{
+	UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame SAVED"));
+	UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UBridgeTunnelManagerSaveGame::StaticClass()));
+	tmp->Count = Count;
+	for (auto& i : Connectors)
+	{
+		tmp->Connectors.Add(i.Key);
+	}
+
+	if (!IsValid(tmp)) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager tmp in Save is not valid"));
+	}
+
+	SaveManagerRef->Save(tmp, SaveActorType::BridgeTunnelManager);
+}
+bool ABridgeTunnelManager::Load() 
+{
+	UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager SaveGame LOADED"));
+
+	if (!GameMode) {
+		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
+	if (!SaveManagerRef) {
+		SaveManagerRef = GameMode->GetSaveManager();
+	}	
+	
+	UBridgeTunnelManagerSaveGame* tmp = Cast<UBridgeTunnelManagerSaveGame>(SaveManagerRef->Load(SaveActorType::BridgeTunnelManager));
+
+	if (!IsValid(tmp)) {
+		UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager tmp in Load is not valid"));
+		return false;
+	}
+
+	Count = tmp->Count;
+		
+	for (auto& i : tmp->Connectors)
+	{
+		ABridgeTunnel* tmpBridgeTunnel = LoadConnector(i);
+
+		Connectors.Add(i, tmpBridgeTunnel);
+	}
+
+	return true;
+}
+ABridgeTunnel* ABridgeTunnelManager::LoadConnector(int32 connectorId)
+{
+	UE_LOG(LogTemp, Warning, TEXT("BridgeTunnelManager LOAD BridgeTunnel"));
+	ABridgeTunnel* tmpBridgeTunnel = SpawnConnector();
+	tmpBridgeTunnel->ConnectorId = connectorId;
+	tmpBridgeTunnel->Load();
+	return tmpBridgeTunnel;
+}
+ABridgeTunnel* ABridgeTunnelManager::SpawnConnector()
+{
+	// Load BP Class
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BridgeTunnel/BP_BridgeTunnel.BP_BridgeTunnel'")));
+
+	// Cast to BP
+	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	// Check object validation
+	if (!SpawnActor) {
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / BridgeTunnel")));
+		return nullptr;
+	}
+
+	// Check null
+	UClass* SpawnClass = SpawnActor->StaticClass();
+	if (SpawnClass == nullptr) {
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		return nullptr;
+	}
+
+	// Spawn actor
+	FActorSpawnParameters SpawnParams;
+	FTransform SpawnTransform;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ABridgeTunnel* tmpBridgeTunnel = Cast<ABridgeTunnel>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
+
+	return tmpBridgeTunnel;
 }

@@ -8,6 +8,8 @@
 #include "../../PlayerState/TinyMetroPlayerState.h"
 #include "ConnectorType.h"
 #include "ConnectorData.h"
+#include "BridgeTunnel.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -64,12 +66,14 @@ private:
 	bool IsPointsValid(const TArray<FIntPoint>& points);
 
 public:
-	FConnectorData* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
-	FConnectorData* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
+	ABridgeTunnel* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
+	ABridgeTunnel* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FConnectorData> Connectors;
+	TMap<int32, ABridgeTunnel*> Connectors;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 0;
 
 	UFUNCTION(BlueprintCallable)
 	void DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points);
@@ -77,11 +81,11 @@ public:
 	void DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF);
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteConnector(FConnectorData connectorData);
+	void DeleteConnector(ABridgeTunnel* Connector);
 
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectConnector(FConnectorData connectorData);
+	void DisconnectConnector(ABridgeTunnel* Connector);
 
 	UFUNCTION(BlueprintCallable)
 	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points);
@@ -92,4 +96,22 @@ public:
 public:
 	bool IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points);
 	bool AreArraysEqual(const TArray<FIntPoint>& Array1, const TArray<FIntPoint>& Array2);
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	bool Load();
+
+	UFUNCTION()
+	ABridgeTunnel* LoadConnector(int32 connectorId);
+
+	ABridgeTunnel* SpawnConnector();
+
 };

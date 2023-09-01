@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
+#include "ConnectorData.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "BridgeTunnel.generated.h"
 
 UCLASS()
@@ -25,14 +26,48 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 count;
+	FConnectorData ConnectorInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 count;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ConnectorId ;
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CountUp();
 	virtual void CountUp_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Register();
+	virtual void Register_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SendDeathCertificate();
+	virtual void SendDeathCertificate_Implementation();
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CountDown();
 	virtual void CountDown_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void BuildBridgeTunnel();
+	virtual void BuildBridgeTunnel_Implementation();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	ATinyMetroPlayerState* PlayerStateRef;
+
+
+	UFUNCTION()
+	void Save();
+
+	UFUNCTION()
+	bool Load();
 };

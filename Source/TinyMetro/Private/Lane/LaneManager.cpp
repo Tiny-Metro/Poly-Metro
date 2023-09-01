@@ -397,7 +397,7 @@ void ALaneManager::Save()
 }
 
 bool ALaneManager::Load()
-{
+{ 
 	if (!GameMode) {
 		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	}
