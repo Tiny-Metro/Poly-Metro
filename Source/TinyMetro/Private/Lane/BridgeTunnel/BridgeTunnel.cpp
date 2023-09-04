@@ -40,8 +40,8 @@ void ABridgeTunnel::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-void ABridgeTunnel::CountUp_Implementation() {};
-void ABridgeTunnel::CountDown_Implementation() {};
+void ABridgeTunnel::CountUp_Implementation(int32 LaneID) {};
+void ABridgeTunnel::CountDown_Implementation(int32 LaneID) {};
 void ABridgeTunnel::BuildBridgeTunnel_Implementation() {};
 
 void ABridgeTunnel::Register_Implementation() {};

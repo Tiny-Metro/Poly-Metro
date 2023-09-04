@@ -1004,11 +1004,11 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	// if it is possible, bulid it
 	for (int i = 0; i < BridgeArea.Num(); i++) 
 	{		
-		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i], LaneId);
 	}
 	for (int i = 0; i < TunnelArea.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i], LaneId);
 	}
 
 	// Done
@@ -1304,7 +1304,7 @@ void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
-		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+		BTMangerREF->DisconnectByInfo(targetType, Area[i], LaneId);
 	}
 }
 
@@ -1318,7 +1318,7 @@ void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(targetType, Area[i]);
+		BTMangerREF->BuildConnector(targetType, Area[i], LaneId);
 	}
 }
 

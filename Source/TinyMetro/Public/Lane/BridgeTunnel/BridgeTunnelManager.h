@@ -31,12 +31,12 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ConnectBT(const TArray<FIntPoint>& points);
-	virtual void ConnectBT_Implementation(const TArray<FIntPoint>& points);
+	void ConnectBT(const TArray<FIntPoint>& points, int32 LaneID);
+	virtual void ConnectBT_Implementation(const TArray<FIntPoint>& points, int32 LaneID);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void DisconnectBT(const TArray<FIntPoint>& points);
-	virtual void DisconnectBT_Implementation(const TArray<FIntPoint>& points);
+	void DisconnectBT(const TArray<FIntPoint>& points, int32 LaneID);
+	virtual void DisconnectBT_Implementation(const TArray<FIntPoint>& points, int32 LaneID);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -47,15 +47,15 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CreateNewBridge(const TArray<FIntPoint>& points);
-	virtual void CreateNewBridge_Implementation(const TArray<FIntPoint>& points);
+	void CreateNewBridge(const TArray<FIntPoint>& points, int32 LaneId);
+	virtual void CreateNewBridge_Implementation(const TArray<FIntPoint>& points, int32 LaneId);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CreateNewTunnel(const TArray<FIntPoint>& points);
-	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points);
+	void CreateNewTunnel(const TArray<FIntPoint>& points, int32 LaneId);
+	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points, int32 LaneId);
 	
 	UFUNCTION(BlueprintCallable)
-	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points);
+	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points, int32 LaneID);
 
 	UFUNCTION(BlueprintCallable)
 	void ReturnItem(ConnectorType type);
@@ -85,13 +85,13 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectConnector(ABridgeTunnel* Connector);
+	void DisconnectConnector(ABridgeTunnel* Connector, int32 LaneID);
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points);
+	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points, int32 LaneID);
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF);
+	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF, int32 LaneID);
 
 public:
 	bool IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points);
