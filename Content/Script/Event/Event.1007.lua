@@ -11,7 +11,12 @@ end
 
 -- Event occur weight
 function Weight()
-    return 3
+    policy = GetPolicyData()
+    if policy.IsCCTV
+    {
+        return 3
+    }
+    return 0
 end
 
 -- Event start (event effect)
