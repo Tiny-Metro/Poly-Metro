@@ -13,16 +13,17 @@ end
 -- Event occur weight
 function Weight()
     policy = GetPolicyData()
+    level = policy.ServiceLevel
 
-    if policy == 1 then
+    if level == 1 then
         return 0
-    elseif policy == 2 then
+    elseif level == 2 then
         return 1
-    elseif policy == 3 then
+    elseif level == 3 then
         return 2
-    elseif policy == 4 then
+    elseif level == 4 then
         return 3
-    elseif policy == 5 then
+    elseif level == 5 then
         return 4
     end
 end
