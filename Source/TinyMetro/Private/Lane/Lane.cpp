@@ -15,6 +15,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManager.h"
+#include "Statistics/StatisticsManager.h"
 
 // Sets default values
 ALane::ALane()
@@ -60,6 +61,8 @@ void ALane::BeginPlay()
 
 	SaveManagerRef = GameMode->GetSaveManager();
 
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
+
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	SaveManagerRef->SaveTask.AddDynamic(this, &ALane::Save);
@@ -75,6 +78,7 @@ void ALane::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].AverageComplain = GetStationComplainAverage();
 
 	//Delay Removing
 	if (DoesLaneToBeRemoved)
@@ -182,6 +186,8 @@ bool ALane::GetIsCircularLine() const
 void ALane::SetIsCircularLine(bool _Circular)
 {
 	IsCircularLine = _Circular;
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = _Circular;
 }
   
 FLanePoint ALane::GetNearestLanePoint(FVector Location) {
@@ -2509,3 +2515,72 @@ void ALane::SetHasSaveFile(bool hasSave)
 {
 	HasSaveFile = hasSave;
 }
+
+void ALane::SubTotalLaneCount()
+{
+	StatisticsManagerRef->LaneStatistics.TotalLaneCount--;
+}
+
+void ALane::AddTotalModifyAndDeleteCount()
+{
+	StatisticsManagerRef->LaneStatistics.TotalModifyAndDeleteCount++;
+}
+
+void ALane::AddModifyAndReduceCountInEachLane()
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].TotalModifyAndReduceCount++;
+}
+
+void ALane::AddServiceStationCount(int32 Num)
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceStationCount += Num;
+}
+
+void ALane::SubServiceStationCount(int32 Num)
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceStationCount -= Num;
+}
+
+float ALane::GetStationComplainAverage()
+{
+	float Sum = 0.0f;
+
+	for (int i = 0; i < StationPoint.Num(); i++)
+	{
+		if (i == StationPoint.Num() - 1)
+		{
+			if (!IsCircularLine)
+			{
+				Sum += StationPoint[i]->GetStationInfo().Complain;
+
+				Sum /= StationPoint.Num();
+				break;
+			}
+
+			Sum /= StationPoint.Num() - 1;
+
+		}
+		else
+		{
+			Sum += StationPoint[i]->GetStationInfo().Complain;
+		}
+	}
+
+	return Sum;
+
+}
+
+/*
+void ALane::InitializeCurrentLaneStatics()
+{
+	SubTotalLaneCount();
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceStationCount = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceTrainAndSubtrainCount = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].AverageComplain = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = false;
+
+	//Bridge & Tunnel
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
+}*/

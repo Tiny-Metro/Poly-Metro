@@ -70,6 +70,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	class ATMSaveManager* SaveManagerRef;
 
+	UPROPERTY(BlueprintReadOnly)
+	class AStatisticsManager* StatisticsManagerRef;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UMaterial*> LaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -141,4 +144,8 @@ public:
 
 	UFUNCTION()
 	class ALane* LoadLane(int32 LaneId);
+
+	//Lane Statics
+	UFUNCTION(BlueprintCallable)
+	void CheckTransferStation();
 };
