@@ -31,6 +31,11 @@ public:
 
 protected:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float MinZoom = 300.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float MaxZoom = 3000.0f;
+
 	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
 	class USpringArmComponent* SpringArmComponenet;
 	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
