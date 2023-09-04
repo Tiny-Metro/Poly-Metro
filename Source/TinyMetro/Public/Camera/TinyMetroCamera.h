@@ -31,10 +31,12 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	float MinZoom = 300.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	float MaxZoom = 3000.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	float ZoomSpeed = 20.0f;
 
 	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
 	class USpringArmComponent* SpringArmComponenet;

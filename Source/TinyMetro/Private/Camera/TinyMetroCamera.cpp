@@ -29,7 +29,20 @@ void ATinyMetroCamera::BeginPlay()
 }
 
 void ATinyMetroCamera::MouseWheel(float Axis) {
-	UE_LOG(LogTemp, Log, TEXT("Pawn::MouseWheel %f"), Axis);
+	float currentArmLenght = SpringArmComponenet->TargetArmLength;
+	if (Axis > 0 && currentArmLenght >= MinZoom) {
+		// Zoom in
+		SpringArmComponenet->TargetArmLength += -Axis * ZoomSpeed;
+		if (SpringArmComponenet->TargetArmLength < MinZoom) {
+			SpringArmComponenet->TargetArmLength = MinZoom;
+		}
+	} else if (Axis < 0 && currentArmLenght <= MaxZoom) {
+		// Zoom out
+		SpringArmComponenet->TargetArmLength += -Axis * ZoomSpeed;
+		if (SpringArmComponenet->TargetArmLength > MaxZoom) {
+			SpringArmComponenet->TargetArmLength = MaxZoom;
+		}
+	}
 }
 
 // Called every frame
