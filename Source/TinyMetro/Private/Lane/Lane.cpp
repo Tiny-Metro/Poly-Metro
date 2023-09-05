@@ -2570,7 +2570,7 @@ float ALane::GetStationComplainAverage()
 
 }
 
-/*
+
 void ALane::InitializeCurrentLaneStatics()
 {
 	SubTotalLaneCount();
@@ -2579,8 +2579,9 @@ void ALane::InitializeCurrentLaneStatics()
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceTrainAndSubtrainCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].AverageComplain = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = false;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].TransferStationCount = 0;
 
 	//Bridge & Tunnel
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
-}*/
+}

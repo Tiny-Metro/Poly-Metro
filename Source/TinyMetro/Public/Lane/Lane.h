@@ -457,7 +457,7 @@ protected: //Statistics
 	UFUNCTION(BlueprintCallable)
 	float GetStationComplainAverage();
 
-	/*
+	
 	UFUNCTION(BlueprintCallable) // Lane Deleted
-	void InitializeCurrentLaneStatics();*/
+	void InitializeCurrentLaneStatics();
 };
