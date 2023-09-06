@@ -379,7 +379,6 @@ void ATrainTemplate::Tick(float DeltaTime)
 	if (IsActorDragged) {
 		DropPassenger();
 
-		MouseToWorldLocation;
 		MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
 
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
