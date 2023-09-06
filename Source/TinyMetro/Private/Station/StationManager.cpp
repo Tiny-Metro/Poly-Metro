@@ -24,6 +24,8 @@ AStationManager::AStationManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	StationBlueprintClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Station/BP_Station.BP_Station_C'")).Object;
+
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
@@ -46,6 +48,7 @@ AStationManager::AStationManager()
 void AStationManager::BeginPlay()
 {
 	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("StationManager::BeginPlay"));
 
 	// Init default data
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -206,14 +209,14 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	// Load BP Class
 	//UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 	if (!StationBlueprintClass) {
-		StationBlueprintClass = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
+		StationBlueprintClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, TEXT("Class'/Game/Station/BP_Station.BP_Station_C'")));
 	}
 
 	// Cast to BP
 	//UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	if (!GeneratedStationBlueprint) {
+	/*if (!GeneratedStationBlueprint) {
 		GeneratedStationBlueprint = Cast<UBlueprint>(StationBlueprintClass);
-	}
+	}*/
 	// Check object validation
 	/*if (!SpawnActor) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
@@ -227,7 +230,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedStationBlueprint->GeneratedClass, SpawnTransform));
+	AStation* tmp = Cast<AStation>(GetWorld()->SpawnActorDeferred<AActor>(StationBlueprintClass, SpawnTransform));
 	int32 StatoinId;
 
 	if (Id != -1) {
@@ -545,7 +548,7 @@ StationType AStationManager::GetRandomStationType() {
 
 StationType AStationManager::StationTypeFromString(FString Str, bool& Success) {
 	Success = true;
-	StationType result;
+	StationType result = StationType::Circle;
 	Str = Str.ToLower();
 	if (Str == TEXT("circle")) {
 		result = StationType::Circle;

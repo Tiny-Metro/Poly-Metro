@@ -167,9 +167,7 @@ private:
 
 protected:
 	UPROPERTY()
-	UObject* StationBlueprintClass = nullptr;
-	UPROPERTY()
-	UBlueprint* GeneratedStationBlueprint = nullptr;
+	UClass* StationBlueprintClass = nullptr;
 	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	int32 MaxStationCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")
