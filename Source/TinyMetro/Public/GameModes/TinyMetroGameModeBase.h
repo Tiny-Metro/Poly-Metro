@@ -95,4 +95,7 @@ protected:
 	UPROPERTY()
 	class AStatisticsManager* StatisticsManager;
 
+	UPROPERTY()
+	UClass* ObjBridgeTunnelManager;
+
 };

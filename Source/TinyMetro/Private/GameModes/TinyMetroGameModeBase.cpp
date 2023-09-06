@@ -38,6 +38,8 @@ ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
     if (MyHUD.Succeeded()) {
         HUDClass = MyHUD.Class;
     }
+
+    ObjBridgeTunnelManager = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Lane/BridgeTunnel/BP_BridgeTunnelManger.BP_BridgeTunnelManger_C'")).Object;
 }
 
 FString ATinyMetroGameModeBase::GetFileName() const {
@@ -87,31 +89,12 @@ void ATinyMetroGameModeBase::StartPlay() {
     Shop = GetWorld()->SpawnActor<AShop>();
     EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
 
-    // Spawn BP_BridgeTunnelManager
-    // Load BP Class
-    UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BridgeTunnel/BP_BridgeTunnelManger.BP_BridgeTunnelManger'")));
-    
-    // Cast to BP
-    UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-    // Check object validation
-    if (!SpawnActor) {
-        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN")));
-        return;
-    }
-
-    // Check null
-    UClass* SpawnClass = SpawnActor->StaticClass();
-    if (SpawnClass == nullptr) {
-        GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-        return;
-    }
-
     // Spawn actor
     FActorSpawnParameters SpawnParams;
     FTransform SpawnTransform;
     SpawnParams.Owner = this;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    BridgeTunnelManager = Cast<ABridgeTunnelManager>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+    BridgeTunnelManager = Cast<ABridgeTunnelManager>(GetWorld()->SpawnActor<AActor>(ObjBridgeTunnelManager, SpawnTransform));
     BridgeTunnelManager->Load();
 
     PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -121,10 +104,12 @@ void ATinyMetroGameModeBase::StartPlay() {
 
 void ATinyMetroGameModeBase::BeginPlay() {
     Super::BeginPlay();
+    GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("GameMode::BeginPlay"));
 }
 
 void ATinyMetroGameModeBase::SetGameSpeed(float TimeDilation) {
     UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeDilation);
+    if (!IsValid(PlayerController)) PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     PlayerController->CustomTimeDilation = 1 / UGameplayStatics::GetGlobalTimeDilation(GetWorld());
 }
 
