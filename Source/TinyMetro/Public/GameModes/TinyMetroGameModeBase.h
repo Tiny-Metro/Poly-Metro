@@ -19,6 +19,7 @@ class TINYMETRO_API ATinyMetroGameModeBase : public AGameModeBase
 public:
 	ATinyMetroGameModeBase();
 	virtual FString GetFileName() const;
+	virtual FString GetMapName() const;
 	virtual TMap<FIntPoint, StationType> GetInitData() const;
 	virtual int32 GetDaytime() const;
 	UFUNCTION(BlueprintCallable)
