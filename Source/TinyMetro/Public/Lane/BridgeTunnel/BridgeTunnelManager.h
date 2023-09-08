@@ -114,4 +114,7 @@ public:
 
 	ABridgeTunnel* SpawnConnector();
 
+	UFUNCTION(BlueprintCallable)
+	int32 GetUsingConnectorCount(int32 LaneId, ConnectorType TargetConnectorType);
+
 };

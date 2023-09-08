@@ -371,3 +371,26 @@ ABridgeTunnel* ABridgeTunnelManager::SpawnConnector()
 
 	return tmpBridgeTunnel;
 }
+
+int32 ABridgeTunnelManager::GetUsingConnectorCount(int32 LaneId, ConnectorType TargetConnectorType) 
+{
+	int32 UsingCount = 0;
+
+	// Iterate over the connectors in the map
+	for (const auto& ConnectorPair : Connectors)
+	{
+		ABridgeTunnel* TargetConnector = ConnectorPair.Value;
+
+		// Check if the connector's type matches the target type
+		if (TargetConnector->ConnectorInfo.Type == TargetConnectorType)
+		{
+			// Check if the lane is passing
+			if (TargetConnector->IsLanePassing(LaneId))
+			{
+				UsingCount++;
+			}
+		}
+	}
+
+	return UsingCount;
+}

@@ -70,4 +70,7 @@ public:
 
 	UFUNCTION()
 	bool Load();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsLanePassing(int32 LaneId); // check the targetLane is passing 
 };

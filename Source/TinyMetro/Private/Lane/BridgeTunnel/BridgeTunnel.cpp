@@ -105,3 +105,17 @@ bool ABridgeTunnel::Load()
 	BuildBridgeTunnel();
 	return true;
 }
+bool ABridgeTunnel::IsLanePassing(int32 LaneId)
+{
+	// Check if the lane exists in the LaneUseCount map
+	int32* LaneCountPtr = ConnectorInfo.LaneUseCount.Find(LaneId);
+
+	// If the lane does not exist or its count is not greater than 0, return false
+	if (LaneCountPtr == nullptr || *LaneCountPtr <= 0)
+	{
+		return false;
+	}
+
+	// If the count is greater than 0, return true
+	return true;
+}

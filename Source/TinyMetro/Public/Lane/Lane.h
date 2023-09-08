@@ -460,4 +460,13 @@ protected: //Statistics
 	
 	UFUNCTION(BlueprintCallable) // Lane Deleted
 	void InitializeCurrentLaneStatics();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateUsingConnector();
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingBridgeCount;
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingTunnelCount;
 };

@@ -1005,10 +1005,12 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	for (int i = 0; i < BridgeArea.Num(); i++) 
 	{		
 		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i], LaneId);
+		UpdateUsingConnector();
 	}
 	for (int i = 0; i < TunnelArea.Num(); i++)
 	{
 		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i], LaneId);
+		UpdateUsingConnector();
 	}
 
 	// Done
@@ -1319,6 +1321,7 @@ void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 	for (int i = 0; i < Area.Num(); i++)
 	{
 		BTMangerREF->BuildConnector(targetType, Area[i], LaneId);
+		UpdateUsingConnector();
 	}
 }
 
@@ -2584,4 +2587,9 @@ void ALane::InitializeCurrentLaneStatics()
 	//Bridge & Tunnel
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
+}
+void ALane::UpdateUsingConnector()
+{
+	UsingTunnelCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Tunnel);
+	UsingBridgeCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Bridge);
 }
