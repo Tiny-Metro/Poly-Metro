@@ -2592,4 +2592,7 @@ void ALane::UpdateUsingConnector()
 {
 	UsingTunnelCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Tunnel);
 	UsingBridgeCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Bridge);
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = UsingBridgeCount;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = UsingTunnelCount;
 }
