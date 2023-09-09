@@ -1,9 +1,9 @@
 -- Citizen interview positive data
 function EventData()
     Data = {}
+    Map = GetMapName()
     Data.title = ''
-    -- 서울 -> 맵 이름
-    Data.flavor_text = "서울"..'"지하철 서비스에 대만족" 시민 호평 잇따라'
+    Data.flavor_text = Map..'"지하철 서비스에 대만족" 시민 호평 잇따라'
     Data.message = '지하철 서비스에 대한 칭찬이 자자합니다. 서비스 비용에 투자한 보람이 있군요! 불만도가 10% 감소합니다.'
     Data.period = 7
 

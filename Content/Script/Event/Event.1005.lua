@@ -1,10 +1,10 @@
 -- Decline in tourists data
 function EventData()
     Data = {}
+    Map = GetMapName()
     Data.title = ''
-    -- 서울 -> 맵 이름
-    Data.flavor_text = '"생각보다 별거 없네"...' .. '서울' .. '을 찾는 관광객 크게 줄어'
-    Data.message = '서울' .. '을 찾는 관광객이 늘었습니다. 승객이 10% 감소합니다.'
+    Data.flavor_text = '"생각보다 별거 없네"...' .. Map .. '을 찾는 관광객 크게 줄어'
+    Data.message = Map .. '을 찾는 관광객이 늘었습니다. 승객이 10% 감소합니다.'
     Data.period = 14
 
     return Data
