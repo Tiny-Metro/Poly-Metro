@@ -17,6 +17,7 @@
 UTinyMetroLuaState::UTinyMetroLuaState() {
 	bRawLuaFunctionCall = true;
 
+    Table.Add(TEXT("GetMapName"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetMapName)));
     Table.Add(TEXT("GetTimestamp"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetTimestamp)));
     Table.Add(TEXT("GetPolicyData"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetPolicyData)));
     Table.Add(TEXT("GetDefaultStatistics"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED(UTinyMetroLuaState, GetDefaultStatistics)));
@@ -59,6 +60,13 @@ void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
     if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
     if (!IsValid(PolicyRef)) PolicyRef = GameModeRef->GetPolicy();
+}
+
+FLuaValue UTinyMetroLuaState::GetMapName() {
+    InitReferClasses();
+    FLuaValue mapName = ULuaBlueprintFunctionLibrary::LuaCreateString(GameModeRef->GetMapName());
+
+    return mapName;
 }
 
 FLuaValue UTinyMetroLuaState::GetTimestamp() {
