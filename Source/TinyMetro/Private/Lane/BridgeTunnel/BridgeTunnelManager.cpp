@@ -47,25 +47,25 @@ void ABridgeTunnelManager::Tick(float DeltaTime)
 
 }
 
-void ABridgeTunnelManager::ConnectBT_Implementation(const TArray<FIntPoint>& points) {}
-void ABridgeTunnelManager::DisconnectBT_Implementation(const TArray<FIntPoint>& points) {}
+void ABridgeTunnelManager::ConnectBT_Implementation(const TArray<FIntPoint>& points, int32 LaneID) {}
+void ABridgeTunnelManager::DisconnectBT_Implementation(const TArray<FIntPoint>& points, int32 LaneID) {}
 
-void ABridgeTunnelManager::CreateNewBridge_Implementation(const TArray<FIntPoint>& points) {}
-void ABridgeTunnelManager::CreateNewTunnel_Implementation(const TArray<FIntPoint>& points) {}
+void ABridgeTunnelManager::CreateNewBridge_Implementation(const TArray<FIntPoint>& points, int32 LaneID) {}
+void ABridgeTunnelManager::CreateNewTunnel_Implementation(const TArray<FIntPoint>& points, int32 LaneID) {}
 
 
-void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntPoint>& points) {
+void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntPoint>& points, int32 LaneID) {
 	if (!IsPointsValid(points)) {
 		UE_LOG(LogTemp, Warning, TEXT("The givien pointsArray is invalid"));
 		return; 
 	}
-	Count++;
 	ABridgeTunnel* existingConnector = FindConnector(type, points);
 
 	if (existingConnector != nullptr) {
-		existingConnector->CountUp();
+		existingConnector->CountUp(LaneID);
 		return;
 	}
+	Count++;
 
 	TArray<FIntPoint> Points = ProcessArray(points);
 
@@ -73,7 +73,7 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 	{
 	case ConnectorType::Bridge:
 		if (PlayerStateRef->UseBridge()) { 
-			CreateNewBridge(Points);
+			CreateNewBridge(Points, LaneID);
 		}
 		else { 
 			UE_LOG(LogTemp, Warning, TEXT("No Valid Bridge")); 
@@ -82,7 +82,7 @@ void ABridgeTunnelManager::BuildConnector(ConnectorType type, const TArray<FIntP
 
 	case ConnectorType::Tunnel:
 		if (PlayerStateRef->UseTunnel()) { 
-			CreateNewTunnel(Points); 
+			CreateNewTunnel(Points, LaneID);
 		}
 		else { 
 			UE_LOG(LogTemp, Warning, TEXT("No Valid Tunnel")); 
@@ -239,21 +239,21 @@ void ABridgeTunnelManager::DeleteConnector(ABridgeTunnel* Connector) {
 	Connectors.Remove(Connector->ConnectorId);
 	Connector->Destroy();
 }
-void ABridgeTunnelManager::DisconnectConnector(ABridgeTunnel* Connector) {
-	Connector->CountDown();
+void ABridgeTunnelManager::DisconnectConnector(ABridgeTunnel* Connector, int32 LaneID) {
+	Connector->CountDown(LaneID);
 }
 
-void ABridgeTunnelManager::DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points) {
+void ABridgeTunnelManager::DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points, int32 LaneID) {
 	ABridgeTunnel* ConnectorToDelete = FindConnector(type, points);
 	if (ConnectorToDelete == nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!The givien pointsArray is invalid!!!!!!!!"));
 		return;
 	}
-	DisconnectConnector(ConnectorToDelete);
+	DisconnectConnector(ConnectorToDelete, LaneID);
 }
-void ABridgeTunnelManager::DisconnectByActorRef(ABridgeTunnel* ConnectorREF) {
+void ABridgeTunnelManager::DisconnectByActorRef(ABridgeTunnel* ConnectorREF, int32 LaneID) {
 	ABridgeTunnel* ConnectorToDelete = FindConnector(ConnectorREF);
-	DisconnectConnector(ConnectorToDelete);
+	DisconnectConnector(ConnectorToDelete, LaneID);
 }
 
 bool ABridgeTunnelManager::IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points) 
@@ -370,4 +370,27 @@ ABridgeTunnel* ABridgeTunnelManager::SpawnConnector()
 	ABridgeTunnel* tmpBridgeTunnel = Cast<ABridgeTunnel>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
 
 	return tmpBridgeTunnel;
+}
+
+int32 ABridgeTunnelManager::GetUsingConnectorCount(int32 LaneId, ConnectorType TargetConnectorType) 
+{
+	int32 UsingCount = 0;
+
+	// Iterate over the connectors in the map
+	for (const auto& ConnectorPair : Connectors)
+	{
+		ABridgeTunnel* TargetConnector = ConnectorPair.Value;
+
+		// Check if the connector's type matches the target type
+		if (TargetConnector->ConnectorInfo.Type == TargetConnectorType)
+		{
+			// Check if the lane is passing
+			if (TargetConnector->IsLanePassing(LaneId))
+			{
+				UsingCount++;
+			}
+		}
+	}
+
+	return UsingCount;
 }

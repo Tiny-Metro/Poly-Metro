@@ -40,8 +40,8 @@ void ABridgeTunnel::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-void ABridgeTunnel::CountUp_Implementation() {};
-void ABridgeTunnel::CountDown_Implementation() {};
+void ABridgeTunnel::CountUp_Implementation(int32 LaneID) {};
+void ABridgeTunnel::CountDown_Implementation(int32 LaneID) {};
 void ABridgeTunnel::BuildBridgeTunnel_Implementation() {};
 
 void ABridgeTunnel::Register_Implementation() {};
@@ -103,5 +103,19 @@ bool ABridgeTunnel::Load()
 	count = tmp -> count;
 
 	BuildBridgeTunnel();
+	return true;
+}
+bool ABridgeTunnel::IsLanePassing(int32 LaneId)
+{
+	// Check if the lane exists in the LaneUseCount map
+	int32* LaneCountPtr = ConnectorInfo.LaneUseCount.Find(LaneId);
+
+	// If the lane does not exist or its count is not greater than 0, return false
+	if (LaneCountPtr == nullptr || *LaneCountPtr <= 0)
+	{
+		return false;
+	}
+
+	// If the count is greater than 0, return true
 	return true;
 }

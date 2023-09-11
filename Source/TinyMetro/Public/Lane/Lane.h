@@ -457,7 +457,16 @@ protected: //Statistics
 	UFUNCTION(BlueprintCallable)
 	float GetStationComplainAverage();
 
-	/*
+	
 	UFUNCTION(BlueprintCallable) // Lane Deleted
-	void InitializeCurrentLaneStatics();*/
+	void InitializeCurrentLaneStatics();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateUsingConnector();
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingBridgeCount;
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingTunnelCount;
 };

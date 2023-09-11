@@ -1004,11 +1004,13 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	// if it is possible, bulid it
 	for (int i = 0; i < BridgeArea.Num(); i++) 
 	{		
-		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i], LaneId);
+		UpdateUsingConnector();
 	}
 	for (int i = 0; i < TunnelArea.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i], LaneId);
+		UpdateUsingConnector();
 	}
 
 	// Done
@@ -1304,7 +1306,7 @@ void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
-		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+		BTMangerREF->DisconnectByInfo(targetType, Area[i], LaneId);
 	}
 }
 
@@ -1318,7 +1320,8 @@ void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(targetType, Area[i]);
+		BTMangerREF->BuildConnector(targetType, Area[i], LaneId);
+		UpdateUsingConnector();
 	}
 }
 
@@ -2570,7 +2573,7 @@ float ALane::GetStationComplainAverage()
 
 }
 
-/*
+
 void ALane::InitializeCurrentLaneStatics()
 {
 	SubTotalLaneCount();
@@ -2579,8 +2582,17 @@ void ALane::InitializeCurrentLaneStatics()
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceTrainAndSubtrainCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].AverageComplain = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = false;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].TransferStationCount = 0;
 
 	//Bridge & Tunnel
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
-}*/
+}
+void ALane::UpdateUsingConnector()
+{
+	UsingTunnelCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Tunnel);
+	UsingBridgeCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Bridge);
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = UsingBridgeCount;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = UsingTunnelCount;
+}
