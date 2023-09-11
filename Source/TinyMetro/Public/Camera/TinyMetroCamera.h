@@ -87,29 +87,41 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	FRotator CurrentRotation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	bool CameraMoveEnable = false;
+	bool CameraMoveEnable = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	float CameraMoveSpeedX = 20.0f;
+	double CameraMoveSpeedX = 0.05f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	float CameraMoveSpeedY = 20.0f;
+	double CameraMoveSpeedY = 0.05f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	float CameraMoveBoundary = 0.2f;
+	double CameraMoveBoundaryMinX = -12000.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveBoundaryMaxX = 12000.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveBoundaryMinY = -15000.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveBoundaryMaxY = 15000.0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	float MinZoom = 3000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	float MaxZoom = 20000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float ZoomSpeed = 20.0f;
+	float ZoomSpeed = 5.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float ZoomDegree = 8000.0f;
+	float CurrentZoom = 8000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	float ZoomPinchPreTick = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	double Touch2StartDistance = 0.0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
 	float MinRotationAxisY = -90.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
 	float MaxRotationAxisY = -20.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
+	double CameraRotationSpeedX = 1.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
+	double CameraRotationSpeedY = 1.0;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	//class UBoxComponent* BoxComponent;
@@ -126,6 +138,8 @@ protected:
 	float Touch1PressTime = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	bool IsRotationMode = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool IsMoveMode = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	FVector2D Touch1InitPosition;
 

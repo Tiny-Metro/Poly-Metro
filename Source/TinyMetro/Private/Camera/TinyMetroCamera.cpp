@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
 
 // Sets default values
@@ -44,7 +45,7 @@ void ATinyMetroCamera::BeginPlay()
 
 	//SpringArmComponenet->SetUsingAbsoluteRotation(true);
 	//SpringArmComponenet->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	SpringArmComponenet->TargetArmLength = ZoomDegree;
+	SpringArmComponenet->TargetArmLength = CurrentZoom;
 }
 
 void ATinyMetroCamera::InitViewport(FViewport* Viewport, uint32 unused) {
@@ -147,11 +148,16 @@ void ATinyMetroCamera::Touch1Press() {
 	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
 	bool tmp;
 	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, Touch1InitPosition.X, Touch1InitPosition.Y, tmp);
+	if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
+		PlayerControllerRef->GetMousePosition(Touch1InitPosition.X, Touch1InitPosition.Y);
+	}
+	
 }
 
 void ATinyMetroCamera::Touch1Release() {
 	Touch1Pressed = false;
 	IsRotationMode = false;
+	IsMoveMode = false;
 }
 
 void ATinyMetroCamera::Touch1DoubleClick() {
@@ -160,31 +166,63 @@ void ATinyMetroCamera::Touch1DoubleClick() {
 
 void ATinyMetroCamera::Touch1Axis(float Axis) {
 	if (Touch1Pressed && !Touch2Pressed) {
-		// Rotation mode On
-		if (Touch1PressTime >= 1.0f) IsRotationMode = true;
-
+		// Get finger position
 		FVector2D currentTouchPositon;
 		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
 		bool tmp;
 		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, currentTouchPositon.X, currentTouchPositon.Y, tmp);
+		if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
+			PlayerControllerRef->GetMousePosition(currentTouchPositon.X, currentTouchPositon.Y);
+		}
 		auto distance = currentTouchPositon - Touch1InitPosition;
+
+		
+		// Move mode On
+		if (!IsRotationMode && UKismetMathLibrary::Distance2D(currentTouchPositon, Touch1InitPosition) >= 10) {
+			IsMoveMode = true;
+		}
+
+		// Rotation mode On
+		if (!IsMoveMode && Touch1PressTime >= 1.0f) {
+			IsRotationMode = true;
+		}
+
 		if (IsRotationMode) {
+			// Rotation
+
 			// Rotate Y
 			float normalizeDistanceY = UKismetMathLibrary::NormalizeToRange(distance.Y, (float)-ScreenY, (float)ScreenY);
 			double rotationValueY = UKismetMathLibrary::Lerp(-90, 90, normalizeDistanceY);
-			double clampPitch = UKismetMathLibrary::Clamp(CurrentRotation.Pitch + rotationValueY, MinRotationAxisY, MaxRotationAxisY);
-			//SpringArmComponenet->SetRelativeRotation(FRotator(clampPitch, 0.0f, 0.0f));
+			double clampPitch = UKismetMathLibrary::ClampAngle(CurrentRotation.Pitch + rotationValueY * CameraRotationSpeedY, MinRotationAxisY, MaxRotationAxisY);
 
 			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("Touch1Axis : %f %f %f %f %f %f"), (float)ScreenY, currentTouchPositon.Y, normalizeDistanceY, rotationValueY, clampPitch, CurrentRotation.Pitch));
 
 			// Rotation X
 			float normalizeDistanceX = UKismetMathLibrary::NormalizeToRange(distance.X, (float)-ScreenX, (float)ScreenX);
 			float rotationValueX = UKismetMathLibrary::Lerp(-180, 180, normalizeDistanceX);
-			double clampYaw = UKismetMathLibrary::Clamp(CurrentRotation.Yaw + rotationValueX, -180, 180);
-			SpringArmComponenet->SetRelativeRotation(FRotator(clampPitch, clampYaw, 0.0f));
-		} else {
-			// Move
+			double clampYaw = UKismetMathLibrary::ClampAngle(CurrentRotation.Yaw + rotationValueX, -180, 180);
+			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("Touch1Axis : %f %f %f %f %f %f"), (float)ScreenX, currentTouchPositon.X, normalizeDistanceX, rotationValueX, clampYaw, CurrentRotation.Yaw));
 
+			SpringArmComponenet->SetRelativeRotation(FRotator(clampPitch, CurrentRotation.Yaw + rotationValueX * CameraRotationSpeedX, 0.0f));
+		} 
+		if(IsMoveMode) {
+			if (CameraMoveEnable) {
+				// Move
+				FVector curLocation = GetActorLocation();
+				FRotator curRotation = SpringArmComponenet->GetRelativeRotation();
+				curRotation.Pitch = 0;
+				curRotation.Roll = 0;
+				FVector addLocation = UKismetMathLibrary::Quat_RotateVector(curRotation.Quaternion(), FVector(-distance, 0));
+				
+				FVector newLocation(
+					UKismetMathLibrary::FClamp(curLocation.X + addLocation.X * CameraMoveSpeedX, CameraMoveBoundaryMinX, CameraMoveBoundaryMaxX),
+					UKismetMathLibrary::FClamp(curLocation.Y + addLocation.Y * CameraMoveSpeedY, CameraMoveBoundaryMinY, CameraMoveBoundaryMaxY),
+					curLocation.Z
+				);
+
+				SetActorLocation(newLocation);
+				//AddActorWorldOffset(FVector(distance.X * CameraMoveSpeedX, distance.Y * CameraMoveSpeedY, 0));
+			}
 
 		}
 	}
@@ -192,6 +230,12 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 
 void ATinyMetroCamera::Touch2Press() {
 	Touch2Pressed = true;
+	bool tmp;
+	FVector2D touch1Position, touch2Position;
+	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, touch1Position.X, touch1Position.Y, tmp);
+	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch2, touch2Position.X, touch2Position.Y, tmp);
+	Touch2StartDistance = UKismetMathLibrary::Distance2D(touch1Position, touch2Position);
+	CurrentZoom = SpringArmComponenet->TargetArmLength;
 }
 
 void ATinyMetroCamera::Touch2Release() {
@@ -199,9 +243,20 @@ void ATinyMetroCamera::Touch2Release() {
 }
 
 void ATinyMetroCamera::Touch2Axis(float Axis) {
-	if (Touch2Pressed) {
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("AxisTouch2"));
+	if (Touch2Pressed && !IsMoveMode && !IsRotationMode) {
+		bool tmp;
+		FVector2D touch1Position, touch2Position;
+		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, touch1Position.X, touch1Position.Y, tmp);
+		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch2, touch2Position.X, touch2Position.Y, tmp);
 
+		auto curDistance = UKismetMathLibrary::Distance2D(touch1Position, touch2Position);
+		double newCameraDistance = UKismetMathLibrary::FClamp(
+			CurrentZoom + (Touch2StartDistance - curDistance) * ZoomSpeed,
+			MinZoom,
+			MaxZoom
+		);
+		
+		SpringArmComponenet->TargetArmLength = newCameraDistance;
 	}
 }
 
