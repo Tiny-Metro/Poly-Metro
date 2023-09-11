@@ -99,6 +99,9 @@ AStation::AStation()
 	// Bind click, release event
 	OnClicked.AddDynamic(this, &AStation::StationOnPressed);
 	OnReleased.AddDynamic(this, &AStation::StationOnReleased);
+
+	OnInputTouchBegin.AddDynamic(this, &AStation::StationTouchBegin);
+	OnInputTouchEnd.AddDynamic(this, &AStation::StationTouchEnd);
 }
 
 // Called when the game starts or when spawned
@@ -502,6 +505,13 @@ void AStation::StationOnReleased(AActor* Target, FKey ButtonPressed) {
 	if (TouchTime > LongClickInterval) {
 		StationInfoWidget->ShowWidget(this);
 	}
+}
+
+void AStation::StationTouchBegin(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::Touch C++"));
+}
+
+void AStation::StationTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
 }
 
 void AStation::ComplainRoutine() {

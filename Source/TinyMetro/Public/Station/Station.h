@@ -144,6 +144,12 @@ public:
 	UFUNCTION()
 	virtual void StationOnReleased(AActor* Target, FKey ButtonPressed);
 
+	// Touch
+	UFUNCTION()
+	virtual void StationTouchBegin(ETouchIndex::Type FingerIndex, AActor* TouchedActor);
+	UFUNCTION()
+	virtual void StationTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor);
+
 	// Info widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStationInfoWidget* StationInfoWidget;
