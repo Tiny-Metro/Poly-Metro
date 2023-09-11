@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "InputActionValue.h"
 #include "TinyMetroCamera.generated.h"
+
+class USpringArmComponent;
+class UCameraComponent;
 
 UCLASS()
 class TINYMETRO_API ATinyMetroCamera : public APawn
@@ -18,6 +22,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	//UFUNCTION()
+	void InitViewport(class FViewport* Viewport, uint32 unused);
 
 	UFUNCTION()
 	void MouseWheel(float Axis);
@@ -26,11 +33,6 @@ protected:
 	void MouseX(float Axis);
 	UFUNCTION()
 	void MouseY(float Axis);
-
-	UFUNCTION()
-	void CameraRotationOn();
-	UFUNCTION()
-	void CameraRotationOff();
 
 	UFUNCTION()
 	void CameraMoveX(int32 DirectionFlag, float DeltaTime);
@@ -42,6 +44,28 @@ protected:
 
 	UFUNCTION()
 	void PinchZoom(float Value);
+
+	//// Enhanced input
+	//UFUNCTION()
+	//void Move(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void Touch1Press();
+	UFUNCTION()
+	void Touch1Release();
+	UFUNCTION()
+	void Touch1DoubleClick();
+	UFUNCTION()
+	void Touch1Axis(float Axis);
+
+	UFUNCTION()
+	void Touch2Press();
+	UFUNCTION()
+	void Touch2Release();
+	UFUNCTION()
+	void Touch2Axis(float Axis);
+	
+
 
 public:	
 	// Called every frame
@@ -56,10 +80,12 @@ protected:
 	APlayerController* PlayerControllerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector2D MousePosition;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 ScreenX;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 ScreenY;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	FRotator CurrentRotation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	bool CameraMoveEnable = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
@@ -69,23 +95,44 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	float CameraMoveBoundary = 0.2f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Location")
-	FVector InitLocation = FVector(0, 3500.0f, 6000.f);
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float MinZoom = 300.0f;
+	float MinZoom = 3000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float MaxZoom = 3000.0f;
+	float MaxZoom = 20000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
 	float ZoomSpeed = 20.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float ZoomScale = 2000.0f;
+	float ZoomDegree = 8000.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	float ZoomPinchPreTick = 1.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
-	bool IsCameraRotation = false;
+	float MinRotationAxisY = -90.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
+	float MaxRotationAxisY = -20.0f;
 
-	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
-	class USpringArmComponent* SpringArmComponenet;
-	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
-	class UCameraComponent* CameraComponent;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//class UBoxComponent* BoxComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	USpringArmComponent* SpringArmComponenet;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool Touch1Pressed = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool Touch2Pressed = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	float Touch1PressTime = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool IsRotationMode = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	FVector2D Touch1InitPosition;
+
+	//// Enhanced input
+	//UPROPERTY(EditAnywhere, Category = "Input");
+	//class UInputMappingContext* InputContext;
+	//UPROPERTY(EditAnywhere, Category = "Input");
+	//class UInputAction* MoveAction;
+
 };

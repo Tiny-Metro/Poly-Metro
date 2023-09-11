@@ -2,8 +2,13 @@
 
 
 #include "Camera/TinyMetroCamera.h"
-#include <Engine/Classes/GameFramework/SpringArmComponent.h>
-#include <Engine/Classes/Camera/CameraComponent.h>
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "UnrealClient.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include <Kismet/KismetMathLibrary.h>
 
 // Sets default values
 ATinyMetroCamera::ATinyMetroCamera()
@@ -11,9 +16,14 @@ ATinyMetroCamera::ATinyMetroCamera()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Rootcomponent"));
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	////BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	////BoxComponent->SetupAttachment(RootComponent);
 
 	SpringArmComponenet = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArmComponenet->SetWorldRotation(FRotator(-60.0f, 0.0f, 0.0f).Quaternion());
 	SpringArmComponenet->SetupAttachment(RootComponent);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -29,10 +39,17 @@ void ATinyMetroCamera::BeginPlay()
 	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
 	PlayerControllerRef->GetViewportSize(ScreenX, ScreenY);
 
-	RootComponent->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
+	GEngine->GameViewport->Viewport->ViewportResizedEvent.AddUObject(this, &ATinyMetroCamera::InitViewport);
+	//RootComponent->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f).Quaternion());
 
-	SpringArmComponenet->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
-	SpringArmComponenet->TargetArmLength = ZoomScale;
+	//SpringArmComponenet->SetUsingAbsoluteRotation(true);
+	//SpringArmComponenet->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	SpringArmComponenet->TargetArmLength = ZoomDegree;
+}
+
+void ATinyMetroCamera::InitViewport(FViewport* Viewport, uint32 unused) {
+	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+	PlayerControllerRef->GetViewportSize(ScreenX, ScreenY);
 }
 
 void ATinyMetroCamera::MouseWheel(float Axis) {
@@ -54,26 +71,21 @@ void ATinyMetroCamera::MouseWheel(float Axis) {
 
 void ATinyMetroCamera::MouseX(float Axis) {
 	if(Axis != 0.0f) UE_LOG(LogTemp, Log, TEXT("MouseX : %f"), Axis);
-	if (IsCameraRotation) {
-		CameraComponent->AddLocalRotation(FRotator(0.0f, Axis, 0.0f).Quaternion());
-		SpringArmComponenet->AddLocalRotation(FRotator(Axis, 0.0f, 0.0f).Quaternion());
+	if (IsRotationMode) {
+		//AddActorWorldRotation(FRotator(Axis, 0.0f, 0.0f).Quaternion());
+		//CameraComponent->AddLocalRotation(FRotator(0.0f, Axis, 0.0f).Quaternion());
+		
+		SpringArmComponenet->AddLocalRotation(FRotator(0.0f, Axis, 0.0f).Quaternion());
 	}
 }
 
 void ATinyMetroCamera::MouseY(float Axis) {
 	if (Axis != 0.0f) UE_LOG(LogTemp, Log, TEXT("MouseY : %f"), Axis);
-	if (IsCameraRotation) {
-		SpringArmComponenet->AddLocalRotation(FRotator(Axis, 0.0f, 0.0f).Quaternion());
+	if (IsRotationMode) {
+		//SpringArmComponenet->AddLocalRotation(FRotator(Axis, 0.0f, 0.0f).Quaternion());
+		CameraComponent->AddLocalRotation(FRotator(Axis, 0.0f, 0.0f).Quaternion());
 		//CameraComponent->AddLocalRotation(FRotator(Axis, 0.0f, 0.0f).Quaternion());
 	}
-}
-
-void ATinyMetroCamera::CameraRotationOn() {
-	IsCameraRotation = true;
-}
-
-void ATinyMetroCamera::CameraRotationOff() {
-	IsCameraRotation = false;
 }
 
 void ATinyMetroCamera::CameraMoveX(int32 DirectionFlag, float DeltaTime) {
@@ -101,8 +113,95 @@ void ATinyMetroCamera::SetCameraMoveEnable(bool Flag) {
 }
 
 void ATinyMetroCamera::PinchZoom(float Value) {
-	if (Value != 0.0f) {
-		SpringArmComponenet->TargetArmLength *= Value;
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, FString::Printf(TEXT("PinchZoom : %f"), Value));
+	SpringArmComponenet->TargetArmLength += Value * ZoomSpeed;
+	if (SpringArmComponenet->TargetArmLength > MaxZoom) {
+		SpringArmComponenet->TargetArmLength = MaxZoom;
+	}
+	if (SpringArmComponenet->TargetArmLength < MinZoom) {
+		SpringArmComponenet->TargetArmLength = MinZoom;
+	}
+	//if (Value != 0.0f) {
+	//	if (ZoomPinchPreTick > Value) {
+	//		// Zoom out
+	//		SpringArmComponenet->TargetArmLength += ZoomSpeed;
+	//		if (SpringArmComponenet->TargetArmLength > MaxZoom) {
+	//			SpringArmComponenet->TargetArmLength = MaxZoom;
+	//		}
+	//	} else {
+	//		// Zoom in
+	//		SpringArmComponenet->TargetArmLength -= ZoomSpeed;
+	//		if (SpringArmComponenet->TargetArmLength < MinZoom) {
+	//			SpringArmComponenet->TargetArmLength = MinZoom;
+	//		}
+	//	}
+	//	ZoomPinchPreTick = Value;
+	//}
+}
+
+void ATinyMetroCamera::Touch1Press() {
+	Touch1Pressed = true;
+	Touch1PressTime = 0.0f;
+	CurrentRotation = SpringArmComponenet->GetRelativeRotation();
+
+	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+	bool tmp;
+	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, Touch1InitPosition.X, Touch1InitPosition.Y, tmp);
+}
+
+void ATinyMetroCamera::Touch1Release() {
+	Touch1Pressed = false;
+	IsRotationMode = false;
+}
+
+void ATinyMetroCamera::Touch1DoubleClick() {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("Touch1 DoubleClick"));
+}
+
+void ATinyMetroCamera::Touch1Axis(float Axis) {
+	if (Touch1Pressed && !Touch2Pressed) {
+		// Rotation mode On
+		if (Touch1PressTime >= 1.0f) IsRotationMode = true;
+
+		FVector2D currentTouchPositon;
+		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+		bool tmp;
+		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, currentTouchPositon.X, currentTouchPositon.Y, tmp);
+		auto distance = currentTouchPositon - Touch1InitPosition;
+		if (IsRotationMode) {
+			// Rotate Y
+			float normalizeDistanceY = UKismetMathLibrary::NormalizeToRange(distance.Y, (float)-ScreenY, (float)ScreenY);
+			double rotationValueY = UKismetMathLibrary::Lerp(-90, 90, normalizeDistanceY);
+			double clampPitch = UKismetMathLibrary::Clamp(CurrentRotation.Pitch + rotationValueY, MinRotationAxisY, MaxRotationAxisY);
+			//SpringArmComponenet->SetRelativeRotation(FRotator(clampPitch, 0.0f, 0.0f));
+
+			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("Touch1Axis : %f %f %f %f %f %f"), (float)ScreenY, currentTouchPositon.Y, normalizeDistanceY, rotationValueY, clampPitch, CurrentRotation.Pitch));
+
+			// Rotation X
+			float normalizeDistanceX = UKismetMathLibrary::NormalizeToRange(distance.X, (float)-ScreenX, (float)ScreenX);
+			float rotationValueX = UKismetMathLibrary::Lerp(-180, 180, normalizeDistanceX);
+			double clampYaw = UKismetMathLibrary::Clamp(CurrentRotation.Yaw + rotationValueX, -180, 180);
+			SpringArmComponenet->SetRelativeRotation(FRotator(clampPitch, clampYaw, 0.0f));
+		} else {
+			// Move
+
+
+		}
+	}
+}
+
+void ATinyMetroCamera::Touch2Press() {
+	Touch2Pressed = true;
+}
+
+void ATinyMetroCamera::Touch2Release() {
+	Touch2Pressed = false;
+}
+
+void ATinyMetroCamera::Touch2Axis(float Axis) {
+	if (Touch2Pressed) {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("AxisTouch2"));
+
 	}
 }
 
@@ -113,6 +212,26 @@ void ATinyMetroCamera::Tick(float DeltaTime)
 	//PlayerControllerRef->GetMousePosition(MousePosition.X, MousePosition.Y);
 	//UE_LOG(LogTemp, Log, TEXT("X : %f / %d, Y : %f / %d"), MousePosition.X, ScreenX, MousePosition.Y, ScreenY);
 
+	/*double TouchX1 = 0, TouchY1 = 0;
+	double TouchX2 = 0, TouchY2 = 0;
+	bool CurrentPress1, CurrentPress2;
+	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, TouchX1, TouchY1, CurrentPress1);
+	
+	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch2, TouchX2, TouchY2, CurrentPress2);
+	FString msg = "Tick : ";
+	msg += CurrentPress1 ? "True " : "False ";
+	msg += FString::SanitizeFloat(TouchX1) + " " + FString::SanitizeFloat(TouchY1);
+	msg += " | ";
+	msg += CurrentPress2 ? "True " : "False ";
+	msg += FString::SanitizeFloat(TouchX2) + " " + FString::SanitizeFloat(TouchY2);*/
+
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, msg);
+
+	//AddActorWorldRotation(FRotator(0.0f, 0.0f, 1.0f * DeltaTime).Quaternion());
+
+	if (Touch1Pressed && !Touch2Pressed) {
+		Touch1PressTime += DeltaTime;
+	}
 	
 }
 
@@ -121,16 +240,26 @@ void ATinyMetroCamera::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(TEXT("Right Mouse Button"), IE_Pressed, this, &ATinyMetroCamera::CameraRotationOn);
-	PlayerInputComponent->BindAction(TEXT("Right Mouse Button"), IE_Released, this, &ATinyMetroCamera::CameraRotationOff);
+	//PlayerInputComponent->BindAction(TEXT("Right Mouse Button"), IE_Pressed, this, &ATinyMetroCamera::CameraRotationOn);
+	//PlayerInputComponent->BindAction(TEXT("Right Mouse Button"), IE_Released, this, &ATinyMetroCamera::CameraRotationOff);
 
-	// Bind wheel mapping (Camera zoom in, out)
-	PlayerInputComponent->BindAxis(TEXT("Mouse Wheel"), this, &ATinyMetroCamera::MouseWheel);
-	// Bind wheel mapping (Camera zoom in, out)
-	PlayerInputComponent->BindAxis(TEXT("Pinch Zoom"), this, &ATinyMetroCamera::PinchZoom);
+	//// Bind wheel mapping (Camera zoom in, out)
+	//PlayerInputComponent->BindAxis(TEXT("Mouse Wheel"), this, &ATinyMetroCamera::MouseWheel);
+	//// Bind wheel mapping (Camera zoom in, out)
+	//PlayerInputComponent->BindAxis(TEXT("Pinch Zoom"), this, &ATinyMetroCamera::PinchZoom);
 
-	PlayerInputComponent->BindAxis(TEXT("Mouse X"), this, &ATinyMetroCamera::MouseX);
-	PlayerInputComponent->BindAxis(TEXT("Mouse Y"), this, &ATinyMetroCamera::MouseY);
+	//PlayerInputComponent->BindAxis(TEXT("Mouse X"), this, &ATinyMetroCamera::MouseX);
+	//PlayerInputComponent->BindAxis(TEXT("Mouse Y"), this, &ATinyMetroCamera::MouseY);
+
+	PlayerInputComponent->BindAction(TEXT("Action Touch1"), IE_Pressed, this, &ATinyMetroCamera::Touch1Press);
+	PlayerInputComponent->BindAction(TEXT("Action Touch1"), IE_Released, this, &ATinyMetroCamera::Touch1Release);
+	PlayerInputComponent->BindAction(TEXT("Action Touch1"), IE_DoubleClick, this, &ATinyMetroCamera::Touch1DoubleClick);
+
+	PlayerInputComponent->BindAction(TEXT("Action Touch2"), IE_Pressed, this, &ATinyMetroCamera::Touch2Press);
+	PlayerInputComponent->BindAction(TEXT("Action Touch2"), IE_Released, this, &ATinyMetroCamera::Touch2Release);
+
+	PlayerInputComponent->BindAxis(TEXT("Axis Touch1"), this, &ATinyMetroCamera::Touch1Axis);
+	PlayerInputComponent->BindAxis(TEXT("Axis Touch2"), this, &ATinyMetroCamera::Touch2Axis);
 
 }
 
