@@ -26,29 +26,21 @@ protected:
 	//UFUNCTION()
 	void InitViewport(class FViewport* Viewport, uint32 unused);
 
+	// Used Windows
 	UFUNCTION()
 	void MouseWheel(float Axis);
-
 	UFUNCTION()
-	void MouseX(float Axis);
+	void CameraMoveX(float Axis);
 	UFUNCTION()
-	void MouseY(float Axis);
-
+	void CameraMoveY(float Axis);
 	UFUNCTION()
-	void CameraMoveX(int32 DirectionFlag, float DeltaTime);
+	void CameraRotationX(float Axis);
 	UFUNCTION()
-	void CameraMoveY(int32 DirectionFlag, float DeltaTime);
-
+	void CameraRotationY(float Axis);
 	UFUNCTION()
-	void SetCameraMoveEnable(bool Flag);
+	void ToggleCameraMoveEnable();
 
-	UFUNCTION()
-	void PinchZoom(float Value);
-
-	//// Enhanced input
-	//UFUNCTION()
-	//void Move(const FInputActionValue& Value);
-
+	// Used Mobile
 	UFUNCTION()
 	void Touch1Press();
 	UFUNCTION()
@@ -57,15 +49,12 @@ protected:
 	void Touch1DoubleClick();
 	UFUNCTION()
 	void Touch1Axis(float Axis);
-
 	UFUNCTION()
 	void Touch2Press();
 	UFUNCTION()
 	void Touch2Release();
 	UFUNCTION()
 	void Touch2Axis(float Axis);
-	
-
 
 public:	
 	// Called every frame
@@ -115,9 +104,9 @@ protected:
 	double Touch2StartDistance = 0.0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
-	float MinRotationAxisY = -90.0f;
+	double MinRotationAxisY = -90.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
-	float MaxRotationAxisY = -20.0f;
+	double MaxRotationAxisY = -20.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
 	double CameraRotationSpeedX = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
