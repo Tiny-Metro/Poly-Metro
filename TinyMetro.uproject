@@ -32,10 +32,6 @@
 			"SupportedTargetPlatforms": [
 				"Win64"
 			]
-		},
-		{
-			"Name": "EnhancedInput",
-			"Enabled": true
 		}
 	]
 }

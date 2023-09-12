@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "InputActionValue.h"
 #include "TinyMetroCamera.generated.h"
 
 class USpringArmComponent;
@@ -112,8 +111,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
 	double CameraRotationSpeedY = 1.0;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//class UBoxComponent* BoxComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
 	USpringArmComponent* SpringArmComponenet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
@@ -131,11 +128,4 @@ protected:
 	bool IsMoveMode = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	FVector2D Touch1InitPosition;
-
-	//// Enhanced input
-	//UPROPERTY(EditAnywhere, Category = "Input");
-	//class UInputMappingContext* InputContext;
-	//UPROPERTY(EditAnywhere, Category = "Input");
-	//class UInputAction* MoveAction;
-
 };
