@@ -55,6 +55,13 @@ protected:
 	UFUNCTION()
 	void Touch2Axis(float Axis);
 
+	// Save & Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+	
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -66,6 +73,8 @@ protected:
 
 	UPROPERTY()
 	APlayerController* PlayerControllerRef;
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector2D MousePosition;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")

@@ -4,6 +4,9 @@
 #include "Camera/TinyMetroCamera.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "SaveSystem/TMSaveManager.h"
+#include "Camera/TinyMetroCameraSaveGame.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
 
@@ -28,13 +31,20 @@ ATinyMetroCamera::ATinyMetroCamera()
 void ATinyMetroCamera::BeginPlay()
 {
 	Super::BeginPlay();
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Pawn::BeginPlay"));
+
 	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
 	PlayerControllerRef->GetViewportSize(ScreenX, ScreenY);
 
-	GEngine->GameViewport->Viewport->ViewportResizedEvent.AddUObject(this, &ATinyMetroCamera::InitViewport);
+	if (!IsValid(SaveManagerRef)) {
+		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
+	}
 
+	GEngine->GameViewport->Viewport->ViewportResizedEvent.AddUObject(this, &ATinyMetroCamera::InitViewport);
 	SpringArmComponenet->TargetArmLength = CurrentZoom;
+
+	Load();
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ATinyMetroCamera::Save);
 }
 
 void ATinyMetroCamera::InitViewport(FViewport* Viewport, uint32 unused) {
@@ -226,6 +236,36 @@ void ATinyMetroCamera::Touch2Axis(float Axis) {
 		
 		SpringArmComponenet->TargetArmLength = newCameraDistance;
 	}
+}
+
+void ATinyMetroCamera::Save() {
+	if (!IsValid(SaveManagerRef)) {
+		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
+	}
+	UTinyMetroCameraSaveGame* tmp = Cast<UTinyMetroCameraSaveGame>(UGameplayStatics::CreateSaveGameObject(UTinyMetroCameraSaveGame::StaticClass()));
+	tmp->Location = GetActorLocation();
+	tmp->ParentRotation = GetActorRotation();
+	tmp->SpringArmRotation = SpringArmComponenet->GetRelativeRotation();
+	tmp->CameraDistance = SpringArmComponenet->TargetArmLength;
+
+	SaveManagerRef->Save(tmp, SaveActorType::Camera);
+}
+
+void ATinyMetroCamera::Load() {
+	if (!IsValid(SaveManagerRef)) {
+		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
+	}
+	UTinyMetroCameraSaveGame* tmp = Cast<UTinyMetroCameraSaveGame>(SaveManagerRef->Load(SaveActorType::Camera));
+
+	if (!IsValid(tmp)) {
+		return;
+	}
+
+	SetActorLocation(tmp->Location);
+	SetActorRotation(tmp->ParentRotation);
+	SpringArmComponenet->SetRelativeRotation(tmp->SpringArmRotation);
+	SpringArmComponenet->TargetArmLength = tmp->CameraDistance;
+
 }
 
 // Called every frame
