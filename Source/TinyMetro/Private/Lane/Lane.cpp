@@ -494,7 +494,7 @@ void ALane::LaneCreating_Implementation() {}
 void ALane::InitializeNewLane_Implementation() {}
 void ALane::RemoveLane_Implementation() {}
 
-void ALane::ExtendLane_Implementation() {}
+void ALane::ExtendLane_Implementation(AStation* Station) {}
 
 void ALane::FinishRemovingLaneAtStart_Implementation() {}
 
