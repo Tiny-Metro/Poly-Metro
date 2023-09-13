@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "TinyMetroCamera.generated.h"
 
+class USpringArmComponent;
+class UCameraComponent;
+
 UCLASS()
 class TINYMETRO_API ATinyMetroCamera : public APawn
 {
@@ -18,30 +21,46 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	//UFUNCTION()
+	void InitViewport(class FViewport* Viewport, uint32 unused);
 
+	// Used Windows
 	UFUNCTION()
 	void MouseWheel(float Axis);
+	UFUNCTION()
+	void CameraMoveX(float Axis);
+	UFUNCTION()
+	void CameraMoveY(float Axis);
+	UFUNCTION()
+	void CameraRotationX(float Axis);
+	UFUNCTION()
+	void CameraRotationY(float Axis);
+	UFUNCTION()
+	void ToggleCameraMoveEnable();
 
+	// Used Mobile
 	UFUNCTION()
-	void MouseX(float Axis);
+	void Touch1Press();
 	UFUNCTION()
-	void MouseY(float Axis);
+	void Touch1Release();
+	UFUNCTION()
+	void Touch1DoubleClick();
+	UFUNCTION()
+	void Touch1Axis(float Axis);
+	UFUNCTION()
+	void Touch2Press();
+	UFUNCTION()
+	void Touch2Release();
+	UFUNCTION()
+	void Touch2Axis(float Axis);
 
+	// Save & Load
 	UFUNCTION()
-	void CameraRotationOn();
+	void Save();
 	UFUNCTION()
-	void CameraRotationOff();
-
-	UFUNCTION()
-	void CameraMoveX(int32 DirectionFlag, float DeltaTime);
-	UFUNCTION()
-	void CameraMoveY(int32 DirectionFlag, float DeltaTime);
-
-	UFUNCTION()
-	void SetCameraMoveEnable(bool Flag);
-
-	UFUNCTION()
-	void PinchZoom(float Value);
+	void Load();
+	
 
 public:	
 	// Called every frame
@@ -54,38 +73,68 @@ protected:
 
 	UPROPERTY()
 	APlayerController* PlayerControllerRef;
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector2D MousePosition;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 ScreenX;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	int32 ScreenY;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	FRotator CurrentRotation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	bool CameraMoveEnable = false;
+	bool CameraMoveEnable = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	float CameraMoveSpeedX = 20.0f;
+	double CameraMoveSpeedX = 0.05f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	float CameraMoveSpeedY = 20.0f;
+	double CameraMoveSpeedY = 0.05f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
-	float CameraMoveBoundary = 0.2f;
+	double CameraMoveBoundaryMinX = -12000.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveBoundaryMaxX = 12000.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveBoundaryMinY = -15000.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveBoundaryMaxY = 15000.0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Location")
-	FVector InitLocation = FVector(0, 3500.0f, 6000.f);
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float MinZoom = 300.0f;
+	float MinZoom = 3000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float MaxZoom = 3000.0f;
+	float MaxZoom = 20000.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float ZoomSpeed = 20.0f;
+	float ZoomSpeed = 5.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
-	float ZoomScale = 2000.0f;
+	float CurrentZoom = 8000.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	float ZoomPinchPreTick = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Zoom")
+	double Touch2StartDistance = 0.0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
-	bool IsCameraRotation = false;
+	double MinRotationAxisY = -90.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
+	double MaxRotationAxisY = -20.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
+	double CameraRotationSpeedX = 1.0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Rotation")
+	double CameraRotationSpeedY = 1.0;
 
-	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
-	class USpringArmComponent* SpringArmComponenet;
-	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite)
-	class UCameraComponent* CameraComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	USpringArmComponent* SpringArmComponenet;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool Touch1Pressed = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool Touch2Pressed = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	float Touch1PressTime = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool IsRotationMode = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	bool IsMoveMode = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	FVector2D Touch1InitPosition;
 };

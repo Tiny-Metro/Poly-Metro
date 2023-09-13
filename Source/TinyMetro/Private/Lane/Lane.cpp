@@ -229,7 +229,7 @@ LaneDirection ALane::GetLaneShape(FVector Location) {
 	);
 
 	auto shape = min - secondMin;
-	LaneDirection result;
+	LaneDirection result = LaneDirection::Vertical;
 	if (shape.X == 0) { // Vertical
 		result = LaneDirection::Vertical;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
