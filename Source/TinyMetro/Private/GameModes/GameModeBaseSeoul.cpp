@@ -15,6 +15,11 @@ FString AGameModeBaseSeoul::GetFileName() const {
     return TEXT("Seoul");
 }
 
+FString AGameModeBaseSeoul::GetMapName() const {
+    // TODO : Get game language setting, sepearte return value
+    return TEXT("서울");
+}
+
 TMap<FIntPoint, StationType> AGameModeBaseSeoul::GetInitData() const {
     TMap<FIntPoint, StationType> Tmp;
     if (!UGameplayStatics::DoesSaveGameExist("StationSave", 0))

@@ -190,8 +190,8 @@ public:
 
 public : // BlueprintNativeEvent
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ExtendLane();
-	virtual void ExtendLane_Implementation();
+	void ExtendLane(class AStation* Station);
+	virtual void ExtendLane_Implementation(class AStation* Station);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FinishRemovingLaneAtStart();
@@ -457,7 +457,16 @@ protected: //Statistics
 	UFUNCTION(BlueprintCallable)
 	float GetStationComplainAverage();
 
-	/*
+	
 	UFUNCTION(BlueprintCallable) // Lane Deleted
-	void InitializeCurrentLaneStatics();*/
+	void InitializeCurrentLaneStatics();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateUsingConnector();
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingBridgeCount;
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingTunnelCount;
 };

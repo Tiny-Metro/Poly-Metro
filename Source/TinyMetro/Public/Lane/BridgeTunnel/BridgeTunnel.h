@@ -34,8 +34,8 @@ public:
 	int32 ConnectorId ;
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CountUp();
-	virtual void CountUp_Implementation();
+	void CountUp(int32 LaneID);
+	virtual void CountUp_Implementation(int32 LaneID);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Register();
@@ -47,8 +47,8 @@ public:
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CountDown();
-	virtual void CountDown_Implementation();
+	void CountDown(int32 LaneID);
+	virtual void CountDown_Implementation(int32 LaneID);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void BuildBridgeTunnel();
@@ -70,4 +70,7 @@ public:
 
 	UFUNCTION()
 	bool Load();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsLanePassing(int32 LaneId); // check the targetLane is passing 
 };

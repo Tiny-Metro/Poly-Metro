@@ -84,6 +84,9 @@ protected:
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly)
 	int32 UILaneNum;
 
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly)
+	TArray<class AStation*> SelectedStations;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetCanAssginBridge(bool AssginBridge);
@@ -109,15 +112,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSelectedLaneNum(int32 Num);
 
+	UFUNCTION(BlueprintCallable)
+	void AddSelectedStations(class AStation* Station);
+
+	UFUNCTION(BlueprintCallable)
+	void CancelSelectedStations();
+
+
 public:
 	UFUNCTION(BlueprintCallable)
 	class ALane* SpawnLane();
 
 	UFUNCTION(BlueprintCallable)
-	void CreatingNewLane(TArray <AStation*> SelectedStations);
+	void CreatingNewLane();
 
-	UFUNCTION(BlueprintCallable)
-	void AddStationInLane(int CurrentLane);
+	/*UFUNCTION(BlueprintCallable)
+	void AddStationInLane(int CurrentLane);*/
 	
 	UFUNCTION(BlueprintCallable)
 	void AddLane(ALane* Obj);

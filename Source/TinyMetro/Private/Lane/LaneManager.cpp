@@ -8,6 +8,7 @@
 #include "Lane/LaneManagerSaveGame.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Statistics/StatisticsManager.h"
+#include "Station/Station.h"
 
 
 // Sets default values
@@ -112,6 +113,41 @@ void ALaneManager::SetSelectedLaneNum(int32 Num)
 	SetUILaneNum(Num);
 }
 
+void ALaneManager::AddSelectedStations(AStation* Station)
+{
+	SelectedStations.Add(Station);
+
+	if (IsPlacementValid)
+	{
+		//ExtendLane
+		Lanes[SelectedLaneNum]->ExtendLane(Station);
+		SelectedStations.Empty();
+	}
+	else
+	{
+
+		if (SelectedStations.Num() == 2)
+		{
+			//Add NewLane
+			CreatingNewLane();
+
+			CancelSelectedStations();
+		}
+		else
+		{
+			SetUILaneNum(NextLaneNums[0]);
+		}
+
+	}
+}
+
+void ALaneManager::CancelSelectedStations()
+{
+	SelectedStations.Empty();
+
+	SetUILaneNum(0);
+}
+
 ALane* ALaneManager::SpawnLane()
 {
 	// Load BP Class
@@ -143,7 +179,7 @@ ALane* ALaneManager::SpawnLane()
 	return tmpLane;
 }
 
-void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
+void ALaneManager::CreatingNewLane() {
 
 	if (NextLaneNums.IsEmpty()) {
 
@@ -209,12 +245,12 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 }
 
 
-void ALaneManager::AddStationInLane(int CurrentLane) {
-
-	ALane* tmp = GetLaneById(CurrentLane);
-
-	tmp->ExtendLane();
-}
+//void ALaneManager::AddStationInLane(int CurrentLane) {
+//
+//	ALane* tmp = GetLaneById(CurrentLane);
+//
+//	tmp->ExtendLane();
+//}
 
 void ALaneManager::AddLane(ALane* Obj) {
 

@@ -20,7 +20,9 @@ public:
 	
 	UFUNCTION()
 	void InitReferClasses();
-
+	
+	UFUNCTION()
+	FLuaValue GetMapName();
 	UFUNCTION()
 	FLuaValue GetTimestamp();
 	UFUNCTION()
