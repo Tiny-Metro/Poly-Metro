@@ -1,4 +1,4 @@
-// Copyright 2018-2020 - Roberto De Ioris
+// Copyright 2018-2023 - Roberto De Ioris
 
 #include "LuaMultiLineEditableTextBox.h"
 #include "Runtime/Slate/Public/Widgets/Input/SMultiLineEditableTextBox.h"
@@ -6,10 +6,6 @@
 #include "LuaSyntaxHighlighter.h"
 
 #define LOCTEXT_NAMESPACE "UMG"
-
-#if ENGINE_MAJOR_VERSION >=5 && ENGINE_MINOR_VERSION >= 2
-static FEditableTextBoxStyle EditableTextBoxStyle;
-#endif
 
 FLuaCustomHighlighter::FLuaCustomHighlighter()
 {
@@ -220,7 +216,7 @@ TSharedRef<SWidget> ULuaMultiLineEditableTextBox::RebuildWidget()
 
 	EditableTextBoxPtr = SNew(SMultiLineEditableTextBox)
 		.Marshaller(FLuaMachineSyntaxHighlighterTextLayoutMarshaller::Create(Style))
-#if ENGINE_MAJOR_VERSION >=5 && ENGINE_MINOR_VERSION >= 2
+#if ENGINE_MAJOR_VERSION >=5 && ENGINE_MINOR_VERSION >= 1
 		.Style(&EditableTextBoxStyle)
 #else
 		.TextStyle(&CodeStyle)
