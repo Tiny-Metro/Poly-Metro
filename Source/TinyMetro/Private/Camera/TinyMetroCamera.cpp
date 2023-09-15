@@ -100,11 +100,13 @@ void ATinyMetroCamera::CameraMoveY(float Axis) {
 }
 
 void ATinyMetroCamera::CameraRotationX(float Axis) {
-	AddActorWorldRotation(FRotator(0.0, Axis * CameraRotationSpeedX, 0));
+	if (Axis != 0 && !IsResetRotation) {
+		AddActorWorldRotation(FRotator(0.0, Axis * CameraRotationSpeedX, 0));
+	}
 }
 
 void ATinyMetroCamera::CameraRotationY(float Axis) {
-	if (Axis != 0) {
+	if (Axis != 0 && !IsResetRotation) {
 		FRotator curRotation = SpringArmComponenet->GetRelativeRotation();
 		SpringArmComponenet->SetRelativeRotation(FRotator(
 			UKismetMathLibrary::FClamp(curRotation.Pitch + Axis * CameraRotationSpeedY, MinRotationAxisY, MaxRotationAxisY),
@@ -119,18 +121,19 @@ void ATinyMetroCamera::ToggleCameraMoveEnable() {
 }
 
 void ATinyMetroCamera::Touch1Press() {
-	Touch1Pressed = true;
-	Touch1PressTime = 0.0f;
-	CurrentRotation = SpringArmComponenet->GetRelativeRotation();
-	CurrentRotation.Yaw = GetActorRotation().Yaw;
+	if (!IsResetRotation) {
+		Touch1Pressed = true;
+		Touch1PressTime = 0.0f;
+		CurrentRotation = SpringArmComponenet->GetRelativeRotation();
+		CurrentRotation.Yaw = GetActorRotation().Yaw;
 
-	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
-	bool tmp;
-	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, Touch1InitPosition.X, Touch1InitPosition.Y, tmp);
-	if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
-		PlayerControllerRef->GetMousePosition(Touch1InitPosition.X, Touch1InitPosition.Y);
+		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+		bool tmp;
+		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, Touch1InitPosition.X, Touch1InitPosition.Y, tmp);
+		if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
+			PlayerControllerRef->GetMousePosition(Touch1InitPosition.X, Touch1InitPosition.Y);
+		}
 	}
-	
 }
 
 void ATinyMetroCamera::Touch1Release() {
@@ -139,8 +142,20 @@ void ATinyMetroCamera::Touch1Release() {
 	IsMoveMode = false;
 }
 
-void ATinyMetroCamera::Touch1DoubleClick() {
+void ATinyMetroCamera::ResetRotation() {
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("Touch1 DoubleClick"));
+	if (abs(GetActorRotation().Yaw) > 90) {
+		// Rotate clockwise
+		if (GetActorRotation().Yaw > 0) {
+			TargetResetRotation = -((GetActorRotation().Yaw - 180) - 90);
+		} else {
+			TargetResetRotation = -90 - GetActorRotation().Yaw;
+		}
+	} else {
+		// Rotate anti clockwise
+		TargetResetRotation = -90 - GetActorRotation().Yaw;
+	}
+	IsResetRotation = true;
 }
 
 void ATinyMetroCamera::Touch1Axis(float Axis) {
@@ -162,7 +177,7 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 		}
 
 		// Rotation mode On
-		if (!IsMoveMode && Touch1PressTime >= 1.0f) {
+		if (!IsMoveMode && Touch1PressTime >= LongTouchInterval) {
 			IsRotationMode = true;
 		}
 
@@ -207,13 +222,15 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 }
 
 void ATinyMetroCamera::Touch2Press() {
-	Touch2Pressed = true;
-	bool tmp;
-	FVector2D touch1Position, touch2Position;
-	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, touch1Position.X, touch1Position.Y, tmp);
-	PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch2, touch2Position.X, touch2Position.Y, tmp);
-	Touch2StartDistance = UKismetMathLibrary::Distance2D(touch1Position, touch2Position);
-	CurrentZoom = SpringArmComponenet->TargetArmLength;
+	if (!IsResetRotation) {
+		Touch2Pressed = true;
+		bool tmp;
+		FVector2D touch1Position, touch2Position;
+		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, touch1Position.X, touch1Position.Y, tmp);
+		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch2, touch2Position.X, touch2Position.Y, tmp);
+		Touch2StartDistance = UKismetMathLibrary::Distance2D(touch1Position, touch2Position);
+		CurrentZoom = SpringArmComponenet->TargetArmLength;
+	}
 }
 
 void ATinyMetroCamera::Touch2Release() {
@@ -273,6 +290,14 @@ void ATinyMetroCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Double click logic : Reset rotation
+	if (IsResetRotation) {
+		AddActorWorldRotation(FRotator(0, TargetResetRotation * DeltaTime * (1 / CameraRestSeconds), 0));
+		if (UKismetMathLibrary::NearlyEqual_FloatFloat(GetActorRotation().Yaw, -90, 1)) {
+			IsResetRotation = false;
+		}
+	}
+
 	if (Touch1Pressed && !Touch2Pressed) {
 		Touch1PressTime += DeltaTime;
 	}
@@ -286,15 +311,17 @@ void ATinyMetroCamera::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction(TEXT("Action Touch1"), IE_Pressed, this, &ATinyMetroCamera::Touch1Press);
 	PlayerInputComponent->BindAction(TEXT("Action Touch1"), IE_Released, this, &ATinyMetroCamera::Touch1Release);
-	PlayerInputComponent->BindAction(TEXT("Action Touch1"), IE_DoubleClick, this, &ATinyMetroCamera::Touch1DoubleClick);
 
 	PlayerInputComponent->BindAction(TEXT("Action Touch2"), IE_Pressed, this, &ATinyMetroCamera::Touch2Press);
 	PlayerInputComponent->BindAction(TEXT("Action Touch2"), IE_Released, this, &ATinyMetroCamera::Touch2Release);
 
-	PlayerInputComponent->BindAction(TEXT("Camera Hold"), IE_Released, this, &ATinyMetroCamera::ToggleCameraMoveEnable);
-
 	PlayerInputComponent->BindAxis(TEXT("Axis Touch1"), this, &ATinyMetroCamera::Touch1Axis);
 	PlayerInputComponent->BindAxis(TEXT("Axis Touch2"), this, &ATinyMetroCamera::Touch2Axis);
+
+	PlayerInputComponent->BindAction(TEXT("Reset Rotation"), IE_DoubleClick, this, &ATinyMetroCamera::ResetRotation);
+
+
+	PlayerInputComponent->BindAction(TEXT("Camera Hold"), IE_Released, this, &ATinyMetroCamera::ToggleCameraMoveEnable);
 
 	PlayerInputComponent->BindAxis(TEXT("Keyborad Move X"), this, &ATinyMetroCamera::CameraMoveX);
 	PlayerInputComponent->BindAxis(TEXT("Keyborad Move Y"), this, &ATinyMetroCamera::CameraMoveY);
