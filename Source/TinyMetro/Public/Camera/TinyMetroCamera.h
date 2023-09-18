@@ -33,7 +33,7 @@ protected:
 	UFUNCTION()
 	void CameraMoveY(float Axis);
 	UFUNCTION()
-	void CameraRotationX(float Axis);
+	void CameraRotationZ(float Axis);
 	UFUNCTION()
 	void CameraRotationY(float Axis);
 	UFUNCTION()
@@ -94,13 +94,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	FVector2D TargetMoveLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	double CameraMoveSeconds = 1.0;
+	double CameraAutoMoveSeconds = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	bool CameraMoveEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	double CameraMoveSpeedX = 0.05f;
+	double CameraMoveSpeedX = 0.02f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	double CameraMoveSpeedY = 0.05f;
+	double CameraMoveSpeedY = 0.02f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	double CameraMoveBoundaryMinX = -12000.0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
@@ -132,7 +132,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation")
 	double MaxRotationAxisY = -20.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation")
-	double CameraRotationSpeedX = 1.0;
+	double CameraRotationSpeedZ = 1.0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotation")
 	double CameraRotationSpeedY = 1.0;
 
