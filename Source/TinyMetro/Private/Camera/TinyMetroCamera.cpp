@@ -99,9 +99,9 @@ void ATinyMetroCamera::CameraMoveY(float Axis) {
 	}
 }
 
-void ATinyMetroCamera::CameraRotationX(float Axis) {
+void ATinyMetroCamera::CameraRotationZ(float Axis) {
 	if (Axis != 0 && !IsResetRotation) {
-		AddActorWorldRotation(FRotator(0.0, Axis * CameraRotationSpeedX, 0));
+		AddActorWorldRotation(FRotator(0.0, Axis * CameraRotationSpeedZ, 0));
 	}
 }
 
@@ -143,7 +143,6 @@ void ATinyMetroCamera::Touch1Release() {
 }
 
 void ATinyMetroCamera::ResetRotation() {
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("Touch1 DoubleClick"));
 	if (abs(GetActorRotation().Yaw) > 90) {
 		// Rotate clockwise
 		if (GetActorRotation().Yaw > 0) {
@@ -156,6 +155,12 @@ void ATinyMetroCamera::ResetRotation() {
 		TargetResetRotation = -90 - GetActorRotation().Yaw;
 	}
 	IsResetRotation = true;
+}
+
+void ATinyMetroCamera::MoveCamera(FVector2D TargetLocation) {
+	TargetMoveLocation = TargetLocation;
+	TargetDistance = TargetLocation - FVector2D(GetActorLocation());
+	IsAutoMovement = true;
 }
 
 void ATinyMetroCamera::Touch1Axis(float Axis) {
@@ -298,6 +303,19 @@ void ATinyMetroCamera::Tick(float DeltaTime)
 		}
 	}
 
+	// Auto movement logic
+	if (IsAutoMovement) {
+		AddActorWorldOffset(FVector(TargetDistance * DeltaTime * (1 / CameraAutoMoveSeconds), 0));
+		auto tmp = GetActorLocation();
+		if (UKismetMathLibrary::NearlyEqual_TransformTransform(
+			FTransform(FVector(TargetMoveLocation, 0)),
+			FTransform(FVector(tmp.X, tmp.Y, 0)),
+			10
+		)) {
+			IsAutoMovement = false;
+		}
+	}
+
 	if (Touch1Pressed && !Touch2Pressed) {
 		Touch1PressTime += DeltaTime;
 	}
@@ -325,7 +343,7 @@ void ATinyMetroCamera::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAxis(TEXT("Keyborad Move X"), this, &ATinyMetroCamera::CameraMoveX);
 	PlayerInputComponent->BindAxis(TEXT("Keyborad Move Y"), this, &ATinyMetroCamera::CameraMoveY);
-	PlayerInputComponent->BindAxis(TEXT("Keyboard Rotation X"), this, &ATinyMetroCamera::CameraRotationX);
+	PlayerInputComponent->BindAxis(TEXT("Keyboard Rotation Z"), this, &ATinyMetroCamera::CameraRotationZ);
 	PlayerInputComponent->BindAxis(TEXT("Keyboard Rotation Y"), this, &ATinyMetroCamera::CameraRotationY);
 	PlayerInputComponent->BindAxis(TEXT("Mouse Wheel"), this, &ATinyMetroCamera::MouseWheel);
 }
