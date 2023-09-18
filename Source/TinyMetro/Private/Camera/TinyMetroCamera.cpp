@@ -203,7 +203,7 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 			//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("Touch1Axis : %f %f %f %f %f %f"), (float)ScreenX, currentTouchPositon.X, normalizeDistanceX, rotationValueX, clampYaw, CurrentRotation.Yaw));
 
 			SpringArmComponenet->SetRelativeRotation(FRotator(clampPitch, 0.0, 0.0));
-			SetActorRotation(FRotator(0.0, CurrentRotation.Yaw + rotationValueX * CameraRotationSpeedX, 0.0));
+			SetActorRotation(FRotator(0.0, CurrentRotation.Yaw + rotationValueX * CameraRotationSpeedZ, 0.0));
 		} 
 		if(IsMoveMode) {
 			if (CameraMoveEnable) {
