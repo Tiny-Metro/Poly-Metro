@@ -54,8 +54,10 @@ protected:
 	void Touch2Axis(float Axis);
 
 	// Used Common
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ResetRotation();
+	UFUNCTION(BlueprintCallable)
+	void MoveCamera(FVector2D TargetLocation);
 
 	// Save & Load
 	UFUNCTION()
@@ -85,6 +87,14 @@ protected:
 	int32 ScreenY;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FRotator CurrentRotation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	bool IsAutoMovement = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	FVector2D TargetDistance;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	FVector2D TargetMoveLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	double CameraMoveSeconds = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	bool CameraMoveEnable = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")

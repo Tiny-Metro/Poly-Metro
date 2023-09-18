@@ -143,7 +143,6 @@ void ATinyMetroCamera::Touch1Release() {
 }
 
 void ATinyMetroCamera::ResetRotation() {
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("Touch1 DoubleClick"));
 	if (abs(GetActorRotation().Yaw) > 90) {
 		// Rotate clockwise
 		if (GetActorRotation().Yaw > 0) {
@@ -156,6 +155,12 @@ void ATinyMetroCamera::ResetRotation() {
 		TargetResetRotation = -90 - GetActorRotation().Yaw;
 	}
 	IsResetRotation = true;
+}
+
+void ATinyMetroCamera::MoveCamera(FVector2D TargetLocation) {
+	TargetMoveLocation = TargetLocation;
+	TargetDistance = TargetLocation - FVector2D(GetActorLocation());
+	IsAutoMovement = true;
 }
 
 void ATinyMetroCamera::Touch1Axis(float Axis) {
@@ -295,6 +300,19 @@ void ATinyMetroCamera::Tick(float DeltaTime)
 		AddActorWorldRotation(FRotator(0, TargetResetRotation * DeltaTime * (1 / CameraRestSeconds), 0));
 		if (UKismetMathLibrary::NearlyEqual_FloatFloat(GetActorRotation().Yaw, -90, 1)) {
 			IsResetRotation = false;
+		}
+	}
+
+	// Auto movement logic
+	if (IsAutoMovement) {
+		AddActorWorldOffset(FVector(TargetDistance * DeltaTime * (1 / CameraMoveSeconds), 0));
+		auto tmp = GetActorLocation();
+		if (UKismetMathLibrary::NearlyEqual_TransformTransform(
+			FTransform(FVector(TargetMoveLocation, 0)),
+			FTransform(FVector(tmp.X, tmp.Y, 0)),
+			10
+		)) {
+			IsAutoMovement = false;
 		}
 	}
 
