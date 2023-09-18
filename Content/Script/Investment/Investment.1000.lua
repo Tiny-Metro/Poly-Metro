@@ -3,7 +3,7 @@
 function InvestmentData()
     local Data = {}
     Data.message = '10개의 역을 지나는 노선을 만드세요.'
-    Data.time_require = 0
+    Data.time_require = -1
     Data.award = '열차 1량'
 
     return Data

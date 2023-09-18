@@ -9,14 +9,19 @@ function InvestmentData()
     return Data
 end
 
-local subtrains
+local trains
 local pre_subtrain_count
 
 -- Call when investment start
 -- Used save info when start
 function Start()
-    subtrains = GetSubtrainStatistics()
-    pre_subtrain_count = subtrains.TotalPlacementCount
+    trains = GetTrainInfos()
+    pre_subtrain_count = {}
+    for i=0, #trains do
+        if trains[i].SubtrainCount ~= -1 then
+            pre_subtrain_count[i] = trains[i].SubtrainCount
+        end
+    end
 end
 
 -- Investment appear condition
@@ -27,8 +32,17 @@ end
 
 -- Investment success condition
 function Process()
-    -- 모든 열차의 객차 확인 후, 추가적으로 객차가 2개 이상 연결되 열차가 있을 시 success 반환
-    return "success"
+    local additionalSubtrainsNeeded = 2
+
+    for i = 0, #trains do
+        if trains[i].SubtrainCount ~= -1 then
+            local additionalSubtrains = trains[i].SubtrainCount - (pre_subtrain_count[i] or 0)
+            if additionalSubtrains >= additionalSubtrainsNeeded then
+                return "success"
+            end
+        end
+    end
+    return "continue"
 end
 
 -- Investment award

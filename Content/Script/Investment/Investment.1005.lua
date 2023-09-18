@@ -35,9 +35,8 @@ function Start()
     subtrains = GetSubtrainStatistics()
     stations = GetDefaultStatistics()
 
-    --ToDo: 열차 업그레이드 확인
-    -- pre_train_upgrade
-    -- pre_subtrain_upgrade
+    pre_train_upgrade = trains.TotalUpgradeCount
+    pre_subtrain_upgrade = subtrains.TotalUpgradeCount
     pre_statiion_upgrade = stations.UpgradeStationCount
 end
 
@@ -49,9 +48,9 @@ end
 
 -- Investment success condition
 function Process()
-    local cur_train_upgrade
-    local cur_subtrain_upgrade
-    local cur_statiion_upgrade
+    local cur_train_upgrade = trains.TotalUpgradeCount
+    local cur_subtrain_upgrade = subtrains.TotalUpgradeCount
+    local cur_statiion_upgrade = stations.UpgradeStationCount
 
     if selectedTarget.name == "열차" and cur_train_upgrade > pre_train_upgrade then
         return "success"

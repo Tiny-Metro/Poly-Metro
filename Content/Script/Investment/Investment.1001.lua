@@ -3,7 +3,7 @@
 function InvestmentData()
     local Data = {}
     Data.message = '순환선을 건설하세요.'
-    Data.time_require = 0
+    Data.time_require = -1
     Data.award = '객차 1량, 300$'
 
     return Data
