@@ -12,6 +12,7 @@
 #include "SaveSystem/TMSaveManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Statistics/StatisticsManager.h"
+#include "Lane/LaneManager.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include <Engine/AssetManager.h>
@@ -118,6 +119,7 @@ void AStation::BeginPlay()
 	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	PolicyRef = GameModeRef->GetPolicy();
 	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+	LaneManagerRef = GameModeRef->GetLaneManager();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationInfo.Type]);
@@ -498,20 +500,33 @@ void AStation::SetInfoWidget(UStationInfoWidget* Widget) {
 }
 
 void AStation::StationOnPressed(AActor* Target, FKey ButtonPressed) {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::ClickBegin C++"));
 	TouchTime = 0.0f;
 }
 
 void AStation::StationOnReleased(AActor* Target, FKey ButtonPressed) {
 	if (TouchTime > LongClickInterval) {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::ClickEnd::Long C++"));
 		StationInfoWidget->ShowWidget(this);
+	} else {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::ClickEnd::Short C++"));
+		LaneManagerRef->AddSelectedStations(this);
 	}
 }
 
 void AStation::StationTouchBegin(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::Touch C++"));
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::TouchBegin C++"));
+	TouchTime = 0.0f;
 }
 
 void AStation::StationTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+	if (TouchTime > LongClickInterval) {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::TouchEnd::Long C++"));
+		StationInfoWidget->ShowWidget(this);
+	} else {
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::TouchEnd::Short C++"));
+		LaneManagerRef->AddSelectedStations(this);
+	}
 }
 
 void AStation::ComplainRoutine() {
