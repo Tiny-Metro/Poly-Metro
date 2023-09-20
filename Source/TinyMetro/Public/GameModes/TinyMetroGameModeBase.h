@@ -95,6 +95,8 @@ protected:
 	class ATinyMetroEventManager* EventManager;
 	UPROPERTY()
 	class AStatisticsManager* StatisticsManager;
+	UPROPERTY()
+	APawn* PawnRef;
 
 	UPROPERTY()
 	UClass* ObjBridgeTunnelManager;

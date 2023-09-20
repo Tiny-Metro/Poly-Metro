@@ -114,8 +114,9 @@ void ATinyMetroGameModeBase::BeginPlay() {
 void ATinyMetroGameModeBase::SetGameSpeed(float TimeDilation) {
     UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TimeDilation);
     if (!IsValid(PlayerController)) PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+    if (!IsValid(PawnRef)) PawnRef = PlayerController->GetPawn();
     PlayerController->CustomTimeDilation = 1 / UGameplayStatics::GetGlobalTimeDilation(GetWorld());
-    PlayerController->GetPawn()->CustomTimeDilation = 1 / UGameplayStatics::GetGlobalTimeDilation(GetWorld());
+    PawnRef->CustomTimeDilation = 1 / UGameplayStatics::GetGlobalTimeDilation(GetWorld());
 }
 
 AStationManager* ATinyMetroGameModeBase::GetStationManager() const {
