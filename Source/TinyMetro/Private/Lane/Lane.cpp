@@ -1866,22 +1866,6 @@ void ALane::ClearLanePoint() {
 	LaneArray.Empty();
 }
 
-// YANGNI??
-void ALane::HandleScaling(bool IsScaling, float Length) {
-	if (IsScaling) { SectionLength = GetActorScale3D().X * Length; }
-	else SectionLength = Length;
-	return;
-}
-
-void ALane::HandleFullLength(bool IsFullLength){
-	if (IsFullLength) {
-		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(LaneSpline->GetSplineLength() / SectionLength))-1;
-	}
-	else {
-		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(LaneSpline->GetSplineLength() / SectionLength));
-	}
-}
-
 
 void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];

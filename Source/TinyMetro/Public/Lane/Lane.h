@@ -313,16 +313,10 @@ public:
 	void SetLaneSpline();
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void HandleScaling(bool IsScaling, float Length);
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	double SectionLength = 100;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void HandleFullLength(bool IsFullLength);
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 EndLoop;
 
