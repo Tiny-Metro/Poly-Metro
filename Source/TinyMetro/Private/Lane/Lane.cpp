@@ -1918,7 +1918,7 @@ void ALane::ChangeRemoveMaterialAtIndex(int32 Index) // also make WillBeRemoved 
 void ALane::SetSplineMeshes(){
 
 	//Check the input parameter is valid
-	if (!LaneSpline)//Spline)
+	if (!LaneSpline)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
 		return;
