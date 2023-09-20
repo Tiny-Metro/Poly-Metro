@@ -16,7 +16,7 @@ ALaneManager::ALaneManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	LaneClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Lane/BP_Lane.BP_Lane_C'")).Object;
 }
 
 // Called when the game starts or when spawned
@@ -151,22 +151,25 @@ void ALaneManager::CancelSelectedStations()
 ALane* ALaneManager::SpawnLane()
 {
 	// Load BP Class
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
-
-	// Cast to BP
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	// Check object validation
-	if (!SpawnActor) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / Lane")));
-		return nullptr;
+	//UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BP_Lane.BP_Lane'")));
+	if (!LaneClass) {
+		LaneClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, TEXT("Class'/Game/Lane/BP_Lane.BP_Lane_C'")));
 	}
 
+	// Cast to BP
+	//UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
+	//// Check object validation
+	//if (!SpawnActor) {
+	//	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / Lane")));
+	//	return nullptr;
+	//}
+
 	// Check null
-	UClass* SpawnClass = SpawnActor->StaticClass();
+	/*UClass* SpawnClass = SpawnActor->StaticClass();
 	if (SpawnClass == nullptr) {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
 		return nullptr;
-	}
+	}*/
 
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
@@ -174,7 +177,7 @@ ALane* ALaneManager::SpawnLane()
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
+	ALane* tmpLane = Cast<ALane>(GetWorld()->SpawnActor<AActor>(LaneClass, SpawnParams));
 	
 	return tmpLane;
 }

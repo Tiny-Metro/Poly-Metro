@@ -99,6 +99,9 @@ public:
 
 
 protected:
+	// Widget class
+	UPROPERTY()
+	UClass* TrainInfoWidgetClass = nullptr;
 	// Train, Subtrain asset
 	UPROPERTY()
 	UObject* TrainBlueprintClass = nullptr;

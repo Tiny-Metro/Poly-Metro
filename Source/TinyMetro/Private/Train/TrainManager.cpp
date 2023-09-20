@@ -22,6 +22,8 @@ ATrainManager::ATrainManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	TrainInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_TrainInfoWidget.WBP_TrainInfoWidget_C'")).Object;
+
 }
 
 // Called when the game starts or when spawned
@@ -36,12 +38,9 @@ void ATrainManager::BeginPlay()
 	InitTrainMaterial();
 	InitPassengerMaterial();
 
-	FSoftClassPath MyWidgetClassRef(TEXT("Blueprint'/Game/Stage/UI/HUD/WBP_TrainInfoWidget.WBP_TrainInfoWidget_C'"));
-	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
-		TrainInfoWidget = CreateWidget<UTrainInfoWidget>(GetWorld(), MyWidgetClass);
-		TrainInfoWidget->AddToViewport();
-		TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	TrainInfoWidget = CreateWidget<UTrainInfoWidget>(GetWorld(), TrainInfoWidgetClass);
+	TrainInfoWidget->AddToViewport();
+	TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
 
 	for (auto& i : Trains) {
 		i->FinishLoad();

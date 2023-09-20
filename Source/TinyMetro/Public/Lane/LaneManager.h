@@ -51,6 +51,8 @@ public:
 	FLaneCancelDelegate LaneCancelDelegate;
 
 protected:
+	UPROPERTY(VisibleAnywhere)
+	UClass* LaneClass = nullptr;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool CanAssignBridge;

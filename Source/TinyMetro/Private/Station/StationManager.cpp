@@ -26,6 +26,9 @@ AStationManager::AStationManager()
 
 	StationBlueprintClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Station/BP_Station.BP_Station_C'")).Object;
 
+	StationInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_StationInfoWidget.WBP_StationInfoWidget_C'")).Object;
+	StationSpawnWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_SpawnBorderAlarm.WBP_SpawnBorderAlarm_C'")).Object;
+
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
 
@@ -167,12 +170,9 @@ float AStationManager::GetComplainAverage() {
 }
 
 void AStationManager::InitStationInfoWidget() {
-	FSoftClassPath MyWidgetClassRef(TEXT("Blueprint'/Game/Stage/UI/HUD/WBP_StationInfoWidget.WBP_StationInfoWidget_C'"));
-	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
-		StationInfoWidget = CreateWidget<UStationInfoWidget>(GetWorld(), MyWidgetClass);
-		StationInfoWidget->AddToViewport();
-		StationInfoWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	StationInfoWidget = CreateWidget<UStationInfoWidget>(GetWorld(), StationInfoWidgetClass);
+	StationInfoWidget->AddToViewport();
+	StationInfoWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 UStationInfoWidget* AStationManager::GetStationInfoWidget() const {
@@ -180,12 +180,8 @@ UStationInfoWidget* AStationManager::GetStationInfoWidget() const {
 }
 
 void AStationManager::InitStationSpawnWidget() {
-	FSoftClassPath MyWidgetClassRef(TEXT("WidgetBlueprint'/Game/Stage/UI/HUD/WBP_SpawnBorderAlarm.WBP_SpawnBorderAlarm_C'"));
-	if (UClass* MyWidgetClass = MyWidgetClassRef.TryLoadClass<UUserWidget>()) {
-		StationSpawnWidget = CreateWidget<UStationSpawnBorderWidget>(GetWorld(), MyWidgetClass);
-		StationSpawnWidget->AddToViewport();
-		//StationSpawnWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	StationSpawnWidget = CreateWidget<UStationSpawnBorderWidget>(GetWorld(), StationSpawnWidgetClass);
+	StationSpawnWidget->AddToViewport();
 }
 
 AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALane* LaneRef) {
