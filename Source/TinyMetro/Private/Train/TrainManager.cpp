@@ -23,6 +23,8 @@ ATrainManager::ATrainManager()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TrainInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_TrainInfoWidget.WBP_TrainInfoWidget_C'")).Object;
+	TrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")).Object;
+	SubtrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_SubTrain.BP_Subtrain_C'")).Object;
 
 }
 
@@ -267,9 +269,7 @@ int32 ATrainManager::GetSubTrainCountFilterByUpgrade(bool Upgrade, int32 LaneId)
 
 void ATrainManager::SpawnTrain(int32 TrainId, FVector SpawnLocation) {
 	// Load BP Class
-	if (!TrainBlueprintClass) TrainBlueprintClass = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
-	// Cast to BP
-	if (!GeneratedTrainBlueprint) GeneratedTrainBlueprint = Cast<UBlueprint>(TrainBlueprintClass);
+	if (!TrainClass) TrainClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")));
 
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
@@ -278,7 +278,7 @@ void ATrainManager::SpawnTrain(int32 TrainId, FVector SpawnLocation) {
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ATrain* tmp = Cast<ATrain>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedTrainBlueprint->GeneratedClass, SpawnTransform));
+	ATrain* tmp = Cast<ATrain>(GetWorld()->SpawnActorDeferred<AActor>(TrainClass, SpawnTransform));
 	tmp->SetTrainId(TrainId);
 	tmp->Load();
 
@@ -289,9 +289,7 @@ void ATrainManager::SpawnTrain(int32 TrainId, FVector SpawnLocation) {
 
 void ATrainManager::SpawnSubtrain(int32 TrainId, int32 OwnerId, FVector SpawnLocation) {
 	// Load BP Class
-	if (!SubtrainBlueprintClass) SubtrainBlueprintClass = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_SubTrain.BP_Subtrain'")));
-	// Cast to BP
-	if (!GeneratedSubtrainBlueprint) GeneratedSubtrainBlueprint = Cast<UBlueprint>(SubtrainBlueprintClass);
+	if (!SubtrainClass) SubtrainClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, TEXT("Class'/Game/Train/BP_SubTrain.BP_Subtrain_C'")));
 
 	// Spawn actor
 	FActorSpawnParameters SpawnParams;
@@ -300,7 +298,7 @@ void ATrainManager::SpawnSubtrain(int32 TrainId, int32 OwnerId, FVector SpawnLoc
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ASubtrain* tmp = Cast<ASubtrain>(GetWorld()->SpawnActorDeferred<AActor>(GeneratedSubtrainBlueprint->GeneratedClass, SpawnTransform));
+	ASubtrain* tmp = Cast<ASubtrain>(GetWorld()->SpawnActorDeferred<AActor>(SubtrainClass, SpawnTransform));
 	tmp->SetTrainId(TrainId);
 	tmp->SetOwnerTrainId(OwnerId);
 	tmp->Load();

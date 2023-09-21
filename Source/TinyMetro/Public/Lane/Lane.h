@@ -44,6 +44,8 @@ public:
 	bool CurrentlyPoppingLane;
 
 public:
+	UPROPERTY()
+	UClass* TrainClass = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<FLanePoint> LaneArray;
 
