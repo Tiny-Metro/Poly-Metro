@@ -109,7 +109,13 @@ void ATrainTemplate::UpdatePassengerMesh() {
 }
 
 AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocation) {
-	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+	FVector2D ScreenLocation;
+	bool currentlyPressed;
+	if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
+		ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+	} else {
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetInputTouchState(ETouchIndex::Touch1, ScreenLocation.X, ScreenLocation.Y, currentlyPressed);
+	}
 	FVector WorldPosition, WorldDirection;
 	FHitResult HitResult;
 	LineTraceIgnoreActors.AddUnique(this);
