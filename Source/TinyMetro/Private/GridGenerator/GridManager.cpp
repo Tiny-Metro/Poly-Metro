@@ -76,7 +76,7 @@ FGridCellData AGridManager::GetGridCellDataByPoint(int X, int Y) const {
 }
 
 FGridCellData AGridManager::GetGridCellDataByIndex(int Index) const {
-	UE_LOG(LogTemp, Log, TEXT("GridManager::GetGridCellDataByIndex"));
+	//UE_LOG(LogTemp, Log, TEXT("GridManager::GetGridCellDataByIndex"));
 	if (Index > GridCellData.Num()) {
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(
