@@ -52,6 +52,11 @@ public:
 	// Weekly tasks
 	virtual void WeeklyTask() override;
 
+	// Save & Load
+	virtual void Save();
+	virtual bool Load();
+	virtual void FinishLoad();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -60,9 +65,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 OwnerTrainId;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
-	class ATrain* TrainRef;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
-	class ATrain* OwnerTrain;
+	class ATrain* OwnerTrainRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Subtrain")
 	int32 Index = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

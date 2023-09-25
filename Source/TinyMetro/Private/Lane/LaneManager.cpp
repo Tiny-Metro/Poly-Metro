@@ -7,6 +7,8 @@
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManagerSaveGame.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Statistics/StatisticsManager.h"
+#include "Station/Station.h"
 
 
 // Sets default values
@@ -25,6 +27,7 @@ void ALaneManager::BeginPlay()
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 	SaveManagerRef = GameMode->GetSaveManager();
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
 	
 	InitLaneMaterial();
 
@@ -110,6 +113,41 @@ void ALaneManager::SetSelectedLaneNum(int32 Num)
 	SetUILaneNum(Num);
 }
 
+void ALaneManager::AddSelectedStations(AStation* Station)
+{
+	SelectedStations.Add(Station);
+
+	if (IsPlacementValid)
+	{
+		//ExtendLane
+		Lanes[SelectedLaneNum]->ExtendLane(Station);
+		SelectedStations.Empty();
+	}
+	else
+	{
+
+		if (SelectedStations.Num() == 2)
+		{
+			//Add NewLane
+			CreatingNewLane();
+
+			CancelSelectedStations();
+		}
+		else
+		{
+			SetUILaneNum(NextLaneNums[0]);
+		}
+
+	}
+}
+
+void ALaneManager::CancelSelectedStations()
+{
+	SelectedStations.Empty();
+
+	SetUILaneNum(0);
+}
+
 ALane* ALaneManager::SpawnLane()
 {
 	// Load BP Class
@@ -141,7 +179,7 @@ ALane* ALaneManager::SpawnLane()
 	return tmpLane;
 }
 
-void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
+void ALaneManager::CreatingNewLane() {
 
 	if (NextLaneNums.IsEmpty()) {
 
@@ -190,6 +228,11 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 	Lanes.Add(NextLaneNums[0], tmpLane);
 	//Lanes.Add(tmpLane);
 
+	StatisticsManagerRef->LaneStatistics.TotalLaneCount++;
+	StatisticsManagerRef->LaneStatistics.Lanes[tmpLane->GetLaneId()].ServiceStationCount += 2;
+	
+	CheckTransferStation();
+
 	tmpLane->SpawnTrain();
 
 	UE_LOG(LogTemp, Warning, TEXT("StationPoint Num : %d"), tmpLane->StationPoint.Num());
@@ -202,12 +245,12 @@ void ALaneManager::CreatingNewLane(TArray<AStation*> SelectedStations) {
 }
 
 
-void ALaneManager::AddStationInLane(int CurrentLane) {
-
-	ALane* tmp = GetLaneById(CurrentLane);
-
-	tmp->ExtendLane();
-}
+//void ALaneManager::AddStationInLane(int CurrentLane) {
+//
+//	ALane* tmp = GetLaneById(CurrentLane);
+//
+//	tmp->ExtendLane();
+//}
 
 void ALaneManager::AddLane(ALane* Obj) {
 
@@ -356,9 +399,7 @@ int32 ALaneManager::GetPosition(FIntPoint Start, FIntPoint End) {
 				TargetStart = TargetEnd;
 			}
 
-				
-
-			}
+		}
 	}
 
 	if (TakenPosition.Num() == 0) {
@@ -397,7 +438,7 @@ void ALaneManager::Save()
 }
 
 bool ALaneManager::Load()
-{
+{ 
 	if (!GameMode) {
 		GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	}
@@ -451,4 +492,44 @@ ALane* ALaneManager::LoadLane(int32 LaneId)
 	}
 
 	return tmpLane;
+}
+
+void ALaneManager::CheckTransferStation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("In?"));
+
+	for (auto& Item : Lanes)
+	{
+		ALane* Lane = Item.Value;
+		int32 Sum = 0;
+
+		for (int i = 0; i<Lane->StationPoint.Num(); i++)
+		{
+			if (i == Lane->StationPoint.Num() - 1)
+			{
+				if (Lane->GetIsCircularLine())
+				{
+					break;
+				}
+				else
+				{
+					if (Lane->StationPoint[i]->GetStationInfo().ServiceLaneCount >= 2)
+					{
+						Sum++;
+					}
+				}
+			}
+			else
+			{
+				if (Lane->StationPoint[i]->GetStationInfo().ServiceLaneCount >= 2)
+				{
+					Sum++;
+				}
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Lane %d , StationPoint %d , Sum :: %d"), Item.Key, i, Sum);
+		}
+
+		StatisticsManagerRef->LaneStatistics.Lanes[Item.Key].TransferStationCount = Sum;
+	}
 }

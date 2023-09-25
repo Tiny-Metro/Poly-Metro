@@ -144,6 +144,14 @@ public:
 	UFUNCTION()
 	virtual void WeeklyTask();
 
+	// Save & Load
+	UFUNCTION()
+	virtual void Save();
+	UFUNCTION()
+	virtual bool Load();
+	UFUNCTION()
+	virtual void FinishLoad();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	FTrainInfo TrainInfo;
@@ -165,6 +173,8 @@ protected:
 	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	class ATimer* TimerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -190,8 +200,8 @@ protected:
 	FStationInfo CurrentStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FStationInfo NextStation;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	class AStation* Destination;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	//class AStation* Destination;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
@@ -224,6 +234,10 @@ protected:
 	
 	// Check click & longclick
 	bool IsSingleClick = false;
+
+	// Save & Load flag
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsLoaded = false;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

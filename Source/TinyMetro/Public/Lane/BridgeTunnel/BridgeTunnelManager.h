@@ -8,6 +8,8 @@
 #include "../../PlayerState/TinyMetroPlayerState.h"
 #include "ConnectorType.h"
 #include "ConnectorData.h"
+#include "BridgeTunnel.h"
+#include "GameModes/TinyMetroGameModeBase.h"
 #include "BridgeTunnelManager.generated.h"
 
 UCLASS()
@@ -29,12 +31,12 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ConnectBT(const TArray<FIntPoint>& points);
-	virtual void ConnectBT_Implementation(const TArray<FIntPoint>& points);
+	void ConnectBT(const TArray<FIntPoint>& points, int32 LaneID);
+	virtual void ConnectBT_Implementation(const TArray<FIntPoint>& points, int32 LaneID);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void DisconnectBT(const TArray<FIntPoint>& points);
-	virtual void DisconnectBT_Implementation(const TArray<FIntPoint>& points);
+	void DisconnectBT(const TArray<FIntPoint>& points, int32 LaneID);
+	virtual void DisconnectBT_Implementation(const TArray<FIntPoint>& points, int32 LaneID);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -45,15 +47,15 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CreateNewBridge(const TArray<FIntPoint>& points);
-	virtual void CreateNewBridge_Implementation(const TArray<FIntPoint>& points);
+	void CreateNewBridge(const TArray<FIntPoint>& points, int32 LaneId);
+	virtual void CreateNewBridge_Implementation(const TArray<FIntPoint>& points, int32 LaneId);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CreateNewTunnel(const TArray<FIntPoint>& points);
-	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points);
+	void CreateNewTunnel(const TArray<FIntPoint>& points, int32 LaneId);
+	virtual void CreateNewTunnel_Implementation(const TArray<FIntPoint>& points, int32 LaneId);
 	
 	UFUNCTION(BlueprintCallable)
-	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points);
+	void BuildConnector(ConnectorType type, const TArray<FIntPoint>& points, int32 LaneID);
 
 	UFUNCTION(BlueprintCallable)
 	void ReturnItem(ConnectorType type);
@@ -64,12 +66,14 @@ private:
 	bool IsPointsValid(const TArray<FIntPoint>& points);
 
 public:
-	FConnectorData* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
-	FConnectorData* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
+	ABridgeTunnel* FindConnector(ConnectorType type, const TArray<FIntPoint> points);
+	ABridgeTunnel* FindConnector(TWeakObjectPtr<ABridgeTunnel> ConnectorREF);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FConnectorData> Connectors;
+	TMap<int32, ABridgeTunnel*> Connectors;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 0;
 
 	UFUNCTION(BlueprintCallable)
 	void DeleteConnectorByInfo(ConnectorType type, const TArray<FIntPoint>& points);
@@ -77,19 +81,40 @@ public:
 	void DeleteConnectorByActorRef(ABridgeTunnel* ConnectorREF);
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteConnector(FConnectorData connectorData);
+	void DeleteConnector(ABridgeTunnel* Connector);
 
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectConnector(FConnectorData connectorData);
+	void DisconnectConnector(ABridgeTunnel* Connector, int32 LaneID);
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points);
+	void DisconnectByInfo(ConnectorType type, const TArray<FIntPoint>& points, int32 LaneID);
 
 	UFUNCTION(BlueprintCallable)
-	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF);
+	void DisconnectByActorRef(ABridgeTunnel* ConnectorREF, int32 LaneID);
 
 public:
 	bool IsConnectorExist(ConnectorType type, const TArray<FIntPoint> points);
 	bool AreArraysEqual(const TArray<FIntPoint>& Array1, const TArray<FIntPoint>& Array2);
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ATinyMetroGameModeBase* GameMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATMSaveManager* SaveManagerRef;
+
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	bool Load();
+
+	UFUNCTION()
+	ABridgeTunnel* LoadConnector(int32 connectorId);
+
+	ABridgeTunnel* SpawnConnector();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetUsingConnectorCount(int32 LaneId, ConnectorType TargetConnectorType);
+
 };

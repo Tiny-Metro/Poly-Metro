@@ -72,6 +72,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATMSaveManager* SaveManagerRef;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class AStatisticsManager* StatisticsManagerRef;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spline")
 	USplineComponent* LaneSpline;
 
@@ -187,8 +190,8 @@ public:
 
 public : // BlueprintNativeEvent
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ExtendLane();
-	virtual void ExtendLane_Implementation();
+	void ExtendLane(class AStation* Station);
+	virtual void ExtendLane_Implementation(class AStation* Station);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FinishRemovingLaneAtStart();
@@ -434,4 +437,36 @@ private:
 
 public:
 	void SetHasSaveFile(bool hasSave);
+
+protected: //Statistics
+	UFUNCTION(BlueprintCallable)
+	void SubTotalLaneCount();
+
+	UFUNCTION(BlueprintCallable)
+	void AddTotalModifyAndDeleteCount();
+
+	UFUNCTION(BlueprintCallable)
+	void AddModifyAndReduceCountInEachLane();
+
+	UFUNCTION(BlueprintCallable)
+	void AddServiceStationCount(int32 Num);
+
+	UFUNCTION(BlueprintCallable)
+	void SubServiceStationCount(int32 Num);
+
+	UFUNCTION(BlueprintCallable)
+	float GetStationComplainAverage();
+
+	
+	UFUNCTION(BlueprintCallable) // Lane Deleted
+	void InitializeCurrentLaneStatics();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateUsingConnector();
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingBridgeCount;
+
+	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
+	int32 UsingTunnelCount;
 };

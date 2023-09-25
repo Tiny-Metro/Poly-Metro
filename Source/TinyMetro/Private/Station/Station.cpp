@@ -99,6 +99,9 @@ AStation::AStation()
 	// Bind click, release event
 	OnClicked.AddDynamic(this, &AStation::StationOnPressed);
 	OnReleased.AddDynamic(this, &AStation::StationOnReleased);
+
+	OnInputTouchBegin.AddDynamic(this, &AStation::StationTouchBegin);
+	OnInputTouchEnd.AddDynamic(this, &AStation::StationTouchEnd);
 }
 
 // Called when the game starts or when spawned
@@ -504,6 +507,13 @@ void AStation::StationOnReleased(AActor* Target, FKey ButtonPressed) {
 	}
 }
 
+void AStation::StationTouchBegin(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("Station::Touch C++"));
+}
+
+void AStation::StationTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+}
+
 void AStation::ComplainRoutine() {
 	// Check station can increase complain
 	if (IsComplainIncreaseEnable) {
@@ -554,7 +564,7 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 	// Check tick (Time)
 	if (PassengerSpawnCurrent >= PassengerSpawnRequire) {
 		// Check spawn enable
-		if (IsPassengerSpawnEnable && StationInfo.IsDestroyed) {
+		if (IsPassengerSpawnEnable && !StationInfo.IsDestroyed) {
 			// Check spawn probability
 			if (StationManager->CalculatePassegnerSpawnProbability()) {
 				SpawnPassenger(StationManager->CalculatePassengerDestination(StationInfo.Type));

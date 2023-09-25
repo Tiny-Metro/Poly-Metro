@@ -15,6 +15,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManager.h"
+#include "Statistics/StatisticsManager.h"
 
 // Sets default values
 ALane::ALane()
@@ -60,6 +61,8 @@ void ALane::BeginPlay()
 
 	SaveManagerRef = GameMode->GetSaveManager();
 
+	StatisticsManagerRef = GameMode->GetStatisticsManager();
+
 	TinyMetroPlayerState = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 
 	SaveManagerRef->SaveTask.AddDynamic(this, &ALane::Save);
@@ -75,6 +78,7 @@ void ALane::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].AverageComplain = GetStationComplainAverage();
 
 	//Delay Removing
 	if (DoesLaneToBeRemoved)
@@ -182,6 +186,8 @@ bool ALane::GetIsCircularLine() const
 void ALane::SetIsCircularLine(bool _Circular)
 {
 	IsCircularLine = _Circular;
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = _Circular;
 }
   
 FLanePoint ALane::GetNearestLanePoint(FVector Location) {
@@ -223,7 +229,7 @@ LaneDirection ALane::GetLaneShape(FVector Location) {
 	);
 
 	auto shape = min - secondMin;
-	LaneDirection result;
+	LaneDirection result = LaneDirection::Vertical;
 	if (shape.X == 0) { // Vertical
 		result = LaneDirection::Vertical;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
@@ -488,7 +494,7 @@ void ALane::LaneCreating_Implementation() {}
 void ALane::InitializeNewLane_Implementation() {}
 void ALane::RemoveLane_Implementation() {}
 
-void ALane::ExtendLane_Implementation() {}
+void ALane::ExtendLane_Implementation(AStation* Station) {}
 
 void ALane::FinishRemovingLaneAtStart_Implementation() {}
 
@@ -998,11 +1004,13 @@ void ALane::SetLaneArray(const TArray<class AStation*>& NewStationPoint) {
 	// if it is possible, bulid it
 	for (int i = 0; i < BridgeArea.Num(); i++) 
 	{		
-		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Bridge, BridgeArea[i], LaneId);
+		UpdateUsingConnector();
 	}
 	for (int i = 0; i < TunnelArea.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i]);
+		BTMangerREF->BuildConnector(ConnectorType::Tunnel, TunnelArea[i], LaneId);
+		UpdateUsingConnector();
 	}
 
 	// Done
@@ -1298,7 +1306,7 @@ void ALane::DisconnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
-		BTMangerREF->DisconnectByInfo(targetType, Area[i]);
+		BTMangerREF->DisconnectByInfo(targetType, Area[i], LaneId);
 	}
 }
 
@@ -1312,7 +1320,8 @@ void ALane::ConnectBT(TArray<TArray<FIntPoint>> Area, GridType Type) {
 
 	for (int i = 0; i < Area.Num(); i++)
 	{
-		BTMangerREF->BuildConnector(targetType, Area[i]);
+		BTMangerREF->BuildConnector(targetType, Area[i], LaneId);
+		UpdateUsingConnector();
 	}
 }
 
@@ -1486,6 +1495,29 @@ bool ALane::Load()
 	{
 		AddAdjListDistance(StationPoint[i], StationPoint[i+1]);
 	}
+
+	//SetLane
+	for (int i = 0; i < StationPoint.Num(); i++)
+	{
+		if (i == StationPoint.Num() - 1)
+		{
+			if (IsCircularLine)
+			{
+				break;
+			}
+			else
+			{
+				StationPoint[i]->SetLanes(LaneId);
+			}
+		}
+		else
+		{
+			StationPoint[i]->SetLanes(LaneId);
+		}
+		
+	}
+
+
 
 	//PointArray Save
 	for (const auto& i : tmp->PointArray)
@@ -2485,4 +2517,82 @@ void ALane::InitLaneSpline()
 void ALane::SetHasSaveFile(bool hasSave)
 {
 	HasSaveFile = hasSave;
+}
+
+void ALane::SubTotalLaneCount()
+{
+	StatisticsManagerRef->LaneStatistics.TotalLaneCount--;
+}
+
+void ALane::AddTotalModifyAndDeleteCount()
+{
+	StatisticsManagerRef->LaneStatistics.TotalModifyAndDeleteCount++;
+}
+
+void ALane::AddModifyAndReduceCountInEachLane()
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].TotalModifyAndReduceCount++;
+}
+
+void ALane::AddServiceStationCount(int32 Num)
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceStationCount += Num;
+}
+
+void ALane::SubServiceStationCount(int32 Num)
+{
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceStationCount -= Num;
+}
+
+float ALane::GetStationComplainAverage()
+{
+	float Sum = 0.0f;
+
+	for (int i = 0; i < StationPoint.Num(); i++)
+	{
+		if (i == StationPoint.Num() - 1)
+		{
+			if (!IsCircularLine)
+			{
+				Sum += StationPoint[i]->GetStationInfo().Complain;
+
+				Sum /= StationPoint.Num();
+				break;
+			}
+
+			Sum /= StationPoint.Num() - 1;
+
+		}
+		else
+		{
+			Sum += StationPoint[i]->GetStationInfo().Complain;
+		}
+	}
+
+	return Sum;
+
+}
+
+
+void ALane::InitializeCurrentLaneStatics()
+{
+	SubTotalLaneCount();
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceStationCount = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].ServiceTrainAndSubtrainCount = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].AverageComplain = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].IsCircularLane = false;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].TransferStationCount = 0;
+
+	//Bridge & Tunnel
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
+}
+void ALane::UpdateUsingConnector()
+{
+	UsingTunnelCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Tunnel);
+	UsingBridgeCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Bridge);
+
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = UsingBridgeCount;
+	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = UsingTunnelCount;
 }
