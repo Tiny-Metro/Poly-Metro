@@ -270,9 +270,17 @@ bool ATrain::IsPassengerSlotFull() {
 	}
 }
 
-void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
-	Super::TrainOnReleased(Target, ButtonPressed);
+//void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+//	OnReleasedLogic();
+//}
+//
+//void ATrain::TrainTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+//	OnReleasedLogic();
+//}
 
+void ATrain::OnReleasedLogic() {
+	Super::OnReleasedLogic();
+	UE_LOG(LogTemp, Log, TEXT("Train::OnReleasedLogic"));
 	// Drag & Drop operation
 	if (!IsSingleClick) {
 		if (IsValid(LaneRef)) {
@@ -298,7 +306,7 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 			DespawnTrain();
 		}
 	}
-	
+
 	// Reset single click checker
 	IsSingleClick = false;
 }
@@ -306,9 +314,6 @@ void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	Super::ServiceStart(StartLocation, Lane, D);
 	bool tmp;
-
-	StartLocation.Z = 20.f;
-	this->SetActorLocation(StartLocation);
 
 	// Set serviced lane id
 	SetServiceLaneId(Lane->GetLaneId());
