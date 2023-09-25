@@ -124,11 +124,24 @@ public:
 	UFUNCTION()
 	void SetNextStation(FStationInfo Info);
 
-	// Click & Release
+	// Click & Release (Windows)
 	UFUNCTION()
 	virtual void TrainOnPressed(AActor* Target, FKey ButtonPressed);
 	UFUNCTION()
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed);
+
+	// Click & Release (Mobile)
+	UFUNCTION()
+	virtual void TrainTouchBegin(ETouchIndex::Type FingerIndex, AActor* TouchedActor);
+	UFUNCTION()
+	virtual void TrainTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor);
+
+	UFUNCTION()
+	virtual void OnPressedLogic();
+	UFUNCTION()
+	virtual void OnReleasedLogic();
+
+
 	UFUNCTION(BlueprintCallable)
 	int32 GetShiftCount() const;
 
@@ -153,11 +166,13 @@ public:
 	virtual void FinishLoad();
 
 protected:
+	UPROPERTY()
+	class ATinyMetroPlayerController* PlayerControllerRef = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	FTrainInfo TrainInfo;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATinyMetroGameModeBase* GameModeRef;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Info")
 	class ALane* LaneRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ALaneManager* LaneManagerRef;
@@ -184,6 +199,8 @@ protected:
 	TArray<AActor*> LineTraceIgnoreActors;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorDragged = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	bool IsActorSpawnByWidget = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float OnPressedTime;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")

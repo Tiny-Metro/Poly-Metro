@@ -5,6 +5,7 @@
 #include "Train/TrainManager.h"
 #include "Train/TrainInfoWidget.h"
 #include "GameModes/GameModeBaseSeoul.h"
+#include "Camera/TinyMetroPlayerController.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Lane/LaneManager.h"
 #include "Lane/Lane.h"
@@ -69,6 +70,8 @@ ATrainTemplate::ATrainTemplate()
 	OnClicked.AddDynamic(this, &ATrainTemplate::TrainOnPressed);
 	OnReleased.AddDynamic(this, &ATrainTemplate::TrainOnReleased);
 
+	OnInputTouchBegin.AddDynamic(this, &ATrainTemplate::TrainTouchBegin);
+	OnInputTouchEnd.AddDynamic(this, &ATrainTemplate::TrainTouchEnd);
 }
 
 // Called when the game starts or when spawned
@@ -87,6 +90,8 @@ void ATrainTemplate::BeginPlay()
 	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 	TimerRef = GameModeRef->GetTimer();
 	SaveManagerRef = GameModeRef->GetSaveManager();
+
+	PlayerControllerRef = Cast<ATinyMetroPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
@@ -109,20 +114,38 @@ void ATrainTemplate::UpdatePassengerMesh() {
 }
 
 AActor* ATrainTemplate::ConvertMousePositionToWorldLocation(FVector& WorldLocation) {
-	FVector2D ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
-	FVector WorldPosition, WorldDirection;
 	FHitResult HitResult;
+	FHitResult LineTraceResult;
+	FVector2D ScreenLocation;
+	//bool currentlyPressed;
+	if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, HitResult);
+		//ScreenLocation = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
+	} else {
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHitResultUnderFingerByChannel(ETouchIndex::Touch1, ETraceTypeQuery::TraceTypeQuery1, true, HitResult);
+		//UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetInputTouchState(ETouchIndex::Touch1, ScreenLocation.X, ScreenLocation.Y, currentlyPressed);
+	}
+
+	/*int32 ScreenX, ScreenY;
+	PlayerControllerRef->GetViewportSize(ScreenX, ScreenY);
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("Screen X Y : %d %d"), ScreenX, ScreenY));
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("Screen X Y : %f %f"), ScreenLocation.X, ScreenLocation.Y));*/
+
+	FVector WorldPosition, WorldDirection;
 	LineTraceIgnoreActors.AddUnique(this);
-	UGameplayStatics::DeprojectScreenToWorld(
+	/*UGameplayStatics::DeprojectScreenToWorld(
 		UGameplayStatics::GetPlayerController(GetWorld(), 0),
 		ScreenLocation * UWidgetLayoutLibrary::GetViewportScale(GetWorld()),
 		WorldPosition, WorldDirection);
 	UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldPosition, (WorldDirection * 1000000000.0f) + WorldPosition,
 		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
-		HitResult, true);
-	WorldLocation = HitResult.Location;
+		LineTraceResult, true);*/
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), HitResult.TraceStart, HitResult.TraceEnd,
+		ETraceTypeQuery::TraceTypeQuery1, false, LineTraceIgnoreActors, EDrawDebugTrace::Type::None,
+		LineTraceResult, true);
+	WorldLocation = LineTraceResult.Location;
 	WorldLocation.Z = 20.f;
-	return HitResult.GetActor();
+	return LineTraceResult.GetActor();
 }
 
 void ATrainTemplate::SetTrainMaterial(ALane* Lane) {
@@ -208,8 +231,13 @@ int32 ATrainTemplate::GetWeeklyBoardPassenger() const {
 
 void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	//Destination = D;
+	StartLocation.Z = 20.f;
+	this->SetActorLocation(StartLocation);
+
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	IsActorSpawnByWidget = false;
+
 	LaneRef = Lane;
 	TrainInfo.ServiceLaneId = Lane->GetLaneId();
 	TrainInfo.ShiftCount++;
@@ -293,12 +321,33 @@ void ATrainTemplate::SetNextStation(FStationInfo Info) {
 }
 
 void ATrainTemplate::TrainOnPressed(AActor* Target, FKey ButtonPressed) {
+	OnPressedLogic();
+}
+
+void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+	OnReleasedLogic();
+}
+
+int32 ATrainTemplate::GetShiftCount() const {
+	return TrainInfo.ShiftCount;
+}
+
+void ATrainTemplate::TrainTouchBegin(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+	OnPressedLogic();
+}
+
+void ATrainTemplate::TrainTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
+	OnReleasedLogic();
+}
+
+void ATrainTemplate::OnPressedLogic() {
 	TouchInput = true;
 	TouchTime = 0.0f;
 	OnPressedTime = UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld());
 }
 
-void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
+void ATrainTemplate::OnReleasedLogic() {
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::OnReleasedLogic"));
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 		TEXT("TrainTemplate::OnReleased")
 	);*/
@@ -314,9 +363,6 @@ void ATrainTemplate::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	TouchTime = 0.0f;
 }
 
-int32 ATrainTemplate::GetShiftCount() const {
-	return TrainInfo.ShiftCount;
-}
 
 void ATrainTemplate::SetDespawnNextStation() {
 	DeferredDespawn = true;
@@ -376,11 +422,23 @@ void ATrainTemplate::Tick(float DeltaTime)
 		}
 	}
 
+	//FHitResult HitResult;
+	//FVector touchPosition;
+	/*if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
+		PlayerControllerRef->GetHitResultUnderCursorByChannel(ETraceTypeQuery::TraceTypeQuery1, true, HitResult);
+	} else {
+		PlayerControllerRef->GetHitResultUnderFingerByChannel(ETouchIndex::Touch1, ETraceTypeQuery::TraceTypeQuery1, true, HitResult);
+	}*/
+	//ConvertMousePositionToWorldLocation(touchPosition);
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("Hit : %f %f %f"), touchPosition.X, touchPosition.Y, touchPosition.Z));
+
+
 	if (IsActorDragged) {
 		DropPassenger();
 
-		MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
-
+		//MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
+		MouseToWorldActor = PlayerControllerRef->ConvertMousePositionToWorldLocation(MouseToWorldLocation, LineTraceIgnoreActors);
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("Train:: %f %f %f"), MouseToWorldLocation.X, MouseToWorldLocation.Y, MouseToWorldLocation.Z));
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
 			FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
 		LaneRef = Cast<ALane>(MouseToWorldActor);

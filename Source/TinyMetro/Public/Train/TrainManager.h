@@ -99,15 +99,14 @@ public:
 
 
 protected:
+	// Widget class
+	UPROPERTY()
+	UClass* TrainInfoWidgetClass = nullptr;
 	// Train, Subtrain asset
 	UPROPERTY()
-	UObject* TrainBlueprintClass = nullptr;
+	UClass* TrainClass = nullptr;
 	UPROPERTY()
-	UBlueprint* GeneratedTrainBlueprint = nullptr;
-	UPROPERTY()
-	UObject* SubtrainBlueprintClass = nullptr;
-	UPROPERTY()
-	UBlueprint* GeneratedSubtrainBlueprint = nullptr;
+	UClass* SubtrainClass = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	class ATinyMetroGameModeBase* GameModeRef;

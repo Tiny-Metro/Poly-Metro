@@ -166,8 +166,12 @@ private:
 	void PrintPath(int32 Start, StationType Type, TQueue<int32>* Path);
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UClass* StationBlueprintClass = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	UClass* StationInfoWidgetClass = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	UClass* StationSpawnWidgetClass = nullptr;
 	UPROPERTY(BlueprintReadOnly, Category = "Station")
 	int32 MaxStationCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Station")

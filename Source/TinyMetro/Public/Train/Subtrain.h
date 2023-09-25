@@ -31,6 +31,7 @@ public:
 	// Click & Release
 	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
 
+	virtual void OnReleasedLogic() override;
 	// TrainTemplate override function
 	//virtual FVector GetNextTrainPosition() override;
 

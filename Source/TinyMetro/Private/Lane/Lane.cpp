@@ -23,6 +23,9 @@ ALane::ALane()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Used in SpawnTrain function
+	TrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")).Object;
+
 	LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
@@ -800,12 +803,10 @@ void ALane::SpawnTrain()
 					
 					AStation* Destination = StationPoint[1];
 
-					UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Train/BP_Train.BP_Train'")));
+					if (!TrainClass) {
+						TrainClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")));
+					}
 
-					UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-					UClass* SpawnClass = SpawnActor->StaticClass();
-
-					FActorSpawnParameters SpawnParams;
 					FTransform SpawnTransform;
 
 					FVector SpawnLocation = StationPoint[0]->GetCurrentGridCellData().WorldLocation;
@@ -813,7 +814,7 @@ void ALane::SpawnTrain()
 
 					SpawnTransform.SetLocation(SpawnLocation);
 
-					ATrain* Train = Cast<ATrain>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnTransform));
+					ATrain* Train = Cast<ATrain>(GetWorld()->SpawnActor<AActor>(TrainClass, SpawnTransform));
 
 
 					Train->ServiceStart(Train->GetActorLocation(), this, Destination);
@@ -1866,22 +1867,6 @@ void ALane::ClearLanePoint() {
 	LaneArray.Empty();
 }
 
-// YANGNI??
-void ALane::HandleScaling(bool IsScaling, float Length) {
-	if (IsScaling) { SectionLength = GetActorScale3D().X * Length; }
-	else SectionLength = Length;
-	return;
-}
-
-void ALane::HandleFullLength(bool IsFullLength){
-	if (IsFullLength) {
-		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(LaneSpline->GetSplineLength() / SectionLength))-1;
-	}
-	else {
-		EndLoop = FMath::TruncToInt(FMath::TruncToFloat(LaneSpline->GetSplineLength() / SectionLength));
-	}
-}
-
 
 void ALane::SetMeshMaterial() {
 	MeshMaterial = LaneMaterial[LaneId];
@@ -1934,7 +1919,7 @@ void ALane::ChangeRemoveMaterialAtIndex(int32 Index) // also make WillBeRemoved 
 void ALane::SetSplineMeshes(){
 
 	//Check the input parameter is valid
-	if (!LaneSpline)//Spline)
+	if (!LaneSpline)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
 		return;

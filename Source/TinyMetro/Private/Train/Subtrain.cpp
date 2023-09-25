@@ -146,7 +146,10 @@ bool ASubtrain::CanUpgrade() const {
 
 void ASubtrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
 	Super::TrainOnReleased(Target, ButtonPressed);
+	OnPressedLogic();
+}
 
+void ASubtrain::OnReleasedLogic() {
 	// Drag & Drop operation
 	if (!IsSingleClick) {
 		if (IsValid(LaneRef)) {
