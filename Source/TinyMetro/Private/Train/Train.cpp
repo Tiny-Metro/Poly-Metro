@@ -270,14 +270,6 @@ bool ATrain::IsPassengerSlotFull() {
 	}
 }
 
-//void ATrain::TrainOnReleased(AActor* Target, FKey ButtonPressed) {
-//	OnReleasedLogic();
-//}
-//
-//void ATrain::TrainTouchEnd(ETouchIndex::Type FingerIndex, AActor* TouchedActor) {
-//	OnReleasedLogic();
-//}
-
 void ATrain::OnReleasedLogic() {
 	Super::OnReleasedLogic();
 	UE_LOG(LogTemp, Log, TEXT("Train::OnReleasedLogic"));
