@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Camera/TinyMetroCameraSaveGame.h"
+#include "Camera/TinyMetroPlayerController.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
@@ -32,7 +33,7 @@ void ATinyMetroCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<ATinyMetroPlayerController>(Controller);
 	PlayerControllerRef->GetViewportSize(ScreenX, ScreenY);
 
 	if (!IsValid(SaveManagerRef)) {
@@ -48,7 +49,7 @@ void ATinyMetroCamera::BeginPlay()
 }
 
 void ATinyMetroCamera::InitViewport(FViewport* Viewport, uint32 unused) {
-	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+	if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<ATinyMetroPlayerController>(Controller);
 	PlayerControllerRef->GetViewportSize(ScreenX, ScreenY);
 }
 
@@ -127,13 +128,14 @@ void ATinyMetroCamera::Touch1Press() {
 		CurrentRotation = SpringArmComponenet->GetRelativeRotation();
 		CurrentRotation.Yaw = GetActorRotation().Yaw;
 
-		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<ATinyMetroPlayerController>(Controller);
 		bool tmp;
 		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, Touch1InitPosition.X, Touch1InitPosition.Y, tmp);
 		if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {
 			PlayerControllerRef->GetMousePosition(Touch1InitPosition.X, Touch1InitPosition.Y);
 		}
 	}
+	PlayerControllerRef->SingleInputRelease();
 }
 
 void ATinyMetroCamera::Touch1Release() {
@@ -167,7 +169,7 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 	if (Touch1Pressed && !Touch2Pressed) {
 		// Get finger position
 		FVector2D currentTouchPositon;
-		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<APlayerController>(Controller);
+		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<ATinyMetroPlayerController>(Controller);
 		bool tmp;
 		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, currentTouchPositon.X, currentTouchPositon.Y, tmp);
 		if (UGameplayStatics::GetPlatformName() == TEXT("Windows")) {

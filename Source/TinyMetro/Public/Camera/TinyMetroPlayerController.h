@@ -20,4 +20,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AActor* ConvertMousePositionToWorldLocation(FVector& WorldLocation, const TArray<AActor*>& TraceIgnoreActor);
+	
+	// Check cancel selected lane
+	UFUNCTION()
+	void SingleInputRelease();
+
+protected:
+	UPROPERTY()
+	class ALaneManager* LaneManagerRef;
 };
