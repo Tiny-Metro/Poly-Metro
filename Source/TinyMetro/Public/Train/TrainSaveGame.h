@@ -7,6 +7,7 @@
 #include "TrainInfo.h"
 #include "TrainStatus.h"
 #include "../Station/Passenger.h"
+#include "../Station/StationInfo.h"
 #include "TrainSaveGame.generated.h"
 
 /**
@@ -23,7 +24,11 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TMap<int32, FPassenger> Passenger;
 	UPROPERTY(BlueprintReadWrite)
-	int32 DestinationStationId;
+	FStationInfo CurrentStation;
+	UPROPERTY(BlueprintReadWrite)
+	FStationInfo NextStation;
 	UPROPERTY(BlueprintReadWrite)
 	TrainStatus Status;
+	UPROPERTY(BlueprintReadWrite)
+	FRotator Rotation;
 };

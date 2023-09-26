@@ -109,8 +109,6 @@ protected:
 	
 	UPROPERTY()
 	int32 RideCount = 0;
-	UPROPERTY()
-	int32 PassengerIndex = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<FVector> PassengerMeshPosition = {

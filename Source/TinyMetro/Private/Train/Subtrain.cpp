@@ -149,7 +149,9 @@ void ASubtrain::OnReleasedLogic() {
 	// Drag & Drop operation
 	if (!IsSingleClick) {
 		if (IsValid(LaneRef)) {
-			ServiceStart(GetActorLocation(), LaneRef, nullptr);
+			FVector StartLocation = GridManagerRef->Approximate(OwnerTrainRef->GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
+			StartLocation.Z = 20.0f;
+			ServiceStart(StartLocation, LaneRef, nullptr);
 			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalShiftCount++;
 		} else {
 			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalRetrievalCount++;
@@ -174,7 +176,7 @@ void ASubtrain::BeginPlay() {
 void ASubtrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	LaneRef = Lane;
 	OwnerTrainRef->AddSubtrain(this);
-	StartLocation = GridManagerRef->Approximate(OwnerTrainRef->GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
+	StartLocation = OwnerTrainRef->GetActorLocation();
 	StartLocation.Z = 20.0f;
 	Super::ServiceStart(StartLocation, LaneRef, D);
 	SetTrainMaterial(LaneRef);
@@ -232,6 +234,7 @@ void ASubtrain::Save() {
 	tmp->TrainInfo = TrainInfo;
 	tmp->Passenger = Passenger;
 	tmp->OwnerTrainId = OwnerTrainId;
+	tmp->Rotation = GetActorRotation();
 
 	LaneRef = LaneManagerRef->Lanes[TrainInfo.ServiceLaneId];
 
@@ -248,6 +251,7 @@ bool ASubtrain::Load() {
 	TrainInfo = tmp->TrainInfo;
 	Passenger = tmp->Passenger;
 	OwnerTrainId = tmp->OwnerTrainId;
+	SetActorRotation(tmp->Rotation);
 	LaneRef = LaneManagerRef->Lanes[TrainInfo.ServiceLaneId];
 
 	return true;

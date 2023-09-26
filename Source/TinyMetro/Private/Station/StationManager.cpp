@@ -337,7 +337,7 @@ void AStationManager::RemoveAdjListItem(AStation* Start, AStation* End)
 
 AStation* AStationManager::GetStationByStationInfo(FStationInfo Info) {
 	for (auto& i : Station) {
-		if (i->GetStationInfo() == Info) {
+		if (i->GetStationInfo().Id == Info.Id) {
 			return i;
 		}
 	}
@@ -505,11 +505,11 @@ void AStationManager::FloydWarshall() {
 
 	// Calculate route
 	for (int i = 0; i < StationNum; i++) {
-		for (int j = 0; j < StationNum; j++) {
+		for (int j = 1; j < 11; j++) {
 			if (ShortestPath.Find(i) == nullptr) {
 				ShortestPath.Add(i);
 			}
-			ShortestPath[i].Emplace(
+			ShortestPath[i].Add(
 				StaticCast<StationType>(j),
 				PathFinding(i, StaticCast<StationType>(j))
 			);
