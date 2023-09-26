@@ -76,7 +76,7 @@ public:
 protected:
 
 	UPROPERTY()
-	APlayerController* PlayerControllerRef;
+	class ATinyMetroPlayerController* PlayerControllerRef;
 	UPROPERTY()
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
