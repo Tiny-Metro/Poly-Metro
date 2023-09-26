@@ -28,9 +28,6 @@ public:
 	virtual void Upgrade() override;
 	virtual bool CanUpgrade() const override;
 
-	// Click & Release
-	virtual void TrainOnReleased(AActor* Target, FKey ButtonPressed) override;
-
 	virtual void OnReleasedLogic() override;
 	// TrainTemplate override function
 	//virtual FVector GetNextTrainPosition() override;
