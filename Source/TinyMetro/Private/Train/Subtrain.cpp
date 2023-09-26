@@ -149,7 +149,9 @@ void ASubtrain::OnReleasedLogic() {
 	// Drag & Drop operation
 	if (!IsSingleClick) {
 		if (IsValid(LaneRef)) {
-			ServiceStart(GetActorLocation(), LaneRef, nullptr);
+			FVector StartLocation = GridManagerRef->Approximate(OwnerTrainRef->GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
+			StartLocation.Z = 20.0f;
+			ServiceStart(StartLocation, LaneRef, nullptr);
 			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalShiftCount++;
 		} else {
 			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalRetrievalCount++;
@@ -174,7 +176,7 @@ void ASubtrain::BeginPlay() {
 void ASubtrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	LaneRef = Lane;
 	OwnerTrainRef->AddSubtrain(this);
-	StartLocation = GridManagerRef->Approximate(OwnerTrainRef->GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
+	StartLocation = OwnerTrainRef->GetActorLocation();
 	StartLocation.Z = 20.0f;
 	Super::ServiceStart(StartLocation, LaneRef, D);
 	SetTrainMaterial(LaneRef);

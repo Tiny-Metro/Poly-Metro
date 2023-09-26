@@ -34,7 +34,9 @@ void ATrain::Tick(float DeltaTime) {
 			GetOffPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation), tmp);
 			PassengerTransitionCount -= PassengerTransitionDelay;
 		}
-	} else if (Status == TrainStatus::GetOn) {
+	} 
+
+	if (Status == TrainStatus::GetOn) {
 		PassengerTransitionCount += DeltaTime;
 		if (PassengerTransitionCount >= PassengerTransitionDelay) {
 			GetOnPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation));
@@ -183,9 +185,6 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 			// Movement stop, release
 			TrainMovement->SetActive(false);
-
-			// Initialize check index
-			PassengerIndex = 0;
 
 			// Change status : Run -> GetOff
 			Status = TrainStatus::GetOff;
@@ -402,12 +401,11 @@ void ATrain::ActiveMoveTest() {
 void ATrain::GetOnPassenger(AStation* Station) {
 	if (!IsPassengerSlotFull()) {
 		// Log
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Staton::GetOnPassenger"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Train::GetOnPassenger"));
 
-		auto RidePassenger = Station->GetOnPassenger(PassengerIndex++, this);
+		auto RidePassenger = Station->GetOnPassenger(-1, this);
 
 		if (RidePassenger.Destination != StationType::None) {
-			PassengerIndex--;
 			// Add Passenger
 			if (!AddPassenger(RidePassenger)) { // Train is full
 				// Passenger get on subtrain
@@ -571,7 +569,8 @@ void ATrain::Save() {
 	UTrainSaveGame* tmp = Cast<UTrainSaveGame>(UGameplayStatics::CreateSaveGameObject(UTrainSaveGame::StaticClass()));
 	tmp->TrainInfo = TrainInfo;
 	tmp->Passenger = Passenger;
-	tmp->DestinationStationId = NextStation.Id;
+	tmp->CurrentStation = CurrentStation;
+	tmp->NextStation = NextStation;
 	tmp->Status = Status;
 
 	SaveManagerRef->Save(tmp, SaveActorType::Train, TrainInfo.Id);
@@ -586,7 +585,8 @@ bool ATrain::Load() {
 
 	TrainInfo = tmp->TrainInfo;
 	Passenger = tmp->Passenger;
-	NextStation.Id = tmp->DestinationStationId;
+	CurrentStation = tmp->CurrentStation;
+	NextStation = tmp->NextStation;
 	Status = tmp->Status;
 	//Destination = StationManagerRef->GetStationById(tmp->DestinationStationId);
 	LaneRef = LaneManagerRef->Lanes[TrainInfo.ServiceLaneId];
