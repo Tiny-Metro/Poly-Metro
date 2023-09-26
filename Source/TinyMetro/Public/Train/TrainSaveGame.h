@@ -29,4 +29,6 @@ public:
 	FStationInfo NextStation;
 	UPROPERTY(BlueprintReadWrite)
 	TrainStatus Status;
+	UPROPERTY(BlueprintReadWrite)
+	FRotator Rotation;
 };

@@ -23,4 +23,6 @@ public:
 	TMap<int32, FPassenger> Passenger;
 	UPROPERTY(BlueprintReadWrite)
 	int32 OwnerTrainId;
+	UPROPERTY(BlueprintReadWrite)
+	FRotator Rotation;
 };

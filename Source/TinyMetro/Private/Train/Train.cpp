@@ -318,8 +318,10 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 
 
 	// Initialize train's Current, Next station
-	CurrentStation.Id = -1;
-	NextStation = D->GetStationInfo();
+	if (!IsLoaded) {
+		CurrentStation.Id = -1;
+		NextStation = D->GetStationInfo();
+	}
 
 	// Set train material
 	SetTrainMaterial(LaneRef);
@@ -572,6 +574,7 @@ void ATrain::Save() {
 	tmp->CurrentStation = CurrentStation;
 	tmp->NextStation = NextStation;
 	tmp->Status = Status;
+	tmp->Rotation = GetActorRotation();
 
 	SaveManagerRef->Save(tmp, SaveActorType::Train, TrainInfo.Id);
 }
@@ -588,6 +591,7 @@ bool ATrain::Load() {
 	CurrentStation = tmp->CurrentStation;
 	NextStation = tmp->NextStation;
 	Status = tmp->Status;
+	SetActorRotation(tmp->Rotation);
 	//Destination = StationManagerRef->GetStationById(tmp->DestinationStationId);
 	LaneRef = LaneManagerRef->Lanes[TrainInfo.ServiceLaneId];
 
@@ -603,6 +607,9 @@ void ATrain::FinishLoad() {
 		}
 		if (TrainInfo.IsUpgrade) {
 			Upgrade();
+		}
+		if (Status != TrainStatus::Run) {
+			TrainMovement->SetActive(false);
 		}
 	} else {
 		DespawnTrain();
