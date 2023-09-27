@@ -146,6 +146,8 @@ void ALaneManager::CancelSelectedStations()
 	SelectedStations.Empty();
 
 	SetUILaneNum(0);
+
+	IsPlacementValid = false;
 }
 
 ALane* ALaneManager::SpawnLane()
