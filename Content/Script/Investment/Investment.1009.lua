@@ -4,12 +4,13 @@ function InvestmentData()
     local Data = {}
     Data.message = '잔여 대출금이 없도록 하세요.'
     Data.time_require = -1
-    Data.award = '2000$'
+    Data.award = 2000
 
     return Data
 end
 
 local loan
+
 -- Call when investment start
 -- Used save info when start
 function Start()
@@ -36,5 +37,5 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(2000)
+    AddMoney(InvestmentData.Award)
 end

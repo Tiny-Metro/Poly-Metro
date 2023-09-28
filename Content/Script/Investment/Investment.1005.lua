@@ -23,10 +23,12 @@ end
 local trains
 local subtrains
 local stations
+local time
 
 local pre_train_upgrade
 local pre_subtrain_upgrade
 local pre_statiion_upgrade
+local timestamp
 
 -- Call when investment start
 -- Used save info when start
@@ -34,10 +36,12 @@ function Start()
     trains = GetTrainStatistics()
     subtrains = GetSubtrainStatistics()
     stations = GetDefaultStatistics()
+    time = GetTimestamp()
 
     pre_train_upgrade = trains.TotalUpgradeCount
     pre_subtrain_upgrade = subtrains.TotalUpgradeCount
     pre_statiion_upgrade = stations.UpgradeStationCount
+    timestamp = time.Date
 end
 
 -- Investment appear condition
@@ -58,9 +62,14 @@ function Process()
         return "success"
     elseif selectedTarget.name == "역" and cur_station_upgrade > pre_station_upgrade then
         return "success"
-    else
-        return "continue"
     end
+
+    local curtime = time.Date
+    if curtime - timestamp > InvestmentData().time_require then
+        return "fail"
+    end
+
+    return "continue"
 end
 
 -- Investment award

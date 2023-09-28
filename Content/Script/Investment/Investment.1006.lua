@@ -23,10 +23,12 @@ end
 local bridge
 local tunnel
 local lane
+local time
 
 local pre_bridge
 local pre_tunnel
 local pre_lane
+local timestamp
 
 -- Call when investment start
 -- Used save info when start
@@ -34,10 +36,12 @@ function Start()
     bridge = GetBridgeStatistics()
     tunnel = GetTunnelStatistics()
     lane = GetLaneDetailStatistics()
+    time = GetTimestamp()
 
     pre_bridge = bridge.TotalPlacementCount
     pre_tunnel = tunnel.TotalPlacementCount
     pre_lane = lane.TotalModifyAndDeleteCount
+    timestamp = time.Date
 end
 
 -- Investment appear condition
@@ -58,9 +62,14 @@ function Process()
         return "success"
     elseif selectedTarget.name == "노선" and cur_lane == pre_lane then
         return "success"
-    else
-        return "continue"
     end
+
+    local curtime = time.Date
+    if curtime - timestamp >= InvestmentData().time_require then
+        return "fail"
+    end
+
+    return "continue"
 end
 
 -- Investment award

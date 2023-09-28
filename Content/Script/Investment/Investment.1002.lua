@@ -4,7 +4,7 @@ function InvestmentData()
     local Data = {}
     Data.message = '10개의 역을 추가로 운임하세요.'
     Data.time_require = 14
-    Data.award = '500$'
+    Data.award = 500
 
     return Data
 end
@@ -12,11 +12,15 @@ end
 local stations
 local target_station_count
 local pre_active_station
+local time
+local timestamp
 
 -- Call when investment start
 -- Used save info when start
 function Start()
     stations = GetStationInfos()
+    time = GetTimestamp()
+    timestamp = time.Date
     target_station_count = 10
     pre_active_station = 0
     
@@ -35,6 +39,7 @@ end
 -- Investment success condition
 function Process()
     local cur_active_station = 0
+    local curtime = time.Date
 
     for i=0, #stations do
         if stations[i].IsActive then
@@ -44,6 +49,8 @@ function Process()
 
     if pre_active_station + target_station_count <= cur_active_station then
         return "success"
+    elseif curtime - timestamp > InvestmentData.time_require then
+        return "fail"
     else
         return "continue"
     end
@@ -51,5 +58,5 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(500)
+    AddMoney(InvestmentData.award)
 end

@@ -11,11 +11,16 @@ end
 
 local trains
 local pre_subtrain_count
+local time
+local timestamp
 
 -- Call when investment start
 -- Used save info when start
 function Start()
     trains = GetTrainInfos()
+    time = GetTimestamp()
+    timestamp = time.Date
+
     pre_subtrain_count = {}
     for i=0, #trains do
         if trains[i].SubtrainCount ~= -1 then
@@ -33,6 +38,7 @@ end
 -- Investment success condition
 function Process()
     local additionalSubtrainsNeeded = 2
+    local curtime = time.Date
 
     for i = 0, #trains do
         if trains[i].SubtrainCount ~= -1 then
@@ -42,6 +48,11 @@ function Process()
             end
         end
     end
+
+    if curtime - timestamp > InvestmentData().time_require then
+        return "fail"
+    end
+
     return "continue"
 end
 
