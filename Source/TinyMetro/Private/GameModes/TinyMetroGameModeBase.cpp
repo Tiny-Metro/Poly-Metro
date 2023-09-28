@@ -92,6 +92,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     Timer = GetWorld()->SpawnActor<ATimer>();
     Shop = GetWorld()->SpawnActor<AShop>();
     EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
+    EventManager->Load();
 
     // Spawn actor
     FActorSpawnParameters SpawnParams;
