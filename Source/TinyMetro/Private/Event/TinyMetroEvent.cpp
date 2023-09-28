@@ -20,6 +20,7 @@ UTinyMetroEvent* UTinyMetroEvent::CreateEvent(FString ScriptFileName, UEventLuaS
 	Obj->LuaState = LuaState;
 	Obj->WorldRef = WorldContextObject;
 	Obj->InitLuaState();
+	Obj->InitEvent();
 	
 	return Obj;
 }
@@ -30,6 +31,7 @@ void UTinyMetroEvent::InitLuaState() {
 }
 
 int32 UTinyMetroEvent::EventStart() {
+
 	auto readLua = ULuaBlueprintFunctionLibrary::LuaGlobalCall(WorldRef, LuaState->GetClass(),
 		TEXT("Start"), TArray<FLuaValue>());
 	InitEvent();
@@ -48,6 +50,7 @@ void UTinyMetroEvent::InitEvent() {
 	EventData.FlavorText = ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("flavor_text")));
 	EventData.Message = ULuaBlueprintFunctionLibrary::LuaValueToUTF8(readLua.GetField(TEXT("message")));
 	EventData.Period = readLua.GetField(TEXT("period")).ToInteger();
+	//UE_LOG(LogTemp, Log, TEXT("Event::%s"), *LuaState->LuaFilename);
 }
 
 int32 UTinyMetroEvent::GetEventPeriod() {

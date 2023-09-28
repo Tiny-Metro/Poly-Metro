@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TinyMetroEventOccurData.h"
+#include "TinyMetroEventData.h"
 #include "TinyMetroEventManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEventOccurTask);
@@ -36,6 +37,8 @@ public:
 	void OccurEvent();
 	UFUNCTION()
 	void UpdateEventWeight();
+	UFUNCTION()
+	FTinyMetroEventData GetEventData(int32 EventId);
 
 	// Occur specific event
 	// Not used in game (Only test)
@@ -50,7 +53,7 @@ public:
 	UFUNCTION()
 	void Save();
 	UFUNCTION()
-	bool Load();
+	void Load();
 
 	UPROPERTY(BlueprintAssignable)
 	FEventOccurTask EventOccurTask;
@@ -63,9 +66,16 @@ protected:
 	UPROPERTY()
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY()
+	bool IsLoaded = false;
+	UPROPERTY()
 	class ATimer* TimerRef;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Info")
 	class UEventLuaState* LuaState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Event")
+	TMap<int32, class ULuaComponent*> LuaComponentArr;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Event")
+	//TMap<int32, FTinyMetroEventData> EventDataArr;
 
 	UPROPERTY()
 	TArray<float> EventOccurProbability = {
@@ -93,17 +103,17 @@ protected:
 		0 // Day 35
 	};
 	UPROPERTY(VisibleAnywhere, Category = "Info")
-	uint32 Day = 0;
+	uint32 ProgressDay = 0;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
-	int32 EventPeriod = 0;
+	int32 ExpirationDay = 0;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Event")
 	TArray<int32> EventCandidate;
-	UPROPERTY(BlueprintReadOnly)
-	class UTinyMetroEvent* SelectedEvent;
-	UPROPERTY()
-	TMap<int32, class UTinyMetroEvent*> EventArr;
+	//UPROPERTY(BlueprintReadOnly, Category = "Event")
+	//class UTinyMetroEvent* SelectedEvent;
+	//UPROPERTY(VisibleAnywhere, Category = "Event")
+	//TMap<int32, class UTinyMetroEvent*> EventArr;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "Event")
 	TArray<FTinyMetroEventOccurData> EventOccurLog;
 };
