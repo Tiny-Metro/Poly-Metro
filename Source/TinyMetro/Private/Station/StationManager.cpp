@@ -606,6 +606,10 @@ void AStationManager::Save() {
 	tmp->NextStationId = NextStationId;
 	tmp->IsPassengerSpawnEnable = IsPassengerSpawnEnable;
 	tmp->StationSpawnDataArr = StationSpawnLog;
+	tmp->AdditionalPassengerSpawnProbabilityByEvent = AdditionalPassengerSpawnProbabilityByEvent;
+	tmp->FreePassengerSpawnProbabilityByEvent = FreePassengerSpawnProbabilityByEvent;
+	tmp->ComplainIncreaseRateByEvent = ComplainIncreaseRateByEvent;
+	tmp->PassengerDestinationTypeWeight = PassengerDestinationTypeWeight;
 	
 	SaveManagerRef->Save(tmp, SaveActorType::StationManager);
 }
@@ -629,9 +633,12 @@ bool AStationManager::Load() {
 	NextStationId = tmp->NextStationId;
 	IsPassengerSpawnEnable = tmp->IsPassengerSpawnEnable;
 	for (auto& i : tmp->StationSpawnDataArr) {
-		SpawnStation(i.GridCellData, i.Type, i.StationId);
-		
+		SpawnStation(i.GridCellData, i.Type, i.StationId);	
 	}
+	AdditionalPassengerSpawnProbabilityByEvent = tmp->AdditionalPassengerSpawnProbabilityByEvent;
+	FreePassengerSpawnProbabilityByEvent = tmp->FreePassengerSpawnProbabilityByEvent;
+	ComplainIncreaseRateByEvent = tmp->ComplainIncreaseRateByEvent;
+	PassengerDestinationTypeWeight = tmp->PassengerDestinationTypeWeight;
 
 	return true;
 }
