@@ -48,52 +48,52 @@ TArray<ULoan*> ABank::GetAllLoan() const {
 }
 
 void ABank::InitInvestment() {
-	TArray<FString> findFiles;
-	IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
-	FString scriptDir = FPaths::ProjectContentDir()
-		.Append(TEXT("Script"))
-		.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
-		.Append(TEXT("Investment"));
-	FRegexPattern pattern(TEXT("Investment\\.[1-9]\\d{3}\\.lua"));
+	//TArray<FString> findFiles;
+	//IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
+	//FString scriptDir = FPaths::ProjectContentDir()
+	//	.Append(TEXT("Script"))
+	//	.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
+	//	.Append(TEXT("Investment"));
+	//FRegexPattern pattern(TEXT("Investment\\.[1-9]\\d{3}\\.lua"));
 
 
-	if (!IsLoadSuccess) {
-		// Load fail : New game
-		// Copy files to Content/Script/Investment/Saved
-		platformFile.FindFiles(findFiles, *scriptDir, TEXT("lua"));
-		for (auto& i : findFiles) {
-			FRegexMatcher matcher(pattern, i);
-			if (matcher.FindNext()) {
-				FString saveEventDir = FPaths::GetPath(i)
-					.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
-					.Append(TEXT("Saved"))
-					.Append(FGenericPlatformMisc::GetDefaultPathSeparator());
-				FString cleanFileName = FPaths::GetCleanFilename(i);
+	//if (!IsLoadSuccess) {
+	//	// Load fail : New game
+	//	// Copy files to Content/Script/Investment/Saved
+	//	platformFile.FindFiles(findFiles, *scriptDir, TEXT("lua"));
+	//	for (auto& i : findFiles) {
+	//		FRegexMatcher matcher(pattern, i);
+	//		if (matcher.FindNext()) {
+	//			FString saveEventDir = FPaths::GetPath(i)
+	//				.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
+	//				.Append(TEXT("Saved"))
+	//				.Append(FGenericPlatformMisc::GetDefaultPathSeparator());
+	//			FString cleanFileName = FPaths::GetCleanFilename(i);
 
-				if (!platformFile.DirectoryExists(*saveEventDir)) platformFile.CreateDirectory(*saveEventDir);
+	//			if (!platformFile.DirectoryExists(*saveEventDir)) platformFile.CreateDirectory(*saveEventDir);
 
-				platformFile.CopyFile(*(saveEventDir + cleanFileName), *i);
-			}
-		}
-	}
+	//			platformFile.CopyFile(*(saveEventDir + cleanFileName), *i);
+	//		}
+	//	}
+	//}
 
-	scriptDir
-		.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
-		.Append(TEXT("Saved"));
+	//scriptDir
+	//	.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
+	//	.Append(TEXT("Saved"));
 
-	findFiles.Empty();
-	platformFile.FindFiles(findFiles, *scriptDir, TEXT("lua"));
+	//findFiles.Empty();
+	//platformFile.FindFiles(findFiles, *scriptDir, TEXT("lua"));
 
-	// Read files
-	// Read directory = saved directory
-	for (auto& i : findFiles) {
-		FRegexMatcher matcher(pattern, i);
-		if (matcher.FindNext()) {
-			auto tmpInvestment = UInvestment::CreateInvestment(FPaths::GetCleanFilename(i), LuaState, GetWorld());
-			Investment.Add(tmpInvestment->GetInvestmentData().Id, tmpInvestment);
-			InvestmentCandidate.Add(tmpInvestment->GetInvestmentData().Id);
-		}
-	}
+	//// Read files
+	//// Read directory = saved directory
+	//for (auto& i : findFiles) {
+	//	FRegexMatcher matcher(pattern, i);
+	//	if (matcher.FindNext()) {
+	//		auto tmpInvestment = UInvestment::CreateInvestment(FPaths::GetCleanFilename(i), LuaState, GetWorld());
+	//		Investment.Add(tmpInvestment->GetInvestmentData().Id, tmpInvestment);
+	//		InvestmentCandidate.Add(tmpInvestment->GetInvestmentData().Id);
+	//	}
+	//}
 }
 
 // Replace investment at Index
@@ -103,56 +103,56 @@ void ABank::ChangeInvestment() {
 	UpdateInvestmentCandidate();
 	RemoveFinishedInvestment();
 
-	// Remove duplicated index
-	for (auto& i : VisibleInvestmentIndex) {
-		InvestmentCandidate.RemoveSingle(i);
-	}
+	//// Remove duplicated index
+	//for (auto& i : VisibleInvestmentIndex) {
+	//	InvestmentCandidate.RemoveSingle(i);
+	//}
 
-	// If stock is full, remove not processing one
-	if (VisibleInvestmentIndex.Num() == InvestmentStock) {
-		bool removeFlag = false;
-		for (auto& i : VisibleInvestmentIndex) {
-			if (!removeFlag) {
-				auto state = Investment[i]->GetInvestmentState();
-				if (state != InvestmentState::Processing) {
-					VisibleInvestmentIndex.RemoveSingle(i);
-					removeFlag = true;
-				}
-			}
-		}
-	}
+	//// If stock is full, remove not processing one
+	//if (VisibleInvestmentIndex.Num() == InvestmentStock) {
+	//	bool removeFlag = false;
+	//	for (auto& i : VisibleInvestmentIndex) {
+	//		if (!removeFlag) {
+	//			auto state = Investment[i]->GetInvestmentState();
+	//			if (state != InvestmentState::Processing) {
+	//				VisibleInvestmentIndex.RemoveSingle(i);
+	//				removeFlag = true;
+	//			}
+	//		}
+	//	}
+	//}
 
-	// Check number of investment
-	// Fill up investment
-	while (InvestmentCandidate.Num() > 0 && VisibleInvestmentIndex.Num() < InvestmentStock) {
-		int32 newInvestmentId = InvestmentCandidate[FMath::RandRange(0, InvestmentCandidate.Num() - 1)];
-		VisibleInvestmentIndex.Add(newInvestmentId);
-		InvestmentCandidate.RemoveSingle(newInvestmentId);
-	}
+	//// Check number of investment
+	//// Fill up investment
+	//while (InvestmentCandidate.Num() > 0 && VisibleInvestmentIndex.Num() < InvestmentStock) {
+	//	int32 newInvestmentId = InvestmentCandidate[FMath::RandRange(0, InvestmentCandidate.Num() - 1)];
+	//	VisibleInvestmentIndex.Add(newInvestmentId);
+	//	InvestmentCandidate.RemoveSingle(newInvestmentId);
+	//}
 }
 
 // Replace all investment except activated one
 void ABank::ChangeAllInvestment() {
 	UpdateInvestmentCandidate();
 
-	// Remove duplicated index
-	for (auto& i : VisibleInvestmentIndex) {
-		InvestmentCandidate.RemoveSingle(i);
-	}
+	//// Remove duplicated index
+	//for (auto& i : VisibleInvestmentIndex) {
+	//	InvestmentCandidate.RemoveSingle(i);
+	//}
 
-	// Clear investment slot except processing one
-	for (auto& i : VisibleInvestmentIndex) {
-		auto state = Investment[i]->GetInvestmentState();
-		if (state != InvestmentState::Processing) VisibleInvestmentIndex.RemoveSingle(i);
-	}
+	//// Clear investment slot except processing one
+	//for (auto& i : VisibleInvestmentIndex) {
+	//	auto state = Investment[i]->GetInvestmentState();
+	//	if (state != InvestmentState::Processing) VisibleInvestmentIndex.RemoveSingle(i);
+	//}
 
-	// Check number of investment
-	// Fill up investment
-	while (InvestmentCandidate.Num() > 0 && VisibleInvestmentIndex.Num() < InvestmentStock) {
-		int32 newInvestmentId = InvestmentCandidate[FMath::RandRange(0, InvestmentCandidate.Num() - 1)];
-		VisibleInvestmentIndex.Add(newInvestmentId);
-		InvestmentCandidate.RemoveSingle(newInvestmentId);
-	}
+	//// Check number of investment
+	//// Fill up investment
+	//while (InvestmentCandidate.Num() > 0 && VisibleInvestmentIndex.Num() < InvestmentStock) {
+	//	int32 newInvestmentId = InvestmentCandidate[FMath::RandRange(0, InvestmentCandidate.Num() - 1)];
+	//	VisibleInvestmentIndex.Add(newInvestmentId);
+	//	InvestmentCandidate.RemoveSingle(newInvestmentId);
+	//}
 }
 
 int32 ABank::GetInvestmentStock() const {
@@ -160,23 +160,23 @@ int32 ABank::GetInvestmentStock() const {
 }
 
 void ABank::UpdateInvestmentCandidate() {
-	InvestmentCandidate.Empty();
+	/*InvestmentCandidate.Empty();
 	for (auto& i : Investment) {
 		if (i.Value->GetAppearance()) {
 			InvestmentCandidate.Add(i.Key);
 		}
-	}
+	}*/
 }
 
 void ABank::RemoveFinishedInvestment() {
 	// Remove success, fail investment
-	for (auto& i : VisibleInvestmentIndex) {
+	/*for (auto& i : VisibleInvestmentIndex) {
 		auto state = Investment[i]->GetInvestmentState();
 		if (state == InvestmentState::Success || state == InvestmentState::Fail) {
 			Investment[i]->ResetInvestment();
 			VisibleInvestmentIndex.RemoveSingle(i);
 		}
-	}
+	}*/
 }
 
 
@@ -223,9 +223,9 @@ void ABank::InitLoan() {
 }
 
 void ABank::DailyTask() {
-	for (auto& i : Investment) {
-		i.Value->NotifyDailyTask();
-	}
+	//for (auto& i : Investment) {
+	//	i.Value->NotifyDailyTask();
+	//}
 }
 
 void ABank::WeeklyTask() {
@@ -235,9 +235,9 @@ void ABank::WeeklyTask() {
 	}
 
 	// Investment weekly task
-	if (InvestmentStock < MaxInvestmetStock) InvestmentStock++;
-	ChangeInvestment();
-	InvestmentUpdateTask.Broadcast();
+	//if (InvestmentStock < MaxInvestmetStock) InvestmentStock++;
+	//ChangeInvestment();
+	//InvestmentUpdateTask.Broadcast();
 }
 
 void ABank::Save() {
@@ -251,9 +251,9 @@ void ABank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	for (auto& i : Investment) {
-		i.Value->InvestmentProcess();
-	}
+	//for (auto& i : Investment) {
+	//	i.Value->InvestmentProcess();
+	//}
 
 	for (auto& i : Loan) {
 		i->GetAvailable();
