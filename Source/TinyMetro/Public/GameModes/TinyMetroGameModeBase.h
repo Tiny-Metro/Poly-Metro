@@ -55,6 +55,8 @@ public:
 	class ATinyMetroEventManager* GetEventManager() const;
 	UFUNCTION(BlueprintCallable)
 	class AStatisticsManager* GetStatisticsManager() const;
+	UFUNCTION(BlueprintCallable)
+	class AInvestmentManager* GetInvestmentManager() const;
 
 	// Test
 	UFUNCTION(BlueprintCallable)
@@ -83,6 +85,8 @@ protected:
 	class APolicy* Policy;
 	UPROPERTY()
 	class ABank* Bank;
+	UPROPERTY()
+	class AInvestmentManager* InvestmentManagerRef;
 	UPROPERTY()
 	class ATimer* Timer;
 	UPROPERTY()
