@@ -64,8 +64,8 @@ void UTinyMetroLuaState::InitReferClasses() {
 
 FLuaValue UTinyMetroLuaState::GetMapName() {
     InitReferClasses();
-    FLuaValue mapName = ULuaBlueprintFunctionLibrary::LuaCreateString(GameModeRef->GetMapName());
-
+    //FLuaValue mapName = ULuaBlueprintFunctionLibrary::LuaCreateString(GameModeRef->GetMapName());
+    FLuaValue mapName = ULuaBlueprintFunctionLibrary::LuaValueFromUTF8(GameModeRef->GetMapName());
     return mapName;
 }
 
