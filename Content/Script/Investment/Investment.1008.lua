@@ -45,5 +45,5 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(InvestmentData.Award)
+    AddMoney(InvestmentData.award)
 end

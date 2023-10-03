@@ -19,8 +19,8 @@ end
 
 -- Investment appear condition
 function Appearance()
-    totalloanmoney = loan.TotalRepayMoney - loan.TotalRepayInterestMoney
-    return totalloanmoney > 0
+    totalloanmoney = loan.TotalUsingLoanCount
+    return totalloanmoney ~= 0
 end
 
 -- Investment success condition
@@ -37,5 +37,5 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(InvestmentData.Award)
+    AddMoney(InvestmentData.award)
 end

@@ -59,5 +59,5 @@ end
 -- Investment award
 function Award()
     AddItem(Train, 1)
-    AddMoney(500)
+    AddMoney(300)
 end
