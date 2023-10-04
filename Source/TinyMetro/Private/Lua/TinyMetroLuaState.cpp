@@ -11,6 +11,7 @@
 #include "Train/TrainManager.h"
 #include "Train/Train.h"
 #include "Policy/Policy.h"
+#include "Finance/InvestmentManager.h"
 #include "LuaMachine/Public/LuaBlueprintFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -60,6 +61,7 @@ void UTinyMetroLuaState::InitReferClasses() {
     if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
     if (!IsValid(TrainManagerRef)) TrainManagerRef = GameModeRef->GetTrainManager();
     if (!IsValid(PolicyRef)) PolicyRef = GameModeRef->GetPolicy();
+    if (!IsValid(InvestmentManagerRef)) InvestmentManagerRef = GameModeRef->GetInvestmentManager();
 }
 
 FLuaValue UTinyMetroLuaState::GetMapName() {
@@ -276,7 +278,7 @@ TArray<FLuaValue> UTinyMetroLuaState::GetTrainInfos() {
         tmp.SetField(TEXT("ServiceLaneId"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.ServiceLaneId));
         if (trainInfo.Type == TrainType::Train) {
             tmp.SetField(TEXT("TrainType"), ULuaBlueprintFunctionLibrary::LuaCreateString(TEXT("Train")));
-            tmp.SetField(TEXT("SubtrainCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(Cast<ATrain>(i)->GetSubtrainCount()));
+            tmp.SetField(TEXT("SubtrainCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(trainInfo.SubtrainCount));
         }else {
             tmp.SetField(TEXT("TrainType"), ULuaBlueprintFunctionLibrary::LuaCreateString(TEXT("Subtrain")));
             tmp.SetField(TEXT("SubtrainCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(-1));
