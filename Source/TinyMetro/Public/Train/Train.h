@@ -44,7 +44,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddSubtrain(UPARAM(DisplayName = "Subtrains")ASubtrain* T);
 	UFUNCTION(BlueprintCallable)
-	int32 GetSubtrainCount() const;
+	int32 GetSubtrainCount();
 	UFUNCTION()
 	void ActiveMoveTest(); 
 	UFUNCTION()
