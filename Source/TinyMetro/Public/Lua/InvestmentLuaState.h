@@ -28,7 +28,7 @@ public:
 	void AddItem(FLuaValue Item, FLuaValue Amount);
 
 	UFUNCTION()
-	FLuaValue GetTimestamAtStart(FLuaValue Id);
+	FLuaValue GetTimestampAtStart(FLuaValue Id);
 	UFUNCTION()
 	FLuaValue GetDefaultStatisticsAtStart(FLuaValue Id);
 	UFUNCTION()
