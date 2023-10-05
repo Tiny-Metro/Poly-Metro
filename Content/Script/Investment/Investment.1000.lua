@@ -10,6 +10,7 @@ function InvestmentData()
 end
 
 local lane
+local total_lane
 local target_station_count
 local pre_sum
 
@@ -17,10 +18,11 @@ local pre_sum
 -- Used save info when start
 function Start()
     lane = GetLaneDetailStatistics()
+    total_lane = GetLaneStatistics()
     target_station_count = 10
     pre_sum = 0
 
-    local lane_count = lane.TotalLaneCount
+    local lane_count = total_lane.TotalLaneCount
     for i=0, lane_count - 1 do
         pre_sum = pre_sum + lane[i].TransferStationCount
     end
@@ -34,7 +36,7 @@ end
 -- Investment success condition
 function Process()
     local cur_sum = 0
-    local lane_count = lane.TotalLaneCount
+    local lane_count = total_lane.TotalLaneCount
 
     for i=0, lane_count - 1 do
         cur_sum = cur_sum + lane[i].TransferStationCount

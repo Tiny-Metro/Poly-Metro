@@ -44,6 +44,7 @@ function Process()
     end
 
     if curtime - timestamp < InvestmentData().time_require then
+        -- 삼항 연산자
         return isFail and "fail" or "continue"
     else
         return isFail and "fail" or "success"

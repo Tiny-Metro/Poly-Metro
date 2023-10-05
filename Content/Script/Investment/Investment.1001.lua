@@ -10,15 +10,17 @@ function InvestmentData()
 end
 
 local lane
+local total_lane
 local pre_circular_lane
 
 -- Call when investment start
 -- Used save info when start
 function Start()
     lane = GetLaneDetailStatistics()
+    total_lane = GetLaneStatistics()
     pre_circular_lane = 0
 
-    local lane_count = lane.TotalLaneCount
+    local lane_count = total_lane.TotalLaneCount
     for i=0, lane_count - 1 do
         if lane[i].IsCircularLane then
             pre_circular_lane = pre_circular_lane + 1
@@ -34,7 +36,7 @@ end
 -- Investment success condition
 function Process()
     local cur_circular_lane = 0
-    local lane_count = lane.TotalLaneCount
+    local lane_count = total_lane.TotalLaneCount
 
     for i=0, lane_count - 1 do
         if lane[i].IsCircularLane then

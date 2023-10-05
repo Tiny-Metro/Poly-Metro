@@ -26,7 +26,7 @@ end
 -- Investment success condition
 function Process()
     local repaymoney = loan.TotalRepayMoney
-    local repayinterestmoney = loan.RepayInterestMoney
+    local repayinterestmoney = loan.TotalRepayInterestMoney
 
     if repaymoney - repayinterestmoney <= 0 then
         return "success"

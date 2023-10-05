@@ -10,6 +10,7 @@ function InvestmentData()
 end
 
 local lane
+local total_lane
 local pre_transfer_station
 local time
 local timestamp
@@ -18,11 +19,12 @@ local timestamp
 -- Used save info when start
 function Start()
     lane = GetLaneDetailStatistics()
+    total_lane = GetLaneStatistics()
     time = GetTimestamp()
     timestamp = time.Date
     pre_transfer_station = {}
 
-    for i = 0, #lane do
+    for i = 0, total_lane.TotalLaneCount - 1 do
         pre_transfer_station[i] = lane[i].TransferStationCount
     end
 end
