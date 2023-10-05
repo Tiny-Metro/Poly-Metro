@@ -130,6 +130,8 @@ void AInvestmentManager::InitInvestment() {
 		}
 	}
 
+	UpdateAccessibleInvestment();
+
 	int32 randIdx = FMath::RandRange(0, InvestmentIdArr.Num() - 1);
 	InvestmentCandidate.Add(0, InvestmentIdArr[randIdx]);
 
@@ -160,6 +162,7 @@ UInvestment* AInvestmentManager::GetInvestmentById(int32 Id) {
 }
 
 void AInvestmentManager::RefreshAccessibleInvestment() {
+	UpdateAccessibleInvestment();
 	TMap<int32, int32> newCandidate;
 	for (int i = 0; i < InvestmentSlot; i++) {
 		if (LuaComponentArr[InvestmentCandidate[i]]->GetState() == InvestmentState::Processing
@@ -179,6 +182,15 @@ void AInvestmentManager::RefreshAccessibleInvestment() {
 	}
 	CanRefresh = false;
 	InvestmentCandidate = newCandidate;
+}
+
+void AInvestmentManager::UpdateAccessibleInvestment() {
+	InvestmentIdArr.Empty();
+	for (auto& i : LuaComponentArr) {
+		if (i.Value->GetAppearance()) {
+			InvestmentIdArr.Add(i.Key);
+		}
+	}
 }
 
 void AInvestmentManager::WeeklyTask() {

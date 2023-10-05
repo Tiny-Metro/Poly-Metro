@@ -34,6 +34,8 @@ public:
 	// Update candidate
 	UFUNCTION(BlueprintCallable)
 	void RefreshAccessibleInvestment();
+	UFUNCTION()
+	void UpdateAccessibleInvestment();
 
 	// Weekly task (call by timer)
 	UFUNCTION()
