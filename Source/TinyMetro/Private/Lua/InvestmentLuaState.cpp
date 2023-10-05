@@ -15,6 +15,19 @@ UInvestmentLuaState::UInvestmentLuaState() {
     Table.Add(TEXT("AddMoney"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, AddMoney, FLuaValue)));
     Table.Add(TEXT("AddItem"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_TwoParams(UInvestmentLuaState, AddItem, FLuaValue, FLuaValue)));
 
+    Table.Add(TEXT("GetTimestampAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTimestampAtStart, FLuaValue)));
+    Table.Add(TEXT("GetDefaultStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetDefaultStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetLaneStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetLaneStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetLaneDetailStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetLaneDetailStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetShopStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetShopStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetTrainStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTrainStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetSubtrainStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetSubtrainStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetBridgeStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetBridgeStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetTunnelStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTunnelStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetBankStatisticsAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetBankStatisticsAtStart, FLuaValue)));
+    Table.Add(TEXT("GetStationInfosAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetStationInfosAtStart, FLuaValue)));
+    Table.Add(TEXT("GetTrainInfosAtStart"), FLuaValue::Function(GET_FUNCTION_NAME_CHECKED_OneParam(UInvestmentLuaState, GetTrainInfosAtStart, FLuaValue)));
+
     Table.Add(TEXT("Train"), FLuaValue(TEXT("Train")));
 
     Table.Add(TEXT("success"), FLuaValue(TEXT("success")));
@@ -62,7 +75,7 @@ void UInvestmentLuaState::AddItem(FLuaValue Item, FLuaValue Amount) {
     }
 }
 
-FLuaValue UInvestmentLuaState::GetTimestamAtStart(FLuaValue Id) {
+FLuaValue UInvestmentLuaState::GetTimestampAtStart(FLuaValue Id) {
     InitReferClasses();
     FLuaValue timeTable = CreateLuaTable();
     auto timestamp = InvestmentManagerRef->GetInvestmentStartData(Id.ToInteger()).Timestamp;

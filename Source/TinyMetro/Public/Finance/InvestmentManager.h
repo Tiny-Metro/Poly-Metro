@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "InvestmentStartData.h"
 #include "InvestmentManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRefreshTask);
 
 UCLASS()
 class TINYMETRO_API AInvestmentManager : public AActor
@@ -29,9 +31,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class UInvestment* GetInvestmentById(int32 Id);
 
-	// Daily, Weekly task (call by timer)
-	UFUNCTION()
-	void DailyTask();
+	// Update candidate
+	UFUNCTION(BlueprintCallable)
+	void RefreshAccessibleInvestment();
+
+	// Weekly task (call by timer)
 	UFUNCTION()
 	void WeeklyTask();
 
@@ -41,6 +45,13 @@ public:
 	UFUNCTION()
 	void Load();
 
+	// Call by InvestmentLuaState
+	UFUNCTION()
+	FInvestmentStartData GetInvestmentStartData(int32 Id);
+
+	UPROPERTY(BlueprintAssignable)
+	FRefreshTask RefreshTask;
+
 protected:
 	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
@@ -48,11 +59,21 @@ protected:
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY()
 	class ATimer* TimerRef;
+	UPROPERTY()
+	class AStatisticsManager* StatisticsManagerRef;
+	UPROPERTY()
+	class AStationManager* StationManagerRef;
+	UPROPERTY()
+	class ATrainManager* TrainManagerRef;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	class UInvestmentLuaState* LuaState;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
 	TMap<int32, class UInvestment*> LuaComponentArr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+	TArray<int32> InvestmentIdArr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	TMap<int32, FInvestmentStartData> InvestmentStartData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	bool CanRefresh = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
