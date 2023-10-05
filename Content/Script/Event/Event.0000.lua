@@ -17,3 +17,10 @@ end
 -- Event start (event effect)
 function Start()
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct
