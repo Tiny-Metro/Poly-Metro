@@ -90,17 +90,17 @@ protected:
 
 protected:
 	// For investment
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	int32 InvestmentStock = 1;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	TMap<int32, UInvestment*> Investment;
-	// Store appearable investment Id
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	TArray<int32> InvestmentCandidate;
-	// Store investment Id what visible in UI
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	TArray<int32> VisibleInvestmentIndex;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	int32 MaxInvestmetStock = 3;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	//int32 InvestmentStock = 1;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	//TMap<int32, UInvestment*> Investment;
+	//// Store appearable investment Id
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	//TArray<int32> InvestmentCandidate;
+	//// Store investment Id what visible in UI
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	//TArray<int32> VisibleInvestmentIndex;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
+	//int32 MaxInvestmetStock = 3;
 
 };

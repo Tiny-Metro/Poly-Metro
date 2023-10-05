@@ -21,5 +21,8 @@ enum class SaveActorType : uint8
 	BridgeTunnel = 8 UMETA(DisplayName = "BridgeTunnel"),
 	Policy = 9 UMETA(DisplayName = "Policy"),
 	Camera = 10 UMETA(DisplayName = "Camera"),
-	EventManager = 10 UMETA(DisplayName = "EventManager")
+	EventManager = 10 UMETA(DisplayName = "EventManager"),
+	InvestmentManager = 11 UMETA(DisplayName = "InvestmentManager"),
+	Investment = 12 UMETA(DisplayName = "Investment"),
+	Timer = 13 UMETA(DisplayName = "Timer")
 };
