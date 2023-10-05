@@ -4,6 +4,8 @@
 #include "Timer/Timer.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
+#include "Timer/TimerSaveGame.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -20,13 +22,17 @@ void ATimer::BeginPlay()
 	Super::BeginPlay();
 
 	// Get GameMode, set daytime
-	GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
-	//StationManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStationManager();
+	if(!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
 	Daytime = GameModeRef->GetDaytime();
+
+	Load();
 
 	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("Day"), true);
 	FString dayName = enumPtr->GetNameStringByValue((uint8)Timestamp.DayoftheWeek);
 	GEngine->AddOnScreenDebugMessage(0, 5.0f, FColor::Black, dayName);
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ATimer::Save);
 }
 
 // Called every frame
@@ -73,5 +79,39 @@ FTimestamp ATimer::GetTimestamp() {
 
 int32 ATimer::GetDaytime() const {
 	return Daytime;
+}
+
+void ATimer::Save() {
+	if (!IsValid(SaveManagerRef)) {
+		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
+	}
+	UTimerSaveGame* tmp = Cast<UTimerSaveGame>(UGameplayStatics::CreateSaveGameObject(UTimerSaveGame::StaticClass()));
+
+	tmp->ElapseTimeSec = ElapseTimeSec;
+	tmp->Timestamp = Timestamp;
+	tmp->DayCounter = DayCounter;
+	tmp->WeekCounter = WeekCounter;
+	tmp->SkiptimeTarget = SkiptimeTarget;
+	tmp->SkiptimeFlag = SkiptimeFlag;
+
+	SaveManagerRef->Save(tmp, SaveActorType::Timer);
+}
+
+void ATimer::Load() {
+	if (!IsValid(SaveManagerRef)) {
+		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
+	}
+	UTimerSaveGame* tmp = Cast<UTimerSaveGame>(SaveManagerRef->Load(SaveActorType::Timer));
+
+	if (!IsValid(tmp)) {
+		return;
+	}
+
+	ElapseTimeSec = tmp->ElapseTimeSec;
+	Timestamp = tmp->Timestamp;
+	DayCounter = tmp->DayCounter;
+	WeekCounter = tmp->WeekCounter;
+	SkiptimeTarget = tmp->SkiptimeTarget;
+	SkiptimeFlag = tmp->SkiptimeFlag;
 }
 

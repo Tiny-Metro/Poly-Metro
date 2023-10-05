@@ -34,6 +34,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetDaytime() const;
 
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Time")
 	float ElapseTimeSec;
@@ -46,9 +51,9 @@ public:
 
 protected:
 	UPROPERTY()
-	class AStationManager* StationManagerRef;
-	UPROPERTY()
 	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	int32 Daytime;
 	UPROPERTY(VisibleAnywhere, Category = "Info")

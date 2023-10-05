@@ -23,5 +23,6 @@ enum class SaveActorType : uint8
 	Camera = 10 UMETA(DisplayName = "Camera"),
 	EventManager = 10 UMETA(DisplayName = "EventManager"),
 	InvestmentManager = 11 UMETA(DisplayName = "InvestmentManager"),
-	Investment = 12 UMETA(DisplayName = "Investment")
+	Investment = 12 UMETA(DisplayName = "Investment"),
+	Timer = 13 UMETA(DisplayName = "Timer")
 };
