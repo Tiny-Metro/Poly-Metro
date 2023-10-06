@@ -81,6 +81,8 @@ public:
 	void AddComplainIncreaseRateByEvent(float Rate);
 	UFUNCTION()
 	float GetComplainIncreaseRate() const;
+	UFUNCTION()
+	void SetComplainIncreaseEnable(bool Flag);
 	
 	// Save & Load
 	UFUNCTION()
@@ -260,6 +262,8 @@ protected:
 	float ComplainIncreaseRateByPolicy = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
 	float ComplainIncreaseRateByEvent = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Complain")
+	bool IsComplainIncreaseEnable = true;
 
 	// Info Widget
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

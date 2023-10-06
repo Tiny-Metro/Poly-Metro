@@ -207,17 +207,16 @@ FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Succe
 		if (Cmd[1].IsNumeric()) {
 			int32 index = FCString::Atoi(*Cmd[1]) + 1;
 			auto investmentCandidate = InvestmentManagerRef->GetInvestmentCandidate();
-			UInvestment* investment;
 			if (investmentCandidate.Contains(index)) {
-				investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+				UInvestment* investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+				if (investment->GetState() == InvestmentState::Processing) {
+					investment->Success();
+					result += FString::Printf(TEXT("Command success : Clear investment %d"), FCString::Atoi(*Cmd[1]));
+				} else {
+					result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
+				}
 			} else {
 				result += FString::Printf(TEXT("Command fail : Invalid index %d"), index);
-			}
-			if (investment->GetState() == InvestmentState::Processing) {
-				investment->Success();
-				result += FString::Printf(TEXT("Command success : Clear investment %d"), FCString::Atoi(*Cmd[1]));
-			} else {
-				result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
 			}
 		} else {
 			Success = false;
@@ -248,17 +247,16 @@ FString AConsoleProcessor::CmdInvestmentFail(TArray<FString> Cmd, bool& Success)
 		if (Cmd[1].IsNumeric()) {
 			int32 index = FCString::Atoi(*Cmd[1]) + 1;
 			auto investmentCandidate = InvestmentManagerRef->GetInvestmentCandidate();
-			UInvestment* investment;
 			if (investmentCandidate.Contains(index)) {
-				investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+				UInvestment* investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+				if (investment->GetState() == InvestmentState::Processing) {
+					investment->Fail();
+					result += FString::Printf(TEXT("Command success : Fail investment %d"), FCString::Atoi(*Cmd[1]));
+				} else {
+					result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
+				}
 			} else {
 				result += FString::Printf(TEXT("Command fail : Invalid index %d"), index);
-			}
-			if (investment->GetState() == InvestmentState::Processing) {
-				investment->Fail();
-				result += FString::Printf(TEXT("Command success : Fail investment %d"), FCString::Atoi(*Cmd[1]));
-			} else {
-				result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
 			}
 		} else {
 			Success = false;
@@ -302,9 +300,7 @@ FString AConsoleProcessor::CmdComplainOn(TArray<FString> Cmd, bool& Success) {
 	FString result = TEXT("Complain on : ");
 	switch (Cmd.Num()) {
 	case 1: // complain_on
-		for (auto& i : StationManagerRef->GetAllStations()) {
-			i->SetComplainIncreaseEnable(true);
-		}
+		StationManagerRef->SetComplainIncreaseEnable(true);
 		result += TEXT("Command success : All station can increase complain");
 		break;
 	case 2: // complain_on {id}
@@ -337,9 +333,7 @@ FString AConsoleProcessor::CmdComplainOff(TArray<FString> Cmd, bool& Success) {
 	FString result = TEXT("Complain off : ");
 	switch (Cmd.Num()) {
 	case 1: // complain_off
-		for (auto& i : StationManagerRef->GetAllStations()) {
-			i->SetComplainIncreaseEnable(false);
-		}
+		StationManagerRef->SetComplainIncreaseEnable(false);
 		result += TEXT("Command success : All station can not increase complain");
 		break;
 	case 2: // complain_off {id}
@@ -574,9 +568,9 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 		} else if (splitStr[0] == TEXT("del_lane")) {
 			// TODO : del_lane command
 		} else if (splitStr[0] == TEXT("investment_clear")) {
-			// TODO : investment_clear command
+			Result = CmdInvestmentSuccess(splitStr, Success);
 		} else if (splitStr[0] == TEXT("investment_fail")) {
-			// TODO : investment_fail command
+			Result = CmdInvestmentFail(splitStr, Success);
 		} else if (splitStr[0] == TEXT("repay")) {
 			Result = CmdRepay(splitStr, Success);
 		} else if (splitStr[0] == TEXT("complain_off")) {
