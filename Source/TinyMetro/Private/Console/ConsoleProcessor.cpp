@@ -5,6 +5,8 @@
 #include "Station/StationManager.h"
 #include "GridGenerator/GridManager.h"
 #include "Finance/Bank.h"
+#include "Finance/InvestmentManager.h"
+#include "Finance/Investment.h"
 #include "Timer/Timer.h"
 #include "Event/TinyMetroEventManager.h"
 #include <Kismet/GameplayStatics.h>
@@ -29,6 +31,7 @@ void AConsoleProcessor::BeginPlay()
 	BankRef = GameModeRef->GetBank();
 	TimerRef = GameModeRef->GetTimer();
 	EventManagerRef = GameModeRef->GetEventManager();
+	InvestmentManagerRef = GameModeRef->GetInvestmentManager();
 }
 
 void AConsoleProcessor::TextTest(FText Txt) {
@@ -191,26 +194,30 @@ FString AConsoleProcessor::CmdDeleteLane(TArray<FString> Cmd, bool& Success) {
 // investment_clear {n} : Success {n}th investment
 FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Success) {
 	// TODO : After finish investment
-	//FString result = TEXT("Investment clear : ");
-	//switch (Cmd.Num()) {
-	//case 1: // investment_clear
-	//	for (auto& i : BankRef->GetAvailableInvestment()) {
-
-	//	}
-	//	break;
-	//case 2: // investment_clear {n}
-	//	if (Cmd[1].IsNumeric()) {
-
-	//	} else {
-	//		Success = false;
-	//		result += TEXT("Fail");
-	//	}
-	//	break;
-	//default: // Fail
-	//	Success = false;
-	//	result += TEXT("Fail");
-	//}
-	return FString();
+	FString result = TEXT("Investment clear : ");
+	switch (Cmd.Num()) {
+	case 1: // investment_clear
+		for (auto& i : InvestmentManagerRef->GetAllInvestment()) {
+			if (i.Value->GetState() == InvestmentState::Processing) {
+				i.Value->Success();
+			}
+		}
+		result += TEXT("Command success : clear all investment");
+		break;
+	case 2: // investment_clear {n}
+		if (Cmd[1].IsNumeric()) {
+			InvestmentManagerRef->GetInvestmentById(FCString::Atoi(*Cmd[1]))->Success();
+			result += FString::Printf(TEXT("Command success : clear investment %d"), FCString::Atoi(*Cmd[1]));
+		} else {
+			Success = false;
+			result += TEXT("Invalid command : Not numeric input");
+		}
+		break;
+	default: // Fail
+		Success = false;
+		result += TEXT("Invalid command : Not supported command");
+	}
+	return result;
 }
 
 // investment_fail : Fail all investment
