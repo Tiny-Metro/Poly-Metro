@@ -165,6 +165,10 @@ TMap<int32, class UInvestment*> AInvestmentManager::GetAllInvestment() {
 	return LuaComponentArr;
 }
 
+TMap<int32, int32> AInvestmentManager::GetInvestmentCandidate() {
+	return InvestmentCandidate;
+}
+
 void AInvestmentManager::RefreshAccessibleInvestment() {
 	UpdateAccessibleInvestment();
 	TMap<int32, int32> newCandidate;
