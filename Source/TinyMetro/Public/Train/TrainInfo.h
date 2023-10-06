@@ -22,6 +22,8 @@ struct TINYMETRO_API FTrainInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TrainType Type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SubtrainCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalBoardPassenger = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 WeeklyBoardPassenger = 0;

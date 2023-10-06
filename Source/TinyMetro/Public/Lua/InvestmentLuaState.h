@@ -27,4 +27,28 @@ public:
 	UFUNCTION()
 	void AddItem(FLuaValue Item, FLuaValue Amount);
 
+	UFUNCTION()
+	FLuaValue GetTimestampAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetDefaultStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetLaneStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	TArray<FLuaValue> GetLaneDetailStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetShopStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetTrainStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetSubtrainStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetBridgeStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetTunnelStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	FLuaValue GetBankStatisticsAtStart(FLuaValue Id);
+	UFUNCTION()
+	TArray<FLuaValue> GetStationInfosAtStart(FLuaValue Id);
+	UFUNCTION()
+	TArray<FLuaValue> GetTrainInfosAtStart(FLuaValue Id);
 };

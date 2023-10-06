@@ -56,5 +56,7 @@ protected:
 	class ATimer* TimerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ATinyMetroEventManager* EventManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class AInvestmentManager* InvestmentManagerRef;
 
 };

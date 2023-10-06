@@ -5,6 +5,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include <UObject/ConstructorHelpers.h>
 #include "Finance/Bank.h"
+#include "Finance/InvestmentManager.h"
 #include "Train/TrainManager.h"
 #include "Lane/LaneManager.h"
 #include "Policy/Policy.h"
@@ -93,6 +94,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     Shop = GetWorld()->SpawnActor<AShop>();
     EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
     EventManager->Load();
+    InvestmentManagerRef = GetWorld()->SpawnActor<AInvestmentManager>();
 
     // Spawn actor
     FActorSpawnParameters SpawnParams;
@@ -162,6 +164,10 @@ ATinyMetroEventManager* ATinyMetroGameModeBase::GetEventManager() const {
 
 AStatisticsManager* ATinyMetroGameModeBase::GetStatisticsManager() const {
     return StatisticsManager;
+}
+
+AInvestmentManager* ATinyMetroGameModeBase::GetInvestmentManager() const {
+    return InvestmentManagerRef;
 }
 
 void ATinyMetroGameModeBase::TestFunction() {

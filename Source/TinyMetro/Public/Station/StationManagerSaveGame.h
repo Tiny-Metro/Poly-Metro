@@ -33,4 +33,7 @@ public:
 	float ComplainIncreaseRateByEvent = 0.0f;
 	UPROPERTY()
 	TMap<StationType, float> PassengerDestinationTypeWeight;
+
+	UPROPERTY()
+	bool IsComplainIncreaseEnable;
 };

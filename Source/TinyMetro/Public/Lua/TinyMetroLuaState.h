@@ -67,4 +67,6 @@ protected:
 	class ATrainManager* TrainManagerRef;
 	UPROPERTY()
 	class APolicy* PolicyRef;
+	UPROPERTY()
+	class AInvestmentManager* InvestmentManagerRef;
 };

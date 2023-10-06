@@ -392,8 +392,9 @@ bool ATrain::CanUpgrade() const {
 	}
 }
 
-int32 ATrain::GetSubtrainCount() const {
-	return Subtrains.Num();
+int32 ATrain::GetSubtrainCount() {
+	TrainInfo.SubtrainCount = Subtrains.Num();
+	return TrainInfo.SubtrainCount;
 }
 
 void ATrain::ActiveMoveTest() {
@@ -559,6 +560,7 @@ void ATrain::IndexingSubtrain() {
 	for (int i = 0; i < Subtrains.Num(); i++) {
 		Subtrains[i]->SetIndex(i);
 	}
+	TrainInfo.SubtrainCount = Subtrains.Num();
 }
 
 void ATrain::WeeklyTask() {
