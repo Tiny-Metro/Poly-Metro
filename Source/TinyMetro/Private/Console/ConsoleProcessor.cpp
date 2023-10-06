@@ -5,6 +5,8 @@
 #include "Station/StationManager.h"
 #include "GridGenerator/GridManager.h"
 #include "Finance/Bank.h"
+#include "Finance/InvestmentManager.h"
+#include "Finance/Investment.h"
 #include "Timer/Timer.h"
 #include "Event/TinyMetroEventManager.h"
 #include <Kismet/GameplayStatics.h>
@@ -29,6 +31,7 @@ void AConsoleProcessor::BeginPlay()
 	BankRef = GameModeRef->GetBank();
 	TimerRef = GameModeRef->GetTimer();
 	EventManagerRef = GameModeRef->GetEventManager();
+	InvestmentManagerRef = GameModeRef->GetInvestmentManager();
 }
 
 void AConsoleProcessor::TextTest(FText Txt) {
@@ -190,33 +193,81 @@ FString AConsoleProcessor::CmdDeleteLane(TArray<FString> Cmd, bool& Success) {
 // investment_clear : Success all investment
 // investment_clear {n} : Success {n}th investment
 FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Success) {
-	// TODO : After finish investment
-	//FString result = TEXT("Investment clear : ");
-	//switch (Cmd.Num()) {
-	//case 1: // investment_clear
-	//	for (auto& i : BankRef->GetAvailableInvestment()) {
-
-	//	}
-	//	break;
-	//case 2: // investment_clear {n}
-	//	if (Cmd[1].IsNumeric()) {
-
-	//	} else {
-	//		Success = false;
-	//		result += TEXT("Fail");
-	//	}
-	//	break;
-	//default: // Fail
-	//	Success = false;
-	//	result += TEXT("Fail");
-	//}
-	return FString();
+	FString result = TEXT("Investment clear : ");
+	switch (Cmd.Num()) {
+	case 1: // investment_clear
+		for (auto& i : InvestmentManagerRef->GetAllInvestment()) {
+			if (i.Value->GetState() == InvestmentState::Processing) {
+				i.Value->Success();
+			}
+		}
+		result += TEXT("Command success : Clear all investment");
+		break;
+	case 2: // investment_clear {n}
+		if (Cmd[1].IsNumeric()) {
+			int32 index = FCString::Atoi(*Cmd[1]) + 1;
+			auto investmentCandidate = InvestmentManagerRef->GetInvestmentCandidate();
+			if (investmentCandidate.Contains(index)) {
+				UInvestment* investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+				if (investment->GetState() == InvestmentState::Processing) {
+					investment->Success();
+					result += FString::Printf(TEXT("Command success : Clear investment %d"), FCString::Atoi(*Cmd[1]));
+				} else {
+					result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
+				}
+			} else {
+				result += FString::Printf(TEXT("Command fail : Invalid index %d"), index);
+			}
+		} else {
+			Success = false;
+			result += TEXT("Invalid command : Not numeric input");
+		}
+		break;
+	default: // Fail
+		Success = false;
+		result += TEXT("Invalid command : Not supported command");
+	}
+	return result;
 }
 
 // investment_fail : Fail all investment
 // investment_fail {n} : Fail {n}th investment
 FString AConsoleProcessor::CmdInvestmentFail(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Investment fail : ");
+	switch (Cmd.Num()) {
+	case 1: // investment_clear
+		for (auto& i : InvestmentManagerRef->GetAllInvestment()) {
+			if (i.Value->GetState() == InvestmentState::Processing) {
+				i.Value->Fail();
+			}
+		}
+		result += TEXT("Command success : Fail all investment");
+		break;
+	case 2: // investment_clear {n}
+		if (Cmd[1].IsNumeric()) {
+			int32 index = FCString::Atoi(*Cmd[1]) + 1;
+			auto investmentCandidate = InvestmentManagerRef->GetInvestmentCandidate();
+			if (investmentCandidate.Contains(index)) {
+				UInvestment* investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+				if (investment->GetState() == InvestmentState::Processing) {
+					investment->Fail();
+					result += FString::Printf(TEXT("Command success : Fail investment %d"), FCString::Atoi(*Cmd[1]));
+				} else {
+					result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
+				}
+			} else {
+				result += FString::Printf(TEXT("Command fail : Invalid index %d"), index);
+			}
+		} else {
+			Success = false;
+			result += TEXT("Invalid command : Not numeric input");
+		}
+		break;
+	default: // Fail
+		Success = false;
+		result += TEXT("Invalid command : Not supported command");
+	}
+	return result;
 }
 
 // repay : Repay all loan
@@ -249,29 +300,28 @@ FString AConsoleProcessor::CmdComplainOn(TArray<FString> Cmd, bool& Success) {
 	FString result = TEXT("Complain on : ");
 	switch (Cmd.Num()) {
 	case 1: // complain_on
-		for (auto& i : StationManagerRef->GetAllStations()) {
-			i->SetComplainIncreaseEnable(true);
-		}
-		result += TEXT("Success");
+		StationManagerRef->SetComplainIncreaseEnable(true);
+		result += TEXT("Command success : All station can increase complain");
 		break;
 	case 2: // complain_on {id}
 		if (Cmd[1].IsNumeric()) {
-			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
+			int32 stationId = FCString::Atoi(*Cmd[1]);
+			auto stationRef = StationManagerRef->GetStationById(stationId);
 			if (IsValid(stationRef)) {
 				stationRef->SetComplainIncreaseEnable(true);
-				result += TEXT("Success");
+				result += FString::Printf(TEXT("Command success : Station id %d is can increase complain"), stationId);
 			} else {
 				Success = false;
-				result += TEXT("Invalid station");
+				result += TEXT("Command fail : Invalid station");
 			}
 		} else {
 			Success = false;
-			result += TEXT("Incorrect input");
+			result += TEXT("Invalid command : Not numeric input");
 		}
 		break;
 	default: // Incorrect input
 		Success = false;
-		result += TEXT("Incorrect input");
+		result += TEXT("Invalid command : Not supported command");
 		break;
 	}
 	return result;
@@ -283,29 +333,28 @@ FString AConsoleProcessor::CmdComplainOff(TArray<FString> Cmd, bool& Success) {
 	FString result = TEXT("Complain off : ");
 	switch (Cmd.Num()) {
 	case 1: // complain_off
-		for (auto& i : StationManagerRef->GetAllStations()) {
-			i->SetComplainIncreaseEnable(false);
-		}
-		result += TEXT("Success");
+		StationManagerRef->SetComplainIncreaseEnable(false);
+		result += TEXT("Command success : All station can not increase complain");
 		break;
 	case 2: // complain_off {id}
 		if (Cmd[1].IsNumeric()) {
-			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
+			int32 stationId = FCString::Atoi(*Cmd[1]);
+			auto stationRef = StationManagerRef->GetStationById(stationId);
 			if (IsValid(stationRef)) {
 				stationRef->SetComplainIncreaseEnable(false);
-				result += TEXT("Success");
+				result += FString::Printf(TEXT("Command success : Station id %d is can not increase complain"), stationId);
 			} else {
 				Success = false;
-				result += TEXT("Invalid station");
+				result += TEXT("Command fail : Invalid station");
 			}
 		} else {
 			Success = false;
-			result += TEXT("Incorrect input");
+			result += TEXT("Invalid command : Not numeric input");
 		}
 		break;
 	default: // Incorrect input
 		Success = false;
-		result += TEXT("Incorrect input");
+		result += TEXT("Invalid command : Not supported command");
 		break;
 	}
 	return result;
@@ -519,9 +568,9 @@ FString AConsoleProcessor::Command(FString Cmd, bool& Success) {
 		} else if (splitStr[0] == TEXT("del_lane")) {
 			// TODO : del_lane command
 		} else if (splitStr[0] == TEXT("investment_clear")) {
-			// TODO : investment_clear command
+			Result = CmdInvestmentSuccess(splitStr, Success);
 		} else if (splitStr[0] == TEXT("investment_fail")) {
-			// TODO : investment_fail command
+			Result = CmdInvestmentFail(splitStr, Success);
 		} else if (splitStr[0] == TEXT("repay")) {
 			Result = CmdRepay(splitStr, Success);
 		} else if (splitStr[0] == TEXT("complain_off")) {

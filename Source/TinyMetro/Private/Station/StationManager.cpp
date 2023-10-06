@@ -240,6 +240,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	tmp->SetStationInfo(StatoinId, Type);
 	tmp->SetGridCellData(GridCellData);
 	tmp->SetPassengerSpawnEnable(IsPassengerSpawnEnable);
+	tmp->SetComplainIncreaseEnable(IsComplainIncreaseEnable);
 	tmp->Load();
 
 	tmp->FinishSpawning(SpawnTransform);
@@ -407,6 +408,13 @@ float AStationManager::GetComplainIncreaseRate() const {
 	return ComplainIncreaseRate + 
 		ComplainIncreaseRateByEvent + 
 		ComplainIncreaseRateByPolicy;
+}
+
+void AStationManager::SetComplainIncreaseEnable(bool Flag) {
+	IsComplainIncreaseEnable = Flag;
+	for (auto& i : Station) {
+		i->SetComplainIncreaseEnable(Flag);
+	}
 }
 
 void AStationManager::SetPassengerSpawnEnable(bool Flag) {
@@ -610,6 +618,7 @@ void AStationManager::Save() {
 	tmp->FreePassengerSpawnProbabilityByEvent = FreePassengerSpawnProbabilityByEvent;
 	tmp->ComplainIncreaseRateByEvent = ComplainIncreaseRateByEvent;
 	tmp->PassengerDestinationTypeWeight = PassengerDestinationTypeWeight;
+	tmp->IsComplainIncreaseEnable = IsComplainIncreaseEnable;
 	
 	SaveManagerRef->Save(tmp, SaveActorType::StationManager);
 }
@@ -632,6 +641,7 @@ bool AStationManager::Load() {
 
 	NextStationId = tmp->NextStationId;
 	IsPassengerSpawnEnable = tmp->IsPassengerSpawnEnable;
+	IsComplainIncreaseEnable = tmp->IsComplainIncreaseEnable;
 	for (auto& i : tmp->StationSpawnDataArr) {
 		SpawnStation(i.GridCellData, i.Type, i.StationId);	
 	}
