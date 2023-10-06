@@ -30,6 +30,8 @@ public:
 	void NotifyInvestmentFinish(int32 Id);
 	UFUNCTION(BlueprintCallable)
 	class UInvestment* GetInvestmentById(int32 Id);
+	UFUNCTION(BlueprintCallable)
+	TMap<int32, class UInvestment*> GetAllInvestment();
 
 	// Update candidate
 	UFUNCTION(BlueprintCallable)
