@@ -193,7 +193,6 @@ FString AConsoleProcessor::CmdDeleteLane(TArray<FString> Cmd, bool& Success) {
 // investment_clear : Success all investment
 // investment_clear {n} : Success {n}th investment
 FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Success) {
-	// TODO : After finish investment
 	FString result = TEXT("Investment clear : ");
 	switch (Cmd.Num()) {
 	case 1: // investment_clear
@@ -202,12 +201,24 @@ FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Succe
 				i.Value->Success();
 			}
 		}
-		result += TEXT("Command success : clear all investment");
+		result += TEXT("Command success : Clear all investment");
 		break;
 	case 2: // investment_clear {n}
 		if (Cmd[1].IsNumeric()) {
-			InvestmentManagerRef->GetInvestmentById(FCString::Atoi(*Cmd[1]))->Success();
-			result += FString::Printf(TEXT("Command success : clear investment %d"), FCString::Atoi(*Cmd[1]));
+			int32 index = FCString::Atoi(*Cmd[1]) + 1;
+			auto investmentCandidate = InvestmentManagerRef->GetInvestmentCandidate();
+			UInvestment* investment;
+			if (investmentCandidate.Contains(index)) {
+				investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+			} else {
+				result += FString::Printf(TEXT("Command fail : Invalid index %d"), index);
+			}
+			if (investment->GetState() == InvestmentState::Processing) {
+				investment->Success();
+				result += FString::Printf(TEXT("Command success : Clear investment %d"), FCString::Atoi(*Cmd[1]));
+			} else {
+				result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
+			}
 		} else {
 			Success = false;
 			result += TEXT("Invalid command : Not numeric input");
@@ -223,7 +234,42 @@ FString AConsoleProcessor::CmdInvestmentSuccess(TArray<FString> Cmd, bool& Succe
 // investment_fail : Fail all investment
 // investment_fail {n} : Fail {n}th investment
 FString AConsoleProcessor::CmdInvestmentFail(TArray<FString> Cmd, bool& Success) {
-	return FString();
+	FString result = TEXT("Investment fail : ");
+	switch (Cmd.Num()) {
+	case 1: // investment_clear
+		for (auto& i : InvestmentManagerRef->GetAllInvestment()) {
+			if (i.Value->GetState() == InvestmentState::Processing) {
+				i.Value->Fail();
+			}
+		}
+		result += TEXT("Command success : Fail all investment");
+		break;
+	case 2: // investment_clear {n}
+		if (Cmd[1].IsNumeric()) {
+			int32 index = FCString::Atoi(*Cmd[1]) + 1;
+			auto investmentCandidate = InvestmentManagerRef->GetInvestmentCandidate();
+			UInvestment* investment;
+			if (investmentCandidate.Contains(index)) {
+				investment = InvestmentManagerRef->GetInvestmentById(investmentCandidate[index]);
+			} else {
+				result += FString::Printf(TEXT("Command fail : Invalid index %d"), index);
+			}
+			if (investment->GetState() == InvestmentState::Processing) {
+				investment->Fail();
+				result += FString::Printf(TEXT("Command success : Fail investment %d"), FCString::Atoi(*Cmd[1]));
+			} else {
+				result += FString::Printf(TEXT("Command fail : Investment %d is not started"), FCString::Atoi(*Cmd[1]));
+			}
+		} else {
+			Success = false;
+			result += TEXT("Invalid command : Not numeric input");
+		}
+		break;
+	default: // Fail
+		Success = false;
+		result += TEXT("Invalid command : Not supported command");
+	}
+	return result;
 }
 
 // repay : Repay all loan
