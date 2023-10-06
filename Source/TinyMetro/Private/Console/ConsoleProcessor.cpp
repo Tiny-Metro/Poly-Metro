@@ -305,26 +305,27 @@ FString AConsoleProcessor::CmdComplainOn(TArray<FString> Cmd, bool& Success) {
 		for (auto& i : StationManagerRef->GetAllStations()) {
 			i->SetComplainIncreaseEnable(true);
 		}
-		result += TEXT("Success");
+		result += TEXT("Command success : All station can increase complain");
 		break;
 	case 2: // complain_on {id}
 		if (Cmd[1].IsNumeric()) {
-			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
+			int32 stationId = FCString::Atoi(*Cmd[1]);
+			auto stationRef = StationManagerRef->GetStationById(stationId);
 			if (IsValid(stationRef)) {
 				stationRef->SetComplainIncreaseEnable(true);
-				result += TEXT("Success");
+				result += FString::Printf(TEXT("Command success : Station id %d is can increase complain"), stationId);
 			} else {
 				Success = false;
-				result += TEXT("Invalid station");
+				result += TEXT("Command fail : Invalid station");
 			}
 		} else {
 			Success = false;
-			result += TEXT("Incorrect input");
+			result += TEXT("Invalid command : Not numeric input");
 		}
 		break;
 	default: // Incorrect input
 		Success = false;
-		result += TEXT("Incorrect input");
+		result += TEXT("Invalid command : Not supported command");
 		break;
 	}
 	return result;
@@ -339,26 +340,27 @@ FString AConsoleProcessor::CmdComplainOff(TArray<FString> Cmd, bool& Success) {
 		for (auto& i : StationManagerRef->GetAllStations()) {
 			i->SetComplainIncreaseEnable(false);
 		}
-		result += TEXT("Success");
+		result += TEXT("Command success : All station can not increase complain");
 		break;
 	case 2: // complain_off {id}
 		if (Cmd[1].IsNumeric()) {
-			auto stationRef = StationManagerRef->GetStationById(FCString::Atoi(*Cmd[1]));
+			int32 stationId = FCString::Atoi(*Cmd[1]);
+			auto stationRef = StationManagerRef->GetStationById(stationId);
 			if (IsValid(stationRef)) {
 				stationRef->SetComplainIncreaseEnable(false);
-				result += TEXT("Success");
+				result += FString::Printf(TEXT("Command success : Station id %d is can not increase complain"), stationId);
 			} else {
 				Success = false;
-				result += TEXT("Invalid station");
+				result += TEXT("Command fail : Invalid station");
 			}
 		} else {
 			Success = false;
-			result += TEXT("Incorrect input");
+			result += TEXT("Invalid command : Not numeric input");
 		}
 		break;
 	default: // Incorrect input
 		Success = false;
-		result += TEXT("Incorrect input");
+		result += TEXT("Invalid command : Not supported command");
 		break;
 	}
 	return result;
