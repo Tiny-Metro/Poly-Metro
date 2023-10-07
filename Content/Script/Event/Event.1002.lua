@@ -23,3 +23,10 @@ function Start()
     AddPassengerSpawnProbabilityByType(station_type, 0.3)
     ScaleComplain(1.1)
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct

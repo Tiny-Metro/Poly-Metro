@@ -44,3 +44,10 @@ function Start()
     DestroyStation(i)
     AddPassengerSpawnProbability(-0.3)
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct

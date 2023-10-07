@@ -51,4 +51,13 @@ end
 -- Investment award
 function Award()
     AddMoney(InvestmentData.award)
+
+    InvestmentDataStruct= {}
+    InvestmentDataStruct.InvestmentData = InvestmentData
+    InvestmentDataStruct.Start = Start
+    InvestmentDataStruct.Appearance = Appearance
+    InvestmentDataStruct.Process = Process
+    InvestmentDataStruct.Award = Award
+
+    return InvestmentDataStruct
 end

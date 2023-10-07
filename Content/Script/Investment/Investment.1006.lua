@@ -75,10 +75,19 @@ end
 -- Investment award
 function Award()
     if selected_target.name == "다리" then
-        AddItem("Bridge", 2)
+        AddItem(Bridge, 2)
     elseif selected_target.name == "터널" then
-        AddItem("Tunnel", 2)
+        AddItem(Tunnel, 2)
     elseif selected_target.name == "노선" then
-        AddItem("Train", 2)
+        AddItem(Train, 2)
     end
+
+    InvestmentDataStruct= {}
+    InvestmentDataStruct.InvestmentData = InvestmentData
+    InvestmentDataStruct.Start = Start
+    InvestmentDataStruct.Appearance = Appearance
+    InvestmentDataStruct.Process = Process
+    InvestmentDataStruct.Award = Award
+
+    return InvestmentDataStruct
 end

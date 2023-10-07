@@ -23,3 +23,10 @@ end
 function Start()
     ScaleComplain(0.8)
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct

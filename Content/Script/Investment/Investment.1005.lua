@@ -75,10 +75,19 @@ end
 -- Investment award
 function Award()
     if selected_target.name == "열차" then
-        AddItem("Subtrain", 1)
+        AddItem(Subtrain, 1)
     elseif selected_target.name == "객차" then
         AddMoney(300)
     elseif selected_target.name == "역" then
         AddMoney(500)
     end
+
+    InvestmentDataStruct= {}
+    InvestmentDataStruct.InvestmentData = InvestmentData
+    InvestmentDataStruct.Start = Start
+    InvestmentDataStruct.Appearance = Appearance
+    InvestmentDataStruct.Process = Process
+    InvestmentDataStruct.Award = Award
+
+    return InvestmentDataStruct
 end
