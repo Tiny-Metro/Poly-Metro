@@ -19,16 +19,16 @@ end
 
 -- Investment appear condition
 function Appearance()
-    totalloanmoney = loan.TotalUsingLoanCount
-    return totalloanmoney ~= 0
+    total_loan_money = loan.TotalUsingLoanCount
+    return total_loan_money ~= 0
 end
 
 -- Investment success condition
 function Process()
-    local repaymoney = loan.TotalRepayMoney
-    local repayinterestmoney = loan.TotalRepayInterestMoney
+    local repay_money = loan.TotalRepayMoney
+    local repay_interest_money = loan.TotalRepayInterestMoney
 
-    if repaymoney - repayinterestmoney <= 0 then
+    if repay_money - repay_interest_money <= 0 then
         return "success"
     else
         return "continue"

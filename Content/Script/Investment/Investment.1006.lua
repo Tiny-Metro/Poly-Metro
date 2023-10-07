@@ -6,16 +6,16 @@ target = {
     {name = "노선", award = "열차 2량"}
 }
 
-local selectedTarget
+local selected_target
 
 function InvestmentData()
     local Data = {}
     local idx = math.random(1, #target)
-    selectedTarget = target[idx]
+    selected_target = target[idx]
 
-    Data.message = selectedTarget.name .. '을 건설하지 마세요.'
+    Data.message = selected_target.name .. '을 건설하지 마세요.'
     Data.time_require = 7
-    Data.award = selectedTarget.award
+    Data.award = selected_target.award
 
     return Data
 end
@@ -28,7 +28,7 @@ local time
 local pre_bridge
 local pre_tunnel
 local pre_lane
-local timestamp
+local time_stamp
 
 -- Call when investment start
 -- Used save info when start
@@ -41,7 +41,7 @@ function Start()
     pre_bridge = bridge.TotalPlacementCount
     pre_tunnel = tunnel.TotalPlacementCount
     pre_lane = lane.TotalModifyAndDeleteCount
-    timestamp = time.Date
+    time_stamp = time.Date
 end
 
 -- Investment appear condition
@@ -56,16 +56,16 @@ function Process()
     local cur_tunnel = tunnel.TotalPlacementCount
     local cur_lane = lane.TotalModifyAndDeleteCount
 
-    if selectedTarget.name == "다리" and cur_bridge == pre_bridge then
+    if selected_target.name == "다리" and cur_bridge == pre_bridge then
         return "success"
-    elseif selectedTarget.name == "터널" and cur_tunnel == pre_tunnel then
+    elseif selected_target.name == "터널" and cur_tunnel == pre_tunnel then
         return "success"
-    elseif selectedTarget.name == "노선" and cur_lane == pre_lane then
+    elseif selected_target.name == "노선" and cur_lane == pre_lane then
         return "success"
     end
 
-    local curtime = time.Date
-    if curtime - timestamp >= InvestmentData().time_require then
+    local cur_time = time.Date
+    if cur_time - time_stamp >= InvestmentData().time_require then
         return "fail"
     end
 
@@ -74,11 +74,11 @@ end
 
 -- Investment award
 function Award()
-    if selectedTarget.name == "다리" then
+    if selected_target.name == "다리" then
         AddItem("Bridge", 2)
-    elseif selectedTarget.name == "터널" then
+    elseif selected_target.name == "터널" then
         AddItem("Tunnel", 2)
-    elseif selectedTarget.name == "노선" then
+    elseif selected_target.name == "노선" then
         AddItem("Train", 2)
     end
 end

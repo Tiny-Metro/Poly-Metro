@@ -13,7 +13,7 @@ local lane
 local total_lane
 local pre_transfer_station
 local time
-local timestamp
+local time_stamp
 
 -- Call when investment start
 -- Used save info when start
@@ -21,7 +21,7 @@ function Start()
     lane = GetLaneDetailStatistics()
     total_lane = GetLaneStatistics()
     time = GetTimestamp()
-    timestamp = time.Date
+    time_stamp = time.Date
     pre_transfer_station = {}
 
     for i = 0, total_lane.TotalLaneCount - 1 do
@@ -37,7 +37,7 @@ end
 
 -- Investment success condition
 function Process()
-    local curtime = time.Date
+    local cur_time = time.Date
 
     for i = 0, #lane do
         if lane[i].TransferStationCount - pre_transfer_station[i] >= 3 then
@@ -45,7 +45,7 @@ function Process()
         end
     end
 
-    if curtime - timestamp >= InvestmentData().time_require then
+    if cur_time - time_stamp >= InvestmentData().time_require then
         return "fail"
     end
     

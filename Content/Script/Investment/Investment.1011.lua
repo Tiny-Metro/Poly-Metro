@@ -12,14 +12,14 @@ end
 local shop
 local pre_shop
 local time
-local timestamp
+local time_stamp
 
 -- Call when investment start
 -- Used save info when start
 function Start()
     shop = GetShopStatistics()
     time = GetTimestamp()
-    timestamp = time.Date
+    time_stamp = time.Date
     pre_shop = shop.TotalPurchaseCount
 end
 
@@ -30,9 +30,9 @@ end
 
 -- Investment success condition
 function Process()
-    local curtime = time.Date
+    local cur_time = time.Date
 
-    if curtime - timestamp < InvestmentData().time_require then
+    if cur_time - time_stamp < InvestmentData().time_require then
         return "continue"
     elseif shop.TotalPurchaseCount == pre_shop then
         return "success"

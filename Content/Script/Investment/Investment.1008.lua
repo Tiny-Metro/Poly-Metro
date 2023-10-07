@@ -13,7 +13,7 @@ local lane
 local total_lane
 local pre_lane_change
 local time
-local timestamp
+local time_stamp
 
 -- Call when investment start
 -- Used save info when start
@@ -21,7 +21,7 @@ function Start()
     lane = GetLaneDetailStatistics()
     total_lane = GetLaneStatistics()
     time = GetTimestamp()
-    timestamp = time.Date
+    time_stamp = time.Date
     for i = 0, total_lane.TotalLaneCount - 1 do
         pre_lane_change[i] = lane[i].TotalModifyAndReduceCount
     end
@@ -34,9 +34,9 @@ end
 
 -- Investment success condition
 function Process()
-    local curtime = time.Date
+    local cur_time = time.Date
 
-    if curtime - timestamp < InvestmentData().time_require then
+    if cur_time - time_stamp < InvestmentData().time_require then
         return "continue"
     else
         for i = 0, total_lane.TotalLaneCount - 1 do

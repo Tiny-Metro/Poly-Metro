@@ -11,14 +11,14 @@ end
 
 local stations
 local time
-local timestamp
+local time_stamp
 
 -- Call when investment start
 -- Used save info when start
 function Start()
     stations = GetStationInfos()
     time = GetTimestamp()
-    timestamp = time.Date
+    time_stamp = time.Date
 end
 
 -- Investment appear condition
@@ -33,7 +33,7 @@ end
 
 -- Investment success condition
 function Process()
-    local curtime = time.Date
+    local cur_time = time.Date
     local isFail = false
 
     for i = 0, #stations do
@@ -43,7 +43,7 @@ function Process()
         end
     end
 
-    if curtime - timestamp < InvestmentData().time_require then
+    if cur_time - time_stamp < InvestmentData().time_require then
         -- 삼항 연산자
         return isFail and "fail" or "continue"
     else

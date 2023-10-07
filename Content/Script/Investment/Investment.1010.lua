@@ -12,14 +12,14 @@ end
 local statistics
 local pre_passenger
 local time
-local timestamp
+local time_stamp
 
 -- Call when investment start
 -- Used save info when start
 function Start()
     statistics = GetDefaultStatistics()
     time = GetTimestamp()
-    timestamp = time.Date
+    time_stamp = time.Date
     pre_passenger = statistics.TotalArrivePassenger
 end
 
@@ -35,8 +35,8 @@ function Process()
         return "success"
     end
 
-    local curtime = time.Date
-    if curtime - timestamp >= InvestmentData().time_require then
+    local cur_time = time.Date
+    if cur_time - time_stamp >= InvestmentData().time_require then
         return "fail"
     end
 
