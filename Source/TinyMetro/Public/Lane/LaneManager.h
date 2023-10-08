@@ -67,6 +67,9 @@ protected:
 	class ATinyMetroGameModeBase* GameMode;
 
 	UPROPERTY(BlueprintReadOnly)
+	class ATinyMetroPlayerState* PlayerStateRef;
+
+	UPROPERTY(BlueprintReadOnly)
 	AStationManager* StationManagerRef;
 
 	UPROPERTY(BlueprintReadOnly)

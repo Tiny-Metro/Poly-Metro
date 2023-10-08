@@ -3,6 +3,7 @@
 #include "Lane/LaneManager.h"
 #include "Misc/OutputDeviceNull.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "PlayerState/TinyMetroPlayerState.h"
 #include <Engine/AssetManager.h>
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManagerSaveGame.h"
@@ -25,6 +26,7 @@ void ALaneManager::BeginPlay()
 	Super::BeginPlay();
 
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	PlayerStateRef = Cast<ATinyMetroPlayerState>(UGameplayStatics::GetPlayerState(GetWorld(), 0));
 	StationManagerRef = Cast<AStationManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStationManager::StaticClass()));
 	SaveManagerRef = GameMode->GetSaveManager();
 	StatisticsManagerRef = GameMode->GetStatisticsManager();
@@ -186,7 +188,7 @@ ALane* ALaneManager::SpawnLane()
 
 void ALaneManager::CreatingNewLane() {
 
-	if (NextLaneNums.IsEmpty()) {
+	if (!(PlayerStateRef->UseLane())) {
 
 		UE_LOG(LogTemp, Warning, TEXT("Already used up the lane, so I can't make a new one. "));
 		return;
