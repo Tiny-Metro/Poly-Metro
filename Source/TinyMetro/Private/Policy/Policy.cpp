@@ -55,6 +55,11 @@ void APolicy::Save() {
 }
 
 void APolicy::Load() {
+	if (!IsValid(SaveManagerRef))
+	{
+		auto GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		SaveManagerRef = GameModeRef->GetSaveManager();
+	}
 	UPolicySaveGame* tmp = Cast<UPolicySaveGame>(SaveManagerRef->Load(SaveActorType::Policy));
 
 	if (!IsValid(tmp)) return;
