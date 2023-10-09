@@ -117,6 +117,11 @@ void ALaneManager::SetSelectedLaneNum(int32 Num)
 
 void ALaneManager::AddSelectedStations(AStation* Station)
 {
+	if (SelectedStations.Num() == 1 && SelectedStations[0] ==Station)
+	{
+		return;
+	}
+
 	SelectedStations.Add(Station);
 
 	if (IsPlacementValid)
