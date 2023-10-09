@@ -14,11 +14,14 @@ struct TINYMETRO_API FLoanData
 {
 	GENERATED_BODY()
 	FLoanData() = default;
-	FLoanData(int32 Amount, float Rate, int32 DueDateWeek, FString Message) :
+	FLoanData(int32 Id, int32 Amount, float Rate, int32 DueDateWeek, FString Message) :
+		Id(Id),
 		Amount(Amount),
 		Rate(Rate),
 		DueDateWeek(DueDateWeek),
 		Message(Message) { }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Id = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Amount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

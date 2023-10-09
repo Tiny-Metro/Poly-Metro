@@ -18,10 +18,10 @@ class TINYMETRO_API ULoan : public UObject
 
 public:
 	void SetLoanData(FLoanData Data);
-	void SetDaytime(int32 T);
 	void SetPlayerState(ATinyMetroPlayerState* P);
 	void SetWorld(UWorld* W);
 	void SetStatisticsManager(class AStatisticsManager* S);
+	void SetSaveManager(class ATMSaveManager* S);
 	void SetAvailabilityFunction(TFunction<bool(void)> Func);
 	void InitLoan(FLoanData Data);
 
@@ -43,18 +43,24 @@ public:
 	UFUNCTION()
 	void NotifyWeeklyTask();
 
+	// Save & Load (Call by Bank actor)
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroPlayerState* PlayerState;
 	UPROPERTY(BlueprintReadOnly)
 	class AStatisticsManager* StatisticsManagerRef;
+	UPROPERTY(VisibleAnywhere)
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(BlueprintReadOnly)
 	UWorld* WorldContextReference;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	FLoanData LoanData;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	int32 Daytime;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 Balance; // Balance of loan
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
