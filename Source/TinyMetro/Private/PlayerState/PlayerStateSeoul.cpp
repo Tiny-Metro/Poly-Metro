@@ -3,10 +3,10 @@
 
 #include "PlayerState/PlayerStateSeoul.h"
 
-APlayerStateSeoul::APlayerStateSeoul() {
+APlayerStateSeoul::APlayerStateSeoul() : Super() {
 	Money = 200;
-	ValidLane = 3;
-	ValidTunnel = 2;
-	ValidBridge = 3;
-	ValidTrain = 3;
+	ValidItem.Lane = 3;
+	ValidItem.Train = 3;
+	ValidItem.Tunnel = 2;
+	ValidItem.Bridge = 3;
 }

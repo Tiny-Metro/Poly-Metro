@@ -66,17 +66,17 @@ void ABank::InitLoan() {
 	// Message : Message for UI
 	//TArray<FLoanData> LoanArr;
 	TArray<TPair<FLoanData, TFunction<bool(void)>>> LoanArr;
-	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(0, 500, 0.03, 20, TEXT("")), [PlayerState = PlayerState]()->bool {
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(0, 500, 0.03, 20, TEXT("")), [StatisticsManagerRef = StatisticsManagerRef]()->bool {
 		return true;
 		}));
-	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(1, 2000, 0.06, 20, TEXT("Sales over 3,000")), [PlayerState = PlayerState]()->bool {
-		if (PlayerState->GetSales() >= 3000) {
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(1, 2000, 0.06, 20, TEXT("Sales over 3,000")), [StatisticsManagerRef = StatisticsManagerRef]()->bool {
+		if (StatisticsManagerRef->DefaultStatistics.TotalIncome >= 3000) {
 			return true;
 		}
 		return false;
 		}));
-	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(2, 5000, 0.10, 20, TEXT("Profit over 10,000")), [PlayerState = PlayerState]()->bool {
-		if (PlayerState->GetProfit() >= 10000) {
+	LoanArr.Add(TPair<FLoanData, TFunction<bool(void)>>(FLoanData(2, 5000, 0.10, 20, TEXT("Profit over 10,000")), [StatisticsManagerRef = StatisticsManagerRef]()->bool {
+		if (StatisticsManagerRef->DefaultStatistics.TotalIncome >= 10000) {
 			return true;
 		}
 		return false;

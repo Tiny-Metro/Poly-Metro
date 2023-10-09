@@ -2,71 +2,64 @@
 
 
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "PlayerState/TinyMetroPlayerStateSaveGame.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
 #include "Timer/Timer.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "Statistics/StatisticsManager.h"
 #include <Kismet/GameplayStatics.h>
 
 FGamePlayInfo ATinyMetroPlayerState::GetPlayInfo() {
 
 	FGamePlayInfo info;
-	info.PlayTime = 0; // TODO
-	info.Sales = Sales;
-	info.Profit = Profit;
-	info.SalesInWeek = SalesInWeek;
-	info.ProfitInWeek = ProfitInWeek;
-	info.ComplainAverage = StationManager->GetComplainAverage();
-	info.Passenger = Arrive;
-	info.UsingTrain = UsingTrain;
-	info.UsingLane = UsingLane;
-	info.UsingTunnel = UsingTunnel;
-	info.ConnectedStation = 0; // TODO
+
 
 	return info;
 }
 
 void ATinyMetroPlayerState::BeginPlay() {
 	Super::BeginPlay();
-	TinyMetroGameModeBase = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	DayTime = TinyMetroGameModeBase->GetDaytime();
-	StationManager = TinyMetroGameModeBase->GetStationManager();
-	Timer = TinyMetroGameModeBase->GetTimer();
-	TMSaveManager = TinyMetroGameModeBase->GetSaveManager();
-	StatisticsManagerRef = TinyMetroGameModeBase->GetStatisticsManager();
-	
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(StationManager)) StationManager = GameModeRef->GetStationManager();
+	if (!IsValid(TimerRef)) TimerRef = GameModeRef->GetTimer();
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickInterval(1.0);
+
+	Load();
+
+	SaveManagerRef->SaveTask.AddDynamic(this, &ATinyMetroPlayerState::Save);
 }
 
 bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
 	if (Money >= Cost) {
 		switch (Type) {
 		case ItemType::Train:
-			ValidTrain += Amount;
+			ValidItem.Train += Amount;
 			break;
 		case ItemType::Subtrain:
-			ValidSubtrain += Amount;
+			ValidItem.Subtrain += Amount;
 			break;
 		case ItemType::Lane:
-			ValidLane += Amount;
+			ValidItem.Lane += Amount;
 			break;
 		case ItemType::Tunnel:
-			ValidTunnel += Amount;
+			ValidItem.Tunnel += Amount;
 			break;
 		case ItemType::Bridge:
-			ValidBridge += Amount;
+			ValidItem.Bridge += Amount;
 			break;
 		default:
-			// TODO : Upgrade items
 			break;
 		}
 
 		Money -= Cost * Amount;
 		StatisticsManagerRef->DefaultStatistics.TotalSpending -= Cost * Amount;
 		StatisticsManagerRef->DefaultStatistics.WeeklySpending -= Cost * Amount;
-		Profit -= Cost * Amount;
 
 		return true;
 	} else {
@@ -78,42 +71,43 @@ bool ATinyMetroPlayerState::CanUseMoney(int32 Val) const {
 	return this->Money >= Val ? true : false;
 }
 
-int32 ATinyMetroPlayerState::GetSales() const {
-	return Sales;
+int32 ATinyMetroPlayerState::GetValidBridgeCount() {
+	return ValidItem.Bridge;
 }
 
-int32 ATinyMetroPlayerState::GetProfit() const {
-	return Profit;
+int32 ATinyMetroPlayerState::GetValidTunnelCount() {
+	return ValidItem.Tunnel;
 }
 
-int32 ATinyMetroPlayerState::GetValidBridgeCount() 
-{
-	return ValidBridge;
-}
-int32 ATinyMetroPlayerState::GetValidTunnelCount() 
-{
-	return ValidTunnel;
-}
 int32 ATinyMetroPlayerState::GetMoney() {
 	return Money;
 }
 
+FPlayerItem ATinyMetroPlayerState::GetValidItem() {
+	return ValidItem;
+}
+
+FPlayerItem ATinyMetroPlayerState::GetUsingItem() {
+	return UsingItem;
+}
+
 void ATinyMetroPlayerState::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+}
+
+void ATinyMetroPlayerState::EndPlay(EEndPlayReason::Type EndPlayReason) {
+	Super::EndPlay(EndPlayReason);
+	Save();
 }
 
 void ATinyMetroPlayerState::AddMoney(int32 Amount) {
 	Money += Amount;
-	
 }
 
 void ATinyMetroPlayerState::AddIncome(int32 Amount) {
 	Money += Amount;
 	StatisticsManagerRef->DefaultStatistics.TotalIncome += Amount;
 	StatisticsManagerRef->DefaultStatistics.WeeklyIncome += Amount;
-}
-
-void ATinyMetroPlayerState::AddSales(int32 Sale) {
-	Sales += Sale;
 }
 
 void ATinyMetroPlayerState::Test() {
@@ -124,76 +118,98 @@ void ATinyMetroPlayerState::Test() {
 			FColor::Yellow,
 			FString::Printf(TEXT("PlayerState")));
 	}
-  
 }
 
 void ATinyMetroPlayerState::AddItem(ItemType Item, int Amount) {
 	switch (Item) {
 	case ItemType::Lane:
-		ValidLane += Amount;
+		ValidItem.Lane += Amount;
 		break;
 	case ItemType::Train:
-		ValidTrain += Amount;
+		ValidItem.Train += Amount;
 		break;
 	case ItemType::Subtrain:
-		ValidSubtrain += Amount;
+		ValidItem.Subtrain += Amount;
 		break;
 	case ItemType::Bridge:
-		ValidBridge += Amount;
+		ValidItem.Bridge += Amount;
 		break;
 	case ItemType::Tunnel:
-		ValidTunnel += Amount;
+		ValidItem.Tunnel += Amount;
 		break;
-
 	}
 }
 
 bool ATinyMetroPlayerState::UseLane() {
-	if (ValidLane <= 0) {
+	if (ValidItem.Lane <= 0) {
 		return false;
 	} else {
-		ValidLane--;
-		UsingLane++;
+		ValidItem.Lane--;
+		UsingItem.Lane++;
 		return true;
 	}
 }
 
 bool ATinyMetroPlayerState::UseTrain() {
-	if (ValidTrain <= 0) {
+	if (ValidItem.Train <= 0) {
 		return false;
 	} else {
-		ValidTrain--;
-		UsingTrain++;
+		ValidItem.Train--;
+		UsingItem.Train++;
 		return true;
 	}
 }
 
 bool ATinyMetroPlayerState::UseSubtrain() {
-	if (ValidSubtrain <= 0) {
+	if (ValidItem.Subtrain <= 0) {
 		return false;
 	} else {
-		ValidSubtrain--;
-		UsingSubTrain++;
+		ValidItem.Subtrain--;
+		UsingItem.Subtrain++;
 		return true;
 	}
 }
 
 bool ATinyMetroPlayerState::UseBridge() {
-	if (ValidBridge <= 0) {
+	if (ValidItem.Bridge <= 0) {
 		return false;
 	} else {
-		ValidBridge--;
-		UsingBridge++;
+		ValidItem.Bridge--;
+		UsingItem.Bridge++;
 		return true;
 	}
 }
 
 bool ATinyMetroPlayerState::UseTunnel() {
-	if (ValidTunnel <= 0) {
+	if (ValidItem.Tunnel <= 0) {
 		return false;
 	} else {
-		ValidTunnel--;
-		UsingTunnel++;
+		ValidItem.Tunnel--;
+		UsingItem.Tunnel++;
 		return true;
 	}
+}
+
+void ATinyMetroPlayerState::Save() {
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	UTinyMetroPlayerStateSaveGame* tmp = Cast<UTinyMetroPlayerStateSaveGame>(UGameplayStatics::CreateSaveGameObject(UTinyMetroPlayerStateSaveGame::StaticClass()));
+
+	tmp->Money = Money;
+	tmp->ValidItem = ValidItem;
+	tmp->UsingItem = UsingItem;
+
+	SaveManagerRef->Save(tmp, SaveActorType::PlayerState);
+}
+
+void ATinyMetroPlayerState::Load() {
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	UTinyMetroPlayerStateSaveGame* tmp = Cast<UTinyMetroPlayerStateSaveGame>(SaveManagerRef->Load(SaveActorType::PlayerState));
+
+	if (!IsValid(tmp)) {
+		return;
+	}
+
+	Money = tmp->Money;
+	ValidItem = tmp->ValidItem;
+	UsingItem = tmp->UsingItem;
 }
