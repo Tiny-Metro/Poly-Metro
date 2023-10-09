@@ -34,20 +34,6 @@ public:
 	UFUNCTION()
 	void InitLoan();
 
-	// Function investment
-	UFUNCTION()
-	void InitInvestment();
-	UFUNCTION()
-	void ChangeInvestment();
-	UFUNCTION(BlueprintCallable)
-	void ChangeAllInvestment();
-	UFUNCTION(BlueprintCallable)
-	int32 GetInvestmentStock() const;
-	UFUNCTION()
-	void UpdateInvestmentCandidate();
-	UFUNCTION()
-	void RemoveFinishedInvestment();
-
 	// Broadcast by Timer
 	UFUNCTION(BlueprintCallable)
 	void DailyTask();
@@ -60,10 +46,6 @@ public:
 	UFUNCTION()
 	bool Load();
 
-	// Delegate
-	UPROPERTY(BlueprintAssignable)
-	FInvestmentUpdateTask InvestmentUpdateTask;
-
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 Daytime;
@@ -71,8 +53,6 @@ protected:
 	ATinyMetroPlayerState* PlayerState;
 	UPROPERTY(BlueprintReadOnly)
 	ATinyMetroGameModeBase* GameModeRef;
-	UPROPERTY(VisibleAnywhere)
-	class UInvestmentLuaState* LuaState;
 	UPROPERTY(VisibleAnywhere)
 	class ATimer* TimerRef;
 	UPROPERTY(VisibleAnywhere)
@@ -87,20 +67,5 @@ protected:
 	// For loan
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ULoan*> Loan;
-
-protected:
-	// For investment
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	//int32 InvestmentStock = 1;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	//TMap<int32, UInvestment*> Investment;
-	//// Store appearable investment Id
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	//TArray<int32> InvestmentCandidate;
-	//// Store investment Id what visible in UI
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	//TArray<int32> VisibleInvestmentIndex;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Investment")
-	//int32 MaxInvestmetStock = 3;
 
 };
