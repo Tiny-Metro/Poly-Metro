@@ -25,6 +25,7 @@ public:
 	FGamePlayInfo GetPlayInfo();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	// Call by shop
 	UFUNCTION(BlueprintCallable)
@@ -82,10 +83,10 @@ protected:
 	class AStationManager* StationManager;
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class AStatisticsManager* StatisticsManagerRef;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class ATimer* TimerRef;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class ATMSaveManager* SaveManagerRef;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class ATinyMetroGameModeBase* GameModeRef;
 };

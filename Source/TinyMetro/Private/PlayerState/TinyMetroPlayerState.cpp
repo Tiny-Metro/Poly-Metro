@@ -30,6 +30,8 @@ void ATinyMetroPlayerState::BeginPlay() {
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickInterval(1.0);
 
+	Load();
+
 	SaveManagerRef->SaveTask.AddDynamic(this, &ATinyMetroPlayerState::Save);
 }
 
@@ -72,9 +74,11 @@ bool ATinyMetroPlayerState::CanUseMoney(int32 Val) const {
 int32 ATinyMetroPlayerState::GetValidBridgeCount() {
 	return ValidItem.Bridge;
 }
+
 int32 ATinyMetroPlayerState::GetValidTunnelCount() {
 	return ValidItem.Tunnel;
 }
+
 int32 ATinyMetroPlayerState::GetMoney() {
 	return Money;
 }
@@ -88,6 +92,12 @@ FPlayerItem ATinyMetroPlayerState::GetUsingItem() {
 }
 
 void ATinyMetroPlayerState::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+}
+
+void ATinyMetroPlayerState::EndPlay(EEndPlayReason::Type EndPlayReason) {
+	Super::EndPlay(EndPlayReason);
+	Save();
 }
 
 void ATinyMetroPlayerState::AddMoney(int32 Amount) {
