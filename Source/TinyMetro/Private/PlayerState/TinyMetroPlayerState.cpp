@@ -5,6 +5,7 @@
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
 #include "Timer/Timer.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "Statistics/StatisticsManager.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -28,16 +29,16 @@ FGamePlayInfo ATinyMetroPlayerState::GetPlayInfo() {
 
 void ATinyMetroPlayerState::BeginPlay() {
 	Super::BeginPlay();
-	TinyMetroGameModeBase = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	DayTime = TinyMetroGameModeBase->GetDaytime();
-	StationManager = TinyMetroGameModeBase->GetStationManager();
-	Timer = TinyMetroGameModeBase->GetTimer();
-	TMSaveManager = TinyMetroGameModeBase->GetSaveManager();
-	StatisticsManagerRef = TinyMetroGameModeBase->GetStatisticsManager();
-	
+	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!IsValid(StationManager)) StationManager = GameModeRef->GetStationManager();
+	if (!IsValid(Timer)) Timer = GameModeRef->GetTimer();
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickInterval(1.0);
+
 }
 
 bool ATinyMetroPlayerState::BuyItem(ItemType Type, int32 Cost, int32 Amount) {
@@ -196,4 +197,10 @@ bool ATinyMetroPlayerState::UseTunnel() {
 		UsingTunnel++;
 		return true;
 	}
+}
+
+void ATinyMetroPlayerState::Save() {
+}
+
+void ATinyMetroPlayerState::Load() {
 }

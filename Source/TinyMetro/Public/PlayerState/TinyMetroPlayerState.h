@@ -66,6 +66,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool UseTunnel();
 
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 Arrive = 0;
