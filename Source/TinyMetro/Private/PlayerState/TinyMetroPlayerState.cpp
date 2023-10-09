@@ -78,6 +78,14 @@ int32 ATinyMetroPlayerState::GetMoney() {
 	return Money;
 }
 
+FPlayerItem ATinyMetroPlayerState::GetValidItem() {
+	return ValidItem;
+}
+
+FPlayerItem ATinyMetroPlayerState::GetUsingItem() {
+	return UsingItem;
+}
+
 void ATinyMetroPlayerState::Tick(float DeltaTime) {
 }
 
