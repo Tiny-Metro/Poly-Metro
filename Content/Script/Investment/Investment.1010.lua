@@ -1,26 +1,20 @@
 -- remaining loan amount
+local additional_needs_1010 = 180
+local reward_money_amount_1010 = 500
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
-    Data.message = '180명을 수송하세요'
+    Data.message = additional_needs_1010 .. '명을 수송하세요'
     Data.time_require = 28
-    Data.award = 500
+    Data.award = reward_money_amount_1010 .. '$'
 
     return Data
 end
 
-local statistics
-local pre_passenger
-local time
-local time_stamp
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    statistics = GetDefaultStatistics()
-    time = GetTimestamp()
-    time_stamp = time.Date
-    pre_passenger = statistics.TotalArrivePassenger
 end
 
 -- Investment appear condition
@@ -31,28 +25,26 @@ end
 
 -- Investment success condition
 function Process()
-    if statistics.TotalArrivePassenger >= pre_passenger + 180 then
-        return "success"
+    local start_stats = GetDefaultStatisticsAtStart(1010)
+    local cur_stats = GetDefaultStatistics()
+
+    if cur_stats.TotalArrivePassenger >= (start_stats.TotalArrivePassenger + additional_needs_1010) then
+        return success
     end
 
-    local cur_time = time.Date
-    if cur_time - time_stamp >= InvestmentData().time_require then
-        return "fail"
-    end
-
-    return "continue"
+    return continue
 end
 
 -- Investment award
 function Award()
-    AddMoney(InvestmentData.award)
-
-    InvestmentDataStruct= {}
-    InvestmentDataStruct.InvestmentData = InvestmentData
-    InvestmentDataStruct.Start = Start
-    InvestmentDataStruct.Appearance = Appearance
-    InvestmentDataStruct.Process = Process
-    InvestmentDataStruct.Award = Award
-
-    return InvestmentDataStruct
+    AddMoney(reward_money_amount_1010)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

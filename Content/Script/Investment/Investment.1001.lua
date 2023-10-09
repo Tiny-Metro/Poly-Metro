@@ -1,31 +1,20 @@
 -- Circular line connection
+local reward_item_amount_1001 = {Subtrain, 1}
+local reward_money_1001 = 300
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '순환선을 건설하세요.'
     Data.time_require = -1
-    Data.award = '객차 1량, 300$'
+    Data.award = '객차 '.. reward_item_amount_1001[2] ..'량, '.. reward_money_amount_1001 ..'$'
 
     return Data
 end
 
-local lane
-local total_lane
-local pre_circular_lane
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    lane = GetLaneDetailStatistics()
-    total_lane = GetLaneStatistics()
-    pre_circular_lane = 0
-
-    local lane_count = total_lane.TotalLaneCount
-    for i=0, lane_count - 1 do
-        if lane[i].IsCircularLane then
-            pre_circular_lane = pre_circular_lane + 1
-        end
-    end
 end
 
 -- Investment appear condition
@@ -35,33 +24,51 @@ end
 
 -- Investment success condition
 function Process()
-    local cur_circular_lane = 0
-    local lane_count = total_lane.TotalLaneCount
+    local start_lane = GetLaneStatisticsAtStart(1001)
+    local start_circle_lane = GetLaneDetailStatisticsAtStart(1001)
+
+    local cur_lane = GetLaneStatistics()
+    local cur_circle_lane = GetLaneDetailStatistics()
+
+    local lane_count
+    local over_flag = false
+
+    -- current number of lanes
+    if start_lane.TotalLaneCount < cur_lane.TotalLaneCount then
+        lane_count = cur_lane.TotalLaneCount
+        over_flag = true
+    else
+        lane_count = start_lane.TotalLaneCount
+    end
 
     for i=0, lane_count - 1 do
-        if lane[i].IsCircularLane then
-            cur_circular_lane = cur_circular_lane + 1
+        if over_flag and i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount) then
+            -- new lane
+            if cur_circle_lane[i].IsCircularLane then
+                return success
+            end
+        end
+        else
+            -- existing lane
+            if start_circle_lane[i].IsCircularLane == false and cur_circle_lane[i].IsCircularLane == true then
+                return success
+            end
         end
     end
-
-    if pre_circular_lane <= cur_circular_lane then
-        return "success"
-    else
-        return "continue"
-    end
+    return continue
 end
 
 -- Investment award
 function Award()
-    AddItem(Subtrain, 1)
-    AddMoney(300)
-
-    InvestmentDataStruct= {}
-    InvestmentDataStruct.InvestmentData = InvestmentData
-    InvestmentDataStruct.Start = Start
-    InvestmentDataStruct.Appearance = Appearance
-    InvestmentDataStruct.Process = Process
-    InvestmentDataStruct.Award = Award
-
-    return InvestmentDataStruct
+    AddItem(reward_amount_1001[1], reward_amount_1001[2])
+    AddMoney(reward_money_amount_1001)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

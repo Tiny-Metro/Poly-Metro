@@ -1,30 +1,28 @@
 -- Complaint management
+local additional_needs_1003 = 50
+local reward_money_1003 = 800
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
-    Data.message = '어떤 역도 불만도 50을 넘지 않도록 하세요.'
+    Data.message = '어떤 역도 불만도 ' .. additional_needs_1003 .. '을 넘지 않도록 하세요.'
     Data.time_require = 7
-    Data.award = 800
+    Data.award = reward_money_1003 .. "$"
 
     return Data
 end
 
-local stations
-local time
-local time_stamp
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    stations = GetStationInfos()
-    time = GetTimestamp()
-    time_stamp = time.Date
 end
 
 -- Investment appear condition
 function Appearance()
+    local stations = GetStationInfos()
+
     for i=0, #stations do
-        if stations[i].Complain > 50 then
+        if stations[i].Complain > additional_needs_1003 then
             return false
         end
     end
@@ -33,34 +31,41 @@ end
 
 -- Investment success condition
 function Process()
-    local cur_time = time.Date
-    local isFail = false
+    local start_time = GetTimestampAtStart(1003)
+    local cur_time = GetTimestamp()
+    local stations = GetStationInfos()
+
+    local all_stations_limit = true
 
     for i = 0, #stations do
-        if stations[i].Complain > 50 then
-            isFail = true
+        if stations[i].Complain > additional_needs_1003 then
+            -- If the deadline is exceeded, it immediately fails.
+            all_stations_limit = false
             break
         end
     end
 
-    if cur_time - time_stamp < InvestmentData().time_require then
-        -- 삼항 연산자
-        return isFail and "fail" or "continue"
+    if all_stations_limit then
+        if (start_time.Date - cur_time.Date) <= InvestmentData().time_require then
+            return continue
+        else
+            return success
+        end
     else
-        return isFail and "fail" or "success"
+        return fail
     end
 end
 
 -- Investment award
 function Award()
-    AddMoney(InvestmentData.award)
-
-    InvestmentDataStruct= {}
-    InvestmentDataStruct.InvestmentData = InvestmentData
-    InvestmentDataStruct.Start = Start
-    InvestmentDataStruct.Appearance = Appearance
-    InvestmentDataStruct.Process = Process
-    InvestmentDataStruct.Award = Award
-
-    return InvestmentDataStruct
+    AddMoney(reward_money_1003)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

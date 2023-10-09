@@ -1,26 +1,19 @@
 -- No use in stores
+local reward_money_amount_1011 = 500
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '이번 주에는 아이템을 새로 구매하지 마세요.'
     Data.time_require = 7
-    Data.award = 500
+    Data.award = reward_money_amount_1011 .. "$"
 
     return Data
 end
 
-local shop
-local pre_shop
-local time
-local time_stamp
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    shop = GetShopStatistics()
-    time = GetTimestamp()
-    time_stamp = time.Date
-    pre_shop = shop.TotalPurchaseCount
 end
 
 -- Investment appear condition
@@ -30,27 +23,37 @@ end
 
 -- Investment success condition
 function Process()
-    local cur_time = time.Date
+    local start_shop = GetShopStatisticsAtStart(1011)
+    local start_time = GetTimestampAtStart(1011)
 
-    if cur_time - time_stamp < InvestmentData().time_require then
-        return "continue"
-    elseif shop.TotalPurchaseCount == pre_shop then
-        return "success"
+    local cur_shop = GetShopStatistics()
+    local cur_time = GetTimestamp()
+
+    if cur_time.Date - start_time.Date < InvestmentData().time_require then
+        -- within the deadline
+        if cur_shop.TotalPurchaseCount == start_shop.TotalPurchaseCount then
+            return continue
+        else
+            return fail
     else
-        return "fail"
+        -- outside the deadline
+        if cur_shop.TotalPurchaseCount == start_shop.TotalPurchaseCount then
+            return success
+        else
+            return fail
     end
 end
 
 -- Investment award
 function Award()
-    AddMoney(InvestmentData.award)
-
-    InvestmentDataStruct= {}
-    InvestmentDataStruct.InvestmentData = InvestmentData
-    InvestmentDataStruct.Start = Start
-    InvestmentDataStruct.Appearance = Appearance
-    InvestmentDataStruct.Process = Process
-    InvestmentDataStruct.Award = Award
-
-    return InvestmentDataStruct
+    AddMoney(reward_money_amount_1011)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

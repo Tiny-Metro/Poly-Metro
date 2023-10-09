@@ -1,93 +1,73 @@
 -- upgrade
--- Investment condition
-target = {
-    {name = "열차", award = "객차 1량"},
-    {name = "객차", award = "300$"},
-    {name = "역", award = "500$"}
+target_1005 = {
+    {name = "열차", award = {Subtrain, 1}, message = "객차 1량"},
+    {name = "객차", award = 300, message = "300$"},
+    {name = "역", award = 500, message = "500$"}
 }
 
-local selected_target
+local selected_target_1005
 
+-- Investment condition
 function InvestmentData()
     local Data = {}
-    local idx = math.random(1, #target)
-    selected_target = target[idx]
+    local idx = math.random(1, #target_1005)
+    selected_target_1005 = target_1005[idx]
 
-    Data.message = selected_target.name .. '을 업그레이드하세요.'
+    Data.message = selected_target_1005.name .. '을 업그레이드하세요.'
     Data.time_require = 7
-    Data.award = selected_target.award
+    Data.award = selected_target_1005.message
 
     return Data
 end
 
-local trains
-local subtrains
-local stations
-local time
-
-local pre_train_upgrade
-local pre_subtrain_upgrade
-local pre_statiion_upgrade
-local time_stamp
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    trains = GetTrainStatistics()
-    subtrains = GetSubtrainStatistics()
-    stations = GetDefaultStatistics()
-    time = GetTimestamp()
-
-    pre_train_upgrade = trains.TotalUpgradeCount
-    pre_subtrain_upgrade = subtrains.TotalUpgradeCount
-    pre_statiion_upgrade = stations.UpgradeStationCount
-    time_stamp = time.Date
 end
 
 -- Investment appear condition
 function Appearance()
-    time = GetTimestamp()
+    local time = GetTimestamp()
     return time.Week > 2
 end
 
 -- Investment success condition
 function Process()
-    local cur_train_upgrade = trains.TotalUpgradeCount
-    local cur_subtrain_upgrade = subtrains.TotalUpgradeCount
-    local cur_statiion_upgrade = stations.UpgradeStationCount
+    local pre_train_upgrade = GetTrainStatisticsAtStart(1005)
+    local pre_subtrain_upgrade = GetSubtrainStatisticsAtStart(1005)
+    local pre_statiion_upgrade = GetDefaultStatisticsAtStart(1005)
 
-    if selected_target.name == "열차" and cur_train_upgrade > pre_train_upgrade then
-        return "success"
-    elseif selected_target.name == "객차" and cur_subtrain_upgrade > pre_subtrain_upgrade then
-        return "success"
-    elseif selected_target.name == "역" and cur_station_upgrade > pre_station_upgrade then
-        return "success"
+    local cur_train_upgrade = GetTrainStatistics()
+    local cur_subtrain_upgrade = GetSubtrainStatistics()
+    local cur_statiion_upgrade = GetDefaultStatistics()
+
+    if selected_target_1005.name == "열차" and (cur_train_upgrade.TotalUpgradeCount > pre_train_upgrade.TotalUpgradeCount) then
+        return success
+    elseif selected_target_1005.name == "객차" and (cur_subtrain_upgrade.TotalUpgradeCount > pre_subtrain_upgrade.TotalUpgradeCount) then
+        return success
+    elseif selected_target_1005.name == "역" and (cur_station_upgrade.UpgradeStationCount > pre_station_upgrade.UpgradeStationCount) then
+        return success
     end
 
-    local cur_time = time.Date
-    if cur_time - time_stamp > InvestmentData().time_require then
-        return "fail"
-    end
-
-    return "continue"
+    return continue
 end
 
 -- Investment award
 function Award()
-    if selected_target.name == "열차" then
-        AddItem(Subtrain, 1)
-    elseif selected_target.name == "객차" then
-        AddMoney(300)
-    elseif selected_target.name == "역" then
-        AddMoney(500)
+    if selected_target_1005.name == "열차" then
+        AddItem(selected_target_1005.award[1], selected_target_1005.award[2])
+    elseif selected_target_1005.name == "객차" then
+        AddMoney(selected_target_1005.award)
+    elseif selected_target_1005.name == "역" then
+        AddMoney(selected_target_1005.award)
     end
-
-    InvestmentDataStruct= {}
-    InvestmentDataStruct.InvestmentData = InvestmentData
-    InvestmentDataStruct.Start = Start
-    InvestmentDataStruct.Appearance = Appearance
-    InvestmentDataStruct.Process = Process
-    InvestmentDataStruct.Award = Award
-
-    return InvestmentDataStruct
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct
