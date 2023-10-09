@@ -68,6 +68,9 @@ FString ATMSaveManager::MakeFileName(SaveActorType ActorType, int32 id)
 
 	FString fileName = EnumPtr->GetNameStringByIndex((int32)ActorType);
 
+	FString levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+
+	fileName = levelName + TEXT("/") + fileName;
 
 	//Check id
 	if (id == -1)
