@@ -3,7 +3,7 @@
 
 #include "PlayerState/PlayerStateSeoul.h"
 
-APlayerStateSeoul::APlayerStateSeoul() {
+APlayerStateSeoul::APlayerStateSeoul() : Super() {
 	Money = 200;
 	ValidItem.Lane = 3;
 	ValidItem.Train = 3;
