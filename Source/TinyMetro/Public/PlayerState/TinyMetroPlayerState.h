@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "PlayerState/GamePlayInfo.h"
+#include "PlayerItem.h"
 #include "../Shop/ItemType.h"
 #include "../Timer/Timer.h"
 #include "TinyMetroPlayerState.generated.h"
@@ -32,11 +33,11 @@ public:
 	bool CanUseMoney(int32 Val) const;
 	
 	UFUNCTION(BlueprintCallable)
-	int32 GetSales() const;
-	UFUNCTION(BlueprintCallable)
-	int32 GetProfit() const;
-	UFUNCTION(BlueprintCallable)
 	int32 GetMoney();
+	UFUNCTION(BlueprintCallable)
+	FPlayerItem GetValidItem();
+	UFUNCTION(BlueprintCallable)
+	FPlayerItem GetUsingItem();
 
 	UFUNCTION()
 	int32 GetValidBridgeCount();
@@ -73,60 +74,20 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
-	int32 Arrive = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 Money = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
-	int32 Sales = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
-	int32 Profit = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
-	int32 SalesInWeek = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
-	int32 ProfitInWeek = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidLane = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidTrain = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidSubtrain = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidExpress = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidTunnel = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 ValidBridge = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 Transfer = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
-	int32 Investment = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingLane = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingTrain = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingSubTrain = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingExpress = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingTunnel = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Using")
-	int32 UsingBridge = 0;	
-
-	UPROPERTY()
-	int32 DayTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	FPlayerItem ValidItem;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+	FPlayerItem UsingItem;
 
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class AStationManager* StationManager;
-
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY()
-	class ATimer* Timer;
-
+	class ATimer* TimerRef;
 	UPROPERTY()
-	class ATMSaveManager* TMSaveManager;
-
+	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY()
-	class ATinyMetroGameModeBase* TinyMetroGameModeBase;
+	class ATinyMetroGameModeBase* GameModeRef;
 };
