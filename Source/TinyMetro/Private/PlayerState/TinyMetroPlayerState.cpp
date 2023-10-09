@@ -2,6 +2,7 @@
 
 
 #include "PlayerState/TinyMetroPlayerState.h"
+#include "PlayerState/TinyMetroPlayerStateSaveGame.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
 #include "Timer/Timer.h"
@@ -180,7 +181,25 @@ bool ATinyMetroPlayerState::UseTunnel() {
 }
 
 void ATinyMetroPlayerState::Save() {
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	UTinyMetroPlayerStateSaveGame* tmp = Cast<UTinyMetroPlayerStateSaveGame>(UGameplayStatics::CreateSaveGameObject(UTinyMetroPlayerStateSaveGame::StaticClass()));
+
+	tmp->Money = Money;
+	tmp->ValidItem = ValidItem;
+	tmp->UsingItem = UsingItem;
+
+	SaveManagerRef->Save(tmp, SaveActorType::PlayerState);
 }
 
 void ATinyMetroPlayerState::Load() {
+	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	UTinyMetroPlayerStateSaveGame* tmp = Cast<UTinyMetroPlayerStateSaveGame>(SaveManagerRef->Load(SaveActorType::PlayerState));
+
+	if (!IsValid(tmp)) {
+		return;
+	}
+
+	Money = tmp->Money;
+	ValidItem = tmp->ValidItem;
+	UsingItem = tmp->UsingItem;
 }

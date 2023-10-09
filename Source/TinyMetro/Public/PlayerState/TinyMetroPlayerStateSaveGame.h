@@ -13,5 +13,12 @@ UCLASS()
 class TINYMETRO_API UTinyMetroPlayerStateSaveGame : public USaveGame
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY()
+	int32 Money = 0;
+	UPROPERTY()
+	FPlayerItem ValidItem;
+	UPROPERTY()
+	FPlayerItem UsingItem;
 };
