@@ -68,7 +68,9 @@ void ASoundManager::FindReferenceClass() {
 }
 
 void ASoundManager::PlaySound(TinyMetroEffectSound SoundType) {
-	EffectSound[SoundType]->Play();
+	if (EffectSound.Contains(SoundType)) {
+		EffectSound[SoundType]->Play();
+	}
 }
 
 void ASoundManager::PlayRandomBGM() {
