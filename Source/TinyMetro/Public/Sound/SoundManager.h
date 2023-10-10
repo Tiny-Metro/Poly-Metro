@@ -22,6 +22,9 @@ public:
 	ASoundManager();
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void FindReferenceClass();
+
 	UFUNCTION(BlueprintCallable)
 	void PlaySound(TinyMetroEffectSound SoundType);
 	UFUNCTION(BlueprintCallable)
@@ -39,15 +42,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetEffectVolume(float NewVolume);
 
+	// Save, Load
+	UFUNCTION()
+	void Save();
+	UFUNCTION()
+	void Load();
+
 protected:
+	UPROPERTY()
+	class ATMSaveManager* SaveManagerRef = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
 	float BackgroundVolume = 1.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
 	float EffectVolume = 1.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PolyMetro")
-	TObjectPtr<UAudioComponent> TestEffect;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PolyMetro")
-	USoundBase* TestSoundBase;
 	
 	// Effect sounds
 	UPROPERTY(VisibleAnywhere, Category = "Effect Sound")

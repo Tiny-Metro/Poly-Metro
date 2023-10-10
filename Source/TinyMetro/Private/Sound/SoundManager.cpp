@@ -2,7 +2,9 @@
 
 
 #include "Sound/SoundManager.h"
+#include "Sound/SoundManagerSaveGame.h"
 #include "Components/AudioComponent.h"
+#include "SaveSystem/TMSaveManager.h"
 #include "Kismet/GameplayStatics.h"
 
 ASoundManager::ASoundManager() {
@@ -46,6 +48,10 @@ void ASoundManager::BeginPlay() {
 		i->OnAudioFinished.AddDynamic(this, &ASoundManager::PlayRandomBGM);
 	}
 
+	FindReferenceClass();
+	Load();
+	SaveManagerRef->SaveTask.AddDynamic(this, &ASoundManager::Save);
+
 	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == TEXT("Title")) {
 		PlayTitleBGM();
 	} else {
@@ -55,6 +61,10 @@ void ASoundManager::BeginPlay() {
 
 void ASoundManager::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+}
+
+void ASoundManager::FindReferenceClass() {
+	if (!SaveManagerRef) SaveManagerRef = Cast<ATMSaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ATMSaveManager::StaticClass()));
 }
 
 void ASoundManager::PlaySound(TinyMetroEffectSound SoundType) {
@@ -102,4 +112,29 @@ void ASoundManager::SetEffectVolume(float NewVolume) {
 	for (auto& i : EffectSound) {
 		i.Value->SetVolumeMultiplier(EffectVolume);
 	}
+}
+
+void ASoundManager::Save() {
+	FindReferenceClass();
+	USoundManagerSaveGame* tmp = Cast<USoundManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(USoundManagerSaveGame::StaticClass()));
+
+	tmp->BackgroundVolume = BackgroundVolume;
+	tmp->EffectVolume = EffectVolume;
+
+	SaveManagerRef->Save(tmp, SaveActorType::SoundManager);
+}
+
+void ASoundManager::Load() {
+	FindReferenceClass();
+	USoundManagerSaveGame* tmp = Cast<USoundManagerSaveGame>(SaveManagerRef->Load(SaveActorType::SoundManager));
+
+	if (!IsValid(tmp)) {
+		return;
+	}
+	
+	BackgroundVolume = tmp->BackgroundVolume;
+	EffectVolume = tmp->EffectVolume;
+
+	SetBackgroundVolume(BackgroundVolume);
+	SetEffectVolume(EffectVolume);
 }
