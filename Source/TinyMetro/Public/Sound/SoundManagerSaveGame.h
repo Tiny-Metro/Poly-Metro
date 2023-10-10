@@ -16,6 +16,8 @@ class TINYMETRO_API USoundManagerSaveGame : public USaveGame
 
 public:
 	UPROPERTY()
+	float MasterVolume;
+	UPROPERTY()
 	float BackgroundVolume;
 	UPROPERTY()
 	float EffectVolume;
