@@ -57,6 +57,9 @@ public:
 	class AStatisticsManager* GetStatisticsManager() const;
 	UFUNCTION(BlueprintCallable)
 	class AInvestmentManager* GetInvestmentManager() const;
+	UFUNCTION(BlueprintCallable)
+	class ASoundManager* GetSoundManager() const;
+	
 
 	// Test
 	UFUNCTION(BlueprintCallable)
@@ -101,6 +104,8 @@ protected:
 	class AStatisticsManager* StatisticsManager;
 	UPROPERTY()
 	APawn* PawnRef;
+	UPROPERTY()
+	class ASoundManager* SoundManagerRef;
 
 	UPROPERTY()
 	UClass* ObjBridgeTunnelManager;
