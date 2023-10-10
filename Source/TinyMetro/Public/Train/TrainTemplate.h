@@ -190,6 +190,8 @@ protected:
 	class ATimer* TimerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ASoundManager* SoundManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

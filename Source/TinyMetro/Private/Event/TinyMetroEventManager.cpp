@@ -4,6 +4,7 @@
 #include "Event/TinyMetroEventManager.h"
 #include "Event/TinyMetroEvent.h"
 #include "Event/TinyMetroEventManagerSaveGame.h"
+#include "Sound/SoundManager.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Timer/Timer.h"
 #include "Lua/EventLuaState.h"
@@ -27,6 +28,7 @@ void ATinyMetroEventManager::BeginPlay()
 	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
 	if (!IsValid(TimerRef)) TimerRef = GameModeRef->GetTimer();
 	if (!IsValid(LuaState)) LuaState = UEventLuaState::CreateInstance(GetWorld());
+	if (!IsValid(SoundManagerRef)) SoundManagerRef = GameModeRef->GetSoundManager();
 
 	// Read lua and make Event
 	// Call Load function
@@ -124,6 +126,7 @@ void ATinyMetroEventManager::OccurEvent() {
 
 		SelectedEvent->LuaCallFunction(TEXT("Start"), TArray<FLuaValue>(), false);
 		EventOccurTask.Broadcast();
+		SoundManagerRef->PlaySound(TinyMetroEffectSound::OccurEvent);
 	}
 }
 

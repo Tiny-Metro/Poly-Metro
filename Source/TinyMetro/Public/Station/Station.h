@@ -187,6 +187,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ALaneManager* LaneManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ASoundManager* SoundManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 MaintenanceCost = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FServiceData PolicyServiceLevel;

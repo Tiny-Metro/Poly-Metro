@@ -195,6 +195,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class AStatisticsManager* StatisticsManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ASoundManager* SoundManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TMap<FIntPoint, StationType> InitData;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	TArray<StationType> StationSpawnTable = {
