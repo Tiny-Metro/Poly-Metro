@@ -94,6 +94,16 @@ void ASoundManager::PlayTitleBGM() {
 	}
 }
 
+float ASoundManager::GetMasterVolume() const {
+	return MasterVolume;
+}
+
+void ASoundManager::SetMasterVolume(float NewVolume) {
+	MasterVolume = NewVolume;
+	SetBackgroundVolume(BackgroundVolume);
+	SetEffectVolume(EffectVolume);
+}
+
 float ASoundManager::GetBackgroundVolume() const {
 	return BackgroundVolume;
 }
@@ -101,7 +111,7 @@ float ASoundManager::GetBackgroundVolume() const {
 void ASoundManager::SetBackgroundVolume(float NewVolume) {
 	BackgroundVolume = NewVolume;
 	for (auto& i : BackgroundSound) {
-		i->SetVolumeMultiplier(BackgroundVolume);
+		i->SetVolumeMultiplier(BackgroundVolume * MasterVolume);
 	}
 }
 
@@ -112,7 +122,7 @@ float ASoundManager::GetEffectVolume() const {
 void ASoundManager::SetEffectVolume(float NewVolume) {
 	EffectVolume = NewVolume;
 	for (auto& i : EffectSound) {
-		i.Value->SetVolumeMultiplier(EffectVolume);
+		i.Value->SetVolumeMultiplier(EffectVolume * MasterVolume);
 	}
 }
 
@@ -120,6 +130,7 @@ void ASoundManager::Save() {
 	FindReferenceClass();
 	USoundManagerSaveGame* tmp = Cast<USoundManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(USoundManagerSaveGame::StaticClass()));
 
+	tmp->MasterVolume = MasterVolume;
 	tmp->BackgroundVolume = BackgroundVolume;
 	tmp->EffectVolume = EffectVolume;
 
@@ -134,9 +145,9 @@ void ASoundManager::Load() {
 		return;
 	}
 	
+	MasterVolume = tmp->MasterVolume;
 	BackgroundVolume = tmp->BackgroundVolume;
 	EffectVolume = tmp->EffectVolume;
 
-	SetBackgroundVolume(BackgroundVolume);
-	SetEffectVolume(EffectVolume);
+	SetMasterVolume(MasterVolume);
 }

@@ -34,6 +34,10 @@ public:
 
 	// Volume getter, setter
 	UFUNCTION(BlueprintCallable)
+	float GetMasterVolume() const;
+	UFUNCTION(BlueprintCallable)
+	void SetMasterVolume(float NewVolume);
+	UFUNCTION(BlueprintCallable)
 	float GetBackgroundVolume() const;
 	UFUNCTION(BlueprintCallable)
 	void SetBackgroundVolume(float NewVolume);
@@ -52,6 +56,8 @@ protected:
 	UPROPERTY()
 	class ATMSaveManager* SaveManagerRef = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
+	float MasterVolume = 1.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
 	float BackgroundVolume = 1.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
