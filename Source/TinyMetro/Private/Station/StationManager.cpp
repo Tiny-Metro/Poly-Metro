@@ -2,6 +2,7 @@
 
 
 #include "Station/StationManager.h"
+#include "Sound/SoundManager.h"
 #include "Lane/Lane.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationInfo.h"
@@ -60,6 +61,7 @@ void AStationManager::BeginPlay()
 	TimerRef = GameMode->GetTimer();
 	PolicyRef = GameMode->GetPolicy();
 	StatisticsManagerRef = GameMode->GetStatisticsManager();
+	SoundManagerRef = GameMode->GetSoundManager();
 
 	auto GridSize = GridManager->GetGridSize();
 	int32 SpawnPrevent = GridManager->GetStationSpawnPrevent();
@@ -265,6 +267,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 	} else {
 		// New station
 		spawnLog.Timestamp = TimerRef->GetTimestamp();
+		SoundManagerRef->PlaySound(TinyMetroEffectSound::StationSpawn);
 	}
 	StationSpawnLog.Add(spawnLog);
 	

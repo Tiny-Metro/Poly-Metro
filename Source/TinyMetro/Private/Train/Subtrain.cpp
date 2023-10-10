@@ -6,6 +6,7 @@
 #include "Train/TrainManager.h"
 #include "Train/SubtrainAiController.h"
 #include "Train/SubtrainSaveGame.h"
+#include "Sound/SoundManager.h"
 #include "Lane/Lane.h"
 #include "Lane/LaneManager.h"
 #include "PlayerState/TinyMetroPlayerState.h"
@@ -178,6 +179,9 @@ void ASubtrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	OwnerTrainRef->AddSubtrain(this);
 	StartLocation = OwnerTrainRef->GetActorLocation();
 	StartLocation.Z = 20.0f;
+	if (!IsLoaded) {
+		SoundManagerRef->PlaySound(TinyMetroEffectSound::SpawnSubtrain);
+	}
 	Super::ServiceStart(StartLocation, LaneRef, D);
 	SetTrainMaterial(LaneRef);
 }

@@ -5,6 +5,7 @@
 #include "Train/TrainManager.h"
 #include "Train/SubtrainAiController.h"
 #include "Train/TrainSaveGame.h"
+#include "Sound/SoundManager.h"
 #include "Station/Station.h"
 #include "Station/PathQueue.h"
 #include "Lane/Lane.h"
@@ -321,6 +322,7 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	if (!IsLoaded) {
 		CurrentStation.Id = -1;
 		NextStation = D->GetStationInfo();
+		SoundManagerRef->PlaySound(TinyMetroEffectSound::SpawnTrain);
 	}
 
 	// Set train material

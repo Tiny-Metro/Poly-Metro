@@ -6,6 +6,7 @@
 #include "Station/PathQueue.h"
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSaveGame.h"
+#include "Sound/SoundManager.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
 #include "Timer/Timer.h"
@@ -120,6 +121,7 @@ void AStation::BeginPlay()
 	PolicyRef = GameModeRef->GetPolicy();
 	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 	LaneManagerRef = GameModeRef->GetLaneManager();
+	SoundManagerRef = GameModeRef->GetSoundManager();
 
 	StationMeshComponent->SetStaticMesh(StationMesh[(int)StationInfo.Type]);
 	StationComplainMeshComponent->SetStaticMesh(StationComplainMesh[(int)StationInfo.Type]);
@@ -472,6 +474,9 @@ void AStation::SetStationInfo(int32 Id, StationType Type)
 }
 
 void AStation::Upgrade() {
+	if (!StationInfo.IsUpgrade) {
+		SoundManagerRef->PlaySound(TinyMetroEffectSound::StationUpgrade);
+	}
 	StationInfo.IsUpgrade = true;
 	ComplainPassengerNum += UpgradePermissionComplainPassenger;
 

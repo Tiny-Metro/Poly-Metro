@@ -4,6 +4,7 @@
 #include "Train/TrainTemplate.h"
 #include "Train/TrainManager.h"
 #include "Train/TrainInfoWidget.h"
+#include "Sound/SoundManager.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include "Camera/TinyMetroPlayerController.h"
 #include "PlayerState/TinyMetroPlayerState.h"
@@ -90,6 +91,7 @@ void ATrainTemplate::BeginPlay()
 	StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 	TimerRef = GameModeRef->GetTimer();
 	SaveManagerRef = GameModeRef->GetSaveManager();
+	SoundManagerRef = GameModeRef->GetSoundManager();
 
 	PlayerControllerRef = Cast<ATinyMetroPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
@@ -541,6 +543,9 @@ TrainDirection ATrainTemplate::GetTrainDirection() const {
 void ATrainTemplate::Upgrade() {
 	TrainInfo.IsUpgrade = true;
 	CurrentPassengerSlot = MaxPassengerSlotUpgrade;
+	if (!IsLoaded) {
+		SoundManagerRef->PlaySound(TinyMetroEffectSound::TrainUpgrade);
+	}
 	SetTrainSpeed(TRAIN_UPGRADE_SPEED);
 	UpdateTrainMesh();
 }

@@ -69,6 +69,8 @@ protected:
 	bool IsLoaded = false;
 	UPROPERTY()
 	class ATimer* TimerRef;
+	UPROPERTY()
+	class ASoundManager* SoundManagerRef;
 	UPROPERTY(VisibleAnywhere, Category = "Info")
 	class UEventLuaState* LuaState;
 

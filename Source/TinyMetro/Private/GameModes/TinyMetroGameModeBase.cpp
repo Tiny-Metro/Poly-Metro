@@ -11,6 +11,7 @@
 #include "Policy/Policy.h"
 #include "Shop/Shop.h"
 #include "Statistics/StatisticsManager.h"
+#include "Sound/SoundManager.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Lane/BridgeTunnel/BridgeTunnelManager.h"
 #include "Event/TinyMetroEventManager.h"
@@ -95,6 +96,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
     EventManager->Load();
     InvestmentManagerRef = GetWorld()->SpawnActor<AInvestmentManager>();
+    SoundManagerRef = GetWorld()->SpawnActor<ASoundManager>();
 
     // Spawn actor
     FActorSpawnParameters SpawnParams;
@@ -168,6 +170,10 @@ AStatisticsManager* ATinyMetroGameModeBase::GetStatisticsManager() const {
 
 AInvestmentManager* ATinyMetroGameModeBase::GetInvestmentManager() const {
     return InvestmentManagerRef;
+}
+
+ASoundManager* ATinyMetroGameModeBase::GetSoundManager() const {
+    return SoundManagerRef;
 }
 
 void ATinyMetroGameModeBase::TestFunction() {
