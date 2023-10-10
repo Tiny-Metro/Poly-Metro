@@ -133,7 +133,7 @@ void AInvestmentManager::InitInvestment() {
 	UpdateAccessibleInvestment();
 
 	int32 randIdx = FMath::RandRange(0, InvestmentIdArr.Num() - 1);
-	InvestmentCandidate.Add(0, InvestmentIdArr[randIdx]);
+	if (InvestmentIdArr.IsValidIndex(randIdx)) InvestmentCandidate.Add(0, InvestmentIdArr[randIdx]);
 
 	if (LuaComponentArr.Num()< MaxInvestmentSlot) MaxInvestmentSlot = LuaComponentArr.Num();
 }
@@ -158,7 +158,7 @@ void AInvestmentManager::NotifyInvestmentFinish(int32 Id) {
 }
 
 UInvestment* AInvestmentManager::GetInvestmentById(int32 Id) {
-	return LuaComponentArr[Id];
+	return LuaComponentArr.Contains(Id) ? LuaComponentArr[Id] : nullptr;
 }
 
 TMap<int32, class UInvestment*> AInvestmentManager::GetAllInvestment() {
