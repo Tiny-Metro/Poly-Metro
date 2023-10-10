@@ -33,12 +33,12 @@ function Process()
         if i <= start_train then
             -- existing train
             local additional_subtrains = cur_train[i].SubtrainCount - (start_train[i].SubtrainCount or 0)
-            if additional_subtrains >= additional_needs_1004
+            if additional_subtrains >= additional_needs_1004 then
                 return success
             end
         else
             -- new train
-            if cur_train[i].SubtrainCount >= additional_needs_1004
+            if cur_train[i].SubtrainCount >= additional_needs_1004 then
                 return success
             end
         end

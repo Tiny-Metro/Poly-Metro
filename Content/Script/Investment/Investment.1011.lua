@@ -1,12 +1,12 @@
 -- No use in stores
-local reward_money_amount_1011 = 500
+local reward_money_1011 = 500
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '이번 주에는 아이템을 새로 구매하지 마세요.'
     Data.time_require = 7
-    Data.award = reward_money_amount_1011 .. "$"
+    Data.award = reward_money_1011 .. "$"
 
     return Data
 end
@@ -35,18 +35,20 @@ function Process()
             return continue
         else
             return fail
+        end
     else
         -- outside the deadline
         if cur_shop.TotalPurchaseCount == start_shop.TotalPurchaseCount then
             return success
         else
             return fail
+        end
     end
 end
 
 -- Investment award
 function Award()
-    AddMoney(reward_money_amount_1011)
+    AddMoney(reward_money_1011)
 end
 
 InvestmentDataStruct= {}

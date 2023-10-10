@@ -1,12 +1,12 @@
 -- remaining loan amount
-local reward_amount_1009 = 2000
+local reward_money_1009 = 2000
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '잔여 대출금이 없도록 하세요.'
     Data.time_require = -1
-    Data.award = reward_amount_1009 .. "$"
+    Data.award = reward_money_1009 .. "$"
 
     return Data
 end
@@ -36,7 +36,7 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(InvestmentData.award)
+    AddMoney(reward_money_1009)
 end
 
 InvestmentDataStruct= {}

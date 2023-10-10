@@ -1,13 +1,13 @@
 -- remaining loan amount
 local additional_needs_1010 = 180
-local reward_money_amount_1010 = 500
+local reward_money_1010 = 500
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = additional_needs_1010 .. '명을 수송하세요'
     Data.time_require = 28
-    Data.award = reward_money_amount_1010 .. '$'
+    Data.award = reward_money_1010 .. '$'
 
     return Data
 end
@@ -37,7 +37,7 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(reward_money_amount_1010)
+    AddMoney(reward_money_1010)
 end
 
 InvestmentDataStruct= {}

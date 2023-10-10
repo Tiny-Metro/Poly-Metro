@@ -21,6 +21,10 @@ end
 function Appearance()
     local stations = GetStationInfos()
 
+    if stations == nil then
+        return false
+    end
+
     for i=0, #stations do
         if stations[i].Complain > additional_needs_1003 then
             return false

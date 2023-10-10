@@ -1,13 +1,13 @@
 -- transfer station
 local additional_needs_1007 = 3
-local reward_money_amount_1007 = 500
+local reward_money_1007 = 500
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = additional_needs_1007 .. '개 이상의 노선이 지나는 환승역을 만드세요.'
     Data.time_require = 7
-    Data.award = reward_money_amount_1007 .. '$'
+    Data.award = reward_money_1007 .. '$'
 
     return Data
 end
@@ -61,7 +61,7 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(reward_money_amount_1007)
+    AddMoney(reward_money_1007)
 end
 
 InvestmentDataStruct= {}

@@ -1,12 +1,12 @@
 -- lane change
-local reward_amount_1008 = 800
+local reward_money_1008 = 800
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '이번 주에는 노선을 축소, 삭제하지 않고 운영하세요.'
     Data.time_require = 7
-    Data.award = reward_amount_1008 .. '$'
+    Data.award = reward_money_1008 .. '$'
 
     return Data
 end
@@ -61,7 +61,7 @@ end
 
 -- Investment award
 function Award()
-    AddMoney(reward_amount_1008)
+    AddMoney(reward_money_1008)
 end
 
 InvestmentDataStruct= {}
