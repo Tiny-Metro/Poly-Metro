@@ -1933,6 +1933,7 @@ void ALane::SetSplineMeshes(){
 	return;
 }
 
+// * SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
 void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh, int32 Index, int32 Pos) {
 	SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 	SplineMeshComponent->SetStaticMesh(SplineMesh);
@@ -1948,6 +1949,7 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 	SplineMeshComponent->RegisterComponent();
 
 	// Set Location - the location doesn't represent where the meshes are - it represents where it belong and other infos
+	// SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
 	SplineMeshComponent->SetWorldLocation(FVector(LaneId, Index, Pos));
 	FVector vec = SplineMeshComponent->GetComponentLocation();
 }
@@ -2658,6 +2660,7 @@ void ALane::UpdateUsingConnector()
 
 TArray<AStation*> ALane::GetConnectedStations(USplineMeshComponent* ClickedMesh)
 {
+	// SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
 	FVector meshLocation = ClickedMesh->GetComponentLocation();
 	int32 index = meshLocation.Y;
 
