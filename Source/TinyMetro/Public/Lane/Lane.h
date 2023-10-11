@@ -336,9 +336,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSplineMeshes();
 
-private:
-	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
-
 public:
 	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 	UStaticMesh* LaneMesh;
@@ -404,7 +401,8 @@ private:
 	TArray<FLanePoint> GetLanePathByPoint(FIntPoint StartStation, FIntPoint EndStation);
 	void GetLaneArrays(FIntPoint StartStationCoord, FIntPoint AddedStationCoord, TArray<FLanePoint>& PreLaneArray);
 	void SetMeshByIndex(int32 StartIndex, int32 LastIndex);
-	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
+	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh, int32 Index, int32 Pos);
+	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index, int32 Pos);
 	FVector LineIntersection(FVector A, FVector B, FVector C, FVector D);
 
 	float CalculateOffset(int32 LanePosition);

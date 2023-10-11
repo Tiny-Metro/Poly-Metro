@@ -1933,7 +1933,7 @@ void ALane::SetSplineMeshes(){
 	return;
 }
 
-void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh) {
+void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh, int32 Index, int32 Pos) {
 	SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 	SplineMeshComponent->SetStaticMesh(SplineMesh);
 
@@ -1946,6 +1946,10 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 	SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 	SplineMeshComponent->RegisterComponent();
+
+	// Set Location - the location doesn't represent where the meshes are - it represents where it belong and other infos
+	SplineMeshComponent->SetWorldLocation(FVector(LaneId, Index, Pos));
+	FVector vec = SplineMeshComponent->GetComponentLocation();
 }
 
 void ALane::SetMesh(UStaticMesh* Mesh, UStaticMesh* Through) {
@@ -2028,7 +2032,7 @@ void ALane::RemoveLaneFromStart(int32 Index){
 	EndTangent = StartTangent;
 
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-	SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+	SetSplineMeshComponent(SplineMeshComponent, LaneMesh, 0, 3);
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 
@@ -2104,7 +2108,7 @@ void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum){
 
 	//Add&Set Spline Mesh Component (mesh)
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-	SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+	SetSplineMeshComponent(SplineMeshComponent, LaneMesh, lastIndex, 1);
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 
@@ -2459,7 +2463,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 				EndTangent = StartTangent;
 
 				//Add&Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 1);
 			}
 			else if (index == LaneLocation.Num() - 1)
 			{
@@ -2471,7 +2475,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 				StartTangent = EndTangent;
 				//Add&Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 3);
 			}
 			else
 			{
@@ -2489,7 +2493,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 				StartTangent = EndTangent;
 				//Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 3);
 
 				/* --- Middle Mesh (if there is any) --- */
 				if (LaneArray[i].IsBendingPoint) {
@@ -2498,7 +2502,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 					EndTangent = LaneSpline->GetTangentAtSplinePoint(index, ESplineCoordinateSpace::Local);
 
 					//Set Spline Mesh Component (mesh)
-					SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+					SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 2);
 				}
 
 				/* --- Front Mesh --- */
@@ -2515,7 +2519,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 					StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 				}
 				//Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 1);
 
 			}
 		}
@@ -2524,16 +2528,16 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 }
 
-void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index) 
+void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index, int32 Pos) 
 {
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 	if (LaneArray[Index].IsThrough)
 	{
-		SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+		SetSplineMeshComponent(SplineMeshComponent, ThroughMesh, Index, Pos);
 	}
 	else
 	{
-		SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+		SetSplineMeshComponent(SplineMeshComponent, LaneMesh, Index, Pos);
 	}
 	//RemoveMeshMaterial
 	if(LaneArray[Index].WillBeRemoved)
