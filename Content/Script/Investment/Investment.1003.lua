@@ -21,12 +21,8 @@ end
 function Appearance()
     local stations = GetStationInfos()
 
-    if stations == nil then
-        return false
-    end
-
-    for i=0, #stations do
-        if stations[i].Complain > additional_needs_1003 then
+    for i, v in pairs(stations) do
+        if v.Complain > additional_needs_1003 then
             return false
         end
     end
@@ -41,8 +37,8 @@ function Process()
 
     local all_stations_limit = true
 
-    for i = 0, #stations do
-        if stations[i].Complain > additional_needs_1003 then
+    for i, v in pairs(stations) do
+        if v.Complain > additional_needs_1003 then
             -- If the deadline is exceeded, it immediately fails.
             all_stations_limit = false
             break
