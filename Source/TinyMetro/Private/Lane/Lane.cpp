@@ -2655,3 +2655,27 @@ void ALane::UpdateUsingConnector()
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = UsingBridgeCount;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = UsingTunnelCount;
 }
+
+TArray<AStation*> ALane::GetConnectedStations(USplineMeshComponent* ClickedMesh)
+{
+	FVector meshLocation = ClickedMesh->GetComponentLocation();
+	int32 index = meshLocation.Y;
+
+	int32 FrontStationIndex =  -1;
+	int32 BackStationIndex;
+
+	for (int i = 0; i < index; i++)
+	{
+		if (LaneArray[i].IsStation)
+		{
+			FrontStationIndex++;
+		}
+	}
+	BackStationIndex = FrontStationIndex + 1;
+
+	TArray<AStation*> returningStations;
+	returningStations.Add(StationPoint[FrontStationIndex]);
+	returningStations.Add(StationPoint[BackStationIndex]);
+
+	return returningStations;
+}

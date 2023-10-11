@@ -466,4 +466,8 @@ protected: //Statistics
 
 	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 	int32 UsingTunnelCount;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	TArray<AStation*> GetConnectedStations(USplineMeshComponent* ClickedMesh);
 };
