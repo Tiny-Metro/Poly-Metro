@@ -16,6 +16,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManager.h"
 #include "Statistics/StatisticsManager.h"
+#include "Algo/Reverse.h"
 
 // Sets default values
 ALane::ALane()
@@ -2122,6 +2123,7 @@ void ALane::ExtendStart(AStation* NewStation){
 	AStation* NextStation = StationPoint[1];
 
 	AddLaneArray = GetLanePath(NewStation, NextStation);
+
 	int32 lastIndex = AddLaneArray.Num() - 1;
 	AddLaneArray.RemoveAt(lastIndex);
 
@@ -2193,6 +2195,74 @@ void ALane::ExtendEnd(AStation* NewStation){
 	ConnectBT(DeletedTunnel, GridType::Hill);
 
 	return;
+
+}
+
+void ALane::ChangeLaneAppearance(AStation* StartStation, AStation* EndStation)
+{
+	int CurrentBridgeNum = 0;
+	int CurrentTunnelNum = 0;
+
+	ClearSplineMeshAt(0);
+
+	//Get LanePoints
+	TArray<FLanePoint> AddLaneArray;
+
+	AddLaneArray = GetLanePath(EndStation, StartStation);
+	Algo::Reverse(AddLaneArray);
+
+	//Check Changable with BT
+	TArray<TArray<FIntPoint>> TunnelArea = GetConnectorArea(AddLaneArray, GridType::Hill);
+	TArray<TArray<FIntPoint>> BridgeArea = GetConnectorArea(AddLaneArray, GridType::Water);
+
+	int32 RequiredTunnel = GetRequiredConnector(TunnelArea, GridType::Hill);
+	int32 RequiredBridge = GetRequiredConnector(TunnelArea, GridType::Water);
+
+	bool IsChangable = true;
+	if (RequiredBridge > CurrentBridgeNum + TinyMetroPlayerState->GetValidBridgeCount())
+	{
+		IsChangable = false;
+	}
+	if (RequiredTunnel > CurrentTunnelNum + TinyMetroPlayerState->GetValidTunnelCount())
+	{
+		IsChangable = false;
+	}
+
+	if (!IsChangable) return;
+
+	//Start
+	int32 lastIndex = AddLaneArray.Num() - 1;
+	AddLaneArray.RemoveAt(lastIndex); // why?
+
+	FLanePoint Start = LaneArray[0];
+
+	LaneArray.Insert(AddLaneArray, 0);
+
+	AddLaneArray.Add(Start);
+	//End
+
+
+	//Add LaneLoc
+	//	TArray<FVector> NewLaneLocation;
+
+	if (!GridManagerRef) {
+		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+		return;
+	}
+
+	//Set Spline Again
+	//Add Spline Mesh
+	UpdateLocationAndSpline();
+
+	int32 NewPointNum = AddLaneArray.Num();
+	SetMeshByIndex(0, NewPointNum - 1);
+
+	//why DeletedBridge
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
 
 }
 

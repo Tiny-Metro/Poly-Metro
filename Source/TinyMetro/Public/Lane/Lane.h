@@ -378,6 +378,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ExtendEnd(AStation* NewStation);
+	
+	UFUNCTION(BlueprintCallable)
+	void ChangeLaneAppearance(AStation* StartStation, AStation* EndStation);
 
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
