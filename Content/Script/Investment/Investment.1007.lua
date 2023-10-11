@@ -20,7 +20,7 @@ end
 -- Investment appear condition
 function Appearance()
     local time = GetTimestamp()
-    return time.Week > 2
+    return time.Week 0 >= 2
 end
 
 -- Investment success condition
