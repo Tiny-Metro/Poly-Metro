@@ -97,7 +97,8 @@ void AStationManager::BeginPlay()
 		InitData = GameMode->GetInitData();
 
 		for (auto& i : InitData) {
-			SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
+			auto tmp = SpawnStation(GridManager->GetGridCellDataByPoint(i.Key.X, i.Key.Y), i.Value);
+			//tmp->OffSpawnAlarm();
 		}
 	}
 
@@ -203,7 +204,7 @@ AStation* AStationManager::GetNearestStation(FVector CurrentLocation, class ALan
 	return Station[StationIndex];
 }
 
-void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id, FTimestamp Timestamp) {
+AStation* AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id, FTimestamp Timestamp) {
 	// Load BP Class
 	//UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Station/BP_Station.BP_Station'")));
 	if (!StationBlueprintClass) {
@@ -277,7 +278,7 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 
 	/*UE_LOG(LogTemp, Warning, TEXT("StationSpawn GridCellData intpoint: %d / %d"), GridCellData.WorldCoordination.X, GridCellData.WorldCoordination.Y);
 	UE_LOG(LogTemp, Warning, TEXT("StationSpawn"));*/
-
+	return tmp;
 }
 
 void AStationManager::DestroyRandomStation() {
