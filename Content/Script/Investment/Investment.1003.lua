@@ -1,12 +1,13 @@
 -- Complaint management
 local additional_needs_1003 = 50
 local reward_money_1003 = 800
+local time_needed_1003 = 7
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '어떤 역도 불만도 ' .. additional_needs_1003 .. '을 넘지 않도록 하세요.'
-    Data.time_require = 7
+    Data.time_require = time_needed_1003
     Data.award = reward_money_1003 .. "$"
 
     return Data
@@ -46,7 +47,7 @@ function Process()
     end
 
     if all_stations_limit then
-        if (start_time.Date - cur_time.Date) <= InvestmentData().time_require then
+        if (start_time.Date - cur_time.Date) <= time_needed_1003 then
             return continue
         else
             return success

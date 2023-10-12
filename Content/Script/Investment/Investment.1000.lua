@@ -1,12 +1,13 @@
 -- Lane connectiontimestamp
 local additional_needs_1000 = 10
 local reward_item_1000 = {Train, 1}
+local time_needed_1000 = -1
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = additional_needs_1000 .. ' 개의 역을 지나는 노선을 만드세요.'
-    Data.time_require = -1
+    Data.time_require = time_needed_1000
     Data.award = '열차 ' .. reward_item_1000[2] .. '량'
 
     return Data
@@ -42,7 +43,7 @@ function Process()
     end
 
     for i=0,  lane_count - 1 do
-        if over_flag and i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount) then
+        if over_flag and (i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount)) then
             -- new lane
             if cur_station[i].TransferStationCount >= additional_needs_1000 then
                 return success

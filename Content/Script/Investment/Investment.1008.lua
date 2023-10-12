@@ -1,11 +1,12 @@
 -- lane change
 local reward_money_1008 = 800
+local time_needed_1008 = 7
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '이번 주에는 노선을 축소, 삭제하지 않고 운영하세요.'
-    Data.time_require = 7
+    Data.time_require = time_needed_1008
     Data.award = reward_money_1008 .. '$'
 
     return Data
@@ -36,11 +37,11 @@ function Process()
     -- current number of lanes
     if start_lane.TotalLaneCount ~= cur_lane.TotalLaneCount then
         return fail
-    else
-        lane_count = start_lane.TotalLaneCount
     end
+    
+    lane_count = cur_lane.TotalLaneCount
 
-    if cur_time - time_stamp <= InvestmentData().time_require then
+    if (cur_time.Date - start_time.Date) <= time_needed_1008 then
         -- within the deadline
         for i = 0, lane_count - 1 do
             if cur_lane[i].TotalModifyAndReduceCount ~= start_lane[i].TotalModifyAndReduceCount then

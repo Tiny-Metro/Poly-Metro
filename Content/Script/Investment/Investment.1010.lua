@@ -1,12 +1,13 @@
 -- remaining loan amount
 local additional_needs_1010 = 180
 local reward_money_1010 = 500
+local time_needed_1010 = 28
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = additional_needs_1010 .. '명을 수송하세요'
-    Data.time_require = 28
+    Data.time_require = time_needed_1010
     Data.award = reward_money_1010 .. '$'
 
     return Data
@@ -19,7 +20,7 @@ end
 
 -- Investment appear condition
 function Appearance()
-    time = GetTimestamp()
+    local time = GetTimestamp()
     return time.Week < 8
 end
 

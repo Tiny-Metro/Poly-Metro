@@ -1,11 +1,12 @@
 -- remaining loan amount
 local reward_money_1009 = 2000
+local time_needed_1009 = -1
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '잔여 대출금이 없도록 하세요.'
-    Data.time_require = -1
+    Data.time_require = time_needed_1009
     Data.award = reward_money_1009 .. "$"
 
     return Data
@@ -19,8 +20,7 @@ end
 -- Investment appear condition
 function Appearance()
     local loan = GetBankStatistics()
-    total_loan_money = loan.TotalUsingLoanCount
-    return total_loan_money ~= 0
+    return loan.TotalUsingLoanCount ~= 0
 end
 
 -- Investment success condition

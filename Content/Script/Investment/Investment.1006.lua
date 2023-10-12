@@ -1,11 +1,12 @@
 -- don't build
-target_1006 = {
+local target_1006 = {
     {name = "다리", award = {Bridge, 2}, message = "다리 2개"},
     {name = "터널", award = {Tunnel, 2}, message = "터널 2개"},
     {name = "노선", award = {Train, 2}, message = "열차 2량"}
 }
 
 local selected_target_1006
+local time_needed_1006 = 7
 
 -- Investment condition
 function InvestmentData()
@@ -14,7 +15,7 @@ function InvestmentData()
     selected_target_1006 = target_1006[idx]
 
     Data.message = selected_target_1006.name .. '을 건설하지 마세요.'
-    Data.time_require = 7
+    Data.time_require = time_needed_1006
     Data.award = selected_target_1006.message
 
     return Data

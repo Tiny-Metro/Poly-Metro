@@ -1,11 +1,12 @@
 -- upgrade
-target_1005 = {
+local target_1005 = {
     {name = "열차", award = {Subtrain, 1}, message = "객차 1량"},
     {name = "객차", award = 300, message = "300$"},
     {name = "역", award = 500, message = "500$"}
 }
 
 local selected_target_1005
+local time_needed_1005 = 7
 
 -- Investment condition
 function InvestmentData()
@@ -14,7 +15,7 @@ function InvestmentData()
     selected_target_1005 = target_1005[idx]
 
     Data.message = selected_target_1005.name .. '을 업그레이드하세요.'
-    Data.time_require = 7
+    Data.time_require = time_needed_1005
     Data.award = selected_target_1005.message
 
     return Data
@@ -35,11 +36,11 @@ end
 function Process()
     local pre_train_upgrade = GetTrainStatisticsAtStart(1005)
     local pre_subtrain_upgrade = GetSubtrainStatisticsAtStart(1005)
-    local pre_statiion_upgrade = GetDefaultStatisticsAtStart(1005)
+    local pre_station_upgrade = GetDefaultStatisticsAtStart(1005)
 
     local cur_train_upgrade = GetTrainStatistics()
     local cur_subtrain_upgrade = GetSubtrainStatistics()
-    local cur_statiion_upgrade = GetDefaultStatistics()
+    local cur_station_upgrade = GetDefaultStatistics()
 
     if selected_target_1005.name == "열차" and (cur_train_upgrade.TotalUpgradeCount > pre_train_upgrade.TotalUpgradeCount) then
         return success

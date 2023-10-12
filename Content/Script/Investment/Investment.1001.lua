@@ -1,12 +1,13 @@
 -- Circular line connection
 local reward_item_1001 = {Subtrain, 1}
 local reward_money_1001 = 300
+local time_needed_1001 = -1
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '순환선을 건설하세요.'
-    Data.time_require = -1
+    Data.time_require = time_needed_1001
     Data.award = '객차 '.. reward_item_1001[2] ..'량, '.. reward_money_1001 ..'$'
 
     return Data
@@ -42,14 +43,14 @@ function Process()
     end
 
     for i=0, lane_count - 1 do
-        if over_flag and i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount) then
+        if over_flag and (i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount)) then
             -- new lane
             if cur_circle_lane[i].IsCircularLane then
                 return success
             end
         else
             -- existing lane
-            if start_circle_lane[i].IsCircularLane == false and cur_circle_lane[i].IsCircularLane == true then
+            if (start_circle_lane[i].IsCircularLane == false) and (cur_circle_lane[i].IsCircularLane == true) then
                 return success
             end
         end

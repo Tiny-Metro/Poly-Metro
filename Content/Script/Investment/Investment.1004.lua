@@ -2,12 +2,13 @@
 local additional_needs_1004 = 2
 local reward_item_1004 = {Train, 1}
 local reward_money_1004 = 300
+local time_needed_1004 = 7
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '객차가 '.. additional_needs_1004 ..' 개 이상 달린 열차를 만드세요.'
-    Data.time_require = 7
+    Data.time_require = time_needed_1004
     Data.award = '열차 '..  reward_item_1004[2]..'량, '.. reward_money_1004 ..'$'
 
     return Data
@@ -32,7 +33,7 @@ function Process()
     for i = 0, #cur_train do
         if i <= start_train then
             -- existing train
-            local additional_subtrains = cur_train[i].SubtrainCount - (start_train[i].SubtrainCount or 0)
+            local additional_subtrains = (cur_train[i].SubtrainCount - (start_train[i].SubtrainCount or 0))
             if additional_subtrains >= additional_needs_1004 then
                 return success
             end

@@ -1,11 +1,12 @@
 -- No use in stores
 local reward_money_1011 = 500
+local time_needed_1011 = 7
 
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '이번 주에는 아이템을 새로 구매하지 마세요.'
-    Data.time_require = 7
+    Data.time_require = time_needed_1011
     Data.award = reward_money_1011 .. "$"
 
     return Data
@@ -29,7 +30,7 @@ function Process()
     local cur_shop = GetShopStatistics()
     local cur_time = GetTimestamp()
 
-    if cur_time.Date - start_time.Date < InvestmentData().time_require then
+    if (cur_time.Date - start_time.Date) < time_needed_1011 then
         -- within the deadline
         if cur_shop.TotalPurchaseCount == start_shop.TotalPurchaseCount then
             return continue
