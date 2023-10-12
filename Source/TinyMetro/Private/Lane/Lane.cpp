@@ -2204,20 +2204,106 @@ void ALane::ExtendEnd(AStation* NewStation){
 
 }
 
-void ALane::ChangeLaneAppearance(AStation* StartStation, AStation* EndStation)
+void ALane::ChangeLaneAppearance(TArray<FLanePoint> AddLaneArray, int32 StartIndex, int32 EndIndex)
 {
-	int CurrentBridgeNum = 0;
-	int CurrentTunnelNum = 0;
+	//Clear SplineMesh
+	for (int i = StartIndex; i <= EndIndex; i++)
+	{
+		ClearSplineMeshAt(i);
+	}
 
-	ClearSplineMeshAt(0);
+	//Insert AddLaneArray to LaneArray
+	int32 lastIndex = AddLaneArray.Num() - 1;
+	AddLaneArray.RemoveAt(lastIndex);
+	AddLaneArray.RemoveAt(0);
+
+	FLanePoint Start = LaneArray[StartIndex];
+	FLanePoint End = LaneArray[EndIndex];
+
+	LaneArray.Insert(AddLaneArray, StartIndex);
+
+	AddLaneArray.Insert(Start, 0);
+	AddLaneArray.Add(End);
+
+	//Add LaneLoc
+	//	TArray<FVector> NewLaneLocation;
+
+	if (!GridManagerRef) {
+		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+		return;
+	}
+
+	//Set Spline Again
+	//Add Spline Mesh
+	UpdateLocationAndSpline();
+
+	SetMeshByIndex(StartIndex, EndIndex);
+
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
+
+}
+
+void ALane::DoubleTapEvent(USplineMeshComponent* ClickedMesh)
+{
+	//FindStations with SplineMeshComponent
+	TArray<AStation*> TArrStations;
+	TArrStations = GetConnectedStations(ClickedMesh);
+	
+
+	CheckIsChangableLaneAppearance(TArrStations);
+}
+
+void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
+{
+	
+	AStation* StartStation = TargetStations[0];
+	AStation* EndStation = TargetStations[1];
+
+
+	// Find CurrentLaneArray
+	TArray<FLanePoint> CurrentLaneArray;
+	int32 StartIndex;
+	int32 EndIndex;
+	bool IsCurrentLane = false;
+	for (int i=0; i<LaneArray.Num(); i++)
+	{
+		if (LaneArray[i].Coordination == StartStation->GetCurrentGridCellData().WorldCoordination)
+		{
+			IsCurrentLane = true;
+			StartIndex = i;
+		}
+
+		if (IsCurrentLane)
+		{
+			CurrentLaneArray.Add(LaneArray[i]);
+		}
+
+		if (LaneArray[i].Coordination == EndStation->GetCurrentGridCellData().WorldCoordination)
+		{
+			IsCurrentLane = false;
+			EndIndex = i;
+			break;
+		}
+	}
+
+	//Check BT Items with CurrentLaneArray
+	TArray<TArray<FIntPoint>> CurrentTunnelArea = GetConnectorArea(CurrentLaneArray, GridType::Hill);
+	TArray<TArray<FIntPoint>> CurrentBridgeArea = GetConnectorArea(CurrentLaneArray, GridType::Water);
+
+	int32 CurrentTunnelNum = GetRequiredConnector(CurrentTunnelArea, GridType::Hill);
+	int32 CurrentBridgeNum = GetRequiredConnector(CurrentBridgeArea, GridType::Water);
 
 	//Get LanePoints
 	TArray<FLanePoint> AddLaneArray;
 
 	AddLaneArray = GetLanePath(EndStation, StartStation);
 	Algo::Reverse(AddLaneArray);
-
-	//Check Changable with BT
+	
+	//Check BT Items with NewLaneArray
 	TArray<TArray<FIntPoint>> TunnelArea = GetConnectorArea(AddLaneArray, GridType::Hill);
 	TArray<TArray<FIntPoint>> BridgeArea = GetConnectorArea(AddLaneArray, GridType::Water);
 
@@ -2234,42 +2320,45 @@ void ALane::ChangeLaneAppearance(AStation* StartStation, AStation* EndStation)
 		IsChangable = false;
 	}
 
-	if (!IsChangable) return;
-
-	//Start
-	int32 lastIndex = AddLaneArray.Num() - 1;
-	AddLaneArray.RemoveAt(lastIndex); // why?
-
-	FLanePoint Start = LaneArray[0];
-
-	LaneArray.Insert(AddLaneArray, 0);
-
-	AddLaneArray.Add(Start);
-	//End
-
-
-	//Add LaneLoc
-	//	TArray<FVector> NewLaneLocation;
-
-	if (!GridManagerRef) {
-		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+	if (!IsChangable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Not enough BT Item"));
 		return;
 	}
 
-	//Set Spline Again
-	//Add Spline Mesh
-	UpdateLocationAndSpline();
+	//Check Train
+	if (CheckTrainsByDestination(TargetStations))
+	{
+		ChangeLaneAppearance(AddLaneArray, StartIndex, EndIndex);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Train is Alive"))
+		//Delay Change Appearance
+	}
+}
 
-	int32 NewPointNum = AddLaneArray.Num();
-	SetMeshByIndex(0, NewPointNum - 1);
+void ALane::CheckDoubleTap()
+{
+	PressedCount++;
 
-	//why DeletedBridge
-	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
-	ConnectBT(DeletedBridge, GridType::Water);
+	if (PressedCount >= 2)
+	{
+		//ChangeAppearance~
+	}
 
-	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
-	ConnectBT(DeletedTunnel, GridType::Hill);
+	PressedCount = 0;
+}
 
+void ALane::SetInitPressedCountDelay()
+{
+	FTimerHandle DoubleTouchTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DoubleTouchTimerHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			PressedCount = 0;
+
+			GetWorld()->GetTimerManager().ClearTimer(DoubleTouchTimerHandle);
+		}), 0.3f, false);
 }
 
 bool ALane::IsStationsValid(const TArray<class AStation*>& NewStationPoint) {
@@ -2553,6 +2642,7 @@ void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVect
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 	SplineMeshComponent->RegisterComponent();
+	//SplineMeshComponent->OnInputTouchBegin.AddDynamic(this,)
 	LaneArray[Index].MeshArray.Add(SplineMeshComponent);
 }
 

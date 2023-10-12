@@ -375,9 +375,20 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ExtendEnd(AStation* NewStation);
-	
+
+public: // Change Lane Appearance
 	UFUNCTION(BlueprintCallable)
-	void ChangeLaneAppearance(AStation* StartStation, AStation* EndStation);
+	void ChangeLaneAppearance(TArray<FLanePoint> AddLaneArray, int32 StartIndex, int32 EndIndex);
+
+	void DoubleTapEvent(USplineMeshComponent* ClickedMesh);
+
+	void CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations);
+
+	void CheckDoubleTap();
+
+	void SetInitPressedCountDelay();
+
+	int32 PressedCount =0;
 
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
