@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "PlayerItem.h"
 #include "TinyMetroPlayerStateSaveGame.generated.h"
 
 /**
@@ -21,4 +22,24 @@ public:
 	FPlayerItem ValidItem;
 	UPROPERTY()
 	FPlayerItem UsingItem;
+
+	// Tutorial finish flags
+	UPROPERTY()
+	bool IsItemTutorialFinished;
+	UPROPERTY()
+	bool IsLaneTutorialFinished;
+	UPROPERTY()
+	bool IsStationTutorialFinished;
+	UPROPERTY()
+	bool IsTrainTutorialFinished;
+	UPROPERTY()
+	bool IsEventTutorialFinished;
+	UPROPERTY()
+	bool IsShopTutorialFinished;
+	UPROPERTY()
+	bool IsLoanTutorialFinished;
+	UPROPERTY()
+	bool IsInvestmentTutorialFinished;
+	UPROPERTY()
+	bool IsPolicyTutorialFinished;
 };
