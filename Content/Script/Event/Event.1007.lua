@@ -1,6 +1,6 @@
 -- Crime arrest data
 function EventData()
-    Data = {}
+    local Data = {}
     Data.title = ''
     Data.flavor_text = '지하철 범죄율 크게 감소... "CCTV 효과"봤나'
     Data.message = 'CCTV 설치 이후 범죄가 눈에 띄게 감소했습니다. 불만도가 20% 감소합니다.'
@@ -11,7 +11,7 @@ end
 
 -- Event occur weight
 function Weight()
-    policy = GetPolicyData()
+    local policy = GetPolicyData()
     if policy.IsCCTV then
         return 3
     else
