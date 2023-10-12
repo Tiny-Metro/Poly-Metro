@@ -76,6 +76,8 @@ public:
 	static StationType StationTypeFromString(FString Str, bool& Success);
 	UFUNCTION(BlueprintCallable)
 	static FString StationTypeToString(StationType Type, bool& Success);
+	UFUNCTION(BlueprintCallable)
+	static FString StationTypeToIcon(StationType Type, bool& Success);
 
 	UFUNCTION()
 	void AddComplainIncreaseRateByEvent(float Rate);

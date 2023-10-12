@@ -246,7 +246,8 @@ TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
     for (auto& i : stationInfos) {
         FLuaValue tmp = CreateLuaTable();
         tmp.SetField(TEXT("Id"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.Id));
-        tmp.SetField(TEXT("StationType"), ULuaBlueprintFunctionLibrary::LuaCreateString(AStationManager::StationTypeToString(i.Type, tmpBool)));
+        tmp.SetField(TEXT("StationType"), ULuaBlueprintFunctionLibrary::LuaValueFromUTF8(AStationManager::StationTypeToString(i.Type, tmpBool)));
+        tmp.SetField(TEXT("StationIcon"), ULuaBlueprintFunctionLibrary::LuaValueFromUTF8(AStationManager::StationTypeToIcon(i.Type, tmpBool)));
         tmp.SetField(TEXT("ServiceLaneCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.ServiceLaneCount));
         tmp.SetField(TEXT("TotalUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.TotalUsingPassenger));
         tmp.SetField(TEXT("WeeklyUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyUsingPassenger));
