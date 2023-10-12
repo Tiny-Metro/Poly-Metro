@@ -97,6 +97,8 @@ protected:
 	double CameraAutoMoveSeconds = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	bool CameraMoveEnable = true;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	bool UiOpened = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	double CameraMoveSpeedX = 0.02f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")

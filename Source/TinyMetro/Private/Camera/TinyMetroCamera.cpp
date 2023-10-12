@@ -61,7 +61,7 @@ void ATinyMetroCamera::MouseWheel(float Axis) {
 void ATinyMetroCamera::CameraMoveX(float Axis) {
 	// Axis + : Move right
 	// Axis - : Move left
-	if (CameraMoveEnable) {
+	if (CameraMoveEnable && !UiOpened) {
 		FRotator curRotation = GetActorRotation();
 		curRotation.Pitch = 0;
 		curRotation.Roll = 0;
@@ -82,7 +82,7 @@ void ATinyMetroCamera::CameraMoveX(float Axis) {
 void ATinyMetroCamera::CameraMoveY(float Axis) {
 	// Axis + : Move down
 	// Axis - : Move up
-	if (CameraMoveEnable) {
+	if (CameraMoveEnable && !UiOpened) {
 		FRotator curRotation = GetActorRotation();
 		curRotation.Pitch = 0;
 		curRotation.Roll = 0;
@@ -208,7 +208,7 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 			SetActorRotation(FRotator(0.0, CurrentRotation.Yaw + rotationValueX * CameraRotationSpeedZ, 0.0));
 		} 
 		if(IsMoveMode) {
-			if (CameraMoveEnable) {
+			if (CameraMoveEnable && !UiOpened) {
 				// Move
 				FVector curLocation = GetActorLocation();
 				FRotator curRotation = SpringArmComponenet->GetRelativeRotation();
