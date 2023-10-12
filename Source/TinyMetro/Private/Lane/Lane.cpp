@@ -1950,7 +1950,9 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 
 	// Set Location - the location doesn't represent where the meshes are - it represents where it belong and other infos
 	// SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
-	SplineMeshComponent->SetWorldLocation(FVector(LaneId, Index, Pos));
+	// 0.1 = front, 0.2 = middle, 0.3 = back
+	float zPosition = 0.1f * Pos;
+	SplineMeshComponent->SetWorldLocation(FVector(LaneId, Index, zPosition));
 	FVector vec = SplineMeshComponent->GetComponentLocation();
 }
 
