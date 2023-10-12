@@ -738,14 +738,17 @@ void AStationManager::Tick(float DeltaTime)
 
 	float averageComplain = 0.0f;
 	int32 serviceStationCount = 0;
+	int32 upgradeStationCount = 0;
 
 	for (auto& i : Station) {
 		if (i->GetStationInfo().IsActive) serviceStationCount++;
 		averageComplain += i->GetComplain();
+		if (i->GetStationInfo().IsUpgrade) upgradeStationCount++;
 	}
 	
 	StatisticsManagerRef->DefaultStatistics.AverageComplain = averageComplain;
 	StatisticsManagerRef->DefaultStatistics.ServiceStationCount = serviceStationCount;
+	StatisticsManagerRef->DefaultStatistics.UpgradeStationCount = upgradeStationCount;
 
 }
 

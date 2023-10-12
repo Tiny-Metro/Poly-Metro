@@ -232,7 +232,7 @@ FLuaValue UTinyMetroLuaState::GetBankStatistics() {
     statisticsTable.SetField(TEXT("TotalUsingLoanCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalUsingLoanCount));
     statisticsTable.SetField(TEXT("TotalRepayMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalRepayMoney));
     statisticsTable.SetField(TEXT("TotalLoanMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalLoanMoney));
-    statisticsTable.SetField(TEXT("TotalRepayInterestMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalRepayInterestMoney));
+    statisticsTable.SetField(TEXT("TotalRepayInterestMoney"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(bankStatistics.TotalRepayInterestMoney));
 
     return statisticsTable;
 }

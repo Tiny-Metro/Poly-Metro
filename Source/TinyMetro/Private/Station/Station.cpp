@@ -250,7 +250,7 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 
 				// Get money
 				if (!tmp.IsAlreadyPaid && !tmp.IsFree) {
-					PlayerStateRef->AddMoney(Fare);
+					PlayerStateRef->AddIncome(Fare);
 					StationInfo.TotalProfit += Fare;
 					StationInfo.WeeklyProfit += Fare;
 
