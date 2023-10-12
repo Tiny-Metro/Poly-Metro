@@ -8,6 +8,9 @@
 #include "TrainType.h"
 #include "TrainManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTrainTutorialTask, FVector, TrainLocation);
+
+
 UCLASS()
 class TINYMETRO_API ATrainManager : public AActor
 {
@@ -97,6 +100,9 @@ public:
 	UFUNCTION()
 	bool Load();
 
+	// Used tutorial
+	UPROPERTY(BlueprintAssignable)
+	FTrainTutorialTask TrainTutorialTask;
 
 protected:
 	// Widget class
@@ -129,4 +135,5 @@ protected:
 	float CostUpgradeTrain = 200.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float CostUpgradeSubtrain = 200.0f;
+
 };

@@ -197,6 +197,15 @@ void ATinyMetroPlayerState::Save() {
 	tmp->Money = Money;
 	tmp->ValidItem = ValidItem;
 	tmp->UsingItem = UsingItem;
+	tmp->IsItemTutorialFinished = IsItemTutorialFinished;
+	tmp->IsLaneTutorialFinished = IsLaneTutorialFinished;
+	tmp->IsStationTutorialFinished = IsStationTutorialFinished;
+	tmp->IsTrainTutorialFinished = IsTrainTutorialFinished;
+	tmp->IsEventTutorialFinished = IsEventTutorialFinished;
+	tmp->IsShopTutorialFinished = IsShopTutorialFinished;
+	tmp->IsLoanTutorialFinished = IsLoanTutorialFinished;
+	tmp->IsInvestmentTutorialFinished = IsInvestmentTutorialFinished;
+	tmp->IsPolicyTutorialFinished = IsPolicyTutorialFinished;
 
 	SaveManagerRef->Save(tmp, SaveActorType::PlayerState);
 }
@@ -212,4 +221,25 @@ void ATinyMetroPlayerState::Load() {
 	Money = tmp->Money;
 	ValidItem = tmp->ValidItem;
 	UsingItem = tmp->UsingItem;
+	IsItemTutorialFinished = tmp->IsItemTutorialFinished;
+	IsLaneTutorialFinished = tmp->IsLaneTutorialFinished;
+	IsStationTutorialFinished = tmp->IsStationTutorialFinished;
+	IsTrainTutorialFinished = tmp->IsTrainTutorialFinished;
+	IsEventTutorialFinished = tmp->IsEventTutorialFinished;
+	IsShopTutorialFinished = tmp->IsShopTutorialFinished;
+	IsLoanTutorialFinished = tmp->IsLoanTutorialFinished;
+	IsInvestmentTutorialFinished = tmp->IsInvestmentTutorialFinished;
+	IsPolicyTutorialFinished = tmp->IsPolicyTutorialFinished;
+}
+
+void ATinyMetroPlayerState::ResetTutorialProceed() {
+	IsItemTutorialFinished = false;
+	IsLaneTutorialFinished = false;
+	IsStationTutorialFinished = false;
+	IsTrainTutorialFinished = false;
+	IsEventTutorialFinished = false;
+	IsShopTutorialFinished = false;
+	IsLoanTutorialFinished = false;
+	IsInvestmentTutorialFinished = false;
+	IsPolicyTutorialFinished = false;
 }
