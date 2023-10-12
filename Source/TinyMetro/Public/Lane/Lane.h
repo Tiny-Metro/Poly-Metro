@@ -384,9 +384,17 @@ public: // Change Lane Appearance
 
 	void CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations);
 
-	void CheckDoubleTap();
+	UFUNCTION()
+	void CheckDoubleTap(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
 
-	void SetInitPressedCountDelay();
+	UFUNCTION()
+	void CheckDoubleClick(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+
+	UFUNCTION()
+	void InitPressedCountDelay(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void InitPressedCountDelayWithClick(UPrimitiveComponent* TouchedComponent, FKey ButtonReleased);
 
 	int32 PressedCount =0;
 

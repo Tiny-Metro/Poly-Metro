@@ -2206,24 +2206,25 @@ void ALane::ExtendEnd(AStation* NewStation){
 
 void ALane::ChangeLaneAppearance(TArray<FLanePoint> AddLaneArray, int32 StartIndex, int32 EndIndex)
 {
+	FLanePoint Start = LaneArray[StartIndex];
+	FLanePoint End = LaneArray[EndIndex];
+
 	//Clear SplineMesh
-	for (int i = StartIndex; i <= EndIndex; i++)
+	for (int i = EndIndex; i >= StartIndex; i--)
 	{
 		ClearSplineMeshAt(i);
+		LaneArray.RemoveAt(i);
 	}
 
 	//Insert AddLaneArray to LaneArray
 	int32 lastIndex = AddLaneArray.Num() - 1;
-	AddLaneArray.RemoveAt(lastIndex);
-	AddLaneArray.RemoveAt(0);
-
-	FLanePoint Start = LaneArray[StartIndex];
-	FLanePoint End = LaneArray[EndIndex];
+	
+	//AddLaneArray.Insert(Start, 0);
+	//AddLaneArray.Add(End);
 
 	LaneArray.Insert(AddLaneArray, StartIndex);
 
-	AddLaneArray.Insert(Start, 0);
-	AddLaneArray.Add(End);
+	
 
 	//Add LaneLoc
 	//	TArray<FVector> NewLaneLocation;
@@ -2237,14 +2238,14 @@ void ALane::ChangeLaneAppearance(TArray<FLanePoint> AddLaneArray, int32 StartInd
 	//Add Spline Mesh
 	UpdateLocationAndSpline();
 
-	SetMeshByIndex(StartIndex, EndIndex);
+	SetMeshByIndex(StartIndex, StartIndex + lastIndex);
 
 	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
 	ConnectBT(DeletedBridge, GridType::Water);
 
 	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
 	ConnectBT(DeletedTunnel, GridType::Hill);
-
+	
 }
 
 void ALane::DoubleTapEvent(USplineMeshComponent* ClickedMesh)
@@ -2266,8 +2267,8 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 
 	// Find CurrentLaneArray
 	TArray<FLanePoint> CurrentLaneArray;
-	int32 StartIndex;
-	int32 EndIndex;
+	int32 StartIndex =-1;
+	int32 EndIndex =-1;
 	bool IsCurrentLane = false;
 	for (int i=0; i<LaneArray.Num(); i++)
 	{
@@ -2290,6 +2291,12 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 		}
 	}
 
+	if (StartIndex == -1 || EndIndex == -1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StartIndex or EndIndex is null"));
+		return;
+	}
+
 	//Check BT Items with CurrentLaneArray
 	TArray<TArray<FIntPoint>> CurrentTunnelArea = GetConnectorArea(CurrentLaneArray, GridType::Hill);
 	TArray<TArray<FIntPoint>> CurrentBridgeArea = GetConnectorArea(CurrentLaneArray, GridType::Water);
@@ -2302,7 +2309,12 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 
 	AddLaneArray = GetLanePath(EndStation, StartStation);
 	Algo::Reverse(AddLaneArray);
-	
+
+	if (AddLaneArray[1].Coordination == CurrentLaneArray[1].Coordination)
+	{
+		AddLaneArray = GetLanePath(StartStation, EndStation);
+	}
+
 	//Check BT Items with NewLaneArray
 	TArray<TArray<FIntPoint>> TunnelArea = GetConnectorArea(AddLaneArray, GridType::Hill);
 	TArray<TArray<FIntPoint>> BridgeArea = GetConnectorArea(AddLaneArray, GridType::Water);
@@ -2329,6 +2341,8 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 	//Check Train
 	if (CheckTrainsByDestination(TargetStations))
 	{
+		DisconnectBT(CurrentBridgeArea, GridType::Water);
+		DisconnectBT(CurrentTunnelArea, GridType::Hill);
 		ChangeLaneAppearance(AddLaneArray, StartIndex, EndIndex);
 	}
 	else
@@ -2338,19 +2352,36 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 	}
 }
 
-void ALane::CheckDoubleTap()
+void ALane::CheckDoubleTap(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
 {
 	PressedCount++;
 
 	if (PressedCount >= 2)
 	{
-		//ChangeAppearance~
-	}
+		USplineMeshComponent* Mesh = Cast<USplineMeshComponent>(TouchedComponent);
 
-	PressedCount = 0;
+		DoubleTapEvent(Mesh);
+
+		PressedCount = 0;
+	}
 }
 
-void ALane::SetInitPressedCountDelay()
+void ALane::CheckDoubleClick(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Clicked"));
+	PressedCount++;
+
+	if (PressedCount >= 2)
+	{
+		USplineMeshComponent* Mesh = Cast<USplineMeshComponent>(TouchedComponent);
+		UE_LOG(LogTemp, Warning, TEXT("DoubleClicked"));
+		DoubleTapEvent(Mesh);
+
+		PressedCount = 0;
+	}
+}
+
+void ALane::InitPressedCountDelay(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
 {
 	FTimerHandle DoubleTouchTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DoubleTouchTimerHandle, FTimerDelegate::CreateLambda([&]()
@@ -2358,7 +2389,18 @@ void ALane::SetInitPressedCountDelay()
 			PressedCount = 0;
 
 			GetWorld()->GetTimerManager().ClearTimer(DoubleTouchTimerHandle);
-		}), 0.3f, false);
+		}), 0.5f, false);
+}
+
+void ALane::InitPressedCountDelayWithClick(UPrimitiveComponent* TouchedComponent, FKey ButtonReleased)
+{
+	FTimerHandle DoubleTouchTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DoubleTouchTimerHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			PressedCount = 0;
+
+	GetWorld()->GetTimerManager().ClearTimer(DoubleTouchTimerHandle);
+		}), 0.5f, false);
 }
 
 bool ALane::IsStationsValid(const TArray<class AStation*>& NewStationPoint) {
@@ -2642,7 +2684,13 @@ void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVect
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 	SplineMeshComponent->RegisterComponent();
-	//SplineMeshComponent->OnInputTouchBegin.AddDynamic(this,)
+
+	//Add Touch, Click Event
+	SplineMeshComponent->OnInputTouchBegin.AddDynamic(this, &ALane::CheckDoubleTap);
+	SplineMeshComponent->OnInputTouchEnd.AddDynamic(this, &ALane::InitPressedCountDelay);
+	SplineMeshComponent->OnClicked.AddDynamic(this, &ALane::CheckDoubleClick);
+	SplineMeshComponent->OnReleased.AddDynamic(this, &ALane::InitPressedCountDelayWithClick);
+
 	LaneArray[Index].MeshArray.Add(SplineMeshComponent);
 }
 
@@ -2739,6 +2787,7 @@ void ALane::InitializeCurrentLaneStatics()
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
 }
+
 void ALane::UpdateUsingConnector()
 {
 	UsingTunnelCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Tunnel);
