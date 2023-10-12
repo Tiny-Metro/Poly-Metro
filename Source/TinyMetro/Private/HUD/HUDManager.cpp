@@ -8,8 +8,6 @@
 AHUDManager::AHUDManager()
 {
 	CurrentLanguage = ELanguage::Korean;
-    SetStringTable();
-    SetImageTable();
 }
 
 void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
@@ -19,24 +17,12 @@ void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
     // You can implement this based on your HUD widget design
 }
 
-void AHUDManager::SetStringTable()
-{
-    StringTable.Add("ToMenu_ExitText", "Exit");
-}
 
 void AHUDManager::SetImageTable()
 {
-    ImageTable.Add("ToMenu_ExitIcon", LoadTextureFromFile("Texture2D'/Game/UI/HomeWindow/Assets/ExitIcon.ExitIcon'"));
-}
+    // To Menu
+    LoadTextureFromFile("/Game/UI/HomeWindow/Assets/");
 
-
-FString AHUDManager::GetText(FString BigSection, FString SmallSection)
-{
-    if (StringTable.Contains(BigSection))
-    {
-        return StringTable[BigSection];
-    }
-    return FString(); // Return an empty string if the section is not found
 }
 
 void AHUDManager::AssignWidget(FString Name, UPolyMetroWidget* Widget)
@@ -47,21 +33,17 @@ void AHUDManager::AssignWidget(FString Name, UPolyMetroWidget* Widget)
 UPolyMetroWidget* AHUDManager::GetWidget(FString Name)
 {
     UPolyMetroWidget* targetWidget = *Widgets.Find(Name);
-//    if(targetWidget == nullptr)
     return targetWidget;
 }
 
-FString AHUDManager::GetTextByName(FString Name)
+
+FString AHUDManager::GetTextByEnum(EHUDText Name)
 {
-    return *StringTable.Find(Name);
+    if (CurrentLanguage == ELanguage::Korean) return *IntegratedTextTable[Name].Korean;
+    return *IntegratedTextTable[Name].English;
 }
 
-UTexture* AHUDManager::GetImageByName(FString Name)
-{
-    return *ImageTable.Find(Name);
-}
-
-UTexture* AHUDManager::LoadTextureFromFile(const FString& TexturePath)
+void AHUDManager::LoadTextureFromFile(const FString& TexturePath)
 {
     // Use the AssetRegistryModule to load the texture by path
     UTexture* LoadedTexture = nullptr;
@@ -71,12 +53,68 @@ UTexture* AHUDManager::LoadTextureFromFile(const FString& TexturePath)
     TArray<FAssetData> AssetData;
     AssetRegistryModule.Get().GetAssetsByPath(*TexturePath, AssetData);
 
-    if (AssetData.Num() > 0)
+    // Debugging: Log the AssetData
+    for (const FAssetData& Data : AssetData)
     {
-        // You can load the first asset found
-        FStringAssetReference AssetRef(AssetData[0].ObjectPath.ToString());
-        LoadedTexture = Cast<UTexture>(AssetRef.TryLoad());
+        UE_LOG(LogTemp, Warning, TEXT("Found asset: %s"), *Data.AssetName.ToString());
     }
 
-    return LoadedTexture;
+    if (AssetData.Num() > 0)
+    {
+        for (int32 i = 0; i < AssetData.Num(); i++)
+        {
+            FString AssetRefPath = AssetData[i].ObjectPath.ToString();
+            FStringAssetReference AssetRef(AssetRefPath);
+            LoadedTexture = Cast<UTexture>(AssetRef.TryLoad());
+
+            if (LoadedTexture)
+            {
+                FString LoadedTextureName = *LoadedTexture->GetName();
+
+                EHUDImage matchedEnum = EHUDImageContain(*LoadedTextureName);
+                UE_LOG(LogTemp, Error, TEXT("GGGGG:: %s"), *LoadedTextureName);
+
+                if (matchedEnum != EHUDImage::Invalid)
+                {
+                    UE_LOG(LogTemp, Error, TEXT("GGGGG:: Matched %s"), *LoadedTextureName);
+                    TextureTable.Add(matchedEnum, LoadedTexture);
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("GGGGG:: UNMatchessd %s"), *LoadedTextureName);
+
+                }
+            }
+
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("GGGGG::No assets found for path: %s"), *TexturePath);
+    }    
+}
+
+EHUDImage AHUDManager::EHUDImageContain(const FString& TextureName)
+{
+    FString targetString = "EHUDImage::";
+    targetString.Append(TextureName);
+    // Check if TextureName exists in EHUDImage enum
+    for (int32 i = 0; i < static_cast<int32>(EHUDImage::Invalid); i++)
+    {
+        FString EnumValueName = UEnum::GetValueAsString<EHUDImage>(static_cast<EHUDImage>(i));
+//        UE_LOG(LogTemp, Error, TEXT("GGGGG:: EnumValueName %s"), *EnumValueName);
+ 
+        if (EnumValueName.Equals(targetString, ESearchCase::CaseSensitive))
+        {
+            UE_LOG(LogTemp, Error, TEXT("GGGGG:: Enum Matched %s"), *EnumValueName);
+//            return static_cast<EHUDImage>(i);
+        }
+    }
+    return EHUDImage::Invalid;
+}
+
+UTexture* AHUDManager::GetImageByEnum(EHUDImage ImageEnum)
+{
+    if (TextureTable.Find(ImageEnum) == nullptr) return nullptr;
+    return *TextureTable.Find(ImageEnum);
 }

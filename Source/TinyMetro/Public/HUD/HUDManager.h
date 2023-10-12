@@ -24,6 +24,38 @@ enum class ETextSize : uint8
 
 };
 
+UENUM(BlueprintType)
+enum class EHUDText : uint8
+{
+    ToMenu_ExitText,
+    ToMenu_GoBackText,
+    ToMenu_StatisticsText,
+    ToMenu_SettingText,
+    None
+};
+
+UENUM(BlueprintType)
+enum class EHUDImage: uint8
+{
+    ToMenu_ExitIcon,
+    ToMenu_GoBackIcon,
+    ToMenu_StatisticsIcon,
+    ToMenu_SettingIcon,
+    Invalid
+};
+
+USTRUCT(BlueprintType)
+struct TINYMETRO_API FLanguagePair
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString Korean;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        FString English;
+};
+
 UCLASS(Blueprintable)
 class TINYMETRO_API AHUDManager : public AHUD
 {
@@ -32,23 +64,21 @@ class TINYMETRO_API AHUDManager : public AHUD
 public:
     AHUDManager();
 
-    UFUNCTION(BlueprintCallable, Category = "Localization")
+    UFUNCTION(BlueprintCallable)
     void ChangeLanguage(ELanguage NewLanguage);
 
-    UFUNCTION(BlueprintCallable, Category = "Localization")
-    FString GetText(FString BigSection, FString SmallSection);
 
 protected:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Localization")
-    TMap<FString, FString> StringTable;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<EHUDText, FLanguagePair> IntegratedTextTable;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Localization")
-    TMap<FString, UTexture*> ImageTable;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TMap<EHUDImage, UTexture*> TextureTable;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Localization")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     ELanguage CurrentLanguage;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Localization")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     ETextSize CurrentTextSize;
 
 public:
@@ -63,14 +93,14 @@ public:
     UPolyMetroWidget* GetWidget(FString Name);
 
     UFUNCTION(BlueprintCallable)
-    FString GetTextByName(FString Name);
+    FString GetTextByEnum(EHUDText TextName);
 
     UFUNCTION(BlueprintCallable)
-    UTexture* GetImageByName(FString Name);
+    UTexture* GetImageByEnum(EHUDImage ImageEnum);
 
 private:
     void SetImageTable();
-    void SetStringTable();
-    UTexture* LoadTextureFromFile(const FString& TexturePath);
+    void LoadTextureFromFile(const FString& TexturePath);
 
+    EHUDImage EHUDImageContain(const FString& TextureName);
 };
