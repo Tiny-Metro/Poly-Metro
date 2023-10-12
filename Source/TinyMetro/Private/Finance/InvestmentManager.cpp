@@ -172,21 +172,27 @@ TMap<int32, int32> AInvestmentManager::GetInvestmentCandidate() {
 void AInvestmentManager::RefreshAccessibleInvestment() {
 	UpdateAccessibleInvestment();
 	TMap<int32, int32> newCandidate;
+	if (InvestmentIdArr.Num() == 0) return;
+
 	for (int i = 0; i < InvestmentSlot; i++) {
-		if (LuaComponentArr[InvestmentCandidate[i]]->GetState() == InvestmentState::Processing
-			|| LuaComponentArr.Num() <= MaxInvestmentSlot * 2) {
-			// If Investment is processing, not change investment
-			newCandidate.Add(i, InvestmentCandidate[i]);
-		} else {
-			// Investment is finish or not started, change investment
-			int32 randIdx = FMath::RandRange(0, InvestmentIdArr.Num() - 1);
-			// Check : Not candidated investment
-			while (InvestmentCandidate.FindKey(InvestmentIdArr[randIdx])
-				|| newCandidate.FindKey(InvestmentIdArr[randIdx])) {
-				randIdx = FMath::RandRange(0, InvestmentIdArr.Num() - 1);
+		if (InvestmentCandidate.Contains(i)) {
+			if (LuaComponentArr.Contains(InvestmentCandidate[i])) {
+				if (LuaComponentArr[InvestmentCandidate[i]]->GetState() == InvestmentState::Processing
+					|| LuaComponentArr.Num() <= MaxInvestmentSlot * 2) {
+					// If Investment is processing, not change investment
+					newCandidate.Add(i, InvestmentCandidate[i]);
+					continue;
+				}
 			}
-			newCandidate.Add(i, InvestmentIdArr[randIdx]);
 		}
+		// Investment is finish or not started, change investment
+		int32 randIdx = FMath::RandRange(0, InvestmentIdArr.Num() - 1);
+		// Check : Not candidated investment
+		while (InvestmentCandidate.FindKey(InvestmentIdArr[randIdx])
+			|| newCandidate.FindKey(InvestmentIdArr[randIdx])) {
+			randIdx = FMath::RandRange(0, InvestmentIdArr.Num() - 1);
+		}
+		newCandidate.Add(i, InvestmentIdArr[randIdx]);
 	}
 	CanRefresh = false;
 	InvestmentCandidate = newCandidate;
@@ -203,8 +209,9 @@ void AInvestmentManager::UpdateAccessibleInvestment() {
 
 void AInvestmentManager::WeeklyTask() {
 	if (InvestmentSlot < MaxInvestmentSlot) {
-		InvestmentCandidate.Add(InvestmentSlot++, *InvestmentIdArr.begin());
+		InvestmentSlot++;
 	}
+
 	for (auto& i : LuaComponentArr) {
 		if (i.Value->GetState() == InvestmentState::Fail || i.Value->GetState() == InvestmentState::Success) {
 			i.Value->InitInvestment();
