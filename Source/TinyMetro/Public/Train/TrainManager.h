@@ -104,6 +104,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FTrainTutorialTask TrainTutorialTask;
 
+	// Used controller (Click logic)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	ATrainTemplate* ClickedTrain;
+	UFUNCTION(BlueprintCallable)
+	void ReleaseClick();
+
 protected:
 	// Widget class
 	UPROPERTY()
@@ -118,6 +124,8 @@ protected:
 	class ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	class AStatisticsManager* StatisticsManagerRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;

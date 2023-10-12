@@ -18,6 +18,11 @@ public:
 	// Sets default values for this pawn's properties
 	ATinyMetroCamera();
 
+	UFUNCTION()
+	void ToggleCameraMoveEnable();
+	UFUNCTION()
+	void SetCameraMoveEnable(bool Flag);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,8 +41,6 @@ protected:
 	void CameraRotationZ(float Axis);
 	UFUNCTION()
 	void CameraRotationY(float Axis);
-	UFUNCTION()
-	void ToggleCameraMoveEnable();
 
 	// Used Mobile
 	UFUNCTION()

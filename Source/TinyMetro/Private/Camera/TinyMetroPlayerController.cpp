@@ -3,6 +3,7 @@
 
 #include "Camera/TinyMetroPlayerController.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Train/TrainManager.h"
 #include "Lane/LaneManager.h"
 #include "Lane/Lane.h"
 #include "Station/Station.h"

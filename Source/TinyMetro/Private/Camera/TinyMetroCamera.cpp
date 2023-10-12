@@ -121,6 +121,10 @@ void ATinyMetroCamera::ToggleCameraMoveEnable() {
 	CameraMoveEnable = !CameraMoveEnable;
 }
 
+void ATinyMetroCamera::SetCameraMoveEnable(bool Flag) {
+	CameraMoveEnable = Flag;
+}
+
 void ATinyMetroCamera::Touch1Press() {
 	if (!IsResetRotation) {
 		Touch1Pressed = true;
