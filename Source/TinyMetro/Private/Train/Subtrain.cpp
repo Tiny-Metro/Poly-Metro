@@ -107,6 +107,7 @@ void ASubtrain::UpdatePassengerSlot() {
 
 void ASubtrain::DespawnTrain() {
 	PlayerStateRef->AddItem(ItemType::Subtrain, 1);
+	if (!IsActorFirstSpawn) StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalRetrievalCount++;
 	Super::DespawnTrain();
 }
 
@@ -153,9 +154,7 @@ void ASubtrain::OnReleasedLogic() {
 			FVector StartLocation = GridManagerRef->Approximate(OwnerTrainRef->GetActorLocation(), LaneRef->GetLaneShape(GetActorLocation()));
 			StartLocation.Z = 20.0f;
 			ServiceStart(StartLocation, LaneRef, nullptr);
-			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalShiftCount++;
 		} else {
-			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalRetrievalCount++;
 			DespawnTrain();
 		}
 	}

@@ -6,9 +6,11 @@
 #include "Train/TrainSpawnData.h"
 #include "Train/SubtrainSpawnData.h"
 #include "Train/TrainInfoWidget.h"
+#include "Train/TrainTemplate.h"
 #include "Train/Train.h"
 #include "Train/Subtrain.h"
 #include "GameModes/TinyMetroGameModeBase.h"
+#include "Statistics/StatisticsManager.h"
 #include "SaveSystem/TMSaveManager.h"
 #include "Lane/Lane.h"
 #include <Blueprint/UserWidget.h>
@@ -36,6 +38,7 @@ void ATrainManager::BeginPlay()
 	// Init references
 	if (!IsValid(GameModeRef)) GameModeRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
@@ -380,6 +383,10 @@ bool ATrainManager::Load() {
 	return true;
 }
 
+void ATrainManager::ReleaseClick() {
+	if (IsValid(ClickedTrain)) ClickedTrain->OnReleasedLogic();
+}
+
 int32 ATrainManager::GetStationCountByOrigin(FStationInfo Origin, ALane* Lane) {
 	TArray<ATrainTemplate*> arr;
 	for (auto& i : Trains) {
@@ -411,6 +418,27 @@ int32 ATrainManager::GetStationCountByDestination(FStationInfo Destination, ALan
 void ATrainManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	TMap<int, int> trainCountInLane = {
+		{1,0},
+		{2,0},
+		{3,0},
+		{4,0},
+		{5,0},
+		{6,0},
+		{7,0},
+		{8,0}
+	};
 
+	for (auto& i : Trains) {
+		int serviceLaneId = i->GetTrainInfo().ServiceLaneId;
+		if (trainCountInLane.Contains(serviceLaneId)) {
+			trainCountInLane[serviceLaneId]++;
+		}
+	}
+
+	for (auto& i : trainCountInLane) {
+		StatisticsManagerRef->LaneStatistics.Lanes[i.Key].ServiceTrainAndSubtrainCount = i.Value;
+	}
 }
 

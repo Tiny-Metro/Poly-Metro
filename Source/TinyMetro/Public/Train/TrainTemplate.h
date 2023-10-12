@@ -192,6 +192,8 @@ protected:
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ASoundManager* SoundManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroCamera* CameraRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
@@ -203,6 +205,8 @@ protected:
 	bool IsActorDragged = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorSpawnByWidget = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	bool IsActorFirstSpawn = true;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float OnPressedTime;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
