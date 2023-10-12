@@ -238,6 +238,10 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	if (IsActorFirstSpawn) {
+		TrainManagerRef->TrainTutorialTask.Broadcast(GetActorLocation());
+		IsActorFirstSpawn = false;
+	}
 	IsActorSpawnByWidget = false;
 
 	LaneRef = Lane;
@@ -399,6 +403,7 @@ bool ATrainTemplate::Load() {
 	if (!IsValid(LaneManagerRef)) LaneManagerRef = GameModeRef->GetLaneManager();
 	if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
 	IsLoaded = true;
+	IsActorFirstSpawn = false;
 	return false;
 }
 

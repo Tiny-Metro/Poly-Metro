@@ -204,6 +204,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	bool IsActorSpawnByWidget = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	bool IsActorFirstSpawn = true;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float OnPressedTime;
 	UPROPERTY(Config, VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float LongClickInterval;
