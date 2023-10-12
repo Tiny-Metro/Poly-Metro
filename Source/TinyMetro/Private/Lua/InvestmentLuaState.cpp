@@ -104,8 +104,6 @@ FLuaValue UInvestmentLuaState::GetDefaultStatisticsAtStart(FLuaValue Id) {
     statisticsTable.SetField(TEXT("ServiceStationCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.ServiceStationCount));
     statisticsTable.SetField(TEXT("UpgradeStationCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(defaultStatistics.UpgradeStationCount));
 
-    FLuaValue test;
-
     return statisticsTable;
 }
 
@@ -117,7 +115,7 @@ FLuaValue UInvestmentLuaState::GetLaneStatisticsAtStart(FLuaValue Id) {
     statisticsTable.SetField(TEXT("TotalLaneCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.TotalLaneCount));
     statisticsTable.SetField(TEXT("TotalModifyAndDeleteCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(laneStatistics.TotalModifyAndDeleteCount));
 
-    return FLuaValue();
+    return statisticsTable;
 }
 
 TArray<FLuaValue> UInvestmentLuaState::GetLaneDetailStatisticsAtStart(FLuaValue Id) {
@@ -184,7 +182,7 @@ FLuaValue UInvestmentLuaState::GetSubtrainStatisticsAtStart(FLuaValue Id) {
     statisticsTable.SetField(TEXT("TotalRetrievalCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalRetrievalCount));
     statisticsTable.SetField(TEXT("TotalUpgradeCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.SubtrainStatistics.TotalUpgradeCount));
 
-    return FLuaValue();
+    return statisticsTable;
 }
 
 FLuaValue UInvestmentLuaState::GetBridgeStatisticsAtStart(FLuaValue Id) {
@@ -195,7 +193,7 @@ FLuaValue UInvestmentLuaState::GetBridgeStatisticsAtStart(FLuaValue Id) {
     statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.BridgeStatistics.TotalPurchaseCount));
     statisticsTable.SetField(TEXT("TotalPlacementCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.BridgeStatistics.TotalPlacementCount));
 
-    return FLuaValue();
+    return statisticsTable;
 }
 
 FLuaValue UInvestmentLuaState::GetTunnelStatisticsAtStart(FLuaValue Id) {
@@ -206,7 +204,7 @@ FLuaValue UInvestmentLuaState::GetTunnelStatisticsAtStart(FLuaValue Id) {
     statisticsTable.SetField(TEXT("TotalPurchaseCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TunnelStatistics.TotalPurchaseCount));
     statisticsTable.SetField(TEXT("TotalPlacementCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(shopStatistics.TunnelStatistics.TotalPlacementCount));
 
-    return FLuaValue();
+    return statisticsTable;
 }
 
 FLuaValue UInvestmentLuaState::GetBankStatisticsAtStart(FLuaValue Id) {
