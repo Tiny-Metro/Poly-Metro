@@ -130,12 +130,6 @@ void AStation::BeginPlay()
 	UpdatePassengerMesh();
 	SetInfoWidget(StationManager->GetStationInfoWidget());
 
-	// Set off alarm pulse
-	if (SpawnAlarm) {
-		FTimerHandle alarmHandle;
-		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, TimerRef->GetDaytime());
-	}
-
 	if (StationInfo.IsUpgrade) {
 		Upgrade();
 	}
@@ -202,6 +196,8 @@ void AStation::DailyTask() {
 	SpawnDay++;
 	// Update complain
 	ComplainRoutine();
+	// Off spawn pulse;
+	OffSpawnAlarm();
 }
 
 void AStation::Save() {
@@ -595,9 +591,11 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 }
 
 void AStation::OffSpawnAlarm() {
-	SpawnAlarm = false;
-	PulseComponent->SetMaterial(0, nullptr);
-	PulseComponent->SetWorldScale3D(FVector(0));
+	if (SpawnAlarm) {
+		SpawnAlarm = false;
+		PulseComponent->SetMaterial(0, nullptr);
+		PulseComponent->SetWorldScale3D(FVector(0));
+	}
 }
 
 void AStation::EventEnd() {
