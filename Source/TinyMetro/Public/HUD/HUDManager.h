@@ -70,6 +70,7 @@ public:
 
 private:
     void SetImageTable();
-
+    void SetStringTable();
     UTexture* LoadTextureFromFile(const FString& TexturePath);
+
 };

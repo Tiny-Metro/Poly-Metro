@@ -8,6 +8,8 @@
 AHUDManager::AHUDManager()
 {
 	CurrentLanguage = ELanguage::Korean;
+    SetStringTable();
+    SetImageTable();
 }
 
 void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
@@ -17,10 +19,16 @@ void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
     // You can implement this based on your HUD widget design
 }
 
+void AHUDManager::SetStringTable()
+{
+    StringTable.Add("ToMenu_ExitText", "Exit");
+}
+
 void AHUDManager::SetImageTable()
 {
-//    ImageTable.Add("ToMenu_ExitIcon", LoadTextureFromFile(""));
+    ImageTable.Add("ToMenu_ExitIcon", LoadTextureFromFile("Texture2D'/Game/UI/HomeWindow/Assets/ExitIcon.ExitIcon'"));
 }
+
 
 FString AHUDManager::GetText(FString BigSection, FString SmallSection)
 {
@@ -38,7 +46,9 @@ void AHUDManager::AssignWidget(FString Name, UPolyMetroWidget* Widget)
 
 UPolyMetroWidget* AHUDManager::GetWidget(FString Name)
 {
-    return *Widgets.Find(Name);
+    UPolyMetroWidget* targetWidget = *Widgets.Find(Name);
+//    if(targetWidget == nullptr)
+    return targetWidget;
 }
 
 FString AHUDManager::GetTextByName(FString Name)
