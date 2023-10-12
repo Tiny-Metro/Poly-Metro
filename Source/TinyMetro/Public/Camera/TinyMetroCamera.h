@@ -18,6 +18,11 @@ public:
 	// Sets default values for this pawn's properties
 	ATinyMetroCamera();
 
+	UFUNCTION()
+	void ToggleCameraMoveEnable();
+	UFUNCTION()
+	void SetCameraMoveEnable(bool Flag);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,8 +41,6 @@ protected:
 	void CameraRotationZ(float Axis);
 	UFUNCTION()
 	void CameraRotationY(float Axis);
-	UFUNCTION()
-	void ToggleCameraMoveEnable();
 
 	// Used Mobile
 	UFUNCTION()
@@ -97,6 +100,8 @@ protected:
 	double CameraAutoMoveSeconds = 1.0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
 	bool CameraMoveEnable = true;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Move")
+	bool UiOpened = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	double CameraMoveSpeedX = 0.02f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")

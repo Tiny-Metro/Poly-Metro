@@ -613,6 +613,35 @@ FString AStationManager::StationTypeToString(StationType Type, bool& Success) {
 	return result;
 }
 
+FString AStationManager::StationTypeToIcon(StationType Type, bool& Success) {
+	Success = true;
+	FString result;
+	if (Type == StationType::Circle) {
+		result = TEXT("⭘");
+	} else if (Type == StationType::Triangle) {
+		result = TEXT("△");
+	} else if (Type == StationType::Rectangle) {
+		result = TEXT("☐");
+	} else if (Type == StationType::Cross) {
+		result = TEXT("✚");
+	} else if (Type == StationType::Rhombus) {
+		result = TEXT("◇");
+	} else if (Type == StationType::Oval) {
+		result = TEXT("⬭");
+	} else if (Type == StationType::Diamond) {
+		result = TEXT("⯂");
+	} else if (Type == StationType::Pentagon) {
+		result = TEXT("⬠");
+	} else if (Type == StationType::Star) {
+		result = TEXT("☆");
+	} else if (Type == StationType::Fan) {
+		result = TEXT("⌔");
+	} else {
+		Success = false;
+	}
+	return result;
+}
+
 void AStationManager::Save() {
 	UStationManagerSaveGame* tmp = Cast<UStationManagerSaveGame>(UGameplayStatics::CreateSaveGameObject(UStationManagerSaveGame::StaticClass()));
 	tmp->NextStationId = NextStationId;
@@ -709,14 +738,17 @@ void AStationManager::Tick(float DeltaTime)
 
 	float averageComplain = 0.0f;
 	int32 serviceStationCount = 0;
+	int32 upgradeStationCount = 0;
 
 	for (auto& i : Station) {
 		if (i->GetStationInfo().IsActive) serviceStationCount++;
 		averageComplain += i->GetComplain();
+		if (i->GetStationInfo().IsUpgrade) upgradeStationCount++;
 	}
 	
 	StatisticsManagerRef->DefaultStatistics.AverageComplain = averageComplain;
 	StatisticsManagerRef->DefaultStatistics.ServiceStationCount = serviceStationCount;
+	StatisticsManagerRef->DefaultStatistics.UpgradeStationCount = upgradeStationCount;
 
 }
 

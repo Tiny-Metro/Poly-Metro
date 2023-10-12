@@ -106,8 +106,13 @@ void ATinyMetroPlayerState::AddMoney(int32 Amount) {
 
 void ATinyMetroPlayerState::AddIncome(int32 Amount) {
 	Money += Amount;
-	StatisticsManagerRef->DefaultStatistics.TotalIncome += Amount;
-	StatisticsManagerRef->DefaultStatistics.WeeklyIncome += Amount;
+	if (Amount >= 0) {
+		StatisticsManagerRef->DefaultStatistics.TotalIncome += Amount;
+		StatisticsManagerRef->DefaultStatistics.WeeklyIncome += Amount;
+	} else {
+		StatisticsManagerRef->DefaultStatistics.TotalSpending += Amount;
+		StatisticsManagerRef->DefaultStatistics.WeeklySpending += Amount;
+	}
 }
 
 void ATinyMetroPlayerState::Test() {

@@ -192,6 +192,8 @@ protected:
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class ASoundManager* SoundManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	class ATinyMetroCamera* CameraRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TrainDirection Direction;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")

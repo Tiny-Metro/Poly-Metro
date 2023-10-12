@@ -21,5 +21,5 @@ struct TINYMETRO_API FBankStatistics
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalLoanMoney = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TotalRepayInterestMoney = 0;
+	float TotalRepayInterestMoney = 0;
 };
