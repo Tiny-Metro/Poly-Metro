@@ -14,7 +14,7 @@ function InvestmentData()
     local idx = math.random(1, #target_1005)
     selected_target_1005 = target_1005[idx]
 
-    Data.message = selected_target_1005.name .. '을 업그레이드하세요.'
+    Data.message = selected_target_1005.name .. '을/를 업그레이드하세요.'
     Data.time_require = time_needed_1005
     Data.award = selected_target_1005.message
 
