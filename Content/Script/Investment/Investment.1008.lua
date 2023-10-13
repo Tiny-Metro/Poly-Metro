@@ -32,32 +32,31 @@ function Process()
     local cur_total_lane = GetLaneStatistics()
     local cur_time = GetTimestamp()
 
-    local lane_count
+    local lane_count = cur_lane.TotalLaneCount
 
-    -- current number of lanes
-    if start_lane.TotalLaneCount ~= cur_lane.TotalLaneCount then
+    -- build
+    if cur_lane_count.TotalLaneCount ~= pre_lane_count.TotalLaneCount then
         return fail
     end
-    
-    lane_count = cur_lane.TotalLaneCount
 
-    if (cur_time.Date - start_time.Date) <= time_needed_1008 then
-        -- within the deadline
-        for i = 0, lane_count - 1 do
-            if cur_lane[i].TotalModifyAndReduceCount ~= start_lane[i].TotalModifyAndReduceCount then
+    -- modoify
+    if (cur_time.Date - start_time.Date) > time_needed_1006 then
+        for i = 1, lane_count do
+            if cur_lane[i].TotalModifyAndDeleteCount == pre_lane[i].TotalModifyAndDeleteCount then
+                return success
+            else
                 return fail
             end
         end
-        return continue
     else
-        -- outside the deadline
-        for i = 0, lane_count - 1 do
-            if cur_lane[i].TotalModifyAndReduceCount ~= start_lane[i].TotalModifyAndReduceCount then
+        for i = 1, lane_count do
+            if cur_lane[i].TotalModifyAndDeleteCount ~= pre_lane[i].TotalModifyAndDeleteCount then
                 return fail
             end
         end
-        return success
     end
+
+    return continue
 end
 
 -- Investment award

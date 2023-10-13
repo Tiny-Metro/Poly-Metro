@@ -31,19 +31,10 @@ function Process()
     local cur_lane = GetLaneStatistics()
     local cur_station = GetLaneDetailStatistics()
 
-    local lane_count
-    local over_flag = false
+    local lane_count = cur_lane.TotalLaneCount
 
-    -- current number of lanes
-    if start_lane.TotalLaneCount < cur_lane.TotalLaneCount then
-        lane_count = cur_lane.TotalLaneCount
-        over_flag = true
-    else
-        lane_count = start_lane.TotalLaneCount
-    end
-
-    for i=0,  lane_count - 1 do
-        if over_flag and (i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount)) then
+    for i = 1,  lane_count do
+        if i > start_lane.TotalLaneCount then
             -- new lane
             if cur_station[i].TransferStationCount >= additional_needs_1000 then
                 return success

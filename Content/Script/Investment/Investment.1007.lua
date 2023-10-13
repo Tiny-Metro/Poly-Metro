@@ -26,6 +26,7 @@ end
 
 -- Investment success condition
 function Process()
+    -- wrong logic
     local start_lane = GetLaneDetailStatisticsAtStart(1007)
     local start_total_lane = GetLaneStatisticsAtStart(1007)
 
@@ -43,7 +44,7 @@ function Process()
         lane_count = start_lane.TotalLaneCount
     end
 
-    for i = 0, lane_count - 1 do
+    for i = 1, lane_count do
         if over_flag and i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount) then
             -- new lane
             if cur_lane[i].TransferStationCount >= additional_needs_1007 then
