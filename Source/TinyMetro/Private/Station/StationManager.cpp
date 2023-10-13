@@ -283,10 +283,18 @@ void AStationManager::SpawnStation(FGridCellData GridCellData, StationType Type,
 void AStationManager::DestroyRandomStation() {
 	int index = 0;
 
+	// Check if all station destroyed
+	bool allDestroyFlag = false;
+	for (auto& i : Station) {
+		allDestroyFlag = i->GetStationInfo().IsDestroyed;
+		if (!allDestroyFlag) break;
+	}
+	if (allDestroyFlag) return;
+
 	// Select random station not destroyed
 	do {
 		index = FMath::RandRange(0, Station.Num() - 1);
-	} while (!Station[index]->GetStationInfo().IsDestroyed);
+	} while (Station[index]->GetStationInfo().IsDestroyed);
 
 	// Destroy
 	Station[index]->SetStationState(StationState::Destroyed);
