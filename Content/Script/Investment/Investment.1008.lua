@@ -32,25 +32,25 @@ function Process()
     local cur_total_lane = GetLaneStatistics()
     local cur_time = GetTimestamp()
 
-    local lane_count = cur_lane.TotalLaneCount
+    local lane_count = cur_total_lane.TotalLaneCount
 
     -- build
-    if cur_lane_count.TotalLaneCount ~= pre_lane_count.TotalLaneCount then
+    if cur_total_lane.TotalLaneCount < start_total_lane.TotalLaneCount then
         return fail
     end
 
     -- modoify
     if (cur_time.Date - start_time.Date) > time_needed_1006 then
         for i = 1, lane_count do
-            if cur_lane[i].TotalModifyAndDeleteCount == pre_lane[i].TotalModifyAndDeleteCount then
-                return success
-            else
+            if cur_lane[i].TotalModifyAndReduceCount > start_lane[i].TotalModifyAndReduceCount then
                 return fail
+            else
+                return success
             end
         end
     else
         for i = 1, lane_count do
-            if cur_lane[i].TotalModifyAndDeleteCount ~= pre_lane[i].TotalModifyAndDeleteCount then
+            if cur_lane[i].TotalModifyAndReduceCount > start_lane[i].TotalModifyAndReduceCount then
                 return fail
             end
         end
