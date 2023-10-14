@@ -13,6 +13,7 @@ void ULoan::Repay() {
 	} else {
 		PlayerState->AddMoney(-(RepayPerWeek));
 		StatisticsManagerRef->BankStatistics.TotalRepayMoney += RepayPerWeek;
+		StatisticsManagerRef->BankStatistics.TotalRepayInterestMoney += RepayInterest;
 		Balance -= RepayPerWeek;
 		RemainTime--;
 	}
@@ -60,6 +61,7 @@ void ULoan::Load() {
 void ULoan::RepayAll() {
 	PlayerState->AddMoney(-(Balance));
 	StatisticsManagerRef->BankStatistics.TotalRepayMoney += Balance;
+	StatisticsManagerRef->BankStatistics.TotalRepayInterestMoney += RepayInterest * RemainTime;
 	DisableLoan();
 }
 
@@ -115,6 +117,7 @@ void ULoan::SetAvailabilityFunction(TFunction<bool(void)> Func) {
 
 void ULoan::InitLoan(FLoanData Data) {
 	Balance = Data.Amount * FMath::Pow(1 + (Data.Rate / 52), Data.DueDateWeek);
+	RepayInterest = Balance / Data.DueDateWeek;
 	RepayPerWeek = Balance / Data.DueDateWeek;
 	RemainTime = Data.DueDateWeek;
 }

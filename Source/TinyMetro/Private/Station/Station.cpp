@@ -130,12 +130,6 @@ void AStation::BeginPlay()
 	UpdatePassengerMesh();
 	SetInfoWidget(StationManager->GetStationInfoWidget());
 
-	// Set off alarm pulse
-	if (SpawnAlarm) {
-		FTimerHandle alarmHandle;
-		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, TimerRef->GetDaytime());
-	}
-
 	if (StationInfo.IsUpgrade) {
 		Upgrade();
 	}
@@ -202,6 +196,8 @@ void AStation::DailyTask() {
 	SpawnDay++;
 	// Update complain
 	ComplainRoutine();
+	// Off spawn pulse;
+	OffSpawnAlarm();
 }
 
 void AStation::Save() {
@@ -254,7 +250,7 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 
 				// Get money
 				if (!tmp.IsAlreadyPaid && !tmp.IsFree) {
-					PlayerStateRef->AddMoney(Fare);
+					PlayerStateRef->AddIncome(Fare);
 					StationInfo.TotalProfit += Fare;
 					StationInfo.WeeklyProfit += Fare;
 
@@ -595,9 +591,11 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 }
 
 void AStation::OffSpawnAlarm() {
-	SpawnAlarm = false;
-	PulseComponent->SetMaterial(0, nullptr);
-	PulseComponent->SetWorldScale3D(FVector(0));
+	if (SpawnAlarm) {
+		SpawnAlarm = false;
+		PulseComponent->SetMaterial(0, nullptr);
+		PulseComponent->SetWorldScale3D(FVector(0));
+	}
 }
 
 void AStation::EventEnd() {

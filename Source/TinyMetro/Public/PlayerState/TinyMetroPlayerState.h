@@ -71,6 +71,9 @@ public:
 	UFUNCTION()
 	void Load();
 
+	UFUNCTION(BlueprintCallable)
+	void ResetTutorialProceed();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
 	int32 Money = 0;
@@ -89,4 +92,24 @@ protected:
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class ATinyMetroGameModeBase* GameModeRef;
+
+	// Tutorial finish flags
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsItemTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsLaneTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsStationTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsTrainTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsEventTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsShopTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsLoanTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsInvestmentTutorialFinished = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool IsPolicyTutorialFinished = false;
 };

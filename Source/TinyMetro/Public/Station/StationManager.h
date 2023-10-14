@@ -67,7 +67,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AStation* GetNearestStation(FVector CurrentLocation, class ALane* LaneRef);
 	UFUNCTION(BlueprintCallable)
-	void SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id = -1, FTimestamp Timestamp = FTimestamp());
+	AStation* SpawnStation(FGridCellData GridCellData, StationType Type, int32 Id = -1, FTimestamp Timestamp = FTimestamp());
 	UFUNCTION(BlueprintCallable)
 	void DestroyRandomStation();
 	UFUNCTION(BlueprintCallable)
@@ -76,6 +76,8 @@ public:
 	static StationType StationTypeFromString(FString Str, bool& Success);
 	UFUNCTION(BlueprintCallable)
 	static FString StationTypeToString(StationType Type, bool& Success);
+	UFUNCTION(BlueprintCallable)
+	static FString StationTypeToIcon(StationType Type, bool& Success);
 
 	UFUNCTION()
 	void AddComplainIncreaseRateByEvent(float Rate);
