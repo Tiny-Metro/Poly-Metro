@@ -398,6 +398,22 @@ public: // Change Lane Appearance
 
 	int32 PressedCount =0;
 
+protected:
+	UPROPERTY(VisibleAnyWhere)
+	TArray<AStation*> ChangeAppearanceStations;
+	TArray<TArray<FIntPoint>> CurTunnelArea;
+	TArray<TArray<FIntPoint>> CurBridgeArea;
+	TArray<FLanePoint> NewLaneArray;
+	int32 StartLaneArrayIndex;
+	int32 EndLaneArrayIndex;
+
+	UPROPERTY(VisibleAnyWhere)
+	bool AppearanceWillBeChanged = false;
+	
+	void InitDelayChangeAppearanceValues();
+
+	bool CheckTrainsByDestinationForChangeAppearance(const TArray <class AStation*>& Stations);
+
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
 

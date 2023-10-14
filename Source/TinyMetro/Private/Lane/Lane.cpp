@@ -101,6 +101,17 @@ void ALane::Tick(float DeltaTime)
 		FinishRemovingLaneAtEnd();
 	}
 
+	if (AppearanceWillBeChanged)
+	{
+		if (!CheckTrainsByDestinationForChangeAppearance(ChangeAppearanceStations))
+		{
+			DisconnectBT(CurTunnelArea, GridType::Hill);
+			DisconnectBT(CurBridgeArea, GridType::Water);
+			ChangeLaneAppearance(NewLaneArray, StartLaneArrayIndex, EndLaneArrayIndex);
+			InitDelayChangeAppearanceValues();
+		}
+	}
+
 }
 
 
@@ -2341,7 +2352,7 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 	}
 
 	//Check Train
-	if (!CheckTrainsByDestination(TargetStations))
+	if (!CheckTrainsByDestinationForChangeAppearance(TargetStations))
 	{
 		DisconnectBT(CurrentBridgeArea, GridType::Water);
 		DisconnectBT(CurrentTunnelArea, GridType::Hill);
@@ -2350,7 +2361,13 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Train is Alive"))
-		//Delay Change Appearance
+		AppearanceWillBeChanged = true;
+		ChangeAppearanceStations = TargetStations;
+		CurTunnelArea = CurrentTunnelArea;
+		CurBridgeArea = CurrentBridgeArea;
+		NewLaneArray = AddLaneArray;
+		StartLaneArrayIndex = StartIndex;
+		EndLaneArrayIndex = EndIndex;
 	}
 }
 
@@ -2403,6 +2420,37 @@ void ALane::InitPressedCountDelayWithClick(UPrimitiveComponent* TouchedComponent
 
 	GetWorld()->GetTimerManager().ClearTimer(DoubleTouchTimerHandle);
 		}), 0.5f, false);
+}
+
+void ALane::InitDelayChangeAppearanceValues()
+{
+	AppearanceWillBeChanged = false;
+	ChangeAppearanceStations.Empty();
+	CurTunnelArea.Empty();
+	CurBridgeArea.Empty();
+	NewLaneArray.Empty();
+	StartLaneArrayIndex = -1;
+	EndLaneArrayIndex = -1;
+}
+
+bool ALane::CheckTrainsByDestinationForChangeAppearance(const TArray<class AStation*>& Stations)
+{
+	bool res = false;
+
+	for (AStation* Station : Stations)
+	{
+		int32 tmp = TrainManagerRef->GetStationCountByDestination(Station->GetStationInfo(), this);
+
+		if (tmp != 0)
+		{
+				res = true;
+			break;
+		}
+
+
+	}
+
+	return res;
 }
 
 bool ALane::IsStationsValid(const TArray<class AStation*>& NewStationPoint) {
