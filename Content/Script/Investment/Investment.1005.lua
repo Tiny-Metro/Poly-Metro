@@ -34,19 +34,23 @@ end
 
 -- Investment success condition
 function Process()
-    local pre_train_upgrade = GetTrainStatisticsAtStart(1005)
-    local pre_subtrain_upgrade = GetSubtrainStatisticsAtStart(1005)
-    local pre_station_upgrade = GetDefaultStatisticsAtStart(1005)
+    local start_train_upgrade = GetTrainStatisticsAtStart(1005)
+    local start_subtrain_upgrade = GetSubtrainStatisticsAtStart(1005)
+    local start_station_upgrade = GetDefaultStatisticsAtStart(1005)
 
     local cur_train_upgrade = GetTrainStatistics()
     local cur_subtrain_upgrade = GetSubtrainStatistics()
     local cur_station_upgrade = GetDefaultStatistics()
 
-    if selected_target_1005.name == "열차" and (cur_train_upgrade.TotalUpgradeCount > pre_train_upgrade.TotalUpgradeCount) then
+    if selected_target_1005.name == "열차" and (cur_train_upgrade.TotalUpgradeCount > start_train_upgrade.TotalUpgradeCount) then
         return success
-    elseif selected_target_1005.name == "객차" and (cur_subtrain_upgrade.TotalUpgradeCount > pre_subtrain_upgrade.TotalUpgradeCount) then
+    end
+
+    if selected_target_1005.name == "객차" and (cur_subtrain_upgrade.TotalUpgradeCount > start_subtrain_upgrade.TotalUpgradeCount) then
         return success
-    elseif selected_target_1005.name == "역" and (cur_station_upgrade.UpgradeStationCount > pre_station_upgrade.UpgradeStationCount) then
+    end
+
+    if selected_target_1005.name == "역" and (cur_station_upgrade.UpgradeStationCount > start_station_upgrade.UpgradeStationCount) then
         return success
     end
 
