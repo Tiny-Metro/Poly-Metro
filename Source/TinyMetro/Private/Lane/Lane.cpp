@@ -2341,7 +2341,7 @@ void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
 	}
 
 	//Check Train
-	if (CheckTrainsByDestination(TargetStations))
+	if (!CheckTrainsByDestination(TargetStations))
 	{
 		DisconnectBT(CurrentBridgeArea, GridType::Water);
 		DisconnectBT(CurrentTunnelArea, GridType::Hill);
