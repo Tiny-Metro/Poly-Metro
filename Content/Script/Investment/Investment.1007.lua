@@ -26,33 +26,18 @@ end
 
 -- Investment success condition
 function Process()
-    -- wrong logic
-    local start_lane = GetLaneDetailStatisticsAtStart(1007)
-    local start_total_lane = GetLaneStatisticsAtStart(1007)
-
-    local cur_lane = GetLaneDetailStatistics()
-    local cur_total_lane = GetLaneStatistics()
+    local start_station = GetStationInfosAtStart(1007)
+    local cur_station = GetStationInfos()
     
-    local lane_count
-    local over_flag = false
-
-    -- current number of lanes
-    if start_lane.TotalLaneCount < cur_lane.TotalLaneCount then
-        lane_count = cur_lane.TotalLaneCount
-        over_flag = true
-    else
-        lane_count = start_lane.TotalLaneCount
-    end
-
-    for i = 1, lane_count do
-        if over_flag and i > (cur_lane.TotalLaneCount - start_lane.TotalLaneCount) then
-            -- new lane
-            if cur_lane[i].TransferStationCount >= additional_needs_1007 then
+    for i = 0, #cur_station do
+        -- new station
+        if i > #start_station then
+            if cur_station[i].ServiceLaneCount >= 3 then
                 return success
             end
+        -- existing station
         else
-            -- existing lane
-            if (cur_lane[i].TransferStationCount - start_lane[i].TransferStationCount) >= additional_needs_1007 then
+            if (cur_station[i].ServiceLaneCount - start_station.ServiceLaneCount) >= 3 then
                 return success
             end
         end
