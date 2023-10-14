@@ -36,7 +36,6 @@ UPolyMetroWidget* AHUDManager::GetWidget(FString Name)
     return targetWidget;
 }
 
-
 FString AHUDManager::GetTextByEnum(EHUDText Name)
 {
     if (CurrentLanguage == ELanguage::Korean) return *IntegratedTextTable[Name].Korean;
@@ -117,4 +116,35 @@ UTexture* AHUDManager::GetImageByEnum(EHUDImage ImageEnum)
 {
     if (TextureTable.Find(ImageEnum) == nullptr) return nullptr;
     return *TextureTable.Find(ImageEnum);
+}
+
+void AHUDManager::SetTextSizeMap()
+{
+    int32 TitleSize = 36;
+    int32 BasicSize = 32;
+    int32 ExplainationSize = 28;
+
+    switch (CurrentTextSize)
+    {
+    case ETextSize::S:
+        TitleSize -= 4;
+        BasicSize -= 4;
+        ExplainationSize -= 4;
+        break;
+    case ETextSize::M:
+        break;
+    case ETextSize::L:
+        TitleSize += 4;
+        BasicSize += 4;
+        ExplainationSize += 4;
+        break;
+    default:
+        break;
+    }
+    TMap<ETextType, int32> textSizeMap;
+    textSizeMap.Add(ETextType::Title, TitleSize);
+    textSizeMap.Add(ETextType::Basic, BasicSize);
+    textSizeMap.Add(ETextType::ExplainationText, ExplainationSize);
+
+    TextSizeMap = textSizeMap;
 }

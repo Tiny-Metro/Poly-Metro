@@ -192,6 +192,8 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     ETextSize CurrentTextSize;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TMap<ETextType, int32> TextSizeMap;
 
 public:
     //Widgets - Maps with string
@@ -209,6 +211,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     UTexture* GetImageByEnum(EHUDImage ImageEnum);
+
+    UFUNCTION(BlueprintCallable)
+    void SetTextSizeMap();
 
 private:
     void SetImageTable();
