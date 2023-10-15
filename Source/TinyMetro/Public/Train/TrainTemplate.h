@@ -51,8 +51,6 @@ public:
 	void InitTrainMaterial();
 	/*UFUNCTION()
 	void InitTrainMesh();*/
-	UFUNCTION()
-	void TrainMaterialDeferred();
 	/*UFUNCTION()
 	void TrainMeshDeferred();*/
 	UFUNCTION()

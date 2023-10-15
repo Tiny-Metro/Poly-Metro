@@ -503,9 +503,10 @@ void ATrainTemplate::InitTrainMaterial() {
 	);*/
 
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetTrainMaterial();
-	for (int i = 1; i < TrainMaterial.Num() - 1; i++) {
+	while (TrainMaterial.Num() > 1) TrainMaterial.RemoveAt(1);
+	/*for (int i = 1; i < TrainMaterial.Num() - 1; i++) {
 		TrainMaterial.RemoveAt(i);
-	}
+	}*/
 	TrainMaterial.Append(tmp);
 }
 
@@ -516,13 +517,6 @@ void ATrainTemplate::InitTrainMaterial() {
 //		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
 //	);
 //}
-
-void ATrainTemplate::TrainMaterialDeferred() {
-	for (auto& i : TrainMaterialPath) {
-		//TAssetPtr<UMaterial> tmp(i);
-		TrainMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
-	}
-}
 
 //void ATrainTemplate::TrainMeshDeferred() {
 //	for (auto& i : TrainMeshPath) {
