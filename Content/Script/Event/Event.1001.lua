@@ -16,18 +16,19 @@ local calamities = {
     { title = '전태풍', message = '을 덮치다! 역이 파괴될 수 있습니다.' }
 }
 
-local n = 0
+local n_1001 = 0
 
 function EventData()
     local Data = {}
+    local Map = GetMapName()
     local idx = math.random(1, #calamities)
-    n = n + 1
+    n_1001 = n_1001 + 1
 
     local calamity = calamities[idx]
 
     Data.title = calamity.title
-    Data.flavor_text = n .. '호 태풍 ' .. calamity.title
-    Data.message = '태풍 ' .. calamity.title .. '이 ' .. calamity.message
+    Data.flavor_text = n_1001 .. '호 태풍 ' .. calamity.title
+    Data.message = '태풍 ' .. calamity.title .. '이/가 '.. Map .. calamity.message
     Data.period = 3
 
     return Data
@@ -44,3 +45,10 @@ function Start()
     DestroyStation(i)
     AddPassengerSpawnProbability(-0.3)
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct

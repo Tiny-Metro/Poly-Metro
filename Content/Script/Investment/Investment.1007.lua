@@ -1,45 +1,61 @@
 -- transfer station
+local additional_needs_1007 = 3
+local reward_money_1007 = 500
+local time_needed_1007 = 7
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
-    Data.message = '3개 이상의 노선이 지나는 환승역을 만드세요.'
-    Data.time_require = 7
-    Data.award = '500$'
+    Data.message = additional_needs_1007 .. '개 이상의 노선이 지나는 환승역을 만드세요.'
+    Data.time_require = time_needed_1007
+    Data.award = reward_money_1007 .. '$'
 
     return Data
 end
 
-local lane
-local pre_transfer_station
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    lane = GetLaneDetailStatistics()
-    pre_transfer_station = {}
-
-    for i = 0, #lane do
-        pre_transfer_station[i] = lane[i].TransferStationCount
-    end
 end
 
 -- Investment appear condition
 function Appearance()
-    time = GetTimestamp()
-    return time.Week > 2
+    local time = GetTimestamp()
+    return time.Week >= 2
 end
 
 -- Investment success condition
 function Process()
-    for i = 0, #lane do
-        if lane[i].TransferStationCount - pre_transfer_station[i] >= 3 then
-            return "success"
+    local start_station = GetStationInfosAtStart(1007)
+    local cur_station = GetStationInfos()
+    
+    for i = 0, #cur_station do
+        -- new station
+        if i > #start_station then
+            if cur_station[i].ServiceLaneCount >= additional_needs_1007 then
+                return success
+            end
+        -- existing station
+        else
+            if (cur_station[i].ServiceLaneCount - start_station[i].ServiceLaneCount) >= additional_needs_1007 then
+                return success
+            end
         end
     end
-    return "continue"
+
+    return continue
 end
 
 -- Investment award
 function Award()
-    AddMoney(500)
+    AddMoney(reward_money_1007)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

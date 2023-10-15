@@ -1,22 +1,20 @@
 -- No use in stores
+local reward_money_1011 = 500
+local time_needed_1011 = 7
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '이번 주에는 아이템을 새로 구매하지 마세요.'
-    Data.time_require = 7
-    Data.award = '500$'
+    Data.time_require = time_needed_1011
+    Data.award = reward_money_1011 .. "$"
 
     return Data
 end
 
-local shop
-local pre_shop
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    shop = GetShopStatistics()
-    pre_shop = shop.TotalPurchaseCount
 end
 
 -- Investment appear condition
@@ -26,15 +24,39 @@ end
 
 -- Investment success condition
 function Process()
-    if shop.TotalPurchaseCount == pre_shop then
-        return "success"
+    local start_shop = GetShopStatisticsAtStart(1011)
+    local start_time = GetTimestampAtStart(1011)
+
+    local cur_shop = GetShopStatistics()
+    local cur_time = GetTimestamp()
+
+    if (cur_time.Date - start_time.Date) < time_needed_1011 then
+        -- within the deadline
+        if cur_shop.TotalPurchaseCount == start_shop.TotalPurchaseCount then
+            return continue
+        else
+            return fail
+        end
     else
-        return "fail"
+        -- outside the deadline
+        if cur_shop.TotalPurchaseCount == start_shop.TotalPurchaseCount then
+            return success
+        else
+            return fail
+        end
     end
-    return "continue"
 end
 
 -- Investment award
 function Award()
-    AddMoney(500)
+    AddMoney(reward_money_1011)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct
