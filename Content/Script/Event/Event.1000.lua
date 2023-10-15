@@ -24,8 +24,8 @@ function EventData()
 
     local idx = math.random(1, #festival)
 
-    local title = festival.title[idx]
-    local flavor_text = festival.flavor[idx]
+    local title = festival[idx].title
+    local flavor_text = festival[idx].flavor
     
     Data.title = title
     Data.flavor_text = flavor_text
@@ -45,3 +45,10 @@ function Start()
     AddStation(2)
     AddPassengerSpawnProbability(0.3)
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct
