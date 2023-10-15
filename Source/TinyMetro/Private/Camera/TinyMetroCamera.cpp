@@ -7,6 +7,7 @@
 #include "SaveSystem/TMSaveManager.h"
 #include "Camera/TinyMetroCameraSaveGame.h"
 #include "Camera/TinyMetroPlayerController.h"
+#include "Train/TrainManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
@@ -39,6 +40,7 @@ void ATinyMetroCamera::BeginPlay()
 	if (!IsValid(SaveManagerRef)) {
 		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
 	}
+	if (!IsValid(TrainManagerRef)) TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
 
 	GEngine->GameViewport->Viewport->ViewportResizedEvent.AddUObject(this, &ATinyMetroCamera::InitViewport);
 	SpringArmComponenet->TargetArmLength = CurrentZoom;
@@ -146,6 +148,7 @@ void ATinyMetroCamera::Touch1Release() {
 	Touch1Pressed = false;
 	IsRotationMode = false;
 	IsMoveMode = false;
+	TrainManagerRef->ReleaseClick();
 }
 
 void ATinyMetroCamera::ResetRotation() {
@@ -170,7 +173,7 @@ void ATinyMetroCamera::MoveCamera(FVector2D TargetLocation) {
 }
 
 void ATinyMetroCamera::Touch1Axis(float Axis) {
-	if (Touch1Pressed && !Touch2Pressed) {
+	if (Touch1Pressed && !Touch2Pressed && CameraMoveEnable) {
 		// Get finger position
 		FVector2D currentTouchPositon;
 		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<ATinyMetroPlayerController>(Controller);

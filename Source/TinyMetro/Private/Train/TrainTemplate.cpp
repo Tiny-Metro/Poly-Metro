@@ -275,6 +275,7 @@ void ATrainTemplate::DropPassenger() {
 
 	if (IsValid(CurrentStationPointer)) {
 		for (auto& i : Passenger) {
+			if (i.Value.Destination == StationType::None) continue;
 			CurrentStationPointer->GetOffPassenger(i.Value, this);
 			Passenger.Remove(i.Key);
 			UpdatePassengerMesh();
