@@ -46,19 +46,19 @@ void ATimer::Tick(float DeltaTime)
 
 	// Daily check
 	if (DayCounter >= Daytime) {
-		DailyTask.Broadcast();
-
 		Timestamp.DayoftheWeek = static_cast<Day>(Timestamp.Date % 7);
 		Timestamp.Date++;
-
 		DayCounter -= Daytime;
+
+		DailyTask.Broadcast();
 	}
 
 	// Weekly check
 	if (WeekCounter >= (Daytime * 7)) {
-		WeeklyTask.Broadcast();
 		Timestamp.Week++;
 		WeekCounter -= (Daytime * 7);
+
+		WeeklyTask.Broadcast();
 	}
 
 	if (SkiptimeTarget <= ElapseTimeSec && SkiptimeFlag) {
