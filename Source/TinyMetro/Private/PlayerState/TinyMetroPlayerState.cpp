@@ -3,6 +3,7 @@
 
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "PlayerState/TinyMetroPlayerStateSaveGame.h"
+#include "Camera/TinyMetroCamera.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Station/StationManager.h"
 #include "Timer/Timer.h"
@@ -26,12 +27,14 @@ void ATinyMetroPlayerState::BeginPlay() {
 	if (!IsValid(TimerRef)) TimerRef = GameModeRef->GetTimer();
 	if (!IsValid(SaveManagerRef)) SaveManagerRef = GameModeRef->GetSaveManager();
 	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = GameModeRef->GetStatisticsManager();
+	if (!IsValid(CameraRef)) CameraRef = Cast<ATinyMetroCamera>(GetPawn());
 
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickInterval(1.0);
 
 	Load();
 
+	TimerRef->WeeklyTask.AddDynamic(this, &ATinyMetroPlayerState::WeeklyTask);
 	SaveManagerRef->SaveTask.AddDynamic(this, &ATinyMetroPlayerState::Save);
 }
 
@@ -237,6 +240,16 @@ void ATinyMetroPlayerState::Load() {
 	IsPolicyTutorialFinished = tmp->IsPolicyTutorialFinished;
 }
 
+void ATinyMetroPlayerState::WeeklyTask() {
+	if (Money > 0) {
+		if (BankruptcyWarning) {
+			// Bankruptcy
+		} else {
+			BankruptcyWarning = true;
+		}
+	}
+}
+
 void ATinyMetroPlayerState::ResetTutorialProceed() {
 	IsItemTutorialFinished = false;
 	IsLaneTutorialFinished = false;
@@ -247,4 +260,18 @@ void ATinyMetroPlayerState::ResetTutorialProceed() {
 	IsLoanTutorialFinished = false;
 	IsInvestmentTutorialFinished = false;
 	IsPolicyTutorialFinished = false;
+}
+
+void ATinyMetroPlayerState::GameOverByComplain() {
+	GameOverState = GameOverState::Complain;
+	CameraRef->SetCameraMoveEnable(false);
+	GameModeRef->SetGameSpeed(0);
+	GameOverTask.Broadcast();
+}
+
+void ATinyMetroPlayerState::GameOverByBankruptcy() {
+	GameOverState = GameOverState::Bankruptcy;
+	CameraRef->SetCameraMoveEnable(false);
+	GameModeRef->SetGameSpeed(0);
+	GameOverTask.Broadcast();
 }

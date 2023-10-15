@@ -25,6 +25,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetUiOpen(bool Flag);
 
+	UFUNCTION(BlueprintCallable)
+	void MoveCamera(FVector2D TargetLocation);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -61,8 +64,6 @@ protected:
 	// Used Common
 	UFUNCTION(BlueprintCallable)
 	void ResetRotation();
-	UFUNCTION(BlueprintCallable)
-	void MoveCamera(FVector2D TargetLocation);
 
 	// Save & Load
 	UFUNCTION()
