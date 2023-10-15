@@ -8,6 +8,8 @@
 AHUDManager::AHUDManager()
 {
 	CurrentLanguage = ELanguage::Korean;
+    CurrentTextSize = ETextSize::M;
+    SetTextSizeMap();
 }
 
 void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
@@ -147,4 +149,55 @@ void AHUDManager::SetTextSizeMap()
     textSizeMap.Add(ETextType::ExplainationText, ExplainationSize);
 
     TextSizeMap = textSizeMap;
+}
+
+void AHUDManager::UpdateWidgets()
+{
+    for (auto& WidgetPair : Widgets)
+    {
+        UPolyMetroWidget* Widget = WidgetPair.Value;
+        if (Widget)
+        {
+//            Widget->UpdateTextComponents(this);
+//            Widget->UpdateImageComponents(this);
+            Widget->UpdateWidgets(this);
+        }
+    }
+}
+
+UFont* AHUDManager::GetFont()
+{
+    switch (CurrentLanguage)
+    {
+    case ELanguage::English:
+        return EnglishFont;
+        break;
+    case ELanguage::Korean:
+        return KoreanFont;
+        break;
+    default:
+        return KoreanFont;
+        break;
+    }
+}
+
+int32 AHUDManager::GetTextSizeByType(ETextType TextType)
+{
+    return *TextSizeMap.Find(TextType);
+}
+
+FSlateFontInfo AHUDManager::GetFontInfo()
+{
+    switch (CurrentLanguage)
+    {
+    case ELanguage::English:
+        return EnglishFontInfo;
+        break;
+    case ELanguage::Korean:
+        return KoreanFontInfo;
+        break;
+    default:
+        return KoreanFontInfo;
+        break;
+    }
 }

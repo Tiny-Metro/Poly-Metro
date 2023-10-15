@@ -8,7 +8,11 @@
 #include "Components/Image.h"
 #include "HUDEnums.h"
 #include "HUDStructs.h"
+#include "Engine/TextRenderActor.h"  // If you're working with TextRender components
+#include "Internationalization/Text.h"  // For FText
 
+//#include "HUDManager.h"
+class AHUDManager;
 #include "PolyMetroWidget.generated.h"
 
 
@@ -21,12 +25,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString WidgetName;	
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Text")
-	TMap<FString, FString> TextBlockMap;
-
-	UFUNCTION(BlueprintCallable)
-	FString GetTextByName(FString Name);
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FTextComponent> TextComponents;
 
@@ -35,5 +33,31 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UPolyMetroWidget*> Widgets;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FSlateFontInfo DefaultFont;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void AssignTextComponent(FTextComponent NewTextComponent);
+
+	UFUNCTION(BlueprintCallable)
+	void AssignImageComponent(FImageComponent NewImageComponent);
+	
+	UFUNCTION(BlueprintCallable)
+	void UpdateTextComponents(AHUDManager* hudManager);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateImageComponents(AHUDManager* hudManager);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateWidgets(AHUDManager* hudManager);
+
+	/*
+public:
+	UFUNCTION(BlueprintCallable)
+	bool IsValid();
+	*/
+
 
 };
