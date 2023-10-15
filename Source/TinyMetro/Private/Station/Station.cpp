@@ -7,6 +7,7 @@
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSaveGame.h"
 #include "Station/StationSpawnPulse.h"
+#include "Camera/TinyMetroCamera.h"
 #include "Sound/SoundManager.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
@@ -556,7 +557,10 @@ void AStation::ComplainRoutine() {
 	// Complain excess : Game over
 	if (ComplainMax <= StationInfo.Complain) {
 		// Game over code
-
+		PlayerStateRef->GameOverByComplain();
+		if(!IsValid(CameraRef)) CameraRef = Cast<ATinyMetroCamera>(UGameplayStatics::GetPlayerState(GetWorld(), 0)->GetPawn());
+		auto tmpLocation = GetActorLocation();
+		CameraRef->MoveCamera(FVector2D(tmpLocation.X, tmpLocation.Y));
 		//Log
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(
