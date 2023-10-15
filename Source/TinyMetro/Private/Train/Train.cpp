@@ -289,12 +289,10 @@ void ATrain::OnReleasedLogic() {
 			SetActorLocation(StartLocation);
 			//ServiceStart(StartLocation, LaneRef, Destination);
 			ServiceStart(StartLocation, LaneRef, StationManagerRef->GetNearestStation(StartLocation, LaneRef));
-			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalShiftCount++;
 		} else {
 			UE_LOG(LogTemp, Log, TEXT("TrainRelease::Lane Invalid"));
 			// TODO : if upgrade, return upgrade cost
 
-			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalRetrievalCount++;
 			DespawnTrain();
 		}
 	}
@@ -358,6 +356,7 @@ void ATrain::DespawnTrain() {
 	for (auto& i : Subtrains) {
 		i->DespawnTrain();
 	}
+	if (!IsActorFirstSpawn) StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalRetrievalCount++;
 	Super::DespawnTrain();
 }
 

@@ -8,6 +8,9 @@
 #include "TrainType.h"
 #include "TrainManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTrainTutorialTask, FVector, TrainLocation);
+
+
 UCLASS()
 class TINYMETRO_API ATrainManager : public AActor
 {
@@ -97,6 +100,20 @@ public:
 	UFUNCTION()
 	bool Load();
 
+	UFUNCTION()
+	void InitTrainInfoWidget();
+	UFUNCTION()
+	class UTrainInfoWidget* GetTrainInfoWidget();
+
+	// Used tutorial
+	UPROPERTY(BlueprintAssignable)
+	FTrainTutorialTask TrainTutorialTask;
+
+	// Used controller (Click logic)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
+	ATrainTemplate* ClickedTrain;
+	UFUNCTION(BlueprintCallable)
+	void ReleaseClick();
 
 protected:
 	// Widget class
@@ -112,6 +129,8 @@ protected:
 	class ATinyMetroGameModeBase* GameModeRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	class AStatisticsManager* StatisticsManagerRef;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TArray<ATrainTemplate*> Trains;
@@ -129,4 +148,5 @@ protected:
 	float CostUpgradeTrain = 200.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float CostUpgradeSubtrain = 200.0f;
+
 };

@@ -230,7 +230,7 @@ FLuaValue UTinyMetroLuaState::GetBankStatistics() {
     statisticsTable.SetField(TEXT("TotalUsingLoanCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalUsingLoanCount));
     statisticsTable.SetField(TEXT("TotalRepayMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalRepayMoney));
     statisticsTable.SetField(TEXT("TotalLoanMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalLoanMoney));
-    statisticsTable.SetField(TEXT("TotalRepayInterestMoney"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(bankStatistics.TotalRepayInterestMoney));
+    statisticsTable.SetField(TEXT("TotalRepayInterestMoney"), ULuaBlueprintFunctionLibrary::LuaCreateNumber(bankStatistics.TotalRepayInterestMoney));
 
     return statisticsTable;
 }
@@ -244,7 +244,8 @@ TArray<FLuaValue> UTinyMetroLuaState::GetStationInfos() {
     for (auto& i : stationInfos) {
         FLuaValue tmp = CreateLuaTable();
         tmp.SetField(TEXT("Id"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.Id));
-        tmp.SetField(TEXT("StationType"), ULuaBlueprintFunctionLibrary::LuaCreateString(AStationManager::StationTypeToString(i.Type, tmpBool)));
+        tmp.SetField(TEXT("StationType"), ULuaBlueprintFunctionLibrary::LuaValueFromUTF8(AStationManager::StationTypeToString(i.Type, tmpBool)));
+        tmp.SetField(TEXT("StationIcon"), ULuaBlueprintFunctionLibrary::LuaValueFromUTF8(AStationManager::StationTypeToIcon(i.Type, tmpBool)));
         tmp.SetField(TEXT("ServiceLaneCount"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.ServiceLaneCount));
         tmp.SetField(TEXT("TotalUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.TotalUsingPassenger));
         tmp.SetField(TEXT("WeeklyUsingPassenger"), ULuaBlueprintFunctionLibrary::LuaCreateInteger(i.WeeklyUsingPassenger));

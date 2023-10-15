@@ -336,9 +336,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSplineMeshes();
 
-private:
-	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh);
-
 public:
 	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 	UStaticMesh* LaneMesh;
@@ -379,6 +376,44 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ExtendEnd(AStation* NewStation);
 
+public: // Change Lane Appearance
+	UFUNCTION(BlueprintCallable)
+	void ChangeLaneAppearance(TArray<FLanePoint> AddLaneArray, int32 StartIndex, int32 EndIndex);
+
+	void DoubleTapEvent(USplineMeshComponent* ClickedMesh);
+
+	void CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations);
+
+	UFUNCTION()
+	void CheckDoubleTap(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void CheckDoubleClick(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+
+	UFUNCTION()
+	void InitPressedCountDelay(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void InitPressedCountDelayWithClick(UPrimitiveComponent* TouchedComponent, FKey ButtonReleased);
+
+	int32 PressedCount =0;
+
+protected:
+	UPROPERTY(VisibleAnyWhere)
+	TArray<AStation*> ChangeAppearanceStations;
+	TArray<TArray<FIntPoint>> CurTunnelArea;
+	TArray<TArray<FIntPoint>> CurBridgeArea;
+	TArray<FLanePoint> NewLaneArray;
+	int32 StartLaneArrayIndex;
+	int32 EndLaneArrayIndex;
+
+	UPROPERTY(VisibleAnyWhere)
+	bool AppearanceWillBeChanged = false;
+	
+	void InitDelayChangeAppearanceValues();
+
+	bool CheckTrainsByDestinationForChangeAppearance(const TArray <class AStation*>& Stations);
+
 private:
 	bool IsStationsValid(const TArray<class AStation*>& NewStationPoint);
 
@@ -401,7 +436,8 @@ private:
 	TArray<FLanePoint> GetLanePathByPoint(FIntPoint StartStation, FIntPoint EndStation);
 	void GetLaneArrays(FIntPoint StartStationCoord, FIntPoint AddedStationCoord, TArray<FLanePoint>& PreLaneArray);
 	void SetMeshByIndex(int32 StartIndex, int32 LastIndex);
-	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index);
+	void SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh, int32 Index, int32 Pos);
+	void SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index, int32 Pos);
 	FVector LineIntersection(FVector A, FVector B, FVector C, FVector D);
 
 	float CalculateOffset(int32 LanePosition);
@@ -465,4 +501,8 @@ protected: //Statistics
 
 	UPROPERTY(BluePrintReadWrite, EditAnyWhere)
 	int32 UsingTunnelCount;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	TArray<AStation*> GetConnectedStations(USplineMeshComponent* ClickedMesh);
 };

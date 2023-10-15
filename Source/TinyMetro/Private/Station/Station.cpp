@@ -6,6 +6,7 @@
 #include "Station/PathQueue.h"
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSaveGame.h"
+#include "Station/StationSpawnPulse.h"
 #include "Sound/SoundManager.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
@@ -39,13 +40,6 @@ AStation::AStation()
 	StationComplainMeshComponent->SetupAttachment(RootComponent);
 	StationComplainMeshComponent->SetGenerateOverlapEvents(false);
 	StationComplainMeshComponent->SetWorldScale3D(FVector(1.20f));
-	
-	// Set station pulse effect mesh
-	PulseComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pulse plane"));
-	PulseComponent->SetupAttachment(RootComponent);
-	PulseComponent->SetGenerateOverlapEvents(false);
-	PulseComponent->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")).Object);
-	PulseComponent->SetWorldScale3D(FVector(20.0f, 20.0f, 1.0f));
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
@@ -130,14 +124,15 @@ void AStation::BeginPlay()
 	UpdatePassengerMesh();
 	SetInfoWidget(StationManager->GetStationInfoWidget());
 
-	// Set off alarm pulse
-	if (SpawnAlarm) {
-		FTimerHandle alarmHandle;
-		GetWorld()->GetTimerManager().SetTimer(alarmHandle, this, &AStation::OffSpawnAlarm, TimerRef->GetDaytime());
-	}
+	PulseActor = GetWorld()->SpawnActor(AStationSpawnPulse::StaticClass());
+	PulseActor->SetActorLocation(GetActorLocation() - FVector(0, 0, 1));
 
 	if (StationInfo.IsUpgrade) {
 		Upgrade();
+	}
+
+	if (IsLoaded) {
+		OffSpawnAlarm();
 	}
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
@@ -202,6 +197,8 @@ void AStation::DailyTask() {
 	SpawnDay++;
 	// Update complain
 	ComplainRoutine();
+	// Off spawn pulse;
+	OffSpawnAlarm();
 }
 
 void AStation::Save() {
@@ -227,6 +224,8 @@ void AStation::Load() {
 		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
 		SpawnDay = tmp->SpawnDay;
 		StationInfo = tmp->StationInfo;
+
+		IsLoaded = true;
 	}
 }
 
@@ -254,7 +253,7 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 
 				// Get money
 				if (!tmp.IsAlreadyPaid && !tmp.IsFree) {
-					PlayerStateRef->AddMoney(Fare);
+					PlayerStateRef->AddIncome(Fare);
 					StationInfo.TotalProfit += Fare;
 					StationInfo.WeeklyProfit += Fare;
 
@@ -595,9 +594,12 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 }
 
 void AStation::OffSpawnAlarm() {
-	SpawnAlarm = false;
-	PulseComponent->SetMaterial(0, nullptr);
-	PulseComponent->SetWorldScale3D(FVector(0));
+	if (SpawnAlarm) {
+		SpawnAlarm = false;
+	}
+	if (IsValid(PulseActor)) {
+		PulseActor->Destroy();
+	}
 }
 
 void AStation::EventEnd() {

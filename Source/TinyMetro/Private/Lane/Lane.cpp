@@ -16,6 +16,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Lane/LaneManager.h"
 #include "Statistics/StatisticsManager.h"
+#include "Algo/Reverse.h"
 
 // Sets default values
 ALane::ALane()
@@ -98,6 +99,17 @@ void ALane::Tick(float DeltaTime)
 	{ 
 		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("Stations Have To Be Removed At End"));
 		FinishRemovingLaneAtEnd();
+	}
+
+	if (AppearanceWillBeChanged)
+	{
+		if (!CheckTrainsByDestinationForChangeAppearance(ChangeAppearanceStations))
+		{
+			DisconnectBT(CurTunnelArea, GridType::Hill);
+			DisconnectBT(CurBridgeArea, GridType::Water);
+			ChangeLaneAppearance(NewLaneArray, StartLaneArrayIndex, EndLaneArrayIndex);
+			InitDelayChangeAppearanceValues();
+		}
 	}
 
 }
@@ -1932,7 +1944,8 @@ void ALane::SetSplineMeshes(){
 	return;
 }
 
-void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh) {
+// * SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
+void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, UStaticMesh* SplineMesh, int32 Index, int32 Pos) {
 	SplineMeshComponent->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 	SplineMeshComponent->SetStaticMesh(SplineMesh);
 
@@ -1945,6 +1958,13 @@ void ALane::SetSplineMeshComponent(USplineMeshComponent* SplineMeshComponent, US
 	SplineMeshComponent->SetCollisionProfileName(TEXT("BlockAll"));
 
 	SplineMeshComponent->RegisterComponent();
+
+	// Set Location - the location doesn't represent where the meshes are - it represents where it belong and other infos
+	// SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
+	// 0.1 = front, 0.2 = middle, 0.3 = back
+	float zPosition = 0.1f * Pos;
+	SplineMeshComponent->SetWorldLocation(FVector(LaneId, Index, zPosition));
+	FVector vec = SplineMeshComponent->GetComponentLocation();
 }
 
 void ALane::SetMesh(UStaticMesh* Mesh, UStaticMesh* Through) {
@@ -2027,7 +2047,7 @@ void ALane::RemoveLaneFromStart(int32 Index){
 	EndTangent = StartTangent;
 
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-	SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+	SetSplineMeshComponent(SplineMeshComponent, LaneMesh, 0, 3);
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 
@@ -2103,7 +2123,7 @@ void ALane::RemoveLaneFromEnd(int32 Index, int32 ExStationNum){
 
 	//Add&Set Spline Mesh Component (mesh)
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
-	SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+	SetSplineMeshComponent(SplineMeshComponent, LaneMesh, lastIndex, 1);
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 
@@ -2122,6 +2142,7 @@ void ALane::ExtendStart(AStation* NewStation){
 	AStation* NextStation = StationPoint[1];
 
 	AddLaneArray = GetLanePath(NewStation, NextStation);
+
 	int32 lastIndex = AddLaneArray.Num() - 1;
 	AddLaneArray.RemoveAt(lastIndex);
 
@@ -2194,6 +2215,242 @@ void ALane::ExtendEnd(AStation* NewStation){
 
 	return;
 
+}
+
+void ALane::ChangeLaneAppearance(TArray<FLanePoint> AddLaneArray, int32 StartIndex, int32 EndIndex)
+{
+	FLanePoint Start = LaneArray[StartIndex];
+	FLanePoint End = LaneArray[EndIndex];
+
+	//Clear SplineMesh
+	for (int i = EndIndex; i >= StartIndex; i--)
+	{
+		ClearSplineMeshAt(i);
+		LaneArray.RemoveAt(i);
+	}
+
+	//Insert AddLaneArray to LaneArray
+	int32 lastIndex = AddLaneArray.Num() - 1;
+	
+	//AddLaneArray.Insert(Start, 0);
+	//AddLaneArray.Add(End);
+
+	LaneArray.Insert(AddLaneArray, StartIndex);
+
+	
+
+	//Add LaneLoc
+	//	TArray<FVector> NewLaneLocation;
+
+	if (!GridManagerRef) {
+		UE_LOG(LogTemp, Warning, TEXT("GridManagerRef is not valid."));
+		return;
+	}
+
+	//Set Spline Again
+	//Add Spline Mesh
+	UpdateLocationAndSpline();
+
+	SetMeshByIndex(StartIndex, StartIndex + lastIndex);
+
+	TArray<TArray<FIntPoint>> DeletedBridge = GetArea(AddLaneArray, GridType::Water);
+	ConnectBT(DeletedBridge, GridType::Water);
+
+	TArray<TArray<FIntPoint>> DeletedTunnel = GetArea(AddLaneArray, GridType::Hill);
+	ConnectBT(DeletedTunnel, GridType::Hill);
+	
+}
+
+void ALane::DoubleTapEvent(USplineMeshComponent* ClickedMesh)
+{
+	//FindStations with SplineMeshComponent
+	TArray<AStation*> TArrStations;
+	TArrStations = GetConnectedStations(ClickedMesh);
+	
+
+	CheckIsChangableLaneAppearance(TArrStations);
+}
+
+void ALane::CheckIsChangableLaneAppearance(TArray<AStation*> TargetStations)
+{
+	
+	AStation* StartStation = TargetStations[0];
+	AStation* EndStation = TargetStations[1];
+
+
+	// Find CurrentLaneArray
+	TArray<FLanePoint> CurrentLaneArray;
+	int32 StartIndex =-1;
+	int32 EndIndex =-1;
+	bool IsCurrentLane = false;
+	for (int i=0; i<LaneArray.Num(); i++)
+	{
+		if (LaneArray[i].Coordination == StartStation->GetCurrentGridCellData().WorldCoordination)
+		{
+			IsCurrentLane = true;
+			StartIndex = i;
+		}
+
+		if (IsCurrentLane)
+		{
+			CurrentLaneArray.Add(LaneArray[i]);
+		}
+
+		if (LaneArray[i].Coordination == EndStation->GetCurrentGridCellData().WorldCoordination)
+		{
+			IsCurrentLane = false;
+			EndIndex = i;
+			break;
+		}
+	}
+
+	if (StartIndex == -1 || EndIndex == -1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StartIndex or EndIndex is null"));
+		return;
+	}
+
+	//Check BT Items with CurrentLaneArray
+	TArray<TArray<FIntPoint>> CurrentTunnelArea = GetConnectorArea(CurrentLaneArray, GridType::Hill);
+	TArray<TArray<FIntPoint>> CurrentBridgeArea = GetConnectorArea(CurrentLaneArray, GridType::Water);
+
+	int32 CurrentTunnelNum = GetRequiredConnector(CurrentTunnelArea, GridType::Hill);
+	int32 CurrentBridgeNum = GetRequiredConnector(CurrentBridgeArea, GridType::Water);
+
+	//Get LanePoints
+	TArray<FLanePoint> AddLaneArray;
+
+	AddLaneArray = GetLanePath(EndStation, StartStation);
+	Algo::Reverse(AddLaneArray);
+
+	if (AddLaneArray[1].Coordination == CurrentLaneArray[1].Coordination)
+	{
+		AddLaneArray = GetLanePath(StartStation, EndStation);
+	}
+
+	//Check BT Items with NewLaneArray
+	TArray<TArray<FIntPoint>> TunnelArea = GetConnectorArea(AddLaneArray, GridType::Hill);
+	TArray<TArray<FIntPoint>> BridgeArea = GetConnectorArea(AddLaneArray, GridType::Water);
+
+	int32 RequiredTunnel = GetRequiredConnector(TunnelArea, GridType::Hill);
+	int32 RequiredBridge = GetRequiredConnector(TunnelArea, GridType::Water);
+
+	bool IsChangable = true;
+	if (RequiredBridge > CurrentBridgeNum + TinyMetroPlayerState->GetValidBridgeCount())
+	{
+		IsChangable = false;
+	}
+	if (RequiredTunnel > CurrentTunnelNum + TinyMetroPlayerState->GetValidTunnelCount())
+	{
+		IsChangable = false;
+	}
+
+	if (!IsChangable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Not enough BT Item"));
+		return;
+	}
+
+	//Check Train
+	if (!CheckTrainsByDestinationForChangeAppearance(TargetStations))
+	{
+		DisconnectBT(CurrentBridgeArea, GridType::Water);
+		DisconnectBT(CurrentTunnelArea, GridType::Hill);
+		ChangeLaneAppearance(AddLaneArray, StartIndex, EndIndex);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Train is Alive"))
+		AppearanceWillBeChanged = true;
+		ChangeAppearanceStations = TargetStations;
+		CurTunnelArea = CurrentTunnelArea;
+		CurBridgeArea = CurrentBridgeArea;
+		NewLaneArray = AddLaneArray;
+		StartLaneArrayIndex = StartIndex;
+		EndLaneArrayIndex = EndIndex;
+	}
+}
+
+void ALane::CheckDoubleTap(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
+{
+	PressedCount++;
+
+	if (PressedCount >= 2)
+	{
+		USplineMeshComponent* Mesh = Cast<USplineMeshComponent>(TouchedComponent);
+
+		DoubleTapEvent(Mesh);
+
+		PressedCount = 0;
+	}
+}
+
+void ALane::CheckDoubleClick(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Clicked"));
+	PressedCount++;
+
+	if (PressedCount >= 2)
+	{
+		USplineMeshComponent* Mesh = Cast<USplineMeshComponent>(TouchedComponent);
+		UE_LOG(LogTemp, Warning, TEXT("DoubleClicked"));
+		DoubleTapEvent(Mesh);
+
+		PressedCount = 0;
+	}
+}
+
+void ALane::InitPressedCountDelay(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
+{
+	FTimerHandle DoubleTouchTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DoubleTouchTimerHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			PressedCount = 0;
+
+			GetWorld()->GetTimerManager().ClearTimer(DoubleTouchTimerHandle);
+		}), 0.5f, false);
+}
+
+void ALane::InitPressedCountDelayWithClick(UPrimitiveComponent* TouchedComponent, FKey ButtonReleased)
+{
+	FTimerHandle DoubleTouchTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DoubleTouchTimerHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			PressedCount = 0;
+
+	GetWorld()->GetTimerManager().ClearTimer(DoubleTouchTimerHandle);
+		}), 0.5f, false);
+}
+
+void ALane::InitDelayChangeAppearanceValues()
+{
+	AppearanceWillBeChanged = false;
+	ChangeAppearanceStations.Empty();
+	CurTunnelArea.Empty();
+	CurBridgeArea.Empty();
+	NewLaneArray.Empty();
+	StartLaneArrayIndex = -1;
+	EndLaneArrayIndex = -1;
+}
+
+bool ALane::CheckTrainsByDestinationForChangeAppearance(const TArray<class AStation*>& Stations)
+{
+	bool res = false;
+
+	for (AStation* Station : Stations)
+	{
+		int32 tmp = TrainManagerRef->GetStationCountByDestination(Station->GetStationInfo(), this);
+
+		if (tmp != 0)
+		{
+				res = true;
+			break;
+		}
+
+
+	}
+
+	return res;
 }
 
 bool ALane::IsStationsValid(const TArray<class AStation*>& NewStationPoint) {
@@ -2389,7 +2646,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 				EndTangent = StartTangent;
 
 				//Add&Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 1);
 			}
 			else if (index == LaneLocation.Num() - 1)
 			{
@@ -2401,7 +2658,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 				StartTangent = EndTangent;
 				//Add&Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 3);
 			}
 			else
 			{
@@ -2419,7 +2676,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 				StartTangent = EndTangent;
 				//Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 3);
 
 				/* --- Middle Mesh (if there is any) --- */
 				if (LaneArray[i].IsBendingPoint) {
@@ -2428,7 +2685,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 					EndTangent = LaneSpline->GetTangentAtSplinePoint(index, ESplineCoordinateSpace::Local);
 
 					//Set Spline Mesh Component (mesh)
-					SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+					SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 2);
 				}
 
 				/* --- Front Mesh --- */
@@ -2445,7 +2702,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 					StartTangent = StartTangent.GetSafeNormal() * ClampedLength;
 				}
 				//Set Spline Mesh Component (mesh)
-				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i);
+				SetSplineMeshComponent(StartPos, StartTangent, EndPos, EndTangent, i, 1);
 
 			}
 		}
@@ -2454,16 +2711,16 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 }
 
-void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index) 
+void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, int32 Index, int32 Pos) 
 {
 	USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this);
 	if (LaneArray[Index].IsThrough)
 	{
-		SetSplineMeshComponent(SplineMeshComponent, ThroughMesh);
+		SetSplineMeshComponent(SplineMeshComponent, ThroughMesh, Index, Pos);
 	}
 	else
 	{
-		SetSplineMeshComponent(SplineMeshComponent, LaneMesh);
+		SetSplineMeshComponent(SplineMeshComponent, LaneMesh, Index, Pos);
 	}
 	//RemoveMeshMaterial
 	if(LaneArray[Index].WillBeRemoved)
@@ -2477,6 +2734,13 @@ void ALane::SetSplineMeshComponent(FVector StartPos, FVector StartTangent, FVect
 	SplineMeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
 	SplineMeshComponent->AttachToComponent(LaneSpline, FAttachmentTransformRules::KeepWorldTransform);
 	SplineMeshComponent->RegisterComponent();
+
+	//Add Touch, Click Event
+	SplineMeshComponent->OnInputTouchBegin.AddDynamic(this, &ALane::CheckDoubleTap);
+	SplineMeshComponent->OnInputTouchEnd.AddDynamic(this, &ALane::InitPressedCountDelay);
+	SplineMeshComponent->OnClicked.AddDynamic(this, &ALane::CheckDoubleClick);
+	SplineMeshComponent->OnReleased.AddDynamic(this, &ALane::InitPressedCountDelayWithClick);
+
 	LaneArray[Index].MeshArray.Add(SplineMeshComponent);
 }
 
@@ -2573,6 +2837,7 @@ void ALane::InitializeCurrentLaneStatics()
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = 0;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = 0;
 }
+
 void ALane::UpdateUsingConnector()
 {
 	UsingTunnelCount = BTMangerREF->GetUsingConnectorCount(LaneId, ConnectorType::Tunnel);
@@ -2580,4 +2845,29 @@ void ALane::UpdateUsingConnector()
 
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingBridgeCount = UsingBridgeCount;
 	StatisticsManagerRef->LaneStatistics.Lanes[LaneId].UsingTunnelCount = UsingTunnelCount;
+}
+
+TArray<AStation*> ALane::GetConnectedStations(USplineMeshComponent* ClickedMesh)
+{
+	// SplineMeshComponent.Location = ( X = LaneId, Y= Attatched Lane Point's Index of LaneArray, Z = MeshPosition (whether it is Front, Back, MiddleMesh) )
+	FVector meshLocation = ClickedMesh->GetComponentLocation();
+	int32 index = meshLocation.Y;
+
+	int32 FrontStationIndex =  -1;
+	int32 BackStationIndex;
+
+	for (int i = 0; i < index; i++)
+	{
+		if (LaneArray[i].IsStation)
+		{
+			FrontStationIndex++;
+		}
+	}
+	BackStationIndex = FrontStationIndex + 1;
+
+	TArray<AStation*> returningStations;
+	returningStations.Add(StationPoint[FrontStationIndex]);
+	returningStations.Add(StationPoint[BackStationIndex]);
+
+	return returningStations;
 }

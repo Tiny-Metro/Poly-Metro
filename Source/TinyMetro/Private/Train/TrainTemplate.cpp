@@ -7,6 +7,7 @@
 #include "Sound/SoundManager.h"
 #include "GameModes/GameModeBaseSeoul.h"
 #include "Camera/TinyMetroPlayerController.h"
+#include "Camera/TinyMetroCamera.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Lane/LaneManager.h"
 #include "Lane/Lane.h"
@@ -235,9 +236,25 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 	//Destination = D;
 	StartLocation.Z = 20.f;
 	this->SetActorLocation(StartLocation);
+	if (!IsValid(StatisticsManagerRef)) StatisticsManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetStatisticsManager();
 
 	TrainManagerRef->AddTrain(this);
 	TrainZAxis = this->GetActorLocation().Z;
+	if (IsActorFirstSpawn) {
+		TrainManagerRef->TrainTutorialTask.Broadcast(GetActorLocation());
+		if (this->GetTrainInfo().Type == TrainType::Train) {
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalPlacementCount++;
+		} else {
+			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalPlacementCount++;
+		}
+		IsActorFirstSpawn = false;
+	} else {
+		if (this->GetTrainInfo().Type == TrainType::Train) {
+			StatisticsManagerRef->ShopStatistics.TrainStatistics.TotalShiftCount++;
+		} else {
+			StatisticsManagerRef->ShopStatistics.SubtrainStatistics.TotalShiftCount++;
+		}
+	}
 	IsActorSpawnByWidget = false;
 
 	LaneRef = Lane;
@@ -258,6 +275,7 @@ void ATrainTemplate::DropPassenger() {
 
 	if (IsValid(CurrentStationPointer)) {
 		for (auto& i : Passenger) {
+			if (i.Value.Destination == StationType::None) continue;
 			CurrentStationPointer->GetOffPassenger(i.Value, this);
 			Passenger.Remove(i.Key);
 			UpdatePassengerMesh();
@@ -343,8 +361,12 @@ void ATrainTemplate::TrainTouchEnd(ETouchIndex::Type FingerIndex, AActor* Touche
 }
 
 void ATrainTemplate::OnPressedLogic() {
+	UE_LOG(LogTemp, Log, TEXT("TrainTemplate::OnClickLogic"));
 	TouchInput = true;
 	TouchTime = 0.0f;
+	TrainManagerRef->ClickedTrain = this;
+	if (!IsValid(CameraRef)) CameraRef = Cast<ATinyMetroCamera>(PlayerStateRef->GetPawn());
+	CameraRef->SetCameraMoveEnable(false);
 	OnPressedTime = UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld());
 }
 
@@ -355,11 +377,14 @@ void ATrainTemplate::OnReleasedLogic() {
 	);*/
 	if (TouchTime < LongClickInterval) {
 		IsSingleClick = true;
+		if (!IsValid(TrainInfoWidget)) SetTrainInfoWidget(TrainManagerRef->GetTrainInfoWidget());
 		TrainInfoWidget->ShowWidget(this);
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 			TEXT("TrainTemplate::OnClick")
 		);*/
 	}
+	if (!IsValid(CameraRef)) CameraRef = Cast<ATinyMetroCamera>(PlayerStateRef->GetPawn());
+	CameraRef->SetCameraMoveEnable(true);
 	IsActorDragged = false;
 	TouchInput = false;
 	TouchTime = 0.0f;
@@ -399,6 +424,7 @@ bool ATrainTemplate::Load() {
 	if (!IsValid(LaneManagerRef)) LaneManagerRef = GameModeRef->GetLaneManager();
 	if (!IsValid(StationManagerRef)) StationManagerRef = GameModeRef->GetStationManager();
 	IsLoaded = true;
+	IsActorFirstSpawn = false;
 	return false;
 }
 
@@ -477,9 +503,10 @@ void ATrainTemplate::InitTrainMaterial() {
 	);*/
 
 	auto tmp = Cast<AGameModeBaseSeoul>(GetWorld()->GetAuthGameMode())->GetTrainManager()->GetTrainMaterial();
-	for (int i = 1; i < TrainMaterial.Num() - 1; i++) {
+	while (TrainMaterial.Num() > 1) TrainMaterial.RemoveAt(1);
+	/*for (int i = 1; i < TrainMaterial.Num() - 1; i++) {
 		TrainMaterial.RemoveAt(i);
-	}
+	}*/
 	TrainMaterial.Append(tmp);
 }
 
@@ -490,13 +517,6 @@ void ATrainTemplate::InitTrainMaterial() {
 //		FStreamableDelegate::CreateUObject(this, &ATrainTemplate::TrainMeshDeferred)
 //	);
 //}
-
-void ATrainTemplate::TrainMaterialDeferred() {
-	for (auto& i : TrainMaterialPath) {
-		//TAssetPtr<UMaterial> tmp(i);
-		TrainMaterial.AddUnique(Cast<UMaterial>(i.ResolveObject()));
-	}
-}
 
 //void ATrainTemplate::TrainMeshDeferred() {
 //	for (auto& i : TrainMeshPath) {

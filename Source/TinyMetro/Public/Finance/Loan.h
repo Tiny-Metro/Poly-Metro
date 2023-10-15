@@ -64,6 +64,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 Balance; // Balance of loan
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	float RepayInterest;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 RepayPerWeek; // Repay amount per week
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int32 RemainTime; // Remainder week
