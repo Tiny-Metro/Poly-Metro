@@ -82,6 +82,8 @@ protected:
 	class ATinyMetroPlayerController* PlayerControllerRef;
 	UPROPERTY()
 	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY()
+	class ATrainManager* TrainManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector2D MousePosition;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
