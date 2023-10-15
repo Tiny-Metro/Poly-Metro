@@ -56,7 +56,7 @@ void ATinyMetroCamera::InitViewport(FViewport* Viewport, uint32 unused) {
 }
 
 void ATinyMetroCamera::MouseWheel(float Axis) {
-	if (!UiOpened) {
+	if (!UiOpened && CameraMoveEnable) {
 		double newZoom = UKismetMathLibrary::FClamp(SpringArmComponenet->TargetArmLength + -Axis * ZoomSpeed, MinZoom, MaxZoom);
 		SpringArmComponenet->TargetArmLength = newZoom;
 	}
@@ -105,13 +105,13 @@ void ATinyMetroCamera::CameraMoveY(float Axis) {
 }
 
 void ATinyMetroCamera::CameraRotationZ(float Axis) {
-	if (Axis != 0 && !IsResetRotation && !UiOpened) {
+	if (Axis != 0 && !IsResetRotation && !UiOpened && CameraMoveEnable) {
 		AddActorWorldRotation(FRotator(0.0, Axis * CameraRotationSpeedZ, 0));
 	}
 }
 
 void ATinyMetroCamera::CameraRotationY(float Axis) {
-	if (Axis != 0 && !IsResetRotation && !UiOpened) {
+	if (Axis != 0 && !IsResetRotation && !UiOpened && CameraMoveEnable) {
 		FRotator curRotation = SpringArmComponenet->GetRelativeRotation();
 		SpringArmComponenet->SetRelativeRotation(FRotator(
 			UKismetMathLibrary::FClamp(curRotation.Pitch + Axis * CameraRotationSpeedY, MinRotationAxisY, MaxRotationAxisY),
