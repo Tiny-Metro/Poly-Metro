@@ -9,4 +9,5 @@ void UStationInfoWidget::NativeConstruct() {
 }
 
 void UStationInfoWidget::ShowWidget_Implementation(AStation* Station) {
+	StationRef = Station;
 }
