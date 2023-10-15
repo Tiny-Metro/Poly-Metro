@@ -42,10 +42,7 @@ void ATrainManager::BeginPlay()
 
 	InitTrainMaterial();
 	InitPassengerMaterial();
-
-	TrainInfoWidget = CreateWidget<UTrainInfoWidget>(GetWorld(), TrainInfoWidgetClass);
-	TrainInfoWidget->AddToViewport();
-	TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+	InitTrainInfoWidget();
 
 	for (auto& i : Trains) {
 		i->FinishLoad();
@@ -381,6 +378,17 @@ bool ATrainManager::Load() {
 	}
 
 	return true;
+}
+
+void ATrainManager::InitTrainInfoWidget() {
+	TrainInfoWidget = CreateWidget<UTrainInfoWidget>(GetWorld(), TrainInfoWidgetClass);
+	TrainInfoWidget->AddToViewport();
+	TrainInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+UTrainInfoWidget* ATrainManager::GetTrainInfoWidget() {
+	if (!IsValid(TrainInfoWidget)) InitTrainInfoWidget();
+	return TrainInfoWidget;
 }
 
 void ATrainManager::ReleaseClick() {

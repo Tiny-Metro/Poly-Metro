@@ -100,6 +100,11 @@ public:
 	UFUNCTION()
 	bool Load();
 
+	UFUNCTION()
+	void InitTrainInfoWidget();
+	UFUNCTION()
+	class UTrainInfoWidget* GetTrainInfoWidget();
+
 	// Used tutorial
 	UPROPERTY(BlueprintAssignable)
 	FTrainTutorialTask TrainTutorialTask;
