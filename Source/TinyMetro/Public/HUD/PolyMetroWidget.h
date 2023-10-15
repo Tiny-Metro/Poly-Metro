@@ -29,6 +29,10 @@ public:
 	TArray<FTextComponent> TextComponents;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FTextComponent> DynamicTextComponents;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FImageComponent> ImageComponents;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

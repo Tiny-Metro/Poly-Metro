@@ -25,6 +25,14 @@ void UPolyMetroWidget::UpdateTextComponents(AHUDManager* hudManager)
 
 		targetTextComponent.TextWidgetREF->SetFont(targetFontInfo);
 	}
+	for (FTextComponent targetTextComponent : DynamicTextComponents)
+	{
+		FSlateFontInfo targetFontInfo = hudManager->GetFontInfo();
+		int32 textSize = hudManager->GetTextSizeByType(targetTextComponent.TextType);
+		targetFontInfo.Size = textSize;
+
+		targetTextComponent.TextWidgetREF->SetFont(targetFontInfo);
+	}
 }
 void UPolyMetroWidget::UpdateImageComponents(AHUDManager* hudManager)
 {
