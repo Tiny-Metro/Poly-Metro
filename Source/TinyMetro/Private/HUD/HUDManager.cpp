@@ -123,8 +123,8 @@ UTexture* AHUDManager::GetImageByEnum(EHUDImage ImageEnum)
 void AHUDManager::SetTextSizeMap()
 {
     int32 TitleSize = 36;
-    int32 BasicSize = 32;
-    int32 ExplainationSize = 28;
+    int32 BasicSize = 27;
+    int32 ExplainationSize = 22;
 
     switch (CurrentTextSize)
     {
@@ -144,6 +144,7 @@ void AHUDManager::SetTextSizeMap()
         break;
     }
     TMap<ETextType, int32> textSizeMap;
+    TextSizeMap.Empty();
     textSizeMap.Add(ETextType::Title, TitleSize);
     textSizeMap.Add(ETextType::Basic, BasicSize);
     textSizeMap.Add(ETextType::ExplainationText, ExplainationSize);
