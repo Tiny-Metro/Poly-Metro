@@ -22,6 +22,8 @@ public:
 	void ToggleCameraMoveEnable();
 	UFUNCTION()
 	void SetCameraMoveEnable(bool Flag);
+	UFUNCTION(BlueprintCallable)
+	void SetUiOpen(bool Flag);
 
 protected:
 	// Called when the game starts or when spawned
