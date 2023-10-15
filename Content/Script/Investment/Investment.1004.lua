@@ -1,52 +1,63 @@
 -- carriage connection
+local additional_needs_1004 = 2
+local reward_item_1004 = {Train, 1}
+local reward_money_1004 = 300
+local time_needed_1004 = 7
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
-    Data.message = '객차가 두 개 이상 달린 열차를 만드세요.'
-    Data.time_require = 7
-    Data.award = '열차 1량, 300$'
+    Data.message = '객차가 '.. additional_needs_1004 ..' 개 이상 달린 열차를 만드세요.'
+    Data.time_require = time_needed_1004
+    Data.award = '열차 '..  reward_item_1004[2]..'량, '.. reward_money_1004 ..'$'
 
     return Data
 end
 
-local trains
-local pre_subtrain_count
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    trains = GetTrainInfos()
-    pre_subtrain_count = {}
-    for i=0, #trains do
-        if trains[i].SubtrainCount ~= -1 then
-            pre_subtrain_count[i] = trains[i].SubtrainCount
-        end
-    end
 end
 
 -- Investment appear condition
 function Appearance()
-    time = GetTimestamp()
-    return time.Week > 2
+    local time = GetTimestamp()
+    return time.Week >= 2
 end
 
 -- Investment success condition
 function Process()
-    local additionalSubtrainsNeeded = 2
+    local start_train = GetTrainInfosAtStart(1004)
+    local cur_train = GetTrainInfos()
 
-    for i = 0, #trains do
-        if trains[i].SubtrainCount ~= -1 then
-            local additionalSubtrains = trains[i].SubtrainCount - (pre_subtrain_count[i] or 0)
-            if additionalSubtrains >= additionalSubtrainsNeeded then
-                return "success"
+    for i = 0, #cur_train do
+        if i <= #start_train then
+            -- existing train
+            local additional_subtrains = (cur_train[i].SubtrainCount - (start_train[i].SubtrainCount or 0))
+            if additional_subtrains >= additional_needs_1004 then
+                return success
+            end
+        else
+            -- new train
+            if cur_train[i].SubtrainCount >= additional_needs_1004 then
+                return success
             end
         end
     end
-    return "continue"
+    return continue
 end
 
 -- Investment award
 function Award()
-    AddItem(Train, 1)
-    AddMoney(500)
+    AddItem(reward_item_1004[1], reward_item_1004[2])
+    AddMoney(reward_money_1004)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

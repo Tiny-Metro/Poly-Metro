@@ -22,6 +22,11 @@ public:
 	void ToggleCameraMoveEnable();
 	UFUNCTION()
 	void SetCameraMoveEnable(bool Flag);
+	UFUNCTION(BlueprintCallable)
+	void SetUiOpen(bool Flag);
+
+	UFUNCTION(BlueprintCallable)
+	void MoveCamera(FVector2D TargetLocation);
 
 protected:
 	// Called when the game starts or when spawned
@@ -59,8 +64,6 @@ protected:
 	// Used Common
 	UFUNCTION(BlueprintCallable)
 	void ResetRotation();
-	UFUNCTION(BlueprintCallable)
-	void MoveCamera(FVector2D TargetLocation);
 
 	// Save & Load
 	UFUNCTION()
@@ -82,6 +85,8 @@ protected:
 	class ATinyMetroPlayerController* PlayerControllerRef;
 	UPROPERTY()
 	class ATMSaveManager* SaveManagerRef;
+	UPROPERTY()
+	class ATrainManager* TrainManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector2D MousePosition;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")

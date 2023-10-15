@@ -7,6 +7,7 @@
 #include "SaveSystem/TMSaveManager.h"
 #include "Camera/TinyMetroCameraSaveGame.h"
 #include "Camera/TinyMetroPlayerController.h"
+#include "Train/TrainManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
@@ -39,6 +40,7 @@ void ATinyMetroCamera::BeginPlay()
 	if (!IsValid(SaveManagerRef)) {
 		SaveManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetSaveManager();
 	}
+	if (!IsValid(TrainManagerRef)) TrainManagerRef = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->GetTrainManager();
 
 	GEngine->GameViewport->Viewport->ViewportResizedEvent.AddUObject(this, &ATinyMetroCamera::InitViewport);
 	SpringArmComponenet->TargetArmLength = CurrentZoom;
@@ -54,8 +56,10 @@ void ATinyMetroCamera::InitViewport(FViewport* Viewport, uint32 unused) {
 }
 
 void ATinyMetroCamera::MouseWheel(float Axis) {
-	double newZoom = UKismetMathLibrary::FClamp(SpringArmComponenet->TargetArmLength + -Axis * ZoomSpeed, MinZoom, MaxZoom);
-	SpringArmComponenet->TargetArmLength = newZoom;
+	if (!UiOpened && CameraMoveEnable) {
+		double newZoom = UKismetMathLibrary::FClamp(SpringArmComponenet->TargetArmLength + -Axis * ZoomSpeed, MinZoom, MaxZoom);
+		SpringArmComponenet->TargetArmLength = newZoom;
+	}
 }
 
 void ATinyMetroCamera::CameraMoveX(float Axis) {
@@ -101,13 +105,13 @@ void ATinyMetroCamera::CameraMoveY(float Axis) {
 }
 
 void ATinyMetroCamera::CameraRotationZ(float Axis) {
-	if (Axis != 0 && !IsResetRotation) {
+	if (Axis != 0 && !IsResetRotation && !UiOpened && CameraMoveEnable) {
 		AddActorWorldRotation(FRotator(0.0, Axis * CameraRotationSpeedZ, 0));
 	}
 }
 
 void ATinyMetroCamera::CameraRotationY(float Axis) {
-	if (Axis != 0 && !IsResetRotation) {
+	if (Axis != 0 && !IsResetRotation && !UiOpened && CameraMoveEnable) {
 		FRotator curRotation = SpringArmComponenet->GetRelativeRotation();
 		SpringArmComponenet->SetRelativeRotation(FRotator(
 			UKismetMathLibrary::FClamp(curRotation.Pitch + Axis * CameraRotationSpeedY, MinRotationAxisY, MaxRotationAxisY),
@@ -125,8 +129,12 @@ void ATinyMetroCamera::SetCameraMoveEnable(bool Flag) {
 	CameraMoveEnable = Flag;
 }
 
+void ATinyMetroCamera::SetUiOpen(bool Flag) {
+	UiOpened = Flag;
+}
+
 void ATinyMetroCamera::Touch1Press() {
-	if (!IsResetRotation) {
+	if (!IsResetRotation && !UiOpened) {
 		Touch1Pressed = true;
 		Touch1PressTime = 0.0f;
 		CurrentRotation = SpringArmComponenet->GetRelativeRotation();
@@ -146,6 +154,7 @@ void ATinyMetroCamera::Touch1Release() {
 	Touch1Pressed = false;
 	IsRotationMode = false;
 	IsMoveMode = false;
+	TrainManagerRef->ReleaseClick();
 }
 
 void ATinyMetroCamera::ResetRotation() {
@@ -170,7 +179,7 @@ void ATinyMetroCamera::MoveCamera(FVector2D TargetLocation) {
 }
 
 void ATinyMetroCamera::Touch1Axis(float Axis) {
-	if (Touch1Pressed && !Touch2Pressed) {
+	if (Touch1Pressed && !Touch2Pressed && CameraMoveEnable && !UiOpened) {
 		// Get finger position
 		FVector2D currentTouchPositon;
 		if (!IsValid(PlayerControllerRef)) PlayerControllerRef = Cast<ATinyMetroPlayerController>(Controller);
@@ -212,7 +221,7 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 			SetActorRotation(FRotator(0.0, CurrentRotation.Yaw + rotationValueX * CameraRotationSpeedZ, 0.0));
 		} 
 		if(IsMoveMode) {
-			if (CameraMoveEnable && !UiOpened) {
+			if (CameraMoveEnable) {
 				// Move
 				FVector curLocation = GetActorLocation();
 				FRotator curRotation = SpringArmComponenet->GetRelativeRotation();
@@ -233,7 +242,7 @@ void ATinyMetroCamera::Touch1Axis(float Axis) {
 }
 
 void ATinyMetroCamera::Touch2Press() {
-	if (!IsResetRotation) {
+	if (!IsResetRotation && !UiOpened) {
 		Touch2Pressed = true;
 		bool tmp;
 		FVector2D touch1Position, touch2Position;
@@ -249,7 +258,7 @@ void ATinyMetroCamera::Touch2Release() {
 }
 
 void ATinyMetroCamera::Touch2Axis(float Axis) {
-	if (Touch2Pressed && !IsMoveMode && !IsRotationMode) {
+	if (Touch2Pressed && !IsMoveMode && !IsRotationMode && !UiOpened) {
 		bool tmp;
 		FVector2D touch1Position, touch2Position;
 		PlayerControllerRef->GetInputTouchState(ETouchIndex::Touch1, touch1Position.X, touch1Position.Y, tmp);

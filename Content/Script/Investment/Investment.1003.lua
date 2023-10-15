@@ -1,26 +1,29 @@
 -- Complaint management
+local additional_needs_1003 = 50
+local reward_money_1003 = 800
+local time_needed_1003 = 7
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
-    Data.message = '어떤 역도 불만도 50을 넘지 않도록 하세요.'
-    Data.time_require = 7
-    Data.award = '800$'
+    Data.message = '어떤 역도 불만도 ' .. additional_needs_1003 .. '을 넘지 않도록 하세요.'
+    Data.time_require = time_needed_1003
+    Data.award = reward_money_1003 .. "$"
 
     return Data
 end
 
-local stations
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    stations = GetStationInfos()
 end
 
 -- Investment appear condition
 function Appearance()
-    for i=0, #stations do
-        if stations[i].Complain > 50 then
+    local stations = GetStationInfos()
+
+    for i, v in pairs(stations) do
+        if v.Complain > additional_needs_1003 then
             return false
         end
     end
@@ -29,17 +32,41 @@ end
 
 -- Investment success condition
 function Process()
-    for i = 0, #stations do
-        if stations[i].Complain > 50 then
-            return "fail"
-        else
-            return "continue"
+    local start_time = GetTimestampAtStart(1003)
+    local cur_time = GetTimestamp()
+    local stations = GetStationInfos()
+
+    local all_stations_limit = true
+
+    for i, v in pairs(stations) do
+        if v.Complain > additional_needs_1003 then
+            -- If the deadline is exceeded, it immediately fails.
+            all_stations_limit = false
+            break
         end
     end
-    return "success"
+
+    if all_stations_limit then
+        if (start_time.Date - cur_time.Date) <= time_needed_1003 then
+            return continue
+        else
+            return success
+        end
+    else
+        return fail
+    end
 end
 
 -- Investment award
 function Award()
-    AddMoney(500)
+    AddMoney(reward_money_1003)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

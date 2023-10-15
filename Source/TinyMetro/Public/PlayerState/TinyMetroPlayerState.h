@@ -8,13 +8,13 @@
 #include "PlayerItem.h"
 #include "../Shop/ItemType.h"
 #include "../Timer/Timer.h"
+#include "GameOverState.h"
 #include "TinyMetroPlayerState.generated.h"
 
 class ATinyMetroGameModeBase;
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverTask);
+
 UCLASS()
 class TINYMETRO_API ATinyMetroPlayerState : public APlayerState
 {
@@ -71,8 +71,18 @@ public:
 	UFUNCTION()
 	void Load();
 
+	UFUNCTION()
+	void WeeklyTask();
+
 	UFUNCTION(BlueprintCallable)
 	void ResetTutorialProceed();
+
+	UFUNCTION()
+	void GameOverByComplain();
+	UFUNCTION()
+	void GameOverByBankruptcy();
+	UPROPERTY(BlueprintAssignable)
+	FGameOverTask GameOverTask;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
@@ -92,6 +102,13 @@ protected:
 	class ATMSaveManager* SaveManagerRef;
 	UPROPERTY(VisibleAnywhere, Category = "Config")
 	class ATinyMetroGameModeBase* GameModeRef;
+	UPROPERTY(VisibleAnywhere, Category = "Config")
+	class ATinyMetroCamera* CameraRef;
+
+	UPROPERTY(VisibleAnywhere, Category = "GameOver")
+	bool BankruptcyWarning = false;
+	UPROPERTY(VisibleAnywhere, Category = "GameOver")
+	GameOverState GameOverState = GameOverState::Playing;
 
 	// Tutorial finish flags
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")

@@ -82,6 +82,7 @@ TArray<FSoftObjectPath> ATinyMetroGameModeBase::GetPassengerMaterialPath() const
 void ATinyMetroGameModeBase::StartPlay() {
     SaveManager = GetWorld()->SpawnActor<ATMSaveManager>();
     StatisticsManager = GetWorld()->SpawnActor<AStatisticsManager>();
+    StatisticsManager->Load();
     StationManager = GetWorld()->SpawnActor<AStationManager>();
     StationManager->Load();
     LaneManager = GetWorld()->SpawnActor<ALaneManager>();
@@ -90,13 +91,13 @@ void ATinyMetroGameModeBase::StartPlay() {
     TrainManager->Load();
     Policy = GetWorld()->SpawnActor<APolicy>();
     Policy->Load();
-    Bank = GetWorld()->SpawnActor<ABank>();
-    Timer = GetWorld()->SpawnActor<ATimer>();
-    Shop = GetWorld()->SpawnActor<AShop>();
+    Bank = GetWorld()->SpawnActor<ABank>(); // Load in Bank::BeginPlay
+    Timer = GetWorld()->SpawnActor<ATimer>(); // Load in Timer::BeginPlay
+    Shop = GetWorld()->SpawnActor<AShop>(); // Any data to load
     EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
     EventManager->Load();
-    InvestmentManagerRef = GetWorld()->SpawnActor<AInvestmentManager>();
-    SoundManagerRef = GetWorld()->SpawnActor<ASoundManager>();
+    InvestmentManagerRef = GetWorld()->SpawnActor<AInvestmentManager>(); // Load in InvestmentManager::Load
+    SoundManagerRef = GetWorld()->SpawnActor<ASoundManager>(); // Load in SoundManager::Load
 
     // Spawn actor
     FActorSpawnParameters SpawnParams;

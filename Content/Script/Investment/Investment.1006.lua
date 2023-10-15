@@ -1,75 +1,127 @@
 -- don't build
--- Investment condition
-target = {
-    {name = "다리", award = "다리 2개"},
-    {name = "터널", award = "터널 2개"},
-    {name = "노선", award = "열차 2량"}
+local target_1006 = {
+    {name = "다리", award = {Bridge, 2}, message = "다리 2개"},
+    {name = "터널", award = {Tunnel, 2}, message = "터널 2개"},
+    {name = "노선", award = {Train, 2}, message = "열차 2량"}
 }
 
-local selectedTarget
+local selected_target_1006
+local time_needed_1006 = 7
 
+-- Investment condition
 function InvestmentData()
     local Data = {}
-    local idx = math.random(1, #target)
-    selectedTarget = target[idx]
+    local idx = math.random(1, #target_1006)
+    selected_target_1006 = target_1006[idx]
 
-    Data.message = selectedTarget.name .. '을 건설하지 마세요.'
-    Data.time_require = 7
-    Data.award = selectedTarget.award
+    Data.message = selected_target_1006.name .. '을/를 건설하지 마세요.'
+    Data.time_require = time_needed_1006
+    Data.award = selected_target_1006.message
 
     return Data
 end
 
-local bridge
-local tunnel
-local lane
-
-local pre_bridge
-local pre_tunnel
-local pre_lane
-
 -- Call when investment start
 -- Used save info when start
 function Start()
-    bridge = GetBridgeStatistics()
-    tunnel = GetTunnelStatistics()
-    lane = GetLaneDetailStatistics()
-
-    pre_bridge = bridge.TotalPlacementCount
-    pre_tunnel = tunnel.TotalPlacementCount
-    pre_lane = lane.TotalModifyAndDeleteCount
 end
 
 -- Investment appear condition
 function Appearance()
-    time = GetTimestamp()
-    return time.Week > 2
+    local time = GetTimestamp()
+    return time.Week >= 2
 end
 
 -- Investment success condition
 function Process()
-    local cur_bridge = bridge.TotalPlacementCount
-    local cur_tunnel = tunnel.TotalPlacementCount
-    local cur_lane = lane.TotalModifyAndDeleteCount
+    local start_time = GetTimestampAtStart(1006)
+    local start_bridge = GetBridgeStatisticsAtStart(1006)
+    local start_tunnel = GetTunnelStatisticsAtStart(1006)
+    --local start_lane = GetLaneDetailStatisticsAtStart(1006)
+    local start_lane_count = GetLaneStatisticsAtStart(1006)
 
-    if selectedTarget.name == "다리" and cur_bridge == pre_bridge then
-        return "success"
-    elseif selectedTarget.name == "터널" and cur_tunnel == pre_tunnel then
-        return "success"
-    elseif selectedTarget.name == "노선" and cur_lane == pre_lane then
-        return "success"
-    else
-        return "continue"
+    local cur_time = GetTimestamp()
+    local cur_bridge = GetBridgeStatistics()
+    local cur_tunnel = GetTunnelStatistics()
+    --local cur_lane = GetLaneDetailStatistics()
+    local cur_lane_count = GetLaneStatistics()
+
+    local lane_count = cur_lane_count.TotalLaneCount
+
+    if selected_target_1006.name == "다리" then
+        if (cur_time.Date - start_time.Date) >= time_needed_1006 then
+            if cur_bridge.TotalPlacementCount == start_bridge.TotalPlacementCount then
+                return success
+            else
+                return fail
+            end   
+        else
+            if cur_bridge.TotalPlacementCount ~= start_bridge.TotalPlacementCount then
+                return fail
+            end
+        end
     end
+
+    if selected_target_1006.name == "터널" then
+        if (cur_time.Date - start_time.Date) >= time_needed_1006 then
+            if cur_tunnel.TotalPlacementCount == start_tunnel.TotalPlacementCount then
+                return success
+            else
+                return fail
+            end   
+        else
+            if cur_tunnel.TotalPlacementCount ~= start_tunnel.TotalPlacementCount then
+                return fail
+            end
+        end
+    end
+
+    if selected_target_1006.name == "노선" then
+        -- build
+        if (cur_time.Date - start_time.Date) >= time_needed_1006 then
+            if cur_lane_count.TotalLaneCount == start_lane_count.TotalLaneCount then
+                return success
+            else
+                return fail
+            end
+        else
+            if cur_lane_count.TotalLaneCount ~= start_lane_count.TotalLaneCount then
+                return fail
+            end
+        end
+        -- modoify
+        --[[
+        if (cur_time.Date - start_time.Date) > time_needed_1006 then
+            for i = 1, lane_count do
+                if cur_lane[i].TotalModifyAndDeleteCount == start_lane[i].TotalModifyAndDeleteCount then
+                    return success
+                else
+                    return fail
+                end
+            end
+        else
+            for i = 1, lane_count do
+                if cur_lane[i].TotalModifyAndDeleteCount ~= start_lane[i].TotalModifyAndDeleteCount then
+                    return fail
+                end
+            end
+        end
+        --]]
+    end
+
+    return continue
 end
 
 -- Investment award
 function Award()
-    if selectedTarget.name == "다리" then
-        AddItem("Bridge", 2)
-    elseif selectedTarget.name == "터널" then
-        AddItem("Tunnel", 2)
-    elseif selectedTarget.name == "노선" then
-        AddItem("Train", 2)
-    end
+    AddItem(selected_target_1006[1], selected_target_1006[2])
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct

@@ -189,6 +189,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	class ASoundManager* SoundManagerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
+	class ATinyMetroCamera* CameraRef;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	int32 MaintenanceCost = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Config")
 	FServiceData PolicyServiceLevel;
@@ -263,9 +265,11 @@ protected:
 
 	// New station
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
-	UStaticMeshComponent* PulseComponent = nullptr;
+	AActor* PulseActor = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
 	bool SpawnAlarm = true;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
+	bool IsLoaded = false;
 
 protected:
 	// Station meshses

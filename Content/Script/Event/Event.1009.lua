@@ -1,7 +1,7 @@
 -- Citizen interview positive data
 function EventData()
-    Data = {}
-    Map = GetMapName()
+    local Data = {}
+    local Map = GetMapName()
     Data.title = ''
     Data.flavor_text = '"시간도 안 지키고 냄새 나는 지하철"...' .. Map .. ' 지하철에 쏟아진 혹평'
     Data.message = '승객들의 민원이 폭주하고 있습니다. 서비스 비용에 투자를 할 필요가 있어보입니다... 불만도가 10% 증가합니다.'
@@ -12,8 +12,8 @@ end
 
 -- Event occur weight
 function Weight()
-    policy = GetPolicyData()
-    level = policy.ServiceLevel
+    local policy = GetPolicyData()
+    local level = policy.ServiceLevel
 
     if level == 1 then
         return 4
@@ -32,3 +32,10 @@ end
 function Start()
     ScaleComplain(1.1)
 end
+
+EventDataStruct = {}
+EventDataStruct.EventData = EventData
+EventDataStruct.Weight = Weight
+EventDataStruct.Start = Start
+
+return EventDataStruct

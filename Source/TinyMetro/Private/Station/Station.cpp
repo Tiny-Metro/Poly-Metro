@@ -6,6 +6,8 @@
 #include "Station/PathQueue.h"
 #include "Station/StationInfoWidget.h"
 #include "Station/StationSaveGame.h"
+#include "Station/StationSpawnPulse.h"
+#include "Camera/TinyMetroCamera.h"
 #include "Sound/SoundManager.h"
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Train/TrainTemplate.h"
@@ -39,13 +41,6 @@ AStation::AStation()
 	StationComplainMeshComponent->SetupAttachment(RootComponent);
 	StationComplainMeshComponent->SetGenerateOverlapEvents(false);
 	StationComplainMeshComponent->SetWorldScale3D(FVector(1.20f));
-	
-	// Set station pulse effect mesh
-	PulseComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pulse plane"));
-	PulseComponent->SetupAttachment(RootComponent);
-	PulseComponent->SetGenerateOverlapEvents(false);
-	PulseComponent->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")).Object);
-	PulseComponent->SetWorldScale3D(FVector(20.0f, 20.0f, 1.0f));
 
 	// Set passenger mesh
 	for (int i = 0; i < MaxPassengerSpawn; i++) {
@@ -130,8 +125,15 @@ void AStation::BeginPlay()
 	UpdatePassengerMesh();
 	SetInfoWidget(StationManager->GetStationInfoWidget());
 
+	PulseActor = GetWorld()->SpawnActor(AStationSpawnPulse::StaticClass());
+	PulseActor->SetActorLocation(GetActorLocation() - FVector(0, 0, 1));
+
 	if (StationInfo.IsUpgrade) {
 		Upgrade();
+	}
+
+	if (IsLoaded) {
+		OffSpawnAlarm();
 	}
 
 	TimerRef->DailyTask.AddDynamic(this, &AStation::DailyTask);
@@ -223,6 +225,8 @@ void AStation::Load() {
 		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
 		SpawnDay = tmp->SpawnDay;
 		StationInfo = tmp->StationInfo;
+
+		IsLoaded = true;
 	}
 }
 
@@ -553,7 +557,10 @@ void AStation::ComplainRoutine() {
 	// Complain excess : Game over
 	if (ComplainMax <= StationInfo.Complain) {
 		// Game over code
-
+		PlayerStateRef->GameOverByComplain();
+		if(!IsValid(CameraRef)) CameraRef = Cast<ATinyMetroCamera>(UGameplayStatics::GetPlayerState(GetWorld(), 0)->GetPawn());
+		auto tmpLocation = GetActorLocation();
+		CameraRef->MoveCamera(FVector2D(tmpLocation.X, tmpLocation.Y));
 		//Log
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(
@@ -593,8 +600,9 @@ void AStation::PassengerSpawnRoutine(float DeltaTime) {
 void AStation::OffSpawnAlarm() {
 	if (SpawnAlarm) {
 		SpawnAlarm = false;
-		PulseComponent->SetMaterial(0, nullptr);
-		PulseComponent->SetWorldScale3D(FVector(0));
+	}
+	if (IsValid(PulseActor)) {
+		PulseActor->Destroy();
 	}
 }
 

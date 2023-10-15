@@ -1,40 +1,49 @@
 -- remaining loan amount
+local reward_money_1009 = 2000
+local time_needed_1009 = -1
+
 -- Investment condition
 function InvestmentData()
     local Data = {}
     Data.message = '잔여 대출금이 없도록 하세요.'
-    Data.time_require = -1
-    Data.award = '2000$'
+    Data.time_require = time_needed_1009
+    Data.award = reward_money_1009 .. "$"
 
     return Data
 end
 
-local loan
 -- Call when investment start
 -- Used save info when start
 function Start()
-    loan = GetBankStatistics()
 end
 
 -- Investment appear condition
 function Appearance()
-    totalloanmoney = loan.TotalRepayMoney - loan.TotalRepayInterestMoney
-    return totalloanmoney > 0
+    local loan = GetBankStatistics()
+    return loan.TotalUsingLoanCount ~= 0
 end
 
 -- Investment success condition
 function Process()
-    local repaymoney = loan.TotalRepayMoney
-    local repayinterestmoney = loan.RepayInterestMoney
+    local loan = GetBankStatistics()
 
-    if repaymoney - repayinterestmoney <= 0 then
-        return "success"
+    if (loan.TotalLoanMoney - loan.TotalRepayMoney) <= 0 then
+        return success
     else
-        return "continue"
+        return continue
     end
 end
 
 -- Investment award
 function Award()
-    AddMoney(2000)
+    AddMoney(reward_money_1009)
 end
+
+InvestmentDataStruct= {}
+InvestmentDataStruct.InvestmentData = InvestmentData
+InvestmentDataStruct.Start = Start
+InvestmentDataStruct.Appearance = Appearance
+InvestmentDataStruct.Process = Process
+InvestmentDataStruct.Award = Award
+
+return InvestmentDataStruct
