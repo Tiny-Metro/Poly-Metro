@@ -51,6 +51,10 @@ void UInvestment::InitInvestment() {
 void UInvestment::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	ProcessInvestment();
+}
+
+void UInvestment::ProcessInvestment() {
 	if (IsStart) {
 		auto luaProcess = LuaCallFunction(TEXT("Process"), TArray<FLuaValue>(), false);
 		FString processResult = luaProcess.ToString();
@@ -125,7 +129,10 @@ void UInvestment::DailyTask() {
 		if (TimeRequire != -1) {
 			RemainTime--;
 			// Fail when time out
-			if (RemainTime < 0) Fail();
+			if (RemainTime < 0) {
+				ProcessInvestment();
+				Fail();
+			}
 		}
 	}
 }
