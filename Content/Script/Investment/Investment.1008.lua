@@ -27,12 +27,20 @@ function Process()
     local start_lane = GetLaneDetailStatisticsAtStart(1008)
     local start_total_lane = GetLaneStatisticsAtStart(1008)
     local start_time = GetTimestampAtStart(1008)
+    local start_count = {}
+
+    for i = 1, 8 do
+        start_count[i] = start_lane[i].TotalModifyAndReduceCount
+    end
 
     local cur_lane = GetLaneDetailStatistics()
     local cur_total_lane = GetLaneStatistics()
     local cur_time = GetTimestamp()
+    local cur_count = {}
 
-    local lane_count = cur_total_lane.TotalLaneCount
+    for i = 1, 8 do
+        cur_count[i] = cur_lane[i].TotalModifyAndReduceCount
+    end
 
     -- build
     if cur_total_lane.TotalLaneCount < start_total_lane.TotalLaneCount then
@@ -40,17 +48,17 @@ function Process()
     end
 
     -- modoify
-    if (cur_time.Date - start_time.Date) > time_needed_1008 then
-        for i = 1, lane_count do
-            if cur_lane[i].TotalModifyAndReduceCount > start_lane[i].TotalModifyAndReduceCount then
+    if (cur_time.Date - start_time.Date) >= time_needed_1008 then
+        for i = 1, 8 do
+            if cur_count[i] > start_count[i] then
                 return fail
             else
                 return success
             end
         end
     else
-        for i = 1, lane_count do
-            if cur_lane[i].TotalModifyAndReduceCount > start_lane[i].TotalModifyAndReduceCount then
+        for i = 1, 8 do
+            if cur_count[i] > start_count[i] then
                 return fail
             end
         end

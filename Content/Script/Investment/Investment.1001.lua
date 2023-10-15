@@ -25,31 +25,17 @@ end
 
 -- Investment success condition
 function Process()
-    local start_lane = GetLaneStatisticsAtStart(1001)
-    local start_circle_lane = GetLaneDetailStatisticsAtStart(1001)
+    local start_lane = GetLaneDetailStatisticsAtStart(1001)
+    local start_circle_lane = {}
 
-    local cur_lane = GetLaneStatistics()
-    local cur_circle_lane = GetLaneDetailStatistics()
+    for i = 1, 8 do
+        start_circle_lane[i] = start_lane[i].IsCircularLane
+    end
 
-    local lane_count = cur_lane.TotalLaneCount
-
-    if lane_count ~= 0 then
-        for i = 1, lane_count do
-            if i > start_lane.TotalLaneCount then
-                -- new lane
-                if cur_circle_lane[i] == nil then
-                    break
-                elseif cur_circle_lane[i].IsCircularLane then
-                    return success
-                end
-            else
-                -- existing lane
-                if (start_circle_lane[i] == nil) or (cur_circle_lane[i] == nil) then
-                    break
-                elseif (start_circle_lane[i].IsCircularLane == false) and (cur_circle_lane[i].IsCircularLane == true) then
-                    return success
-                end
-            end
+    local cur_lane = GetLaneDetailStatistics()
+    for i = 1, 8 do
+        if (cur_lane[i].IsCircularLane == true) and (start_circle_lane[i] == false) then
+            return success
         end
     end
 

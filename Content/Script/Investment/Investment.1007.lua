@@ -27,17 +27,23 @@ end
 -- Investment success condition
 function Process()
     local start_station = GetStationInfosAtStart(1007)
-    local cur_station = GetStationInfos()
+    local start_count = {}
     
-    for i = 0, #cur_station do
+    for i, v in pairs(start_station) do
+        start_count[i] = v.ServiceLaneCount
+    end
+
+    local cur_station = GetStationInfos()
+
+    for i, v in pairs(cur_station) do
         -- new station
-        if i > #start_station then
-            if cur_station[i].ServiceLaneCount >= additional_needs_1007 then
+        if i > #start_count then
+            if v.ServiceLaneCount >= additional_needs_1007 then
                 return success
             end
         -- existing station
         else
-            if (cur_station[i].ServiceLaneCount - start_station[i].ServiceLaneCount) >= additional_needs_1007 then
+            if (v.ServiceLaneCount - start_count[i]) >= additional_needs_1007 then
                 return success
             end
         end
