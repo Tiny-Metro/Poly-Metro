@@ -49,7 +49,7 @@ function Process()
     local lane_count = cur_lane_count.TotalLaneCount
 
     if selected_target_1006.name == "다리" then
-        if (cur_time.Date - start_time.Date) > time_needed_1006 then
+        if (cur_time.Date - start_time.Date) >= time_needed_1006 then
             if cur_bridge.TotalPlacementCount == start_bridge.TotalPlacementCount then
                 return success
             else
@@ -63,7 +63,7 @@ function Process()
     end
 
     if selected_target_1006.name == "터널" then
-        if (cur_time.Date - start_time.Date) > time_needed_1006 then
+        if (cur_time.Date - start_time.Date) >= time_needed_1006 then
             if cur_tunnel.TotalPlacementCount == start_tunnel.TotalPlacementCount then
                 return success
             else
@@ -78,7 +78,7 @@ function Process()
 
     if selected_target_1006.name == "노선" then
         -- build
-        if (cur_time.Date - start_time.Date) > time_needed_1006 then
+        if (cur_time.Date - start_time.Date) >= time_needed_1006 then
             if cur_lane_count.TotalLaneCount == start_lane_count.TotalLaneCount then
                 return success
             else

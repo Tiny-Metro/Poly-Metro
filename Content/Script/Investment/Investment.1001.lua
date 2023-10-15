@@ -33,19 +33,26 @@ function Process()
 
     local lane_count = cur_lane.TotalLaneCount
 
-    for i = 1, lane_count do
-        if i > start_lane.TotalLaneCount then
-            -- new lane
-            if cur_circle_lane[i].IsCircularLane then
-                return success
-            end
-        else
-            -- existing lane
-            if (start_circle_lane[i].IsCircularLane == false) and (cur_circle_lane[i].IsCircularLane == true) then
-                return success
+    if lane_count ~= 0 then
+        for i = 1, lane_count do
+            if i > start_lane.TotalLaneCount then
+                -- new lane
+                if cur_circle_lane[i] == nil then
+                    break
+                elseif cur_circle_lane[i].IsCircularLane then
+                    return success
+                end
+            else
+                -- existing lane
+                if (start_circle_lane[i] == nil) or (cur_circle_lane[i] == nil) then
+                    break
+                elseif (start_circle_lane[i].IsCircularLane == false) and (cur_circle_lane[i].IsCircularLane == true) then
+                    return success
+                end
             end
         end
     end
+
     return continue
 end
 
