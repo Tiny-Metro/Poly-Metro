@@ -31,7 +31,7 @@ function Process()
     local cur_train = GetTrainInfos()
 
     for i = 0, #cur_train do
-        if i <= start_train then
+        if i <= #start_train then
             -- existing train
             local additional_subtrains = (cur_train[i].SubtrainCount - (start_train[i].SubtrainCount or 0))
             if additional_subtrains >= additional_needs_1004 then

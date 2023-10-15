@@ -27,7 +27,7 @@ end
 function Process()
     local loan = GetBankStatistics()
 
-    if (loan.TotalRepayMoney - loan.TotalRepayInterestMoney) <= 0 then
+    if (loan.TotalLoanMoney - loan.TotalRepayMoney) <= 0 then
         return success
     else
         return continue

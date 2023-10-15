@@ -25,7 +25,7 @@ end
 -- Investment success condition
 function Process()
     local start_lane = GetLaneDetailStatisticsAtStart(1008)
-    local start_total_lane = GetLaneDetailStatisticsAtStart(1008)
+    local start_total_lane = GetLaneStatisticsAtStart(1008)
     local start_time = GetTimestampAtStart(1008)
 
     local cur_lane = GetLaneDetailStatistics()
@@ -40,7 +40,7 @@ function Process()
     end
 
     -- modoify
-    if (cur_time.Date - start_time.Date) > time_needed_1006 then
+    if (cur_time.Date - start_time.Date) > time_needed_1008 then
         for i = 1, lane_count do
             if cur_lane[i].TotalModifyAndReduceCount > start_lane[i].TotalModifyAndReduceCount then
                 return fail

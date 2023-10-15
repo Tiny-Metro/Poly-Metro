@@ -37,7 +37,7 @@ function Process()
             end
         -- existing station
         else
-            if (cur_station[i].ServiceLaneCount - start_station.ServiceLaneCount) >= additional_needs_1007 then
+            if (cur_station[i].ServiceLaneCount - start_station[i].ServiceLaneCount) >= additional_needs_1007 then
                 return success
             end
         end
