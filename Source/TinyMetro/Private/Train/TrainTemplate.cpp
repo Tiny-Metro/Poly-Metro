@@ -377,6 +377,7 @@ void ATrainTemplate::OnReleasedLogic() {
 	);*/
 	if (TouchTime < LongClickInterval) {
 		IsSingleClick = true;
+		if (!IsValid(TrainInfoWidget)) SetTrainInfoWidget(TrainManagerRef->GetTrainInfoWidget());
 		TrainInfoWidget->ShowWidget(this);
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue,
 			TEXT("TrainTemplate::OnClick")
