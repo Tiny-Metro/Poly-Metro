@@ -122,6 +122,11 @@ void ALaneManager::AddSelectedStations(AStation* Station)
 		return;
 	}
 
+	if (Station->GetStationInfo().IsDestroyed)
+	{
+		return;
+	}
+
 	SelectedStations.Add(Station);
 
 	if (IsPlacementValid)
