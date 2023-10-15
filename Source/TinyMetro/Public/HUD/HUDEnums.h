@@ -59,6 +59,7 @@ enum class EHUDText : uint8
     ToMenu_ExitText,
     ToMenu_GoBackText,
     ToMenu_StatisticsText,
+    ToMenu_Tutorial,
     ToMenu_SettingText,
     //Setting
     Setting_MaterVolume,

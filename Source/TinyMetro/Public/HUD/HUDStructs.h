@@ -27,14 +27,14 @@ struct TINYMETRO_API FTextComponent
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTextBlock* TextWidgetREF;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTextBlock* TextWidgetREF;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		EHUDText TextEnum;
+	EHUDText TextEnum;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		ETextType TextType;
+	ETextType TextType;
 };
 
 USTRUCT(BlueprintType)
