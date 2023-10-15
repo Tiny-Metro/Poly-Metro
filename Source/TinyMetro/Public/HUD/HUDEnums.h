@@ -40,7 +40,9 @@ enum class EHUDText : uint8
     //  []Statistics - Bank
     //  []Events
 
+    None,
     //Common Terms
+    Station,
     Shop,
     Bank,
     Summary,
@@ -143,17 +145,27 @@ enum class EHUDText : uint8
     StartMenu_StartNew,
     StartMenu_Continue,
     StartMenu_Option,
-    StartMenu_Exit,
+    StartMenu_Exit
     //
-    None
 };
 
 UENUM(BlueprintType)
 enum class EHUDImage : uint8
 {
+    Invalid,
     ToMenu_ExitIcon,
     ToMenu_GoBackIcon,
     ToMenu_StatisticsIcon,
     ToMenu_SettingIcon,
-    Invalid
+    ToMenu_TutorialIcon,
+    Station_Circle,
+    Station_Triangle,
+    Station_Rectangle,
+    Station_Cross,
+    Station_Rhombus,
+    Station_Oval,
+    Station_Diamond,
+    Station_Pentagon,
+    Station_Star,
+    Station_Fan
 };
