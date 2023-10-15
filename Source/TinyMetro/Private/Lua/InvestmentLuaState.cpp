@@ -121,7 +121,6 @@ FLuaValue UInvestmentLuaState::GetLaneStatisticsAtStart(FLuaValue Id) {
 TArray<FLuaValue> UInvestmentLuaState::GetLaneDetailStatisticsAtStart(FLuaValue Id) {
     InitReferClasses();
     TArray<FLuaValue> Result;
-    Result.Add(FLuaValue());
     auto laneStatistics = InvestmentManagerRef->GetInvestmentStartData(Id.ToInteger()).LaneStatistics;
 
     // Add lane 1 ~ 8

@@ -134,7 +134,6 @@ FLuaValue UTinyMetroLuaState::GetLaneStatistics() {
 TArray<FLuaValue> UTinyMetroLuaState::GetLaneDetailStatistics() {
     InitReferClasses();
     TArray<FLuaValue> Result;
-    Result.Add(FLuaValue());
     auto laneStatistics = StatisticsManagerRef->LaneStatistics;
 
     // Add lane 1 ~ 8
