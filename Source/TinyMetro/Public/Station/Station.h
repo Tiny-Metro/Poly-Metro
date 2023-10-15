@@ -263,9 +263,11 @@ protected:
 
 	// New station
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
-	UStaticMeshComponent* PulseComponent = nullptr;
+	AActor* PulseActor = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
 	bool SpawnAlarm = true;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
+	bool IsLoaded = false;
 
 protected:
 	// Station meshses
