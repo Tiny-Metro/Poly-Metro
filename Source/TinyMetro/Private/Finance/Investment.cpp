@@ -54,7 +54,7 @@ void UInvestment::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	ProcessInvestment();
 }
 
-void UInvestment::ProcessInvestment() {
+InvestmentState UInvestment::ProcessInvestment() {
 	if (IsStart) {
 		auto luaProcess = LuaCallFunction(TEXT("Process"), TArray<FLuaValue>(), false);
 		FString processResult = luaProcess.ToString();
@@ -62,16 +62,20 @@ void UInvestment::ProcessInvestment() {
 			FScopeLock Lock(MutexKey.Get());
 
 			if (processResult == TEXT("continue")) {
-				return;
+				return InvestmentState::Processing;
 			} else if (processResult == TEXT("success")) {
 				Success();
+				return InvestmentState::Success;
 			} else if (processResult == TEXT("fail")) {
 				Fail();
+				return InvestmentState::Fail;
 			} else {
-				return;
+				return InvestmentState::Processing;
 			}
 		}
 	}
+
+	return InvestmentState::Ready;
 }
 
 void UInvestment::Start() {
@@ -130,8 +134,10 @@ void UInvestment::DailyTask() {
 			RemainTime--;
 			// Fail when time out
 			if (RemainTime < 0) {
-				ProcessInvestment();
-				Fail();
+				auto tmp = ProcessInvestment();
+				if (tmp != InvestmentState::Success) {
+					Fail();
+				}
 			}
 		}
 	}
