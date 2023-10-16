@@ -46,7 +46,7 @@ void ATrain::Tick(float DeltaTime) {
 		}
 	}
 
-	if (IsValid(LaneRef) && Status == TrainStatus::Run && TrainMovement->IsActive()) {
+	if (IsValid(LaneRef) && Status == TrainStatus::Run && TrainMovement->IsActive() && !IsActorDragged) {
 		auto direction = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), StationManagerRef->GetStationById(NextStation.Id)->GetActorLocation());
 		//UE_LOG(LogTemp, Log, TEXT("NextStationId : %d"), NextStation.Id);
 		//UE_LOG(LogTemp, Log, TEXT("Direction : %f %f %f"), direction.Roll, direction.Pitch, direction.Yaw);
@@ -54,7 +54,8 @@ void ATrain::Tick(float DeltaTime) {
 		direction.Pitch = 0;
 		auto step = UKismetMathLibrary::GetForwardVector(direction);
 		//UE_LOG(LogTemp, Log, TEXT("Step : %f %f %f"), step.X, step.Y, step.Z);
-		auto nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED, ESplineCoordinateSpace::Type::World);
+		//SetActorLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 0.5);
+		auto nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 1, ESplineCoordinateSpace::Type::Local);
 		nextLocation.Z = TrainZAxis;
 		auto newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), nextLocation);
 		newRotation.Roll = 0;
