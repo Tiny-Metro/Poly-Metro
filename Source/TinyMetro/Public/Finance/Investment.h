@@ -32,7 +32,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void ProcessInvestment();
+	InvestmentState ProcessInvestment();
 
 	UFUNCTION(BlueprintCallable)
 	void Start();
