@@ -52,15 +52,16 @@ void ATrain::Tick(float DeltaTime) {
 		//UE_LOG(LogTemp, Log, TEXT("Direction : %f %f %f"), direction.Roll, direction.Pitch, direction.Yaw);
 		direction.Roll = 0;
 		direction.Pitch = 0;
-		auto step = UKismetMathLibrary::GetForwardVector(direction);
+		//auto step = UKismetMathLibrary::GetForwardVector(direction);		
+		auto step = LaneRef->LaneSpline->FindDirectionClosestToWorldLocation(GetActorLocation() , ESplineCoordinateSpace::World);
 		//UE_LOG(LogTemp, Log, TEXT("Step : %f %f %f"), step.X, step.Y, step.Z);
 		//SetActorLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 0.5);
-		auto nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 1, ESplineCoordinateSpace::Type::Local);
+		auto nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 1, ESplineCoordinateSpace::Type::World);
 		nextLocation.Z = TrainZAxis;
 		auto newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), nextLocation);
 		newRotation.Roll = 0;
 		newRotation.Pitch = 0;
-		//UE_LOG(LogTemp, Log, TEXT("NextLocation : %f %f %f"), nextLocation.X, nextLocation.Y, nextLocation.Z);
+		UE_LOG(LogTemp, Log, TEXT("NextLocation : %f %f %f"), nextLocation.X, nextLocation.Y, nextLocation.Z);
 		SetActorLocationAndRotation(nextLocation, newRotation);
 		
 		FIntPoint curLocation;
