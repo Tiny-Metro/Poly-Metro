@@ -320,7 +320,7 @@ void AHUDManager::SetIntegradedTextTable()
 void AHUDManager::AddTextTable(EHUDText TextEnum, FString Korean, FString English)
 {
     FLanguagePair Pair;
-    Pair.Korean = Korean//Korean;
+    Pair.Korean = Korean;
     Pair.English = English;
 
     IntegratedTextTable.Add(TextEnum, Pair);
