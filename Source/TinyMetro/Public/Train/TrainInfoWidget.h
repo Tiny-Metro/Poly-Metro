@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../HUD/PolyMetroWidget.h"
 #include "TrainInfoWidget.generated.h"
 
 /**
@@ -11,7 +12,7 @@
  * Show Train's information
  */
 UCLASS()
-class TINYMETRO_API UTrainInfoWidget : public UUserWidget
+class TINYMETRO_API UTrainInfoWidget : public UPolyMetroWidget
 {
 	GENERATED_BODY()
 	

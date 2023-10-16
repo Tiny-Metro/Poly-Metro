@@ -1,28 +1,56 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "HUD/PolyMetroWidget.h"
+#include "HUD/HUDManager.h"
 
-FString UPolyMetroWidget:: GetTextByName(FString Name)
+
+void UPolyMetroWidget::AssignTextComponent(FTextComponent NewTextComponent)
 {
-	TMap<FString, FString> map;
+	TextComponents.Add(NewTextComponent);
+}
+void UPolyMetroWidget::AssignImageComponent(FImageComponent NewImageComponent)
+{
+	ImageComponents.Add(NewImageComponent);
+}
+void UPolyMetroWidget::UpdateTextComponents(AHUDManager* hudManager)
+{
+	for (FTextComponent targetTextComponent : TextComponents)
+	{
+		FString targetString = hudManager->GetTextByEnum(targetTextComponent.TextEnum);
+		FText targetText = FText::FromString(targetString);
+		targetTextComponent.TextWidgetREF->SetText(targetText);
 
-	map.Add(("GoBack", "Go Back"));
-	map.Add(("Statistics", "Statistics!"));
-	map.Add(("Option", "OPTION"));
-	map.Add(("Tutorial", "turial"));
-	map.Add(("Exit", "Exit"));
+		FSlateFontInfo targetFontInfo = hudManager->GetFontInfo();
+		int32 textSize = hudManager->GetTextSizeByType(targetTextComponent.TextType);
+		targetFontInfo.Size = textSize;
 
-	TextBlockMap = map;
-	
-
-	FString* targetString = map.Find(Name);
-
-	if (targetString == nullptr)
-	{		
-		UE_LOG(LogTemp, Warning, TEXT("No Such Text"));
-		
-		return "ERROR";
+		targetTextComponent.TextWidgetREF->SetFont(targetFontInfo);
 	}
-	return *targetString;
+	for (FTextComponent targetTextComponent : DynamicTextComponents)
+	{
+		FSlateFontInfo targetFontInfo = hudManager->GetFontInfo();
+		int32 textSize = hudManager->GetTextSizeByType(targetTextComponent.TextType);
+		targetFontInfo.Size = textSize;
+
+		targetTextComponent.TextWidgetREF->SetFont(targetFontInfo);
+	}
+}
+void UPolyMetroWidget::UpdateImageComponents(AHUDManager* hudManager)
+{
+	for (FImageComponent targetImage : ImageComponents)
+	{
+		UTexture* targetTexture = hudManager->GetImageByEnum(targetImage.ImageEnum);
+		targetImage.ImageREF->SetBrushFromSoftTexture(targetTexture);
+	}
+}
+void UPolyMetroWidget::UpdateWidgets(AHUDManager* hudManager)
+{
+	for (UPolyMetroWidget* targetWidget : Widgets)
+	{
+		targetWidget->UpdateTextComponents(hudManager);
+		targetWidget->UpdateImageComponents(hudManager);
+		if (targetWidget->Widgets.Num() > 0)
+		{
+			targetWidget->UpdateWidgets(hudManager);
+		}
+	}
 }
