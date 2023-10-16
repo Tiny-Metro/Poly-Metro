@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../HUD/PolyMetroWidget.h"
 #include "StationInfoWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TINYMETRO_API UStationInfoWidget : public UUserWidget
+class TINYMETRO_API UStationInfoWidget : public UPolyMetroWidget
 {
 	GENERATED_BODY()
 	
