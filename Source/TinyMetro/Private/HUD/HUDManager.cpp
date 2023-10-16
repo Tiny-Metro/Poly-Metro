@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "HUD/HUDManager.h"
 
@@ -41,6 +41,7 @@ UPolyMetroWidget* AHUDManager::GetWidget(FString Name)
 
 FString AHUDManager::GetTextByEnum(EHUDText Name)
 {
+    if (IntegratedTextTable.Find(Name) == nullptr) return "NULL";
     if (CurrentLanguage == ELanguage::Korean) return *IntegratedTextTable[Name].Korean;
     return *IntegratedTextTable[Name].English;
 }
@@ -125,7 +126,7 @@ void AHUDManager::SetTextSizeMap()
 {
     int32 TitleSize = 36;
     int32 BasicSize = 27;
-    int32 ExplainationSize = 22;
+    int32 ExplainationSize = 18;
 
     switch (CurrentTextSize)
     {
@@ -207,118 +208,119 @@ FSlateFontInfo AHUDManager::GetFontInfo()
 void AHUDManager::SetIntegradedTextTable()
 {
     IntegratedTextTable.Empty();
-    AddTextTable(EHUDText::None, "NONE", "NONE");
+    AddTextTable(EHUDText::None, TEXT("NONE"), TEXT("NONE"));
 
     //Common Terms
-    AddTextTable(EHUDText::Station, "역", "Station");
-    AddTextTable(EHUDText::Shop, "상점", "Shop");
-    AddTextTable(EHUDText::Bank, "은행", "Bank");
-    AddTextTable(EHUDText::Summary, "요약", "Summary");
-    AddTextTable(EHUDText::Lane, "레인", "Lane");
-    AddTextTable(EHUDText::ShowTotal, "총 표시", "Show Total");
-    AddTextTable(EHUDText::GoBack, "뒤로 가기", "Go Back");
-    AddTextTable(EHUDText::Event, "이벤트", "Event");
-    AddTextTable(EHUDText::Train, "열차", "Train");
-    AddTextTable(EHUDText::Subtrain, "객차", "Subtrain");
-    AddTextTable(EHUDText::Tunnel, "터널", "Tunnel");
-    AddTextTable(EHUDText::Bridge, "다리", "Bridge");
-    AddTextTable(EHUDText::Purchase, "구매", "Purchase");
-    AddTextTable(EHUDText::Upgrade, "업그레이드", "Upgrade");
+    AddTextTable(EHUDText::Station, TEXT("역"), TEXT("Station"));
+    AddTextTable(EHUDText::Shop, TEXT("상점"), TEXT("Shop"));
+    AddTextTable(EHUDText::Bank, TEXT("은행"), TEXT("Bank"));
+    AddTextTable(EHUDText::Summary, TEXT("요약"), TEXT("Summary"));
+    AddTextTable(EHUDText::Lane, TEXT("레인"), TEXT("Lane"));
+    AddTextTable(EHUDText::ShowTotal, TEXT("총 표시"), TEXT("Show Total"));
+    AddTextTable(EHUDText::GoBack, TEXT("뒤로 가기"), TEXT("Go Back"));
+    AddTextTable(EHUDText::Event, TEXT("이벤트"), TEXT("Event"));
+    AddTextTable(EHUDText::Train, TEXT("열차"), TEXT("Train"));
+    AddTextTable(EHUDText::Subtrain, TEXT("객차"), TEXT("Subtrain"));
+    AddTextTable(EHUDText::Tunnel, TEXT("터널"), TEXT("Tunnel"));
+    AddTextTable(EHUDText::Bridge, TEXT("다리"), TEXT("Bridge"));
+    AddTextTable(EHUDText::Purchase, TEXT("구매"), TEXT("Purchase"));
+    AddTextTable(EHUDText::Upgrade, TEXT("업그레이드"), TEXT("Upgrade"));
 
         //ToMenu
-    AddTextTable(EHUDText::ToMenu_ExitText, "게임 종료", "Exit Game");
-    AddTextTable(EHUDText::ToMenu_GoBackText, "뒤로 가기", "Go Back");
-    AddTextTable(EHUDText::ToMenu_StatisticsText, "통계", "Statistics");
-    AddTextTable(EHUDText::ToMenu_Tutorial, "튜토리얼", "Tutorial");
-    AddTextTable(EHUDText::ToMenu_SettingText, "설정", "Settings");
+    AddTextTable(EHUDText::ToMenu_ExitText, TEXT("게임 종료"), TEXT("Exit Game"));
+    AddTextTable(EHUDText::ToMenu_GoBackText, TEXT("뒤로 가기"), TEXT("Go Back"));
+    AddTextTable(EHUDText::ToMenu_StatisticsText, TEXT("통계"), TEXT("Statistics"));
+    AddTextTable(EHUDText::ToMenu_Tutorial, TEXT("튜토리얼"), TEXT("Tutorial"));
+    AddTextTable(EHUDText::ToMenu_SettingText, TEXT("설정"), TEXT("Settings"));
         //Setting
-    AddTextTable(EHUDText::Setting_MaterVolume, "마스터 볼륨", "Master Volume");
-    AddTextTable(EHUDText::Setting_Music, "음악", "Music");
-    AddTextTable(EHUDText::Setting_SoundEffect, "효과음", "Sound Effect");
-    AddTextTable(EHUDText::Setting_CameraSpeed, "카메라 속도", "Camera Speed");
-    AddTextTable(EHUDText::Setting_ChangeSkyByTime, "시간에 따른 하늘 변화", "Change Sky by Time");
-    AddTextTable(EHUDText::Setting_SkySlider, "하늘 슬라이더", "Sky Slider");
-    AddTextTable(EHUDText::Setting_Language, "언어", "Language");
-    AddTextTable(EHUDText::Setting_Language_Korean, "한국어", "Korean");
-    AddTextTable(EHUDText::Setting_Language_English, "영어(English)", "English");
+    AddTextTable(EHUDText::Setting_MaterVolume, TEXT("마스터 볼륨"), TEXT("Master Volume"));
+    AddTextTable(EHUDText::Setting_Music, TEXT("음악"), TEXT("Music"));
+    AddTextTable(EHUDText::Setting_SoundEffect, TEXT("효과음"), TEXT("Sound Effect"));
+    AddTextTable(EHUDText::Setting_CameraSpeed, TEXT("카메라 속도"), TEXT("Camera Speed"));
+    AddTextTable(EHUDText::Setting_ChangeSkyByTime, TEXT("시간에 따른 하늘 변화"), TEXT("Change Sky by Time"));
+    AddTextTable(EHUDText::Setting_SkySlider, TEXT("하늘 슬라이더"), TEXT("Sky Slider"));
+    AddTextTable(EHUDText::Setting_Language, TEXT("언어"), TEXT("Language"));
+    AddTextTable(EHUDText::Setting_Language_Korean, TEXT("한국어"), TEXT("Korean"));
+    AddTextTable(EHUDText::Setting_Language_English, TEXT("영어(English)"), TEXT("English"));
 
         // Summary
-    AddTextTable(EHUDText::Statistics_Summary_PassengerNum_Total, "총 승객 수", "Total Passengers");
-    AddTextTable(EHUDText::Statistics_Summary_PassengerNum_Weekly, "주간 승객 수", "Weekly Passengers");
-    AddTextTable(EHUDText::Statistics_Summary_Profit_Total, "총 수익", "Total Profit");
-    AddTextTable(EHUDText::Statistics_Summary_Profit_Weekly, "주간 수익", "Weekly Profit");
-    AddTextTable(EHUDText::Statistics_Summary_Expense_Total, "총 비용", "Total Expenses");
-    AddTextTable(EHUDText::Statistics_Summary_Expense_Weekly, "주간 비용", "Weekly Expenses");
-    AddTextTable(EHUDText::Statistics_Summary_AvgComplain, "평균 불만도", "Average Complaints");
-    AddTextTable(EHUDText::Statistics_Summary_OperatingStationNum, "운영 역", "Operating Stations");
-    AddTextTable(EHUDText::Statistics_Summary_UpgradedStationNum, "업그레이드된 역", "Upgraded Stations");
+    AddTextTable(EHUDText::Statistics_Summary_PassengerNum_Total, TEXT("총 승객 수"), TEXT("Total Passengers"));
+    AddTextTable(EHUDText::Statistics_Summary_PassengerNum_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));
+    AddTextTable(EHUDText::Statistics_Summary_Profit_Total, TEXT("총 수익"), TEXT("Total Profit"));
+    AddTextTable(EHUDText::Statistics_Summary_Profit_Weekly, TEXT("주간 수익"), TEXT("Weekly Profit"));
+    AddTextTable(EHUDText::Statistics_Summary_Expense_Total, TEXT("총 비용"), TEXT("Total Expenses"));
+    AddTextTable(EHUDText::Statistics_Summary_Expense_Weekly, TEXT("주간 비용"), TEXT("Weekly Expenses"));
+    AddTextTable(EHUDText::Statistics_Summary_AvgComplain, TEXT("평균 불만도"), TEXT("Average Complaints"));
+    AddTextTable(EHUDText::Statistics_Summary_OperatingStationNum, TEXT("운영 역"), TEXT("Operating Stations"));
+    AddTextTable(EHUDText::Statistics_Summary_UpgradedStationNum, TEXT("업그레이드된 역"), TEXT("Upgraded Stations"));
 
         // Lane
-    AddTextTable(EHUDText::Statistics_Lanes_ConstructedLaneTotalNum, "건설된 레인", "Total Constructed Lanes");
-    AddTextTable(EHUDText::Statistics_Lanes_ModificationDeleteNum, "노선 수정 및 삭제 횟수", "Modified and Deleted Lanes");
-    AddTextTable(EHUDText::Statistics_Lane_UsingBridgeNum, "이용중인 다리", "Using Bridges");
-    AddTextTable(EHUDText::Statistics_Lane_UsingTunnelNum, "이용중인 터널", "Using Tunnels");
-    AddTextTable(EHUDText::Statistics_Lane_TransferStationNum, "환승 역", "Transfer Stations");
-    AddTextTable(EHUDText::Statistics_Lane_OperatingStationNum, "운영 역", "Operating Stations");
-    AddTextTable(EHUDText::Statistics_Lane_ModificationNum, "축소 연장 횟수", "Extend/Reduction Count");
-    AddTextTable(EHUDText::Statistics_Lane_AvgComplainNum, "평균 불만도", "Average Complaints");
-    AddTextTable(EHUDText::Statistics_Lane_OperatingTrainNum, "운영 중인 열차", "Operating Trains");
-    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Total, "총 승객", "Total Passengers");
-    AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Total, "총 수익", "Total Profit");
-    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Weekly, "주간 승객 수", "Weekly Passengers");
-
+    AddTextTable(EHUDText::Statistics_Lanes_ConstructedLaneTotalNum, TEXT("건설된 레인"), TEXT("Total Constructed Lanes"));
+    AddTextTable(EHUDText::Statistics_Lanes_ModificationDeleteNum, TEXT("노선 수정 및 삭제 횟수"), TEXT("Modified / Deleted Lanes"));
+    AddTextTable(EHUDText::Statistics_Lane_UsingBridgeNum, TEXT("이용중인 다리"), TEXT("Using Bridges"));
+    AddTextTable(EHUDText::Statistics_Lane_UsingTunnelNum, TEXT("이용중인 터널"), TEXT("Using Tunnels"));
+    AddTextTable(EHUDText::Statistics_Lane_TransferStationNum, TEXT("환승 역"), TEXT("Transfer Stations"));
+    AddTextTable(EHUDText::Statistics_Lane_OperatingStationNum, TEXT("운영 역"), TEXT("Operating Stations"));
+    AddTextTable(EHUDText::Statistics_Lane_ModificationNum, TEXT("축소 연장 횟수"), TEXT("Extend/Reduction Count"));
+    AddTextTable(EHUDText::Statistics_Lane_AvgComplainNum, TEXT("평균 불만도"), TEXT("Average Complaints"));
+    AddTextTable(EHUDText::Statistics_Lane_OperatingTrainNum, TEXT("운영 중인 열차"), TEXT("Operating Trains"));
+    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Total, TEXT("총 승객"), TEXT("Total Passengers"));
+    AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Total, TEXT("총 수익"), TEXT("Total Profit"));
+    AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Weekly, TEXT("주간 수익"), TEXT("Weekly Profit"));
+    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));
+    
     // StationInfo
-    AddTextTable(EHUDText::StationInfo_Complain, "불만도", "Complain");
-    AddTextTable(EHUDText::StationInfo_AvgWaiting, "평균 대기 시간", "Average Waiting Time");
-    AddTextTable(EHUDText::StationInfo_Profit_Total, "총 수익", "Total Profit");
-    AddTextTable(EHUDText::StationInfo_Profit_Weekly, "주간 수익", "Weekly Profit");
-    AddTextTable(EHUDText::StationInfo_Passenger_Total, "총 승객 수", "Total Passengers");
-    AddTextTable(EHUDText::StationInfo_Passenger_Weekly, "주간 승객 수", "Weekly Passengers");
-    AddTextTable(EHUDText::StationInfo_Transfer_Total, "총 환승 수", "Total Transfers");
-    AddTextTable(EHUDText::StationInfo_Transfer_Weekly, "주간 환승 수", "Weekly Transfers");
+    AddTextTable(EHUDText::StationInfo_Complain, TEXT("불만도"), TEXT("Complain"));
+    AddTextTable(EHUDText::StationInfo_AvgWaiting, TEXT("평균 대기 시간"), TEXT("Average Waiting Time"));
+    AddTextTable(EHUDText::StationInfo_Profit_Total, TEXT("총 수익"), TEXT("Total Profit"));
+    AddTextTable(EHUDText::StationInfo_Profit_Weekly, TEXT("주간 수익"), TEXT("Weekly Profit"));
+    AddTextTable(EHUDText::StationInfo_Passenger_Total, TEXT("총 승객 수"), TEXT("Total Passengers"));
+    AddTextTable(EHUDText::StationInfo_Passenger_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));
+    AddTextTable(EHUDText::StationInfo_Transfer_Total, TEXT("총 환승 수"), TEXT("Total Transfers"));
+    AddTextTable(EHUDText::StationInfo_Transfer_Weekly, TEXT("주간 환승 수"), TEXT("Weekly Transfers"));
 
     // Train Info
-    AddTextTable(EHUDText::TrainInfo_CarNum, "차량 수", "Number of Cars");
-    AddTextTable(EHUDText::TrainInfo_Passenger_Total, "총 승객 수", "Total Passengers");
-    AddTextTable(EHUDText::TrainInfo_Passenger_Weekly, "주간 승객 수", "Weekly Passengers");
+    AddTextTable(EHUDText::TrainInfo_CarNum, TEXT("차량 수"), TEXT("Number of Cars"));
+    AddTextTable(EHUDText::TrainInfo_Passenger_Total, TEXT("총 승객 수"), TEXT("Total Passengers"));
+    AddTextTable(EHUDText::TrainInfo_Passenger_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));
 
     // Shop - uses only common Terms
 
     // Bank
-    AddTextTable(EHUDText::Bank_Loan, "대출", "Loan");
-    AddTextTable(EHUDText::Bank_PayBack, "상환", "Payback");
-    AddTextTable(EHUDText::Bank_Repay, "상환", "Repay");
-    AddTextTable(EHUDText::Bank_Remainder, "잔액", "Remainder");
+    AddTextTable(EHUDText::Bank_Loan, TEXT("대출"), TEXT("Loan"));
+    AddTextTable(EHUDText::Bank_PayBack, TEXT("상환"), TEXT("Payback"));
+    AddTextTable(EHUDText::Bank_Repay, TEXT("상환"), TEXT("Repay"));
+    AddTextTable(EHUDText::Bank_Remainder, TEXT("잔액"), TEXT("Remainder"));
 
     //Policy
-    AddTextTable(EHUDText::Policy_ServiceCost, "서비스 비용", "Service Cost");
-    AddTextTable(EHUDText::Policy_ServiceCost_Explaination, "서비스 비용 설명", "Service Cost Explanation");
-    AddTextTable(EHUDText::Policy_PrioritySeat, "우선좌석", "Priority Seat");
-    AddTextTable(EHUDText::Policy_PrioritySeat_Explaination, "우선좌석 설명", "Priority Seat Explanation");
-    AddTextTable(EHUDText::Policy_CCTV, "CCTV", "CCTV");
-    AddTextTable(EHUDText::Policy_CCTV_Explaination, "CCTV 설명", "CCTV Explanation");
-    AddTextTable(EHUDText::Policy_Elevator, "엘리베이터", "Elevator");
-    AddTextTable(EHUDText::Policy_Elevator_Explaination, "엘리베이터 설명", "Elevator Explanation");
-    AddTextTable(EHUDText::Policy_BicyclePermission, "자전거 허용", "Bicycle Permission");
-    AddTextTable(EHUDText::Policy_BicyclePermission_Explaination, "자전거 허용 설명", "Bicycle Permission Explanation");
-    AddTextTable(EHUDText::Policy_TransferSystem, "환승 시스템", "Transfer System");
-    AddTextTable(EHUDText::Policy_TransferSystem_Explaination, "환승 시스템 설명", "Transfer System Explanation");
-    AddTextTable(EHUDText::Policy_On, "켜기", "On");
-    AddTextTable(EHUDText::Policy_Off, "끄기", "Off");
+    AddTextTable(EHUDText::Policy_ServiceCost, TEXT("서비스 비용"), TEXT("Service Cost"));
+    AddTextTable(EHUDText::Policy_ServiceCost_Explaination, TEXT("서비스 비용 설명"), TEXT("Service Cost Explanation"));
+    AddTextTable(EHUDText::Policy_PrioritySeat, TEXT("우선좌석"), TEXT("Priority Seat"));
+    AddTextTable(EHUDText::Policy_PrioritySeat_Explaination, TEXT("우선좌석 설명"), TEXT("Priority Seat Explanation"));
+    AddTextTable(EHUDText::Policy_CCTV, TEXT("CCTV"), TEXT("CCTV"));
+    AddTextTable(EHUDText::Policy_CCTV_Explaination, TEXT("CCTV 설명"), TEXT("CCTV Explanation"));
+    AddTextTable(EHUDText::Policy_Elevator, TEXT("엘리베이터"), TEXT("Elevator"));
+    AddTextTable(EHUDText::Policy_Elevator_Explaination, TEXT("엘리베이터 설명"), TEXT("Elevator Explanation"));
+    AddTextTable(EHUDText::Policy_BicyclePermission, TEXT("자전거 허용"), TEXT("Bicycle Permission"));
+    AddTextTable(EHUDText::Policy_BicyclePermission_Explaination, TEXT("자전거 허용 설명"), TEXT("Bicycle Permission Explanation"));
+    AddTextTable(EHUDText::Policy_TransferSystem, TEXT("환승 시스템"), TEXT("Transfer System"));
+    AddTextTable(EHUDText::Policy_TransferSystem_Explaination, TEXT("환승 시스템 설명"), TEXT("Transfer System Explanation"));
+    AddTextTable(EHUDText::Policy_On, TEXT("켜기"), TEXT("On"));
+    AddTextTable(EHUDText::Policy_Off, TEXT("끄기"), TEXT("Off"));
 
     //Event
     
     //StartMenu
-    AddTextTable(EHUDText::StartMenu_StartNew, "새 게임 시작", "Start New Game");
-    AddTextTable(EHUDText::StartMenu_Continue, "이어하기", "Continue");
-    AddTextTable(EHUDText::StartMenu_Option, "옵션", "Options");
-    AddTextTable(EHUDText::StartMenu_Exit, "종료", "Exit");
+    AddTextTable(EHUDText::StartMenu_StartNew, TEXT("새 게임 시작"), TEXT("Start New Game"));
+    AddTextTable(EHUDText::StartMenu_Continue, TEXT("이어하기"), TEXT("Continue"));
+    AddTextTable(EHUDText::StartMenu_Option, TEXT("옵션"), TEXT("Options"));
+    AddTextTable(EHUDText::StartMenu_Exit, TEXT("종료"), TEXT("Exit"));
 }
 
 void AHUDManager::AddTextTable(EHUDText TextEnum, FString Korean, FString English)
 {
     FLanguagePair Pair;
-    Pair.Korean = Korean;
+    Pair.Korean = Korean//Korean;
     Pair.English = English;
 
     IntegratedTextTable.Add(TextEnum, Pair);
