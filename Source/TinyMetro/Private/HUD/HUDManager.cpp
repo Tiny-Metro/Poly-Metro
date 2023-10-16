@@ -267,7 +267,24 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Total, TEXT("총 승객"), TEXT("Total Passengers"));
     AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Total, TEXT("총 수익"), TEXT("Total Profit"));
     AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Weekly, TEXT("주간 수익"), TEXT("Weekly Profit"));
-    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));
+    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));    
+    AddTextTable(EHUDText::Statistics_Lane_LaneSelection, TEXT("노선 선택:"), TEXT("Lane Selection:"));
+
+    // Shop
+    AddTextTable(EHUDText::Statistics_Shop_SpendMoney, TEXT("소비한 돈"), TEXT("Money Spent"));
+    AddTextTable(EHUDText::Statistics_Shop_TotalPurchaseCount, TEXT("총 구매 횟수"), TEXT("Total Purchases"));
+    AddTextTable(EHUDText::Statistics_Shop_PurchaseCount, TEXT("구매 횟수"), TEXT("Purchase Count"));
+    AddTextTable(EHUDText::Statistics_Shop_PlacedCount, TEXT("놓은 횟수"), TEXT("Placed Count"));
+    AddTextTable(EHUDText::Statistics_Shop_MovedCount, TEXT("이동 횟수"), TEXT("Moved Count"));
+    AddTextTable(EHUDText::Statistics_Shop_RecollectedCount, TEXT("회수 횟수"), TEXT("Recollected Count"));
+    AddTextTable(EHUDText::Statistics_Shop_UpgradeCount, TEXT("업그레이드 횟수"), TEXT("Upgrade Count"));
+    AddTextTable(EHUDText::Statistics_Shop_ObjectSelection, TEXT("오브젝트 선택:"), TEXT("Object Selection:"));
+
+    // Bank
+    AddTextTable(EHUDText::Statistics_Bank_LoanUseCount, TEXT("대출 횟수"), TEXT("Loan Use Count"));
+    AddTextTable(EHUDText::Statistics_Bank_TotalRepayment, TEXT("총 상환금액"), TEXT("Total Repayment"));
+    AddTextTable(EHUDText::Statistics_Bank_TotalLoanAmount, TEXT("총 대출 금액"), TEXT("Total Loan Amount"));
+    AddTextTable(EHUDText::Statistics_Bank_TotalPaidInterest, TEXT("총 지불 이자"), TEXT("Total Paid Interest"));
     
     // StationInfo
     AddTextTable(EHUDText::StationInfo_Complain, TEXT("불만도"), TEXT("Complain"));
