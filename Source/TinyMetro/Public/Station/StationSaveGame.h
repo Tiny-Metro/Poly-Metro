@@ -6,6 +6,7 @@
 #include "GameFramework/SaveGame.h"
 #include "Passenger.h"
 #include "StationInfo.h"
+#include "StationState.h"
 #include "StationSaveGame.generated.h"
 
 /**
@@ -29,5 +30,7 @@ public:
 	bool IsUpgrade;
 	UPROPERTY(BlueprintReadWrite)
 	FStationInfo StationInfo;
+	UPROPERTY(BlueprintReadWrite)
+	StationState State;
 
 };
