@@ -208,6 +208,7 @@ void AStation::Save() {
 	tmp->PassengerSpawnCurrent = PassengerSpawnCurrent;
 	tmp->SpawnDay = SpawnDay;
 	tmp->StationInfo = StationInfo;
+	tmp->State = State;
 
 	GameModeRef->GetSaveManager()->Save(tmp, SaveActorType::Station, StationInfo.Id);
 }
@@ -225,6 +226,7 @@ void AStation::Load() {
 		PassengerSpawnCurrent = tmp->PassengerSpawnCurrent;
 		SpawnDay = tmp->SpawnDay;
 		StationInfo = tmp->StationInfo;
+		State = tmp->State;
 
 		IsLoaded = true;
 	}
@@ -407,7 +409,7 @@ void AStation::UpdateStationMesh() {
 		StationMeshComponent->SetMaterial(0, StationMaterialActive[0]);
 		StationMeshComponent->SetMaterial(1, StationMaterialActive[1]);
 		break;
-	case StationState::Destroyed : 
+	case StationState::Destroyed :
 		StationMeshComponent->SetMaterial(0, StationMaterialDestroyed[0]);
 		StationMeshComponent->SetMaterial(1, StationMaterialDestroyed[1]);
 		break;
