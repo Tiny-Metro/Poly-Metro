@@ -25,31 +25,17 @@ end
 
 -- Investment success condition
 function Process()
-    local start_lane = GetLaneStatisticsAtStart(1000)
-    local start_station = GetLaneDetailStatisticsAtStart(1000)
+    local start_lane = GetLaneDetailStatisticsAtStart(1000)
+    local start_station = {}
 
-    local cur_lane = GetLaneStatistics()
-    local cur_station = GetLaneDetailStatistics()
+    for i = 1, 8 do
+        start_station[i] = start_lane[i].ServiceStationCount
+    end
 
-    local lane_count = cur_lane.TotalLaneCount
-
-    if lane_count ~= 0 then
-        for i = 1,  lane_count do
-            if i > start_lane.TotalLaneCount then
-                -- new lane
-                if cur_station[i] == nil then
-                    break
-                elseif cur_station[i].TransferStationCount >= additional_needs_1000 then
-                    return success
-                end
-            else
-                -- existing lane
-                if (cur_lane[i] == nil) or (start_lane[i] == i) then
-                    break
-                elseif cur_station[i].TransferStationCount >= (start_station[i].TransferStationCount + additional_needs_1000) then
-                    return success
-                end
-            end
+    local cur_lane = GetLaneDetailStatistics()
+    for i = 1, 8 do
+        if start_station[i] + additional_needs_1000 <= cur_lane[i].ServiceStationCount then
+            return success
         end
     end
 

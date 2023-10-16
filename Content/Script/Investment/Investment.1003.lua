@@ -47,7 +47,7 @@ function Process()
     end
 
     if all_stations_limit then
-        if (start_time.Date - cur_time.Date) <= time_needed_1003 then
+        if (cur_time.Date - start_time.Date) <= time_needed_1003 then
             return continue
         else
             return success

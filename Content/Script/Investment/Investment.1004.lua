@@ -28,18 +28,24 @@ end
 -- Investment success condition
 function Process()
     local start_train = GetTrainInfosAtStart(1004)
+    local start_count = {}
+
+    for i, v in pairs(start_train) do
+        start_count[i] = v.SubtrainCount
+    end
+    
     local cur_train = GetTrainInfos()
 
-    for i = 0, #cur_train do
-        if i <= #start_train then
+    for i, v in pairs(cur_train) do
+        if i <= #start_count then
             -- existing train
-            local additional_subtrains = (cur_train[i].SubtrainCount - (start_train[i].SubtrainCount or 0))
+            local additional_subtrains = (v.SubtrainCount - (start_count[i].SubtrainCount or 0))
             if additional_subtrains >= additional_needs_1004 then
                 return success
             end
         else
             -- new train
-            if cur_train[i].SubtrainCount >= additional_needs_1004 then
+            if v.SubtrainCount >= additional_needs_1004 then
                 return success
             end
         end
