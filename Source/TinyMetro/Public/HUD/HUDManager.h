@@ -87,5 +87,6 @@ private:
     void LoadTextureFromFile(const FString& TexturePath);
 
     EHUDImage EHUDImageContain(const FString& TextureName);
-    
+    void SetIntegradedTextTable();
+    void AddTextTable(EHUDText TextEnum, FString Korean, FString English);
 };

@@ -167,5 +167,7 @@ enum class EHUDImage : uint8
     Station_Diamond,
     Station_Pentagon,
     Station_Star,
-    Station_Fan
+    Station_Fan,
+    Train_Train,
+    Train_SubTrain
 };
