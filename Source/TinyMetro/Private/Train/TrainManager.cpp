@@ -393,6 +393,7 @@ UTrainInfoWidget* ATrainManager::GetTrainInfoWidget() {
 
 void ATrainManager::ReleaseClick() {
 	if (IsValid(ClickedTrain)) ClickedTrain->OnReleasedLogic();
+	ClickedTrain = nullptr;
 }
 
 int32 ATrainManager::GetStationCountByOrigin(FStationInfo Origin, ALane* Lane) {
