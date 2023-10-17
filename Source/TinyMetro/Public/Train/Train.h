@@ -17,7 +17,8 @@ UCLASS(Config = Game)
 class TINYMETRO_API ATrain : public ATrainTemplate
 {
 	GENERATED_BODY()
-	
+
+	friend class ASubtrain;
 public:
 	ATrain();
 

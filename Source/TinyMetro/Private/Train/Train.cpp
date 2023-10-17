@@ -47,27 +47,25 @@ void ATrain::Tick(float DeltaTime) {
 	}
 
 	if (IsValid(LaneRef) && Status == TrainStatus::Run && TrainMovement->IsActive() && !IsActorDragged) {
-		auto direction = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), StationManagerRef->GetStationById(NextStation.Id)->GetActorLocation());
-		//UE_LOG(LogTemp, Log, TEXT("NextStationId : %d"), NextStation.Id);
-		//UE_LOG(LogTemp, Log, TEXT("Direction : %f %f %f"), direction.Roll, direction.Pitch, direction.Yaw);
-		direction.Roll = 0;
-		direction.Pitch = 0;
-		//auto step = UKismetMathLibrary::GetForwardVector(direction);
-		
-		FVector nextStep;
+			
+		FVector nextStep, nextLocation;
 		if (Direction == TrainDirection::Up) {
 			nextStep = LaneRef->ReverseSpline->FindDirectionClosestToWorldLocation(GetActorLocation(), ESplineCoordinateSpace::World);
+			nextLocation = LaneRef->ReverseSpline->FindLocationClosestToWorldLocation(GetActorLocation() + (nextStep)*DeltaTime * TrainSpeed, ESplineCoordinateSpace::Type::World);
+			//UE_LOG(LogTemp, Log, TEXT("Train move up, Input key : %f"), LaneRef->ReverseSpline->FindInputKeyClosestToWorldLocation(GetActorLocation()));
 		} else {
 			nextStep = LaneRef->LaneSpline->FindDirectionClosestToWorldLocation(GetActorLocation(), ESplineCoordinateSpace::World);
+			nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + (nextStep)*DeltaTime * TrainSpeed, ESplineCoordinateSpace::Type::World);
+			//UE_LOG(LogTemp, Log, TEXT("Train move down, Input key : %f"), LaneRef->LaneSpline->FindInputKeyClosestToWorldLocation(GetActorLocation()));
+
 		}
-		//UE_LOG(LogTemp, Log, TEXT("Step : %f %f %f"), step.X, step.Y, step.Z);
-		//SetActorLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 0.5);
-		auto nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + (nextStep) * DeltaTime * TRAIN_DEFAULT_SPEED * 1, ESplineCoordinateSpace::Type::World);
+
+
 		nextLocation.Z = TrainZAxis;
 		auto newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), nextLocation);
 		newRotation.Roll = 0;
 		newRotation.Pitch = 0;
-		UE_LOG(LogTemp, Log, TEXT("NextLocation : %f %f %f"), nextLocation.X, nextLocation.Y, nextLocation.Z);
+		//UE_LOG(LogTemp, Log, TEXT("NextLocation : %f %f %f"), nextLocation.X, nextLocation.Y, nextLocation.Z);
 		SetActorLocationAndRotation(nextLocation, newRotation);
 	}
 
@@ -179,7 +177,7 @@ void ATrain::BeginPlay() {
 
 void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor->IsA(AStation::StaticClass()) && !IsActorDragged) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Train::Overlap"));
+		UE_LOG(LogTemp, Log, TEXT("Train::Overlap"))
 		
 		auto Station = Cast<AStation>(OtherActor);
 		// Check passing station
@@ -214,6 +212,7 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			for (auto& i : Subtrains) {
 				i->SetCurrentStation(GetCurrentStation());
 				i->SetNextStation(GetNextStation());
+				i->SetTrainDirection(Direction);
 			}
 
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Overlap"));
@@ -657,6 +656,7 @@ void ATrain::AddSubtrain(ASubtrain* T) {
 	Subtrains.AddUnique(T);
 	T->AttachToTrain(this);
 	T->SetActorLocation(this->GetActorLocation());
+	T->SetTrainDirection(Direction);
 	UpdateSubtrainDistance();
 	UpdateSubtrainSpeed();
 	IndexingSubtrain();
