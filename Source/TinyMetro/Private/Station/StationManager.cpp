@@ -27,8 +27,7 @@ AStationManager::AStationManager()
 
 	StationBlueprintClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Station/BP_Station.BP_Station_C'")).Object;
 
-//	StationInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_StationInfoWidget.WBP_StationInfoWidget_C'")).Object;
-	StationInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game//UI/InfoWidgets/WBP_StationInfoWidget.WBP_StationInfoWidget_C'")).Object;
+	StationInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/UI/InfoWidgets/WBP_StationInfoWidget.WBP_StationInfoWidget_C'")).Object;
 	StationSpawnWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_SpawnBorderAlarm.WBP_SpawnBorderAlarm_C'")).Object;
 
 	// Init GridManager
@@ -130,7 +129,7 @@ void AStationManager::AddPassegnerSpawnProbabilityByEvent(float Amount) {
 }
 
 bool AStationManager::CalculatePassegnerSpawnProbability() const {
-	if (FMath::RandRange(0.0f, 1.0f) >= (PassengerSpawnProbability + AdditionalPassengerSpawnProbabilityByEvent + AdditionalPassengerSpawnProbabilityByPolicy)) {
+	if (FMath::RandRange(0.0f, 1.0f) <= (PassengerSpawnProbability + AdditionalPassengerSpawnProbabilityByEvent + AdditionalPassengerSpawnProbabilityByPolicy)) {
 		return true;
 	} else {
 		return false;
@@ -138,7 +137,7 @@ bool AStationManager::CalculatePassegnerSpawnProbability() const {
 }
 
 bool AStationManager::CalculateFreePassegnerSpawnProbability() const {
-	if (FMath::RandRange(0.0f, 1.0f) >= (FreePassengerSpawnProbability + FreePassengerSpawnProbabilityByEvent + FreePassengerSpawnProbabilityByPolicy)) {
+	if (FMath::RandRange(0.0f, 1.0f) <= (FreePassengerSpawnProbability + FreePassengerSpawnProbabilityByEvent + FreePassengerSpawnProbabilityByPolicy)) {
 		return true;
 	} else {
 		return false;
