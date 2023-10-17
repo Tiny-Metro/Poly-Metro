@@ -29,6 +29,9 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	UFUNCTION(BlueprintCallable)
+	void RemoveSaveData(FString LevelName);
+
 public:
 
 	UPROPERTY(BlueprintAssignable)

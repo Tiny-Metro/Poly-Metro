@@ -3,7 +3,7 @@
 #include "SaveSystem/TMSaveManager.h"
 #include "GameModes/TinyMetroGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 ATMSaveManager::ATMSaveManager()
@@ -34,6 +34,17 @@ void ATMSaveManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	SaveAllActor();
+}
+
+void ATMSaveManager::RemoveSaveData(FString LevelName) {
+	FString saveDir = UKismetSystemLibrary::GetProjectSavedDirectory();
+	saveDir.Append(TEXT("SaveGames"))
+		.Append(FGenericPlatformMisc::GetDefaultPathSeparator())
+		.Append(LevelName);
+
+	IPlatformFile& platformFile = FPlatformFileManager::Get().GetPlatformFile();
+	platformFile.DeleteDirectory(*saveDir);
+
 }
 
 void ATMSaveManager::SaveAllActor()
