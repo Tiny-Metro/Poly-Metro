@@ -24,6 +24,30 @@ public:
     void ChangeLanguage(ELanguage NewLanguage);
     UFUNCTION(BlueprintCallable)
     void ChangeTextSize(ETextSize TextSize);
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool UseSettedText = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Title_Small;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Basic_Small;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Explaination_Small;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Title_Medium;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Basic_Medium;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Explaination_Medium;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Title_Large;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Basic_Large;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Explaination_Large;
 
 
 protected:

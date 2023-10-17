@@ -136,6 +136,40 @@ void AHUDManager::SetTextSizeMap()
     int32 BasicSize = 27;
     int32 ExplainationSize = 18;
 
+    if (UseSettedText)
+    {
+        switch (CurrentTextSize)
+        {
+        case ETextSize::S:
+            TitleSize = Title_Small;
+            BasicSize = Basic_Small;
+            ExplainationSize = Explaination_Small;
+            break;
+        case ETextSize::M:
+            TitleSize = Title_Medium;
+            BasicSize = Basic_Medium;
+            ExplainationSize = Explaination_Medium;
+            break;
+        case ETextSize::L:
+            TitleSize = Title_Large;
+            BasicSize = Basic_Large;
+            ExplainationSize = Explaination_Large;
+            break;
+        default:
+            break;
+        }
+
+        TMap<ETextType, int32> textSizeMap;
+        TextSizeMap.Empty();
+        textSizeMap.Add(ETextType::Title, TitleSize);
+        textSizeMap.Add(ETextType::Basic, BasicSize);
+        textSizeMap.Add(ETextType::ExplainationText, ExplainationSize);
+
+        TextSizeMap = textSizeMap;
+
+        return;
+    }
+
     switch (CurrentTextSize)
     {
     case ETextSize::S:
