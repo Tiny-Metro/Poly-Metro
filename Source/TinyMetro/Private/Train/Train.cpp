@@ -29,16 +29,16 @@ void ATrain::Tick(float DeltaTime) {
 	);*/
 
 	// Passenger Off, On
-	if (Status == TrainStatus::GetOff) {
+	if (Status == TrainStatus::GetOff && !IsActorDragged) {
 		PassengerTransitionCount += DeltaTime;
 		if (PassengerTransitionCount >= PassengerTransitionDelay) {
 			bool tmp;
 			GetOffPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation), tmp);
 			PassengerTransitionCount -= PassengerTransitionDelay;
 		}
-	} 
+	}
 
-	if (Status == TrainStatus::GetOn) {
+	if (Status == TrainStatus::GetOn && !IsActorDragged) {
 		PassengerTransitionCount += DeltaTime;
 		if (PassengerTransitionCount >= PassengerTransitionDelay) {
 			GetOnPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation));
@@ -71,21 +71,8 @@ void ATrain::Tick(float DeltaTime) {
 
 	// Drag & Drop
 	if (IsActorDragged) {
-		//DropPassenger();
-		//MouseToWorldLocation;
-		//MouseToWorldActor = ConvertMousePositionToWorldLocation(MouseToWorldLocation);
-
-		///*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black,
-		//	FString::Printf(TEXT("Train::Tick - %lf, %lf"), MouseToWorldLocation.X, MouseToWorldLocation.Y));*/
-		//LaneRef = Cast<ALane>(MouseToWorldActor);
-		//SetTrainMaterial(LaneRef);
-		//if (MouseToWorldActor->IsA(AStation::StaticClass()) ||
-		//	MouseToWorldActor->IsA(ATrainTemplate::StaticClass())) {
-		//	LineTraceIgnoreActors.AddUnique(MouseToWorldActor);
-		//}
-		//if (IsValid(LaneRef)) {
-		//	
-		//}
+		TrainMovement->SetActive(false);
+		PassengerTransitionCount = 0.0f;
 
 		auto Destination = StationManagerRef->GetNearestStation(MouseToWorldLocation, LaneRef);
 		this->SetActorLocationAndRotation(
@@ -100,8 +87,10 @@ void ATrain::Tick(float DeltaTime) {
 		FVector TrainForwardVector = TrainMeshComponent->GetForwardVector();
 		FRotator TrainRotationVector = TrainMeshComponent->GetComponentRotation();
 		for (int i = 0; i < Subtrains.Num(); i++) {
-			FVector NewSubtrainLocation = TrainForwardVector * TrainSafeDistance * (i + 1);
-			Subtrains[i]->SetActorLocationAndRotation(NewSubtrainLocation, TrainRotationVector);
+			FVector NewSubtrainLocation = TrainForwardVector * Subtrains[i]->DistanceFromTrain;
+			Subtrains[i]->SetActorLocationAndRotation(GetActorLocation() - NewSubtrainLocation, TrainRotationVector);
+			Subtrains[i]->SetTrainMaterial(LaneRef);
+			UE_LOG(LogTemp, Log, TEXT("%f %f %f"), NewSubtrainLocation.X, NewSubtrainLocation.Y, NewSubtrainLocation.Z);
 			//FRotator TrainWorldRotation = TrainMeshComponent->getrotationo
 		}
 	}
@@ -351,6 +340,8 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 		GridManagerRef->GetGridCellDataByCoord(StartLocation, tmp).WorldCoordination
 	));
 
+	PassengerTransitionCount = 0.0f;
+	Status = TrainStatus::Run;
 
 	// Initialize train's Current, Next station
 	if (!IsLoaded) {
@@ -372,6 +363,10 @@ void ATrain::ServiceStart(FVector StartLocation, ALane* Lane, AStation* D) {
 	FVector cubeLocation = this->GetActorLocation();
 	cubeLocation.Z = cubeLocation.Z + 300.0f;
 	CubeComponent->SetWorldLocation(cubeLocation);
+
+	for (auto& i : Subtrains) {
+		i->ServiceStart(StartLocation, Lane, D);
+	}
 }
 
 void ATrain::UpdatePassengerSlot() {
@@ -439,6 +434,7 @@ void ATrain::ActiveMoveTest() {
 }
 
 void ATrain::GetOnPassenger(AStation* Station) {
+	if (!IsValid(Station)) return;
 	if (!IsPassengerSlotFull()) {
 		// Log
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Train::GetOnPassenger"));
@@ -494,7 +490,8 @@ int32 ATrain::GetWeeklyPassenger() const {
 void ATrain::GetOffPassenger(AStation* Station, bool& Success) {
 	// Log
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Station::GerOffPassenger"));
-	
+	if (!IsValid(Station)) return;
+
 	Super::GetOffPassenger(Station, Success);
 	if (Success) {
 		return;

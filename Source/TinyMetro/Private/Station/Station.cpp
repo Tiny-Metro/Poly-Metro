@@ -237,6 +237,7 @@ FPassenger AStation::GetOnPassenger(int32 Index, ATrainTemplate* Train) {
 	// TPair.key : Passenger pointer
 	// TPair.value : Index validation (true : Need to next passenger check, false : Last index)
 	//TPair<UPassenger*, bool> RidePassenger(nullptr, false);
+	if (!IsValid(Train)) return FPassenger();
 	for (int i = 0; i < Passenger.Num(); i++) {
 		// Update passenger route
 		auto PassengerRoute = StationManager->GetShortestPath(
