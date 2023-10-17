@@ -1740,6 +1740,19 @@ void ALane::SetLaneSpline(){
 		LaneSpline->SetSplinePointType(i, ESplinePointType::Linear, true);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("SetLaneSpline: %d"), LaneSpline->GetNumberOfSplinePoints());
+
+
+	TArray<FVector> ReversedLocation;
+	for (int32 Index = LaneLocation.Num() - 1; Index >= 0; --Index) {
+		ReversedLocation.Add(LaneLocation[Index]);
+	}
+
+	ReverseSpline->ClearSplinePoints();
+	ReverseSpline->SetSplinePoints(ReversedLocation, ESplineCoordinateSpace::World, true);
+	for (int32 i = 0; i < ReversedLocation.Num(); i++) {
+		ReverseSpline->SetSplinePointType(i, ESplinePointType::Linear, true);
+	}
+
 }
 
 // Heloper Function for 'SetLaneLocation'
@@ -2760,6 +2773,7 @@ void ALane::InitLaneSpline()
 
 	// Create the spline component and attach it to the RootComponent
 	LaneSpline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+	ReverseSpline = CreateDefaultSubobject<USplineComponent>(TEXT("Reverse Spline"));
 	RootComponent = LaneSpline;
 }
 

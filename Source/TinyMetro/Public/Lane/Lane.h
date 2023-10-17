@@ -76,9 +76,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	class AStatisticsManager* StatisticsManagerRef;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spline")
 	USplineComponent* LaneSpline;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spline")
+	USplineComponent* ReverseSpline;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnyWhere)
