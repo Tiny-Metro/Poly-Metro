@@ -105,7 +105,7 @@ void ATinyMetroGameModeBase::StartPlay() {
     SpawnParams.Owner = this;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
     BridgeTunnelManager = Cast<ABridgeTunnelManager>(GetWorld()->SpawnActor<AActor>(ObjBridgeTunnelManager, SpawnTransform));
-    BridgeTunnelManager->Load();
+    //BridgeTunnelManager->Load();
 
     PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     UE_LOG(LogTemp, Log, TEXT("GameMode::StartPlay : Spawn finish"));

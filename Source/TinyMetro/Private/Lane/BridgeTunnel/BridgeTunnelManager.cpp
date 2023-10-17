@@ -30,6 +30,7 @@ void ABridgeTunnelManager::BeginPlay()
 	SaveManagerRef = GameMode->GetSaveManager();
 	if (SaveManagerRef)
 	{
+		Load();
 		SaveManagerRef->SaveTask.AddDynamic(this, &ABridgeTunnelManager::Save);
 		UE_LOG(LogTemp, Warning, TEXT("SaveManagerRef is Put SaveTask in ABridgeTunnelManager::BeginPlay()"));
 
