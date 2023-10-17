@@ -256,6 +256,9 @@ void ATrainTemplate::ServiceStart(FVector StartLocation, ALane* Lane, AStation* 
 		}
 	}
 	IsActorSpawnByWidget = false;
+	IsActorDragged = false;
+
+	TrainMovement->SetActive(true);
 
 	LaneRef = Lane;
 	TrainInfo.ServiceLaneId = Lane->GetLaneId();
@@ -274,16 +277,19 @@ void ATrainTemplate::DropPassenger() {
 	auto NextStationPointer = StationManagerRef->GetStationByStationInfo(NextStation);
 
 	if (IsValid(CurrentStationPointer)) {
-		for (auto& i : Passenger) {
-			if (i.Value.Destination == StationType::None) continue;
-			CurrentStationPointer->GetOffPassenger(i.Value, this);
-			Passenger.Remove(i.Key);
-			UpdatePassengerMesh();
+		for (int i = 0; i < MaxPassengerSlot; i++) {
+			if (Passenger.Contains(i)) {
+				if (Passenger[i].Destination == StationType::None) continue;
+				CurrentStationPointer->GetOffPassenger(Passenger[i], this);
+				Passenger.Remove(i);
+				UpdatePassengerMesh();
+			}
 		}
 	}
 }
 
 void ATrainTemplate::GetOffPassenger(AStation* Station, bool& Success) {
+	if (!IsValid(Station)) return;
 	Success = false;
 	for (int i = 0; i < CurrentPassengerSlot; i++) {
 		if (Passenger.Contains(i)) {
