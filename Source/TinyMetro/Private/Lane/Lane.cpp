@@ -1650,6 +1650,8 @@ void ALane::SetLaneLocation() {
 	LaneLocation.Empty(); 
 	float Offset = 100;
 
+	int32 IndexCount = 0;
+
 	for (int i = 0; i < LaneArray.Num(); i++)
 	{
 		FLanePoint& CurrentPoint = LaneArray[i];
@@ -1657,6 +1659,8 @@ void ALane::SetLaneLocation() {
 		FVector PointVector = PointToLocation(CurrentPoint.Coordination);
 		FVector LineDirection;
 
+
+		TArray<FVector> AddedLocations;
 		float off = CalculateOffset(CurrentPoint.LanePosition);
 		FVector VectorLocation = PointVector;
 
@@ -1666,6 +1670,12 @@ void ALane::SetLaneLocation() {
 			FVector FrontVector = PointToLocation(FrontPoint.Coordination);
 			LineDirection = CalculateLineDirection(FrontVector, PointVector);
 			VectorLocation += CalculatePerpendicular(LineDirection, Offset, off);
+			
+			if (PointVector != VectorLocation)
+			{
+				AddedLocations.Add(PointVector);
+			}
+			AddedLocations.Add(VectorLocation);
 		}
 		else if (i == LaneArray.Num() - 1)
 		{
@@ -1674,10 +1684,46 @@ void ALane::SetLaneLocation() {
 			LineDirection = CalculateLineDirection(PointVector, BackVector);
 			off = CalculateOffset(BackPoint.LanePosition);
 			VectorLocation += CalculatePerpendicular(LineDirection, Offset, off);
+
+			AddedLocations.Add(VectorLocation);
+			if (PointVector != VectorLocation)
+			{
+				AddedLocations.Add(PointVector);
+			}
 		}
 		else
 		{
-			if (CurrentPoint.IsBendingPoint)
+			if (CurrentPoint.IsStation)
+			{
+				FLanePoint BackPoint = LaneArray[i - 1];
+				FLanePoint FrontPoint = LaneArray[i + 1];
+
+				int32 BackOff = CalculateOffset(BackPoint.LanePosition);
+				int32 FrontOff = CalculateOffset(CurrentPoint.LanePosition);
+
+				if (BackOff != 0)
+				{
+					FVector BackVector = PointToLocation(BackPoint.Coordination);
+					FVector BackDirection = CalculateLineDirection(PointVector, BackVector);
+					FVector BackPerpendicularVector = FVector::CrossProduct(BackDirection, FVector::UpVector);
+					BackPerpendicularVector = ChangePerpendicularToStandard(BackPerpendicularVector);
+					FVector BackVectorLocation = PointVector + BackPerpendicularVector * Offset * BackOff;
+					AddedLocations.Add(BackVectorLocation);
+				}
+
+				AddedLocations.Add(PointVector);
+
+				if (FrontOff != 0)
+				{
+					FVector FrontVector = PointToLocation(FrontPoint.Coordination);
+					FVector FrontDirection = CalculateLineDirection(FrontVector, PointVector);
+					FVector FrontPerpendicularVector = FVector::CrossProduct(FrontDirection, FVector::UpVector);
+					FrontPerpendicularVector = ChangePerpendicularToStandard(FrontPerpendicularVector);
+					FVector FrontVectorLocation = PointVector + FrontPerpendicularVector * Offset * FrontOff;
+					AddedLocations.Add(FrontVectorLocation);
+				}
+			}
+			else if (CurrentPoint.IsBendingPoint)
 			{
 				FLanePoint BackPoint = LaneArray[i - 1];
 				FLanePoint FrontPoint = LaneArray[i + 1];
@@ -1701,13 +1747,15 @@ void ALane::SetLaneLocation() {
 				FVector FrontVectorLocation = PointVector + FrontPerpendicularVector * Offset * FrontOff;
 
 				VectorLocation = (LineIntersection(BackVector + BackPerpendicularVector * Offset * BackOff, BackVectorLocation, FrontVectorLocation, FrontVector + FrontPerpendicularVector * Offset * FrontOff));
+				AddedLocations.Add(VectorLocation);
 				if (BackPerpendicularVector == FrontPerpendicularVector && BackOff != FrontOff)
 				{
-					LaneLocation.Add(BackVectorLocation);
-					CurrentPoint.SplineIndex.Add(LaneLocation.Num() - 1);
-					UE_LOG(LogTemp, Warning, TEXT("SetLaneLocation: ADD MORE"));
+//					LaneLocation.Add(BackVectorLocation);
+	//				CurrentPoint.SplineIndex.Add(LaneLocation.Num() - 1);
+	//				UE_LOG(LogTemp, Warning, TEXT("SetLaneLocation: ADD MORE"));
 
 					VectorLocation = FrontVectorLocation;
+					AddedLocations.Add(VectorLocation);
 				}
 			}
 			else
@@ -1716,10 +1764,19 @@ void ALane::SetLaneLocation() {
 				FVector FrontVector = PointToLocation(FrontPoint.Coordination);
 				LineDirection = CalculateLineDirection(FrontVector, PointVector);
 				VectorLocation += CalculatePerpendicular(LineDirection, Offset, off);
+
+				AddedLocations.Add(VectorLocation);
 			}
 		}
-		LaneLocation.Add(VectorLocation);
-		CurrentPoint.SplineIndex.AddUnique(LaneLocation.Num() - 1);
+//		LaneLocation.Add(VectorLocation);
+//		CurrentPoint.SplineIndex.AddUnique(LaneLocation.Num() - 1);
+		for (int32 k = 0; k < AddedLocations.Num(); k++)
+		{
+			LaneLocation.Add(AddedLocations[k]);
+			CurrentPoint.SplineIndex.Add(IndexCount);
+			IndexCount++;
+		}
+
 		for (int32 j = 0; j < CurrentPoint.SplineIndex.Num(); j++)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("SetLaneLocation: %d (%d)"), i, CurrentPoint.SplineIndex[j]);
@@ -2615,13 +2672,14 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 		UE_LOG(LogTemp, Warning, TEXT("Invalid input parameters for R2SplineMeshComponent."));
 		return;
 	}
-
 	// Destroy Exisiting One
 	for (int32 i = StartIndex; i <= LastIndex; i++)
 	{
 		if (!LaneArray.IsValidIndex(i))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : Invalid LaneArray Index"));			
+			UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : Invalid LaneArray Index"));
+			// PATCHING ERROR!! FINDING FOUNDIMENTAL NEEDED
+			LastIndex = i - 1;
 		}
 		else 
 		{
@@ -2636,15 +2694,23 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 
 	float Length;
 	float ClampedLength;
-
+	UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : Start"));
 	for (int32 i = StartIndex; i <= LastIndex; i++) 
 	{
+		UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : 1st"));
+
 		int32 indexNum = LaneArray[i].SplineIndex.Num();
+		UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : 2nd"));
+
 		for (int32 k = 0; k < indexNum; k++)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : 3rd"));
+
 			int32 index = LaneArray[i].SplineIndex[k];
 			if (index == 0)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : 4th"));
+
 				/* --- Front Mesh Only --- */
 
 				// Set Start/End Pos/Tangent
@@ -2663,6 +2729,8 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 			}
 			else if (index == LaneLocation.Num() - 1)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : 5th"));
+
 				/* --- Back Mesh Only --- */
 
 				// Set Start/End Pos/Tangent
@@ -2676,6 +2744,7 @@ void ALane::SetMeshByIndex(int32 StartIndex, int32 LastIndex){
 			else
 			{
 				/* --- Back Mesh --- */
+				UE_LOG(LogTemp, Warning, TEXT("SetMeshByIndex : 6th"));
 
 // Set Start/End Pos/Tangent
 				StartPos = (LaneSpline->GetLocationAtSplinePoint(index - 1, ESplineCoordinateSpace::Local) + LaneSpline->GetLocationAtSplinePoint(index, ESplineCoordinateSpace::Local)) / 2.0f;
