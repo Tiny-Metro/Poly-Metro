@@ -50,6 +50,41 @@ ASubtrain::ASubtrain() {
 void ASubtrain::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
+	
+	if (IsValid(OwnerTrainRef) && IsValid(LaneRef) && !IsActorDragged) {
+		if (OwnerTrainRef->Status == TrainStatus::Run && OwnerTrainRef->TrainMovement->IsActive()) {
+			float distanceToTrain;
+			FVector nextStep, nextLocation;
+			if (OwnerTrainRef->Direction == TrainDirection::Up) {
+				float keySubtrain = LaneRef->ReverseSpline->FindInputKeyClosestToWorldLocation(GetActorLocation());
+				float keyOwnerTrain = LaneRef->ReverseSpline->FindInputKeyClosestToWorldLocation(OwnerTrainRef->GetActorLocation());
+				distanceToTrain = LaneRef->ReverseSpline->GetDistanceAlongSplineAtSplineInputKey(keyOwnerTrain) - LaneRef->ReverseSpline->GetDistanceAlongSplineAtSplineInputKey(keySubtrain);
+				nextStep = LaneRef->ReverseSpline->FindDirectionClosestToWorldLocation(GetActorLocation(), ESplineCoordinateSpace::World);
+				nextLocation = LaneRef->ReverseSpline->FindLocationClosestToWorldLocation(GetActorLocation() + (nextStep)*DeltaTime * TrainSpeed * 1, ESplineCoordinateSpace::Type::World);
+				//UE_LOG(LogTemp, Log, TEXT("Distacne to train : UP : %f"), distanceToTrain);
+
+			} else {
+				float keySubtrain = LaneRef->ReverseSpline->FindInputKeyClosestToWorldLocation(GetActorLocation());
+				float keyOwnerTrain = LaneRef->ReverseSpline->FindInputKeyClosestToWorldLocation(OwnerTrainRef->GetActorLocation());
+				distanceToTrain = LaneRef->ReverseSpline->GetDistanceAlongSplineAtSplineInputKey(keySubtrain) - LaneRef->ReverseSpline->GetDistanceAlongSplineAtSplineInputKey(keyOwnerTrain);
+				nextStep = LaneRef->LaneSpline->FindDirectionClosestToWorldLocation(GetActorLocation(), ESplineCoordinateSpace::World);
+				nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + (nextStep)*DeltaTime * TrainSpeed * 1, ESplineCoordinateSpace::Type::World);
+				//UE_LOG(LogTemp, Log, TEXT("Distacne to train : Down : %f"), distanceToTrain);
+
+			}
+
+			nextLocation.Z = TrainZAxis;
+			auto newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), nextLocation);
+			newRotation.Roll = 0;
+			newRotation.Pitch = 0;
+			//UE_LOG(LogTemp, Log, TEXT("NextLocation : %f %f %f"), nextLocation.X, nextLocation.Y, nextLocation.Z);
+			if (distanceToTrain >= DistanceFromTrain) {
+				SetActorLocationAndRotation(nextLocation, newRotation);
+			}
+		}
+	}
+
+
 	// Drag activated
 	if (IsActorDragged) {
 		DetachFromTrain();
