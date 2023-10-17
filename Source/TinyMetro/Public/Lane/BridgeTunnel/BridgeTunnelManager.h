@@ -29,6 +29,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	UPROPERTY(VisibleAnywhere)
+	UClass* BridgeTunnelClass = nullptr;
+
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ConnectBT(const TArray<FIntPoint>& points, int32 LaneID);

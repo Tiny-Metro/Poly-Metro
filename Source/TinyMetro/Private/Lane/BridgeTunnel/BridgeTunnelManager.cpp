@@ -16,6 +16,8 @@ ABridgeTunnelManager::ABridgeTunnelManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	BridgeTunnelClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Lane/BridgeTunnel/BP_BridgeTunnel.BP_BridgeTunnel_C'")).Object;
+	
 }
 
 // Called when the game starts or when spawned
@@ -344,31 +346,16 @@ ABridgeTunnel* ABridgeTunnelManager::LoadConnector(int32 connectorId)
 }
 ABridgeTunnel* ABridgeTunnelManager::SpawnConnector()
 {
-	// Load BP Class
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Lane/BridgeTunnel/BP_BridgeTunnel.BP_BridgeTunnel'")));
-
-	// Cast to BP
-	UBlueprint* GeneratedBP = Cast<UBlueprint>(SpawnActor);
-	// Check object validation
-	if (!SpawnActor) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CANT FIND OBJECT TO SPAWN / BridgeTunnel")));
-		return nullptr;
+	if (!BridgeTunnelClass) {
+		BridgeTunnelClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, TEXT("Class'/Game/Lane/BridgeTunnel/BP_BridgeTunnel.BP_BridgeTunnel_C'")));
 	}
 
-	// Check null
-	UClass* SpawnClass = SpawnActor->StaticClass();
-	if (SpawnClass == nullptr) {
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
-		return nullptr;
-	}
-
-	// Spawn actor
 	FActorSpawnParameters SpawnParams;
 	FTransform SpawnTransform;
 	SpawnParams.Owner = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	ABridgeTunnel* tmpBridgeTunnel = Cast<ABridgeTunnel>(GetWorld()->SpawnActor<AActor>(GeneratedBP->GeneratedClass, SpawnParams));
+	ABridgeTunnel* tmpBridgeTunnel = Cast<ABridgeTunnel>(GetWorld()->SpawnActor<AActor>(BridgeTunnelClass, SpawnTransform));
 
 	return tmpBridgeTunnel;
 }
