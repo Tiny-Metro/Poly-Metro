@@ -73,6 +73,10 @@ enum class EHUDText : uint8
     Setting_Language,
     Setting_Language_Korean,
     Setting_Language_English,
+    Setting_TextSize,
+    Setting_Small,
+    Setting_Big,
+    Setting_Medium,
 
     // Summary
     Statistics_Summary_PassengerNum_Total,

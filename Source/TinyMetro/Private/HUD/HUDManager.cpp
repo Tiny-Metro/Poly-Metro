@@ -16,10 +16,17 @@ AHUDManager::AHUDManager()
 void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
 {
     CurrentLanguage = NewLanguage;
+    UpdateWidgets();
     // Update your HUD widgets to reflect the new language
     // You can implement this based on your HUD widget design
 }
 
+void AHUDManager::ChangeTextSize(ETextSize TextSize)
+{
+    CurrentTextSize = TextSize;
+    UpdateWidgets();
+
+}
 
 void AHUDManager::SetImageTable()
 {
@@ -161,8 +168,8 @@ void AHUDManager::UpdateWidgets()
         UPolyMetroWidget* Widget = WidgetPair.Value;
         if (Widget)
         {
-//            Widget->UpdateTextComponents(this);
-//            Widget->UpdateImageComponents(this);
+            Widget->UpdateTextComponents(this);
+            Widget->UpdateImageComponents(this);
             Widget->UpdateWidgets(this);
         }
     }
@@ -242,6 +249,10 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Setting_Language, TEXT("언어"), TEXT("Language"));
     AddTextTable(EHUDText::Setting_Language_Korean, TEXT("한국어"), TEXT("Korean"));
     AddTextTable(EHUDText::Setting_Language_English, TEXT("영어(English)"), TEXT("English"));
+    AddTextTable(EHUDText::Setting_TextSize, TEXT("텍스트 크기"), TEXT("Text Size"));
+    AddTextTable(EHUDText::Setting_Small, TEXT("작게"), TEXT("Small"));
+    AddTextTable(EHUDText::Setting_Big, TEXT("크게"), TEXT("Big"));
+    AddTextTable(EHUDText::Setting_Medium, TEXT("중간"), TEXT("Medium"));
 
         // Summary
     AddTextTable(EHUDText::Statistics_Summary_PassengerNum_Total, TEXT("총 승객 수"), TEXT("Total Passengers"));
