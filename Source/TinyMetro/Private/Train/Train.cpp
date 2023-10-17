@@ -193,11 +193,14 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 			}
 
 			if (IsValid(LaneRef)) {
-				FVector curLocation = GetActorLocation();
-				Direction = LaneRef->SetDirectionInit(
-					StationManagerRef->GetStationById(NextStation.Id),
-					FIntPoint(curLocation.X, curLocation.Y)
-				);
+				auto nextStationRef = StationManagerRef->GetStationById(NextStation.Id);
+				auto curStationRef = StationManagerRef->GetStationById(CurrentStation.Id);
+				if (IsValid(curStationRef)) {
+					Direction = LaneRef->SetDirectionInit(
+						nextStationRef,
+						curStationRef->GetCurrentGridCellData().WorldCoordination
+					);
+				}
 			}
 
 			// Set current, next Station
