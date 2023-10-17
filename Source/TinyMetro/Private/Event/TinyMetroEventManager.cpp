@@ -34,6 +34,8 @@ void ATinyMetroEventManager::BeginPlay()
 	// Call Load function
 	// - Load fail(new game) : Read Content/Script/Event & Copy them to Content/Script/Event/Saved
 	// - Load success(saved game) : Read Content/Script/Event/Saved
+	Load();
+
 	InitializeEvent();
 
 		
