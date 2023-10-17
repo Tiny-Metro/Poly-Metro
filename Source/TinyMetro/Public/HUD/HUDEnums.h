@@ -155,6 +155,7 @@ enum class EHUDText : uint8
     Policy_On,
     Policy_Off,
     //Event
+    Event_EventandNotice,
 
     //StartMenu
     StartMenu_StartNew,

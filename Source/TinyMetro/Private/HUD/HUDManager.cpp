@@ -371,8 +371,8 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Policy_On, TEXT("켜기"), TEXT("On"));
     AddTextTable(EHUDText::Policy_Off, TEXT("끄기"), TEXT("Off"));
 
-    //Event
-    
+    //Event Event_EventandNotice
+    AddTextTable(EHUDText::Event_EventandNotice, TEXT("이벤트/알람"), TEXT("Event/Notice"));
     //StartMenu
     AddTextTable(EHUDText::StartMenu_StartNew, TEXT("새 게임 시작"), TEXT("Start New Game"));
     AddTextTable(EHUDText::StartMenu_Continue, TEXT("이어하기"), TEXT("Continue"));
