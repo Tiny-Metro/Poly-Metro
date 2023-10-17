@@ -26,7 +26,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	StationType Destination;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool IsFree;
+	bool IsFree = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<bool> RandomFree = {true, false, false, false, false};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
