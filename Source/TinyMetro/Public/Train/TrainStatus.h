@@ -10,7 +10,8 @@
 UENUM(BlueprintType)
 enum class TrainStatus : uint8
 {
-	Run = 0 UMETA(DisplayName = "Running"),
-	GetOn = 1 UMETA(DisplayName = "GetOn"),
-	GetOff = 2 UMETA(DisplayName = "GetOff")
+	Spawn = 0 UMETA(DisplayName = "Spawn"),
+	Run = 1 UMETA(DisplayName = "Running"),
+	GetOn = 2 UMETA(DisplayName = "GetOn"),
+	GetOff = 3 UMETA(DisplayName = "GetOff")
 };

@@ -97,7 +97,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	ATrainAiController* AiControllerRef;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
-	TrainStatus Status = TrainStatus::Run;
+	TrainStatus Status = TrainStatus::Spawn;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	float PassengerTransitionDelay = 1.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
