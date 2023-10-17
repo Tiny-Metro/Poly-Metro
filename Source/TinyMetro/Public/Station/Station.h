@@ -168,7 +168,6 @@ public:
 	void UpdatePolicy();
 
 protected:
-	void SpawnPassenger();
 	void UpdatePassengerMesh();
 
 protected:

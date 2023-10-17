@@ -631,38 +631,3 @@ void AStation::UpdatePolicy() {
 		TransferStation = true;
 	}
 }
-
-// Not used
-// Replcaed by SpawnPassenger(StationType)
-void AStation::SpawnPassenger() {
-	/*auto NewPassengerDestination = StationManager->CalculatePassengerDest(StationInfo.Type);
-	UPassenger* tmp = UPassenger::ConstructPassenger(
-		NewPassengerDestination
-	);
-
-	if (FMath::RandRange(0.0, 1.0) < FreePassengerSpawnProbability) {
-		tmp->SetFree();
-	}
-	
-	if (tmp->GetFree()) {
-		SpawnFreePassenger[tmp->GetDestination()]++;
-		StationManager->NotifySpawnPassenger(tmp->GetDestination(), true);
-	} else {
-		SpawnPaidPassenger[tmp->GetDestination()]++;
-		StationManager->NotifySpawnPassenger(tmp->GetDestination(), false);
-	}
-	TotalSpawnPassenger[tmp->GetDestination()]++;
-
-	
-	Passenger.Add(MoveTemp(tmp));*/
-
-	//Log
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.0f,
-			FColor::Yellow,
-			FString::Printf(TEXT("Passenger Spawn!")));*/
-}
-
-
