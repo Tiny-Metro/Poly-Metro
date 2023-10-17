@@ -7,6 +7,7 @@
 #include "Subtrain.h"
 #include "TrainStatus.h"
 #include "TrainAiController.h"
+#include "TrainDirection.h"
 #include "Train.generated.h"
 
 /**

@@ -15,6 +15,7 @@
 #include "PlayerState/TinyMetroPlayerState.h"
 #include "Statistics/StatisticsManager.h"
 #include "SaveSystem/TMSaveManager.h"
+#include "Components/SplineComponent.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/KismetMathLibrary.h>
@@ -43,6 +44,31 @@ void ATrain::Tick(float DeltaTime) {
 			GetOnPassenger(StationManagerRef->GetStationByStationInfo(CurrentStation));
 			PassengerTransitionCount -= PassengerTransitionDelay;
 		}
+	}
+
+	if (IsValid(LaneRef) && Status == TrainStatus::Run && TrainMovement->IsActive() && !IsActorDragged) {
+		auto direction = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), StationManagerRef->GetStationById(NextStation.Id)->GetActorLocation());
+		//UE_LOG(LogTemp, Log, TEXT("NextStationId : %d"), NextStation.Id);
+		//UE_LOG(LogTemp, Log, TEXT("Direction : %f %f %f"), direction.Roll, direction.Pitch, direction.Yaw);
+		direction.Roll = 0;
+		direction.Pitch = 0;
+		//auto step = UKismetMathLibrary::GetForwardVector(direction);
+		
+		FVector nextStep;
+		if (Direction == TrainDirection::Up) {
+			nextStep = LaneRef->ReverseSpline->FindDirectionClosestToWorldLocation(GetActorLocation(), ESplineCoordinateSpace::World);
+		} else {
+			nextStep = LaneRef->LaneSpline->FindDirectionClosestToWorldLocation(GetActorLocation(), ESplineCoordinateSpace::World);
+		}
+		//UE_LOG(LogTemp, Log, TEXT("Step : %f %f %f"), step.X, step.Y, step.Z);
+		//SetActorLocation(GetActorLocation() + step * DeltaTime * TRAIN_DEFAULT_SPEED * 0.5);
+		auto nextLocation = LaneRef->LaneSpline->FindLocationClosestToWorldLocation(GetActorLocation() + (nextStep) * DeltaTime * TRAIN_DEFAULT_SPEED * 1, ESplineCoordinateSpace::Type::World);
+		nextLocation.Z = TrainZAxis;
+		auto newRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), nextLocation);
+		newRotation.Roll = 0;
+		newRotation.Pitch = 0;
+		UE_LOG(LogTemp, Log, TEXT("NextLocation : %f %f %f"), nextLocation.X, nextLocation.Y, nextLocation.Z);
+		SetActorLocationAndRotation(nextLocation, newRotation);
 	}
 
 	// Drag & Drop
@@ -166,6 +192,14 @@ void ATrain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 				}
 				DespawnTrain();
 				return;
+			}
+
+			if (IsValid(LaneRef)) {
+				FVector curLocation = GetActorLocation();
+				Direction = LaneRef->SetDirectionInit(
+					StationManagerRef->GetStationById(NextStation.Id),
+					FIntPoint(curLocation.X, curLocation.Y)
+				);
 			}
 
 			// Set current, next Station
