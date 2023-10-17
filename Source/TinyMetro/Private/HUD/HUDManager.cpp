@@ -24,6 +24,7 @@ void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
 void AHUDManager::ChangeTextSize(ETextSize TextSize)
 {
     CurrentTextSize = TextSize;
+    SetTextSizeMap();
     UpdateWidgets();
 
 }
