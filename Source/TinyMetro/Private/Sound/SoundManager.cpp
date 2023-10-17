@@ -52,7 +52,7 @@ void ASoundManager::BeginPlay() {
 	Load();
 	SaveManagerRef->SaveTask.AddDynamic(this, &ASoundManager::Save);
 
-	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == TEXT("Title")) {
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == TEXT("LV_StartMenu")) {
 		PlayTitleBGM();
 	} else {
 		PlayRandomBGM();

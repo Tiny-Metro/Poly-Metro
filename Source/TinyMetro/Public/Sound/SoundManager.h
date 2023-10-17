@@ -56,15 +56,15 @@ protected:
 	UPROPERTY()
 	class ATMSaveManager* SaveManagerRef = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Volume")
 	float MasterVolume = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Volume")
 	float BackgroundVolume = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Volume")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Volume")
 	float EffectVolume = 1.0f;
 	
 	// Effect sounds
-	UPROPERTY(VisibleAnywhere, Category = "Effect Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Effect Sound")
 	TMap<TinyMetroEffectSound, FString> EffectSoundObjectPath = {
 		TPair<TinyMetroEffectSound, FString>(TinyMetroEffectSound::StationSpawn, TEXT("SoundWave'/Game/Sound/SoundEffect/StationSpawn.StationSpawn'")),
 		TPair<TinyMetroEffectSound, FString>(TinyMetroEffectSound::SpawnTrain, TEXT("SoundWave'/Game/Sound/SoundEffect/SpawnTrain.SpawnTrain'")),
@@ -79,11 +79,11 @@ protected:
 	};
 	UPROPERTY()
 	TMap<TinyMetroEffectSound, USoundBase*> EffectSoundBase;
-	UPROPERTY(VisibleAnywhere, Category = "Effect Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Effect Sound")
 	TMap<TinyMetroEffectSound, TObjectPtr<UAudioComponent>> EffectSound;
 
 	// Background sounds
-	UPROPERTY(VisibleAnywhere, Category = "Background Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Background Sound")
 	TArray<FString> BackgroundSoundObjectPath = {
 		TEXT("SoundWave'/Game/Sound/BGM/BGM_01.BGM_01'"),
 		TEXT("SoundWave'/Game/Sound/BGM/BGM_02.BGM_02'"),
@@ -92,17 +92,17 @@ protected:
 		TEXT("SoundWave'/Game/Sound/BGM/BGM_05.BGM_05'"),
 		TEXT("SoundWave'/Game/Sound/BGM/BGM_06.BGM_06'")
 	};
-	UPROPERTY(VisibleAnywhere, Category = "Background Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Background Sound")
 	TArray<USoundBase*> BackgroundSoundBase;
-	UPROPERTY(VisibleAnywhere, Category = "Background Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Background Sound")
 	TArray<TObjectPtr<UAudioComponent>> BackgroundSound;
 
 	// Background sounds (Title)
-	UPROPERTY(VisibleAnywhere, Category = "Background Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Background Sound")
 	FString TitleBackgroundSoundObjectPath = TEXT("SoundWave'/Game/Sound/BGM/BGM_01.BGM_01'");
-	UPROPERTY(VisibleAnywhere, Category = "Background Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Background Sound")
 	USoundBase* TitleBackgroundSoundBase;
-	UPROPERTY(VisibleAnywhere, Category = "Background Sound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Background Sound")
 	TObjectPtr<UAudioComponent> TitleBackgroundSound;
 
 };
