@@ -11,8 +11,8 @@
 #include "TrainTemplate.generated.h"
 
 // Train speed
-#define TRAIN_DEFAULT_SPEED 300.0f
-#define TRAIN_UPGRADE_SPEED 400.0f
+#define TRAIN_DEFAULT_SPEED 400.0f
+#define TRAIN_UPGRADE_SPEED 600.0f
 
 // Distance between Train and Subtrain
 #define DIST_TRAIN_SUBTRAIN 480.0f
@@ -37,6 +37,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void UpdatePassengerMesh();
+
 
 public:	
 	// Called every frame
@@ -221,6 +222,8 @@ protected:
 	FStationInfo CurrentStation;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	FStationInfo NextStation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
+	float TrainSpeed = TRAIN_DEFAULT_SPEED;
 	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	//class AStation* Destination;
 

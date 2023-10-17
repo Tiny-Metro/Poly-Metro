@@ -534,6 +534,7 @@ void ATrainTemplate::InitPassengerMaterial() {
 
 void ATrainTemplate::SetTrainSpeed(float Speed) {
 	TrainMovement->MaxWalkSpeed = Speed;
+	TrainSpeed = Speed;
 }
 
 void ATrainTemplate::SetTrainId(int32 Id) {
