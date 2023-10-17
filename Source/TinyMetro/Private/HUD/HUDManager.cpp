@@ -274,8 +274,8 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Statistics_Shop_SpendMoney, TEXT("소비한 돈"), TEXT("Money Spent"));
     AddTextTable(EHUDText::Statistics_Shop_TotalPurchaseCount, TEXT("총 구매 횟수"), TEXT("Total Purchases"));
     AddTextTable(EHUDText::Statistics_Shop_PurchaseCount, TEXT("구매 횟수"), TEXT("Purchase Count"));
-    AddTextTable(EHUDText::Statistics_Shop_PlacedCount, TEXT("놓은 횟수"), TEXT("Placed Count"));
-    AddTextTable(EHUDText::Statistics_Shop_MovedCount, TEXT("이동 횟수"), TEXT("Moved Count"));
+    AddTextTable(EHUDText::Statistics_Shop_PlacedCount, TEXT("배치된 횟수"), TEXT("Placed Count"));
+    AddTextTable(EHUDText::Statistics_Shop_MovedCount, TEXT("옮겨진 횟수"), TEXT("Moved Count"));
     AddTextTable(EHUDText::Statistics_Shop_RecollectedCount, TEXT("회수 횟수"), TEXT("Recollected Count"));
     AddTextTable(EHUDText::Statistics_Shop_UpgradeCount, TEXT("업그레이드 횟수"), TEXT("Upgrade Count"));
     AddTextTable(EHUDText::Statistics_Shop_ObjectSelection, TEXT("오브젝트 선택:"), TEXT("Object Selection:"));
