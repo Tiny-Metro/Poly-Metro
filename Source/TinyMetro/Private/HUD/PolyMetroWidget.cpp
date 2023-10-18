@@ -44,6 +44,8 @@ void UPolyMetroWidget::UpdateImageComponents(AHUDManager* hudManager)
 }
 void UPolyMetroWidget::UpdateWidgets(AHUDManager* hudManager)
 {
+	UpdateTextComponents(hudManager);
+	UpdateImageComponents(hudManager);
 	for (UPolyMetroWidget* targetWidget : Widgets)
 	{
 		targetWidget->UpdateTextComponents(hudManager);

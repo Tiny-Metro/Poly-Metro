@@ -73,6 +73,10 @@ enum class EHUDText : uint8
     Setting_Language,
     Setting_Language_Korean,
     Setting_Language_English,
+    Setting_TextSize,
+    Setting_Small,
+    Setting_Big,
+    Setting_Medium,
 
     // Summary
     Statistics_Summary_PassengerNum_Total,
@@ -98,10 +102,21 @@ enum class EHUDText : uint8
     Statistics_Lane_ProfitNum_Total,
     Statistics_Lane_PassengerNum_Weekly,
     Statistics_Lane_ProfitNum_Weekly,
+    Statistics_Lane_LaneSelection,
     // Shop
-    Statistics_Shop_,
+    Statistics_Shop_SpendMoney,
+    Statistics_Shop_TotalPurchaseCount,
+    Statistics_Shop_PurchaseCount,
+    Statistics_Shop_PlacedCount,
+    Statistics_Shop_MovedCount,
+    Statistics_Shop_RecollectedCount,
+    Statistics_Shop_UpgradeCount,
+    Statistics_Shop_ObjectSelection,
     // Bank
-
+    Statistics_Bank_LoanUseCount,
+    Statistics_Bank_TotalRepayment,
+    Statistics_Bank_TotalLoanAmount,
+    Statistics_Bank_TotalPaidInterest,
   //StationInfo
     StationInfo_Complain,
     StationInfo_AvgWaiting,
@@ -140,6 +155,7 @@ enum class EHUDText : uint8
     Policy_On,
     Policy_Off,
     //Event
+    Event_EventandNotice,
 
     //StartMenu
     StartMenu_StartNew,

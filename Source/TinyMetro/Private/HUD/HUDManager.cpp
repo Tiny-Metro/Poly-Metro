@@ -16,10 +16,18 @@ AHUDManager::AHUDManager()
 void AHUDManager::ChangeLanguage(ELanguage NewLanguage)
 {
     CurrentLanguage = NewLanguage;
+    UpdateWidgets();
     // Update your HUD widgets to reflect the new language
     // You can implement this based on your HUD widget design
 }
 
+void AHUDManager::ChangeTextSize(ETextSize TextSize)
+{
+    CurrentTextSize = TextSize;
+    SetTextSizeMap();
+    UpdateWidgets();
+
+}
 
 void AHUDManager::SetImageTable()
 {
@@ -128,6 +136,40 @@ void AHUDManager::SetTextSizeMap()
     int32 BasicSize = 27;
     int32 ExplainationSize = 18;
 
+    if (UseSettedText)
+    {
+        switch (CurrentTextSize)
+        {
+        case ETextSize::S:
+            TitleSize = Title_Small;
+            BasicSize = Basic_Small;
+            ExplainationSize = Explaination_Small;
+            break;
+        case ETextSize::M:
+            TitleSize = Title_Medium;
+            BasicSize = Basic_Medium;
+            ExplainationSize = Explaination_Medium;
+            break;
+        case ETextSize::L:
+            TitleSize = Title_Large;
+            BasicSize = Basic_Large;
+            ExplainationSize = Explaination_Large;
+            break;
+        default:
+            break;
+        }
+
+        TMap<ETextType, int32> textSizeMap;
+        TextSizeMap.Empty();
+        textSizeMap.Add(ETextType::Title, TitleSize);
+        textSizeMap.Add(ETextType::Basic, BasicSize);
+        textSizeMap.Add(ETextType::ExplainationText, ExplainationSize);
+
+        TextSizeMap = textSizeMap;
+
+        return;
+    }
+
     switch (CurrentTextSize)
     {
     case ETextSize::S:
@@ -161,8 +203,8 @@ void AHUDManager::UpdateWidgets()
         UPolyMetroWidget* Widget = WidgetPair.Value;
         if (Widget)
         {
-//            Widget->UpdateTextComponents(this);
-//            Widget->UpdateImageComponents(this);
+            Widget->UpdateTextComponents(this);
+            Widget->UpdateImageComponents(this);
             Widget->UpdateWidgets(this);
         }
     }
@@ -242,6 +284,10 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Setting_Language, TEXT("언어"), TEXT("Language"));
     AddTextTable(EHUDText::Setting_Language_Korean, TEXT("한국어"), TEXT("Korean"));
     AddTextTable(EHUDText::Setting_Language_English, TEXT("영어(English)"), TEXT("English"));
+    AddTextTable(EHUDText::Setting_TextSize, TEXT("텍스트 크기"), TEXT("Text Size"));
+    AddTextTable(EHUDText::Setting_Small, TEXT("작게"), TEXT("Small"));
+    AddTextTable(EHUDText::Setting_Big, TEXT("크게"), TEXT("Big"));
+    AddTextTable(EHUDText::Setting_Medium, TEXT("중간"), TEXT("Medium"));
 
         // Summary
     AddTextTable(EHUDText::Statistics_Summary_PassengerNum_Total, TEXT("총 승객 수"), TEXT("Total Passengers"));
@@ -267,7 +313,24 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Total, TEXT("총 승객"), TEXT("Total Passengers"));
     AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Total, TEXT("총 수익"), TEXT("Total Profit"));
     AddTextTable(EHUDText::Statistics_Lane_ProfitNum_Weekly, TEXT("주간 수익"), TEXT("Weekly Profit"));
-    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));
+    AddTextTable(EHUDText::Statistics_Lane_PassengerNum_Weekly, TEXT("주간 승객 수"), TEXT("Weekly Passengers"));    
+    AddTextTable(EHUDText::Statistics_Lane_LaneSelection, TEXT("노선 선택:"), TEXT("Lane Selection:"));
+
+    // Shop
+    AddTextTable(EHUDText::Statistics_Shop_SpendMoney, TEXT("소비한 돈"), TEXT("Money Spent"));
+    AddTextTable(EHUDText::Statistics_Shop_TotalPurchaseCount, TEXT("총 구매 횟수"), TEXT("Total Purchases"));
+    AddTextTable(EHUDText::Statistics_Shop_PurchaseCount, TEXT("구매 횟수"), TEXT("Purchase Count"));
+    AddTextTable(EHUDText::Statistics_Shop_PlacedCount, TEXT("배치된 횟수"), TEXT("Placed Count"));
+    AddTextTable(EHUDText::Statistics_Shop_MovedCount, TEXT("옮겨진 횟수"), TEXT("Moved Count"));
+    AddTextTable(EHUDText::Statistics_Shop_RecollectedCount, TEXT("회수 횟수"), TEXT("Recollected Count"));
+    AddTextTable(EHUDText::Statistics_Shop_UpgradeCount, TEXT("업그레이드 횟수"), TEXT("Upgrade Count"));
+    AddTextTable(EHUDText::Statistics_Shop_ObjectSelection, TEXT("오브젝트 선택:"), TEXT("Object Selection:"));
+
+    // Bank
+    AddTextTable(EHUDText::Statistics_Bank_LoanUseCount, TEXT("대출 횟수"), TEXT("Loan Use Count"));
+    AddTextTable(EHUDText::Statistics_Bank_TotalRepayment, TEXT("총 상환금액"), TEXT("Total Repayment"));
+    AddTextTable(EHUDText::Statistics_Bank_TotalLoanAmount, TEXT("총 대출 금액"), TEXT("Total Loan Amount"));
+    AddTextTable(EHUDText::Statistics_Bank_TotalPaidInterest, TEXT("총 지불 이자"), TEXT("Total Paid Interest"));
     
     // StationInfo
     AddTextTable(EHUDText::StationInfo_Complain, TEXT("불만도"), TEXT("Complain"));
@@ -308,8 +371,8 @@ void AHUDManager::SetIntegradedTextTable()
     AddTextTable(EHUDText::Policy_On, TEXT("켜기"), TEXT("On"));
     AddTextTable(EHUDText::Policy_Off, TEXT("끄기"), TEXT("Off"));
 
-    //Event
-    
+    //Event Event_EventandNotice
+    AddTextTable(EHUDText::Event_EventandNotice, TEXT("이벤트/알람"), TEXT("Event/Notice"));
     //StartMenu
     AddTextTable(EHUDText::StartMenu_StartNew, TEXT("새 게임 시작"), TEXT("Start New Game"));
     AddTextTable(EHUDText::StartMenu_Continue, TEXT("이어하기"), TEXT("Continue"));
