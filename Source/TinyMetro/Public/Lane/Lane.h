@@ -44,8 +44,8 @@ public:
 	bool CurrentlyPoppingLane;
 
 public:
-	UPROPERTY()
-	UClass* TrainClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ATrain> TrainClass = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Info")
 	TArray<FLanePoint> LaneArray;
 
@@ -87,13 +87,15 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnyWhere)
 	int32 LaneId;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> LaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LaneDefaultMaterialPath = "Material'/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial'";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMesh* HandleMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString LanedHandleMeshPath = TEXT("StaticMesh'/Game/Lane/UpdatedMeshMatrial/SM_LaneEdge.SM_LaneEdge'");
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> RemoveLaneMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FString> RemoveLanePath = {

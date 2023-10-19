@@ -30,6 +30,7 @@ public:
 
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
+	void LoadData();
 
 	UFUNCTION(BlueprintCallable)
 	void SetGameSpeed(float TimeDilation);
@@ -68,46 +69,62 @@ public:
 protected:
 	UPROPERTY(Config)
 	int32 TestValue;
-	UPROPERTY(Config)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Daytime;
+
+	// Defined by DefaultGame.ini
 	UPROPERTY(Config, VisibleAnywhere)
 	TArray<FSoftObjectPath> TrainMaterialPath;
 	UPROPERTY(Config, VisibleAnywhere)
 	TArray<FSoftObjectPath> LaneMaterialPath;
 	UPROPERTY(Config, VisibleAnywhere)
 	TArray<FSoftObjectPath> PassengerMaterialPath;
-	UPROPERTY()
-	class AStationManager* StationManager;
-	UPROPERTY()
-	class ATMSaveManager* SaveManager;
-	UPROPERTY()
-	class ATrainManager* TrainManager;
-	UPROPERTY()
-	class ALaneManager* LaneManager;
-	UPROPERTY()
-	class APolicy* Policy;
-	UPROPERTY()
-	class ABank* Bank;
-	UPROPERTY()
-	class AInvestmentManager* InvestmentManagerRef;
-	UPROPERTY()
-	class ATimer* Timer;
-	UPROPERTY()
-	class AShop* Shop;
-	UPROPERTY()
-	class ABridgeTunnelManager* BridgeTunnelManager;
-	UPROPERTY()
-	APlayerController* PlayerController;
-	UPROPERTY()
-	class ATinyMetroEventManager* EventManager;
-	UPROPERTY()
-	class AStatisticsManager* StatisticsManager;
-	UPROPERTY()
-	APawn* PawnRef;
-	UPROPERTY()
-	class ASoundManager* SoundManagerRef;
 
-	UPROPERTY()
-	UClass* ObjBridgeTunnelManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AStationManager* StationManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class AStationManager> StationManagerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ASoundManager* SoundManagerRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ASoundManager> SoundManagerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ATrainManager* TrainManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ATrainManager> TrainManagerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ALaneManager* LaneManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ALaneManager> LaneManagerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ABridgeTunnelManager* BridgeTunnelManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ABridgeTunnelManager> BridgeTunnelManagerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ATMSaveManager* SaveManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class APolicy* Policy;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ABank* Bank;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AInvestmentManager* InvestmentManagerRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ATimer* Timer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AShop* Shop;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	APlayerController* PlayerController;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ATinyMetroEventManager* EventManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AStatisticsManager* StatisticsManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	APawn* PawnRef;
+
 
 };

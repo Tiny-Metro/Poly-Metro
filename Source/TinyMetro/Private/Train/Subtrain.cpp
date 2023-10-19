@@ -19,14 +19,14 @@
 ASubtrain::ASubtrain() {
 
 	// Load meshes (Subtrain)
-	for (auto& i : SubtrainMeshPath) {
+	/*for (auto& i : SubtrainMeshPath) {
 		SubtrainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
+	}*/
 
 	// Load meshes (UpgradeSubtrain)
-	for (auto& i : UpgradeSubtrainMeshPath) {
+	/*for (auto& i : UpgradeSubtrainMeshPath) {
 		UpgradeSubtrainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
+	}*/
 
 	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort.SM_SubtrainShort'")
@@ -37,7 +37,7 @@ ASubtrain::ASubtrain() {
 	TrainMovement->MaxAcceleration = 3000.0f; // Default 2048
 
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
-	TrainMeshComponent->SetStaticMesh(SubtrainMesh[0]);
+	//TrainMeshComponent->SetStaticMesh(SubtrainMesh[0]);
 	//TrainMeshComponent->SetMaterial(0, TrainMaterial[0]);
 	//TrainMeshComponent->GetStaticMesh()->SetMaterial(0, DefaultMaterial.Object);
 	TrainMeshComponent->SetupAttachment(RootComponent);

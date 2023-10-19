@@ -41,7 +41,8 @@ ATinyMetroGameModeBase::ATinyMetroGameModeBase() {
         HUDClass = MyHUD.Class;
     }
 
-    ObjBridgeTunnelManager = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Lane/BridgeTunnel/BP_BridgeTunnelManger.BP_BridgeTunnelManger_C'")).Object;
+    //SoundManagerClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Sound/BP_SoundManager.BP_SoundManager_C'")).Object;
+    //ObjBridgeTunnelManager = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Lane/BridgeTunnel/BP_BridgeTunnelManger.BP_BridgeTunnelManger_C'")).Object;
 }
 
 FString ATinyMetroGameModeBase::GetFileName() const {
@@ -85,9 +86,9 @@ void ATinyMetroGameModeBase::StartPlay() {
     StatisticsManager->Load();
     StationManager = GetWorld()->SpawnActor<AStationManager>();
     StationManager->Load();
-    LaneManager = GetWorld()->SpawnActor<ALaneManager>();
+    LaneManager = GetWorld()->SpawnActor<ALaneManager>(LaneManagerClass);
     LaneManager->Load();
-    TrainManager = GetWorld()->SpawnActor<ATrainManager>();
+    TrainManager = GetWorld()->SpawnActor<ATrainManager>(TrainManagerClass);
     TrainManager->Load();
     Policy = GetWorld()->SpawnActor<APolicy>();
     Policy->Load();
@@ -97,15 +98,8 @@ void ATinyMetroGameModeBase::StartPlay() {
     EventManager = GetWorld()->SpawnActor<ATinyMetroEventManager>();
     EventManager->Load();
     InvestmentManagerRef = GetWorld()->SpawnActor<AInvestmentManager>(); // Load in InvestmentManager::Load
-    SoundManagerRef = GetWorld()->SpawnActor<ASoundManager>(); // Load in SoundManager::Load
-
-    // Spawn actor
-    FActorSpawnParameters SpawnParams;
-    FTransform SpawnTransform;
-    SpawnParams.Owner = this;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    BridgeTunnelManager = Cast<ABridgeTunnelManager>(GetWorld()->SpawnActor<AActor>(ObjBridgeTunnelManager, SpawnTransform));
-    //BridgeTunnelManager->Load();
+    SoundManagerRef = GetWorld()->SpawnActor<ASoundManager>(SoundManagerClass); // Load in SoundManager::Load
+    BridgeTunnelManager = GetWorld()->SpawnActor<ABridgeTunnelManager>(BridgeTunnelManagerClass);
 
     PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
     UE_LOG(LogTemp, Log, TEXT("GameMode::StartPlay : Spawn finish"));
@@ -115,6 +109,9 @@ void ATinyMetroGameModeBase::StartPlay() {
 void ATinyMetroGameModeBase::BeginPlay() {
     Super::BeginPlay();
     GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, TEXT("GameMode::BeginPlay"));
+}
+
+void ATinyMetroGameModeBase::LoadData() {
 }
 
 void ATinyMetroGameModeBase::SetGameSpeed(float TimeDilation) {

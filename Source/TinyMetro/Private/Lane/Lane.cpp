@@ -25,15 +25,19 @@ ALane::ALane()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Used in SpawnTrain function
-	TrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")).Object;
+	//TrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")).Object;
 
-	LaneMaterial.AddUnique(
+	/*LaneMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*LaneDefaultMaterialPath).Object
 	);
 
 	for (auto& i : RemoveLanePath) {
 		RemoveLaneMaterial.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
-	}
+	}*/
+
+	EndHandle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EndHandle"));
+	StartHandle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StartHandle"));
+
 	if (!GridManagerRef)
 	{
 		GridManagerRef = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));
@@ -42,7 +46,7 @@ ALane::ALane()
 	OnPopHandleCalled.AddDynamic(this, &ALane::OnOtherLanePopHandleCalled);
 	CurrentlyPoppingLane = false;
 	InitLaneSpline();
-	InitHandles();
+	//InitHandles();
 }
 
 
@@ -50,6 +54,8 @@ ALane::ALane()
 void ALane::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitHandles();
 
 	GameMode = Cast<ATinyMetroGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
@@ -180,17 +186,19 @@ void ALane::InitLaneMaterial(TArray<UMaterial*> Materials) {
 }
 void ALane::InitHandles()
 {
-	EndHandle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EndHandle"));
-	StartHandle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StartHandle"));
+	if (IsValid(HandleMesh)) {
+		EndHandle->SetStaticMesh(HandleMesh);
+		StartHandle->SetStaticMesh(HandleMesh);
+	}
 
 	//set Staticmesh of it
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(*LanedHandleMeshPath);
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(*LanedHandleMeshPath);
 
 	if (MeshAsset.Succeeded() )
 	{
 		EndHandle->SetStaticMesh(MeshAsset.Object);
 		StartHandle->SetStaticMesh(MeshAsset.Object);
-	}
+	}*/
 }
 
 bool ALane::GetIsCircularLine() const

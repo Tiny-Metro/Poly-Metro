@@ -51,11 +51,11 @@ protected:
 	TArray<FGridCellData> GridPoints;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Root")
 	USceneComponent* defaultRoot = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMesh* meshGround = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMesh* meshWater = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMesh* meshHill = nullptr;
 
 protected:
