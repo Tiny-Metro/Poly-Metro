@@ -22,7 +22,7 @@ AGridBuilder::AGridBuilder() : GeneratorIndex(0)
 	}
 
 	// Load tile's mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> objGround(
+	/*static ConstructorHelpers::FObjectFinder<UStaticMesh> objGround(
 		TEXT("StaticMesh'/Game/GridBuilder/Meshes/SM_GirdCell_Ground.SM_GirdCell_Ground'"));
 	meshGround = objGround.Object;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> objWater(
@@ -30,7 +30,7 @@ AGridBuilder::AGridBuilder() : GeneratorIndex(0)
 	meshWater = objWater.Object;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> objHill(
 		TEXT("StaticMeshVersionPlusOne'/Game/GridBuilder/Meshes/SM_GirdCell_Hill.SM_GirdCell_Hill'"));
-	meshHill = objHill.Object;
+	meshHill = objHill.Object;*/
 
 	// Init GridManager
 	GridManager = Cast<AGridManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGridManager::StaticClass()));

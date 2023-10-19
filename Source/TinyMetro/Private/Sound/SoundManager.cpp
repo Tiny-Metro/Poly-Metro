@@ -10,21 +10,21 @@
 ASoundManager::ASoundManager() {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickInterval = 0.5f;
-	// Construct background sounds
-	for (auto& i : BackgroundSoundObjectPath) {
-		ConstructorHelpers::FObjectFinder<USoundBase> tmp(*i);
-		if (tmp.Succeeded()) BackgroundSoundBase.Emplace(tmp.Object);
-	}
+	//// Construct background sounds
+	//for (auto& i : BackgroundSoundObjectPath) {
+	//	ConstructorHelpers::FObjectFinder<USoundBase> tmp(*i);
+	//	if (tmp.Succeeded()) BackgroundSoundBase.Emplace(tmp.Object);
+	//}
 
-	// Construct background sound (Title)
-	ConstructorHelpers::FObjectFinder<USoundBase> titleBGM(*TitleBackgroundSoundObjectPath);
-	if (titleBGM.Succeeded()) TitleBackgroundSoundBase = titleBGM.Object;
-		
-	// Construct effect sounds
-	for (auto& i : EffectSoundObjectPath) {
-		ConstructorHelpers::FObjectFinder<USoundBase> tmp(*i.Value);
-		if (tmp.Succeeded()) EffectSoundBase.Emplace(i.Key, tmp.Object);
-	}
+	//// Construct background sound (Title)
+	//ConstructorHelpers::FObjectFinder<USoundBase> titleBGM(*TitleBackgroundSoundObjectPath);
+	//if (titleBGM.Succeeded()) TitleBackgroundSoundBase = titleBGM.Object;
+	//	
+	//// Construct effect sounds
+	//for (auto& i : EffectSoundObjectPath) {
+	//	ConstructorHelpers::FObjectFinder<USoundBase> tmp(*i.Value);
+	//	if (tmp.Succeeded()) EffectSoundBase.Emplace(i.Key, tmp.Object);
+	//}
 
 }
 

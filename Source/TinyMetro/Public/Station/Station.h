@@ -263,6 +263,8 @@ protected:
 	float UpgradeCost = 300.0f;
 
 	// New station
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TSubclassOf<class AStationSpawnPulse> PulseActorClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
 	AActor* PulseActor = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effect")
@@ -278,29 +280,29 @@ protected:
 	UStaticMeshComponent* StationMeshComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* StationComplainMeshComponent = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UStaticMesh*> StationMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UStaticMesh*> StationComplainMesh;
 
 	// Passenger meshes
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TArray<UStaticMeshComponent*> PassengerMeshComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UStaticMesh*> PassengerMesh;
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* OverlapVolume;
 
 	// Material (Station)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> StationMaterialInactive;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> StationMaterialActive;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> StationMaterialDestroyed;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> PassengerMaterial;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* ComplainMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UMaterialInstanceDynamic* ComplainDynamicMaterial;
@@ -352,10 +354,6 @@ protected:
 		TEXT("StaticMesh'/Game/Passenger/PassengerMesh/SM_PassengerFan.SM_PassengerFan'")
 	};
 	UPROPERTY()
-	TArray<FString> PassengerMaterialPath = {
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Outer.M_StationInactive_Outer'"),
-		TEXT("Material'/Game/Station/Asset/StationMaterial/M_StationInactive_Inner.M_StationInactive_Inner'")
-	};
 
 	// Mesh of complain gauge paths
 	TArray<FString> ComplainMeshPath = {

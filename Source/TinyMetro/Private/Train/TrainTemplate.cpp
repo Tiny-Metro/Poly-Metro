@@ -38,14 +38,14 @@ ATrainTemplate::ATrainTemplate()
 	TrainMovement->MaxWalkSpeed = TRAIN_DEFAULT_SPEED; // Default 600
 	TrainMovement->bUseControllerDesiredRotation = true; // Default false
 
-	TrainMaterial.AddUnique(
+	/*TrainMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
-	);
+	);*/
 	
 	// Add dummy material (Material index start "1")
-	PassengerMaterial.AddUnique(
+	/*PassengerMaterial.AddUnique(
 		ConstructorHelpers::FObjectFinder<UMaterial>(*TrainDefaultMaterialPath).Object
-	);
+	);*/
 
 	auto PassengerScene = CreateDefaultSubobject<USceneComponent>("Passengers");
 	PassengerScene->SetupAttachment(GetRootComponent());
@@ -60,9 +60,9 @@ ATrainTemplate::ATrainTemplate()
 	}
 
 	// Load meshes (Passenger)
-	for (auto& i : PassengerMeshPath) {
+	/*for (auto& i : PassengerMeshPath) {
 		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
+	}*/
 
 	/*for (int i = 0; i < MaxPassengerSlotUpgrade; i++) {
 		Passenger.Add(i, nullptr);

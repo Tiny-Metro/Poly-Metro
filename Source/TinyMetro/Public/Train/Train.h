@@ -144,7 +144,7 @@ protected:
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'"),
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_TrainUpgrade.SM_TrainUpgrade'")
 	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TArray<UStaticMesh*> TrainMesh;
 
 private:

@@ -58,35 +58,35 @@ AStation::AStation()
 		tmp->SetRelativeLocation(PassengerPosition);
 		PassengerMeshComponent.Add(MoveTemp(tmp));
 	}
-	
-	// Load meshes (Station)
-	for (auto& i : StationMeshPath) {
-		StationMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
+	//
+	//// Load meshes (Station)
+	//for (auto& i : StationMeshPath) {
+	//	StationMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	//}
 
-	// Load meshes (Passenger)
-	for (auto& i : PassengerMeshPath) {
-		PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
-	
-	// Load meshes (Complain)
-	for (auto& i : ComplainMeshPath) {
-		StationComplainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
+	//// Load meshes (Complain)
+	//for (auto& i : ComplainMeshPath) {
+	//	StationComplainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	//}
 
-	// Load material (Station)
-	for (auto& i : StationMaterialInactivePath) {
-		StationMaterialInactive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
-	}
-	for (auto& i : StationMaterialActivePath) {
-		StationMaterialActive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
-	}
-	for (auto& i : StationMaterialDestroyedPath) {
-		StationMaterialDestroyed.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
-	}
+	//// Load meshes (Passenger)
+	//for (auto& i : PassengerMeshPath) {
+	//	PassengerMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
+	//}
+	//
+	//// Load material (Station)
+	//for (auto& i : StationMaterialInactivePath) {
+	//	StationMaterialInactive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
+	//}
+	//for (auto& i : StationMaterialActivePath) {
+	//	StationMaterialActive.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
+	//}
+	//for (auto& i : StationMaterialDestroyedPath) {
+	//	StationMaterialDestroyed.AddUnique(ConstructorHelpers::FObjectFinder<UMaterial>(*i).Object);
+	//}
 
-	// Load material (Complain)
-	ComplainMaterial = ConstructorHelpers::FObjectFinder<UMaterialInterface>(*ComplainMaterialPath).Object;
+	//// Load material (Complain)
+	//ComplainMaterial = ConstructorHelpers::FObjectFinder<UMaterialInterface>(*ComplainMaterialPath).Object;
 
 	// Set overlap volume
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
@@ -125,7 +125,7 @@ void AStation::BeginPlay()
 	UpdatePassengerMesh();
 	SetInfoWidget(StationManager->GetStationInfoWidget());
 
-	PulseActor = GetWorld()->SpawnActor(AStationSpawnPulse::StaticClass());
+	PulseActor = GetWorld()->SpawnActor(PulseActorClass);
 	PulseActor->SetActorLocation(GetActorLocation() - FVector(0, 0, 1));
 
 	if (StationInfo.IsUpgrade) {

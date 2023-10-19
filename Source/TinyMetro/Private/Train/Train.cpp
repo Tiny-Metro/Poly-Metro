@@ -105,9 +105,9 @@ ATrain::ATrain() {
 	
 
 	// Load meshes (Train)
-	for (auto& i : TrainMeshPath) {
+	/*for (auto& i : TrainMeshPath) {
 		TrainMesh.AddUnique(ConstructorHelpers::FObjectFinder<UStaticMesh>(*i).Object);
-	}
+	}*/
 
 	/*ConstructorHelpers::FObjectFinder<UStaticMesh> LoadTrainMesh(
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_Train.SM_Train'")
@@ -121,7 +121,7 @@ ATrain::ATrain() {
 	OverlapVolume->SetupAttachment(RootComponent);
 
 	TrainMeshComponent->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
-	TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
+	//TrainMeshComponent->SetStaticMesh(TrainMesh[0]);
 	TrainMeshComponent->SetupAttachment(RootComponent);
 
 

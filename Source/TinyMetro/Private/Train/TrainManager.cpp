@@ -24,9 +24,9 @@ ATrainManager::ATrainManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	TrainInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_TrainInfoWidget.WBP_TrainInfoWidget_C'")).Object;
-	TrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")).Object;
-	SubtrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_SubTrain.BP_Subtrain_C'")).Object;
+	//TrainInfoWidgetClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Stage/UI/HUD/WBP_TrainInfoWidget.WBP_TrainInfoWidget_C'")).Object;
+	//TrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_Train.BP_Train_C'")).Object;
+	//SubtrainClass = ConstructorHelpers::FObjectFinder<UClass>(TEXT("Class'/Game/Train/BP_SubTrain.BP_Subtrain_C'")).Object;
 
 }
 

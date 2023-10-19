@@ -268,7 +268,7 @@ protected:
 	UStaticMeshComponent* TrainMeshComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FSoftObjectPath> TrainMaterialPath;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> TrainMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FString TrainDefaultMaterialPath = "Material'/Game/Train/TrainMatrial/M_DefaultTrain.M_DefaultTrain'";
@@ -280,9 +280,9 @@ protected:
 	class UCharacterMovementComponent* TrainMovement;
 
 	// Mesh, Material paths (Passenger)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UStaticMesh*> PassengerMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterial*> PassengerMaterial;
 	UPROPERTY()
 	TArray<FString> PassengerMeshPath = {

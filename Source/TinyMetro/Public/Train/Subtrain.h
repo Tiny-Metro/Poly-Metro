@@ -107,7 +107,7 @@ protected:
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort.SM_SubtrainShort'"),
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainLong.SM_SubtrainLong'")
 	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TArray<UStaticMesh*> SubtrainMesh;
 
 	// Used when main train upgrade
@@ -118,6 +118,6 @@ protected:
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainShort_Upgrade.SM_SubtrainShort_Upgrade'"),
 		TEXT("StaticMesh'/Game/Train/TrainMesh/SM_SubtrainLong_Upgrade.SM_SubtrainLong_Upgrade'")
 	};
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TArray<UStaticMesh*> UpgradeSubtrainMesh;
 };

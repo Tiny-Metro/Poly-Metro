@@ -117,12 +117,12 @@ public:
 
 protected:
 	// Widget class
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UClass* TrainInfoWidgetClass = nullptr;
 	// Train, Subtrain asset
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UClass* TrainClass = nullptr;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UClass* SubtrainClass = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")

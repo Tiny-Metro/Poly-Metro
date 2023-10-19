@@ -15,8 +15,8 @@ AStationSpawnPulse::AStationSpawnPulse()
 	PulseComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Pulse plane"));
 	PulseComponent->SetupAttachment(RootComponent);
 	PulseComponent->SetGenerateOverlapEvents(false);
-	PulseComponent->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")).Object);
-	PulseComponent->SetMaterial(0, ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/Station/Asset/StationMaterial/M_RingPulse.M_RingPulse'")).Object);
+	//PulseComponent->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")).Object);
+	//PulseComponent->SetMaterial(0, ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("Material'/Game/Station/Asset/StationMaterial/M_RingPulse.M_RingPulse'")).Object);
 	PulseComponent->SetWorldScale3D(FVector(20.0f, 20.0f, 1.0f));
 }
 
