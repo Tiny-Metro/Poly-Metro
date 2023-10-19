@@ -79,3 +79,6 @@ Content/Test/**
 # Saved script file
 Content/Script/Investment/Saved*/**
 Content/Script/Event/Saved*/**
+
+# Packaging folder
+Packaging/*
